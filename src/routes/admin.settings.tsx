@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { 
   Building2, 
@@ -41,15 +41,20 @@ export function AdminSettingsPage() {
   const [isImportOpen, setIsImportOpen] = useState(false);
 
   const isAdmin = can(user, "admin");
+  const editable = can(user, "publish");
+  const [dirty, setDirty] = useState(false);
+  useEffect(() => { if (!dirty) setForm({ ...db.siteSettings }); }, [db.siteSettings, dirty]);
 
   const setField = <K extends keyof SiteSettings>(key: K, val: SiteSettings[K]) => {
+    setDirty(true);
     setForm((prev) => ({ ...prev, [key]: val }));
   };
 
   const handleSave = () => {
     try {
       updateSiteSettings(form);
-      toast.success("Website content & settings updated live across all public pages");
+      setDirty(false);
+      toast.success("Demo settings saved in this browser. Global publishing requires the backend.");
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -65,7 +70,7 @@ export function AdminSettingsPage() {
       a.download = `avrasya-properties-backup-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Complete JSON database backup exported");
+      toast.success("Browser workspace exported; linked external files are not included");
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -74,7 +79,9 @@ export function AdminSettingsPage() {
   const handleImportSubmit = () => {
     try {
       if (!importJson.trim()) return toast.error("Please paste JSON backup data");
+      if (!confirm("Replace this browser’s workspace with the validated backup? Export the current workspace first.")) return;
       importBackup(importJson);
+      setDirty(false);
       toast.success("Database restored successfully from backup");
       setIsImportOpen(false);
       setImportJson("");
@@ -84,11 +91,12 @@ export function AdminSettingsPage() {
   };
 
   const handleResetFactory = () => {
-    if (confirm("Reset all properties, leads, contacts and settings to default seed data? Any session changes will be reverted.")) {
+    if (!confirm("Reset this browser’s properties, leads, contacts and settings to demo data? Export a backup first.")) return;
+    try {
       resetData();
-      setForm({ ...DEFAULT_SITE_SETTINGS });
-      toast.success("Database restored to default verified state");
-    }
+      setForm({ ...DEFAULT_SITE_SETTINGS }); setDirty(false);
+      toast.success("Demo workspace reset");
+    } catch (error) { toast.error((error as Error).message); }
   };
 
   return (
@@ -99,6 +107,7 @@ export function AdminSettingsPage() {
         action={
           <div className="flex items-center gap-2">
             <button
+              disabled={!editable}
               onClick={handleSave}
               className={btnPrimary}
             >
@@ -109,6 +118,10 @@ export function AdminSettingsPage() {
         }
       />
 
+      <p role="status" className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
+        Browser demo only. Settings affect this browser; property publishing does not update the public catalogue yet.
+        {!editable && " Your role has read-only access."}
+      </p>
       {/* Tabs */}
       <div className="flex gap-1 overflow-x-auto border-b">
         {TABS.map((t) => (
@@ -126,6 +139,7 @@ export function AdminSettingsPage() {
         ))}
       </div>
 
+      <fieldset disabled={!editable} className="min-w-0">
       {/* TAB 1: Company Profile */}
       {tab === "Company Profile" && (
         <div className="max-w-4xl space-y-6">
@@ -306,13 +320,13 @@ export function AdminSettingsPage() {
                   onChange={(e) => setField("cbiThresholdUsd", Number(e.target.value) || 400000)}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Statutory minimum property valuation required for Turkish Citizenship by Investment ($400,000 statutory law).
+                  Reference value only. Confirm current programme requirements with the client’s legal advisor before publication.
                 </p>
               </div>
               <div className="rounded-lg border bg-muted/40 p-4">
                 <p className="text-xs font-semibold text-foreground">Current Rule Active:</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Properties with valuation equal to or exceeding <b>${form.cbiThresholdUsd.toLocaleString()}</b> receive automatic "CBI Eligible" status across website filters.
+                  The configured reference is <b>${form.cbiThresholdUsd.toLocaleString()}</b>. A listing price alone does not verify citizenship eligibility; record a separate legal review.
                 </p>
               </div>
             </div>
@@ -360,9 +374,9 @@ export function AdminSettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/20">
                 <div>
-                  <p className="text-sm font-medium text-foreground">Real-Time European Central Bank (Frankfurter API)</p>
+                  <p className="text-sm font-medium text-foreground">Indicative exchange rate provider</p>
                   <p className="text-xs text-muted-foreground">
-                    Automatically pulls hourly ECB spot exchange rates for USD, EUR, TRY, and GBP.
+                    Uses the existing browser rate provider. Provider dates and refresh behavior require separate verification; these rates are indicative.
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -418,6 +432,7 @@ export function AdminSettingsPage() {
         </div>
       )}
 
+      </fieldset>
       {/* TAB 4: Backup & Restore */}
       {tab === "Backup & Restore" && (
         <div className="max-w-4xl space-y-6">
@@ -429,11 +444,11 @@ export function AdminSettingsPage() {
               Export all 18+ property records, active leads, CRM contacts, deals, scheduled calendar viewings, and website CMS configurations into a single standalone JSON file.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button onClick={handleDownloadBackup} className={btnPrimary}>
+              <button disabled={!isAdmin} onClick={handleDownloadBackup} className={btnPrimary}>
                 <Download className="h-4 w-4" />
                 <span>Export JSON Backup</span>
               </button>
-              <button onClick={() => setIsImportOpen(!isImportOpen)} className={btnGhost}>
+              <button disabled={!isAdmin} onClick={() => setIsImportOpen(!isImportOpen)} className={btnGhost}>
                 <Upload className="h-4 w-4" />
                 <span>Restore from JSON</span>
               </button>
@@ -450,7 +465,7 @@ export function AdminSettingsPage() {
                   value={importJson}
                   onChange={(e) => setImportJson(e.target.value)}
                 />
-                <button onClick={handleImportSubmit} className={btnPrimary}>
+                <button disabled={!isAdmin} onClick={handleImportSubmit} className={btnPrimary}>
                   Confirm Database Restore
                 </button>
               </div>
@@ -460,12 +475,13 @@ export function AdminSettingsPage() {
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
             <h2 className="text-base font-semibold text-destructive flex items-center gap-2 mb-2">
               <AlertTriangle className="h-4 w-4" />
-              <span>Reset Database to Initial Verified State</span>
+              <span>Reset Browser Demo Workspace</span>
             </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Re-initialize all database tables with the original 18 verified properties, leadership profiles, seed CRM deals, and standard settings.
+              Replace this browser’s data with source-derived listing examples, fictional CRM records, and default settings. This does not restore a production database.
             </p>
             <button
+              disabled={!isAdmin}
               onClick={handleResetFactory}
               className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-destructive/40 bg-destructive/10 px-3 text-sm font-medium text-destructive hover:bg-destructive/20"
             >

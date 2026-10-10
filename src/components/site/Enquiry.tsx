@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { properties } from "@/data/properties";
-import { createInquiry } from "@/admin/store";
 import { useLiveContact } from "@/hooks/useLiveContact";
 
 const SERVICES = ["General consultation", "Investment Advisory", "Property Selection", "Citizenship Consultancy", "Legal & Administrative Coordination", "Property Acquisition", "Residence Permit Support", "Property Management", "Rental Strategy", "Resale Strategy", "International Investor Support", "Investment catalog request"];
@@ -20,19 +19,6 @@ export function Enquiry({ defaultTopic, compact }: { defaultTopic?: string; comp
     if (v.name.trim().length < 2) return setErr("Please add your name.");
     if (v.message.trim().length < 5) return setErr("Please add a short message.");
     setErr(null);
-    try {
-      createInquiry({
-        name: v.name.trim(),
-        email: "",
-        phone: "",
-        topic: v.topic,
-        budget: v.budget.trim(),
-        message: v.message.trim(),
-        source: "Website Consultation",
-      });
-    } catch {
-      /* ignore if offline */
-    }
     const waUrl = `${contact.whatsapp}?text=${encodeURIComponent(buildMessage(v))}`;
     window.open(waUrl, "_blank", "noopener");
   }

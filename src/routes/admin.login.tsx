@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { DEMO_PASSWORD, USERS, login, getSession } from "@/admin/store";
+import { DEMO_ENABLED, DEMO_PASSWORD, USERS, login, getSession } from "@/admin/store";
 import { btnPrimary, field } from "@/admin/Shell";
 export const Route = createFileRoute("/admin/login")({
   validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s["redirect"] === "string" ? s["redirect"] : undefined }),
@@ -15,8 +15,10 @@ function Login() {
   const [show, setShow] = useState(false); const [err, setErr] = useState(""); const [help, setHelp] = useState(false);
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!login(email, pw)) return setErr("Email or password is incorrect.");
-    go();
+    try {
+      if (!login(email, pw)) return setErr("Email or password is incorrect.");
+      go();
+    } catch (error) { setErr((error as Error).message); }
   };
   const go = () => { const r = redirect && redirect.startsWith("/admin") && !redirect.startsWith("/admin/login") ? redirect : "/admin"; nav({ to: r as "/admin" }); };
   useEffect(() => { if (getSession()) go(); }, []);
@@ -26,6 +28,8 @@ function Login() {
         <img src="/images/avrasya-logo.svg" alt="Avrasya Properties Group" className="mb-5 h-10 w-auto object-contain" />
         <h1 className="text-lg font-semibold">Sign in to the workspace</h1>
         <p className="mb-4 text-xs text-muted-foreground">Use fictional information only. Demo accounts, not secure authentication.</p>
+        {!DEMO_ENABLED && <p role="status" className="mb-4 rounded border p-3 text-sm">Production authentication is not connected. Demo login is disabled on this deployment.</p>}
+        <fieldset disabled={!DEMO_ENABLED}>
         <form onSubmit={submit} className="space-y-3">
           <label className="block text-sm">Email<input className={field} value={email} onChange={(e) => setEmail(e.target.value)} type="email" required /></label>
           <label className="block text-sm">Password
@@ -43,7 +47,8 @@ function Login() {
               <td><button className="text-brass-text" onClick={() => { setEmail(u.email); setPw(DEMO_PASSWORD); }}>Use</button></td></tr>))}
           </tbody>
         </table>
-        <p className="mt-2 text-xs text-muted-foreground">Password: <code>{DEMO_PASSWORD}</code> · Permissions are demonstrations only.</p>
+        </fieldset>
+        {DEMO_ENABLED && <p className="mt-2 text-xs text-muted-foreground">Password: <code>{DEMO_PASSWORD}</code> · Permissions are demonstrations only.</p>}
       </div>
     </div>
   );

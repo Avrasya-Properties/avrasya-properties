@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { 
+  can,
   convertInquiryToLead, 
   createInquiry, 
   fmtDate, 
@@ -38,7 +39,8 @@ export function AdminInquiriesPage() {
   const nav = useNavigate();
   const [filter, setFilter] = useState<string>("All");
   const [search, setSearch] = useState("");
-  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selectedInquiry = db.inquiries.find((q) => q.id === selectedId) ?? null;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newForm, setNewForm] = useState({
     name: "",
@@ -69,7 +71,7 @@ export function AdminInquiriesPage() {
 
   const newCount = inquiries.filter((i) => i.status === "New").length;
   const contactedCount = inquiries.filter((i) => i.status === "Contacted").length;
-  const qualifiedCount = inquiries.filter((i) => i.status === "Qualified").length;
+  const qualifiedCount = inquiries.filter((i) => Boolean(i.leadId)).length;
 
   const handleStatusChange = (id: string, newStatus: Inquiry["status"]) => {
     try {
@@ -91,11 +93,11 @@ export function AdminInquiriesPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Remove this inquiry record?")) {
+    if (confirm("Archive this inquiry? It will remain available in the Archived filter.")) {
       try {
         remove("inquiries", id);
-        toast.success("Inquiry removed");
-        if (selectedInquiry?.id === id) setSelectedInquiry(null);
+        toast.success("Inquiry archived");
+        if (selectedInquiry?.id === id) setSelectedId(null);
       } catch (e) {
         toast.error((e as Error).message);
       }
@@ -133,6 +135,7 @@ export function AdminInquiriesPage() {
             <button
               onClick={() => setIsAddOpen(true)}
               className={btnPrimary}
+              disabled={!can(user, "edit-crm")}
             >
               <Plus className="h-3.5 w-3.5" />
               <span>Log Client Inquiry</span>
@@ -161,7 +164,7 @@ export function AdminInquiriesPage() {
         <div className="rounded-xl border bg-card p-4">
           <p className="text-xs uppercase tracking-wider text-emerald-600 font-semibold">Converted Leads</p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-emerald-600">{qualifiedCount}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Advanced to CRM deals</p>
+          <p className="mt-1 text-xs text-muted-foreground">Linked to CRM leads</p>
         </div>
       </div>
 
@@ -220,7 +223,7 @@ export function AdminInquiriesPage() {
                   filtered.map((inq) => (
                     <tr
                       key={inq.id}
-                      onClick={() => setSelectedInquiry(inq)}
+                      onClick={() => setSelectedId(inq.id)}
                       className={`cursor-pointer transition-colors hover:bg-muted/50 ${
                         selectedInquiry?.id === inq.id ? "bg-muted/70" : ""
                       }`}
@@ -259,8 +262,9 @@ export function AdminInquiriesPage() {
                               <MessageSquare className="h-4 w-4" />
                             </a>
                           )}
-                          {inq.status !== "Qualified" && (
+                          {!inq.leadId && inq.status !== "Archived" && (
                             <button
+                              disabled={!can(user, "edit-crm", inq.agentId) || (user?.role === "agent" && inq.agentId !== user.id) || Boolean(inq.leadId) || inq.status === "Archived"}
                               onClick={() => handleConvertToLead(inq.id)}
                               className="rounded p-1 text-brass hover:bg-brass/10"
                               title="Convert to CRM Lead"
@@ -337,6 +341,7 @@ export function AdminInquiriesPage() {
                 </label>
                 <select
                   className={field}
+                  disabled={!can(user, "edit-crm", selectedInquiry.agentId) || (user?.role === "agent" && selectedInquiry.agentId !== user.id)}
                   value={selectedInquiry.status}
                   onChange={(e) => handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])}
                 >
@@ -349,8 +354,9 @@ export function AdminInquiriesPage() {
 
               {/* Action Buttons */}
               <div className="space-y-2 pt-2 border-t">
-                {selectedInquiry.status !== "Qualified" && (
+                {!selectedInquiry.leadId && selectedInquiry.status !== "Archived" && (
                   <button
+                    disabled={!can(user, "edit-crm", selectedInquiry.agentId) || (user?.role === "agent" && selectedInquiry.agentId !== user.id)}
                     onClick={() => handleConvertToLead(selectedInquiry.id)}
                     className={`${btnPrimary} w-full justify-center`}
                   >

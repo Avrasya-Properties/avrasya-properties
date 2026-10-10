@@ -34,7 +34,7 @@ export function getLiveContact(): LiveContact {
         const s: SiteSettings = parsed.siteSettings;
         return {
           company: s.registeredEntity || CONTACT.company,
-          email: (s.email && s.email !== "info.avrasyaproperties@gmail.com") ? s.email : CONTACT.email,
+          email: s.email || CONTACT.email,
           phone: s.phone || CONTACT.phone,
           phoneHref: `tel:${(s.phone || CONTACT.phone).replace(/\s/g, "")}`,
           whatsapp: s.whatsapp || CONTACT.whatsapp,
@@ -67,7 +67,7 @@ export function useLiveContact(): LiveContact {
         const s = customEvent.detail;
         setContact({
           company: s.registeredEntity || CONTACT.company,
-          email: (s.email && s.email !== "info.avrasyaproperties@gmail.com") ? s.email : CONTACT.email,
+          email: s.email || CONTACT.email,
           phone: s.phone || CONTACT.phone,
           phoneHref: `tel:${(s.phone || CONTACT.phone).replace(/\s/g, "")}`,
           whatsapp: s.whatsapp || CONTACT.whatsapp,
