@@ -99,11 +99,10 @@ export function Preloader() {
       <div className="pointer-events-none absolute bottom-0 inset-x-0 w-full overflow-hidden select-none flex flex-col items-center justify-end">
         <div className="w-full flex justify-center items-end">
           <IstanbulSkyline
-            opacity={0.5}
+            opacity={1}
             className="w-full"
           />
         </div>
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent" />
       </div>
     </div>
   );
