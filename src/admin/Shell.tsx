@@ -61,6 +61,30 @@ export function AdminShell({ children }: { children: ReactNode }) {
     return () => clearInterval(id);
   }, []);
 
+  type Hit = { k: string; label: string; go: () => void };
+  const results = useMemo<Hit[]>(() => {
+    const s = q.trim().toLowerCase();
+    if (s.length < 2) return [];
+    const has = (...v: (string | null | undefined)[]) => v.some((x) => x?.toLowerCase().includes(s));
+    const cName = (id: string) => db.contacts.find((c) => c.id === id)?.name ?? "";
+    return [
+      ...db.properties.filter((p) => has(p.title, p.ref, p.district)).map((p) => ({ k: "Property", label: `${p.ref} · ${p.title}`, go: () => nav({ to: "/admin/properties/$id", params: { id: p.id } }) })),
+      ...db.contacts.filter((c) => has(c.name, c.email, c.phone)).map((c) => ({ k: "Contact", label: c.name, go: () => nav({ to: "/admin/contacts" }) })),
+      ...db.leads.filter((l) => has(cName(l.contactId), l.districts)).map((l) => ({ k: "Lead", label: `${cName(l.contactId)} · ${l.stage}`, go: () => nav({ to: "/admin/leads/$id", params: { id: l.id } }) })),
+      ...db.deals.filter((d) => has(d.title)).map((d) => ({ k: "Deal", label: d.title, go: () => nav({ to: "/admin/deals" }) })),
+    ].slice(0, 8);
+  }, [q, db, nav]);
+
+  const notes = useMemo(() => {
+    const now = new Date().toISOString();
+    return [
+      ...db.tasks.filter((t) => !t.done && t.due < now).map((t) => ({ id: `task-${t.id}`, text: `Overdue task: ${t.title} (${fmtDate(t.due)})`, to: "/admin/tasks" as const })),
+      ...db.leads.filter((l) => l.stage === "New").map((l) => ({ id: `lead-${l.id}`, text: `New enquiry: ${db.contacts.find((c) => c.id === l.contactId)?.name ?? "Unknown"}`, to: "/admin/leads" as const })),
+      ...db.properties.filter((p) => p.publication === "In Review").map((p) => ({ id: `rev-${p.id}`, text: `Listing awaiting review: ${p.ref}`, to: "/admin/properties" as const })),
+    ].slice(0, 12);
+  }, [db]);
+  const unread = notes.filter((n) => !db.readNotes.includes(n.id));
+
   const sidebar = (
     <div className="flex h-full flex-col bg-ink text-on-dark border-r border-white/10">
       <div className="flex h-[68px] items-center gap-2.5 px-4 border-b border-white/10">
