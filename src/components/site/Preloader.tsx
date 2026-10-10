@@ -95,10 +95,12 @@ export function Preloader() {
         </div>
       </div>
 
-      {/* Istanbul Architectural Skyline Outline along the bottom */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 w-full overflow-hidden select-none">
-        <IstanbulSkyline className="w-full h-24 sm:h-32 md:h-40 lg:h-48" />
-        <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#D4AF37]/45 to-transparent" />
+      {/* Authentic Istanbul Architectural Skyline along the bottom */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 w-full overflow-hidden select-none flex flex-col items-center justify-end">
+        <div className="w-full max-w-[1600px] flex justify-center">
+          <IstanbulSkyline className="w-full h-28 sm:h-36 md:h-48 lg:h-56 max-h-[25vh]" />
+        </div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
       </div>
     </div>
   );

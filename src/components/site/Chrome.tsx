@@ -368,13 +368,13 @@ export function PageIntro({
       <div
         aria-hidden
         data-parallax="0.25"
-        className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-start opacity-40 z-0"
+        className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-center text-center opacity-40 z-0"
       >
-        <span className="outline-word text-[9.5rem] lg:text-[13rem] leading-[0.82]">
+        <span className="outline-word text-[13rem] leading-none">
           AVRASYA
         </span>
-        <span className="outline-word text-[3rem] lg:text-[4.2rem] tracking-[0.14em] -mt-3 lg:-mt-5 pl-2 leading-[0.85]">
-          Properties
+        <span className="outline-word text-[4rem] tracking-[0.28em] mt-3 uppercase leading-none">
+          PROPERTIES
         </span>
       </div>
       <div className="container-site relative flex flex-col gap-6 py-12 md:flex-row md:items-end md:justify-between md:py-16">

@@ -114,13 +114,13 @@ function Home() {
         <div
           aria-hidden
           data-parallax="0.25"
-          className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-start opacity-25 z-0"
+          className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-center text-center opacity-25 z-0"
         >
-          <span className="outline-word text-[9.5rem] lg:text-[13rem] leading-[0.82]">
+          <span className="outline-word text-[13rem] leading-none">
             AVRASYA
           </span>
-          <span className="outline-word text-[3rem] lg:text-[4.2rem] tracking-[0.14em] -mt-3 lg:-mt-5 pl-2 leading-[0.85]">
-            Properties
+          <span className="outline-word text-[4rem] tracking-[0.28em] mt-3 uppercase leading-none">
+            PROPERTIES
           </span>
         </div>
 
