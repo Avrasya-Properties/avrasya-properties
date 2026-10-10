@@ -23,3 +23,10 @@ jobs:
       - run: bun run test
       - run: bun run build
       - run: bun run typecheck
+      - run: bun scripts/admin-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: admin-smoke-failure
+          path: test-results/
+          if-no-files-found: ignore

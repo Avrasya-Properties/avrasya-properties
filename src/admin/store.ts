@@ -12,7 +12,7 @@ export const USERS: User[] = [
   { id: "u4", name: "Can Yılmaz", email: "viewer@avrasya.test", role: "viewer" },
 ];
 export const DEMO_PASSWORD = "AvrasyaDemo!26";
-export const DEMO_ENABLED = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ADMIN_DEMO === "true";
+export const DEMO_ENABLED = import.meta.env.DEV || import.meta.env["VITE_ENABLE_ADMIN_DEMO"] === "true";
 
 export const AVAIL = ["Unknown", "Available", "Under Offer", "Reserved", "Sold", "Rented", "Off Market"] as const;
 export const PUBL = ["Draft", "In Review", "Published", "Archived"] as const;

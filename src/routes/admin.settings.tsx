@@ -78,7 +78,7 @@ export function AdminSettingsPage() {
 
   const handleImportSubmit = () => {
     try {
-      if (!importJson.trim()) return toast.error("Please paste JSON backup data");
+      if (!importJson.trim()) { toast.error("Please paste JSON backup data"); return; }
       if (!confirm("Replace this browser’s workspace with the validated backup? Export the current workspace first.")) return;
       importBackup(importJson);
       setDirty(false);

@@ -106,7 +106,7 @@ export function AdminInquiriesPage() {
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newForm.name.trim()) return toast.error("Client name is required");
+    if (!newForm.name.trim()) { toast.error("Client name is required"); return; }
     try {
       createInquiry(newForm);
       toast.success("Inquiry registered in inbox");
