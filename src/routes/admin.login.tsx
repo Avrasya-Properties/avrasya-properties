@@ -12,6 +12,7 @@ function Login() {
   const { redirect } = Route.useSearch();
   const nav = useNavigate();
   const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
+  const [ready, setReady] = useState(false);
   const [show, setShow] = useState(false); const [err, setErr] = useState(""); const [help, setHelp] = useState(false);
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +22,7 @@ function Login() {
     } catch (error) { setErr((error as Error).message); }
   };
   const go = () => { const r = redirect && redirect.startsWith("/admin") && !redirect.startsWith("/admin/login") ? redirect : "/admin"; nav({ to: r as "/admin" }); };
-  useEffect(() => { if (getSession()) go(); }, []);
+  useEffect(() => { setReady(true); if (getSession()) go(); }, []);
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 font-sans">
       <div className="w-full max-w-md rounded-md border bg-card p-6">
@@ -29,8 +30,8 @@ function Login() {
         <h1 className="text-lg font-semibold">Sign in to the workspace</h1>
         <p className="mb-4 text-xs text-muted-foreground">Use fictional information only. Demo accounts, not secure authentication.</p>
         {!DEMO_ENABLED && <p role="status" className="mb-4 rounded border p-3 text-sm">Production authentication is not connected. Demo login is disabled on this deployment.</p>}
-        <fieldset disabled={!DEMO_ENABLED}>
-        <form onSubmit={submit} className="space-y-3">
+        <fieldset disabled={!DEMO_ENABLED || !ready}>
+        <form data-ready={ready} onSubmit={submit} className="space-y-3">
           <label className="block text-sm">Email<input className={field} value={email} onChange={(e) => setEmail(e.target.value)} type="email" required /></label>
           <label className="block text-sm">Password
             <div className="flex gap-2"><input className={field} value={pw} onChange={(e) => setPw(e.target.value)} type={show ? "text" : "password"} required />

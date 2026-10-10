@@ -66,6 +66,7 @@ async function waitSaved(collection, field, value) {
 }
 async function login(role) {
   await page.goto(origin + "/admin/login", { waitUntil: "domcontentloaded" });
+  await page.waitForSelector('form[data-ready="true"]');
   await fill('input[type="email"]', role + "@avrasya.test");
   await fill('input[type="password"]', "AvrasyaDemo!26");
   await clickText("Sign in");
@@ -192,6 +193,7 @@ try {
   if (page) await page.screenshot({ path: "test-results/admin-smoke-failure.png", fullPage: true }).catch(() => {});
   console.error("Browser smoke failure:", error.message);
   console.error("Page errors:", JSON.stringify(pageErrors));
+  if (page) console.error("Failure page:", page.url(), await page.evaluate(() => document.body.innerText.slice(0, 3000)).catch(() => ""));
   console.error(serverOutput);
   process.exitCode = 1;
 } finally {
