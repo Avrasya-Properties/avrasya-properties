@@ -10,33 +10,338 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CitizenshipRouteImport } from './routes/citizenship'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
+import { Route as InvestmentCatalogRouteImport } from './routes/investment-catalog'
+import { Route as InvestmentDisclaimerRouteImport } from './routes/investment-disclaimer'
+import { Route as InvestmentInTurkiyeRouteImport } from './routes/investment-in-turkiye'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as WhyTurkiyeRouteImport } from './routes/why-turkiye'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminCalendarRouteImport } from './routes/admin.calendar'
+import { Route as AdminContactsRouteImport } from './routes/admin.contacts'
+import { Route as AdminDealsRouteImport } from './routes/admin.deals'
+import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
+import { Route as AdminLoginRouteImport } from './routes/admin_.login'
+import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
+import { Route as PropertiesSlugRouteImport } from './routes/properties.$slug'
+import { Route as AdminLeadsIndexRouteImport } from './routes/admin.leads.index'
+import { Route as AdminLeadsIdRouteImport } from './routes/admin.leads.$id'
+import { Route as AdminPropertiesIndexRouteImport } from './routes/admin.properties.index'
+import { Route as AdminPropertiesIdRouteImport } from './routes/admin.properties.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CitizenshipRoute = CitizenshipRouteImport.update({
+  id: '/citizenship',
+  path: '/citizenship',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiePolicyRoute = CookiePolicyRouteImport.update({
+  id: '/cookie-policy',
+  path: '/cookie-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentCatalogRoute = InvestmentCatalogRouteImport.update({
+  id: '/investment-catalog',
+  path: '/investment-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentDisclaimerRoute = InvestmentDisclaimerRouteImport.update({
+  id: '/investment-disclaimer',
+  path: '/investment-disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentInTurkiyeRoute = InvestmentInTurkiyeRouteImport.update({
+  id: '/investment-in-turkiye',
+  path: '/investment-in-turkiye',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhyTurkiyeRoute = WhyTurkiyeRouteImport.update({
+  id: '/why-turkiye',
+  path: '/why-turkiye',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCalendarRoute = AdminCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminContactsRoute = AdminContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDealsRoute = AdminDealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTasksRoute = AdminTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin_/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
+  id: '/properties/',
+  path: '/properties/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesSlugRoute = PropertiesSlugRouteImport.update({
+  id: '/properties/$slug',
+  path: '/properties/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLeadsIndexRoute = AdminLeadsIndexRouteImport.update({
+  id: '/leads/',
+  path: '/leads/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsIdRoute = AdminLeadsIdRouteImport.update({
+  id: '/leads/$id',
+  path: '/leads/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPropertiesIndexRoute = AdminPropertiesIndexRouteImport.update({
+  id: '/properties/',
+  path: '/properties/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPropertiesIdRoute = AdminPropertiesIdRouteImport.update({
+  id: '/properties/$id',
+  path: '/properties/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/citizenship': typeof CitizenshipRoute
+  '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
+  '/investment-catalog': typeof InvestmentCatalogRoute
+  '/investment-disclaimer': typeof InvestmentDisclaimerRoute
+  '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/contacts': typeof AdminContactsRoute
+  '/admin/deals': typeof AdminDealsRoute
+  '/admin/tasks': typeof AdminTasksRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/properties/$slug': typeof PropertiesSlugRoute
+  '/admin/': typeof AdminIndexRoute
+  '/properties/': typeof PropertiesIndexRoute
+  '/admin/leads/$id': typeof AdminLeadsIdRoute
+  '/admin/properties/$id': typeof AdminPropertiesIdRoute
+  '/admin/leads/': typeof AdminLeadsIndexRoute
+  '/admin/properties/': typeof AdminPropertiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/citizenship': typeof CitizenshipRoute
+  '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
+  '/investment-catalog': typeof InvestmentCatalogRoute
+  '/investment-disclaimer': typeof InvestmentDisclaimerRoute
+  '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/contacts': typeof AdminContactsRoute
+  '/admin/deals': typeof AdminDealsRoute
+  '/admin/tasks': typeof AdminTasksRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/properties/$slug': typeof PropertiesSlugRoute
+  '/admin': typeof AdminIndexRoute
+  '/properties': typeof PropertiesIndexRoute
+  '/admin/leads/$id': typeof AdminLeadsIdRoute
+  '/admin/properties/$id': typeof AdminPropertiesIdRoute
+  '/admin/leads': typeof AdminLeadsIndexRoute
+  '/admin/properties': typeof AdminPropertiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/citizenship': typeof CitizenshipRoute
+  '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
+  '/investment-catalog': typeof InvestmentCatalogRoute
+  '/investment-disclaimer': typeof InvestmentDisclaimerRoute
+  '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
+  '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/contacts': typeof AdminContactsRoute
+  '/admin/deals': typeof AdminDealsRoute
+  '/admin/tasks': typeof AdminTasksRoute
+  '/admin_/login': typeof AdminLoginRoute
+  '/properties/$slug': typeof PropertiesSlugRoute
+  '/admin/': typeof AdminIndexRoute
+  '/properties/': typeof PropertiesIndexRoute
+  '/admin/leads/$id': typeof AdminLeadsIdRoute
+  '/admin/properties/$id': typeof AdminPropertiesIdRoute
+  '/admin/leads/': typeof AdminLeadsIndexRoute
+  '/admin/properties/': typeof AdminPropertiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/citizenship'
+    | '/contact'
+    | '/cookie-policy'
+    | '/investment-catalog'
+    | '/investment-disclaimer'
+    | '/investment-in-turkiye'
+    | '/privacy-policy'
+    | '/services'
+    | '/terms'
+    | '/why-turkiye'
+    | '/admin/calendar'
+    | '/admin/contacts'
+    | '/admin/deals'
+    | '/admin/tasks'
+    | '/admin/login'
+    | '/properties/$slug'
+    | '/admin/'
+    | '/properties/'
+    | '/admin/leads/$id'
+    | '/admin/properties/$id'
+    | '/admin/leads/'
+    | '/admin/properties/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/citizenship'
+    | '/contact'
+    | '/cookie-policy'
+    | '/investment-catalog'
+    | '/investment-disclaimer'
+    | '/investment-in-turkiye'
+    | '/privacy-policy'
+    | '/services'
+    | '/terms'
+    | '/why-turkiye'
+    | '/admin/calendar'
+    | '/admin/contacts'
+    | '/admin/deals'
+    | '/admin/tasks'
+    | '/admin/login'
+    | '/properties/$slug'
+    | '/admin'
+    | '/properties'
+    | '/admin/leads/$id'
+    | '/admin/properties/$id'
+    | '/admin/leads'
+    | '/admin/properties'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/citizenship'
+    | '/contact'
+    | '/cookie-policy'
+    | '/investment-catalog'
+    | '/investment-disclaimer'
+    | '/investment-in-turkiye'
+    | '/privacy-policy'
+    | '/services'
+    | '/terms'
+    | '/why-turkiye'
+    | '/admin/calendar'
+    | '/admin/contacts'
+    | '/admin/deals'
+    | '/admin/tasks'
+    | '/admin_/login'
+    | '/properties/$slug'
+    | '/admin/'
+    | '/properties/'
+    | '/admin/leads/$id'
+    | '/admin/properties/$id'
+    | '/admin/leads/'
+    | '/admin/properties/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  CitizenshipRoute: typeof CitizenshipRoute
+  ContactRoute: typeof ContactRoute
+  CookiePolicyRoute: typeof CookiePolicyRoute
+  InvestmentCatalogRoute: typeof InvestmentCatalogRoute
+  InvestmentDisclaimerRoute: typeof InvestmentDisclaimerRoute
+  InvestmentInTurkiyeRoute: typeof InvestmentInTurkiyeRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ServicesRoute: typeof ServicesRoute
+  TermsRoute: typeof TermsRoute
+  WhyTurkiyeRoute: typeof WhyTurkiyeRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  PropertiesSlugRoute: typeof PropertiesSlugRoute
+  PropertiesIndexRoute: typeof PropertiesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +353,220 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/citizenship': {
+      id: '/citizenship'
+      path: '/citizenship'
+      fullPath: '/citizenship'
+      preLoaderRoute: typeof CitizenshipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookie-policy': {
+      id: '/cookie-policy'
+      path: '/cookie-policy'
+      fullPath: '/cookie-policy'
+      preLoaderRoute: typeof CookiePolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investment-catalog': {
+      id: '/investment-catalog'
+      path: '/investment-catalog'
+      fullPath: '/investment-catalog'
+      preLoaderRoute: typeof InvestmentCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investment-disclaimer': {
+      id: '/investment-disclaimer'
+      path: '/investment-disclaimer'
+      fullPath: '/investment-disclaimer'
+      preLoaderRoute: typeof InvestmentDisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investment-in-turkiye': {
+      id: '/investment-in-turkiye'
+      path: '/investment-in-turkiye'
+      fullPath: '/investment-in-turkiye'
+      preLoaderRoute: typeof InvestmentInTurkiyeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/why-turkiye': {
+      id: '/why-turkiye'
+      path: '/why-turkiye'
+      fullPath: '/why-turkiye'
+      preLoaderRoute: typeof WhyTurkiyeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/calendar': {
+      id: '/admin/calendar'
+      path: '/calendar'
+      fullPath: '/admin/calendar'
+      preLoaderRoute: typeof AdminCalendarRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/contacts': {
+      id: '/admin/contacts'
+      path: '/contacts'
+      fullPath: '/admin/contacts'
+      preLoaderRoute: typeof AdminContactsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/deals': {
+      id: '/admin/deals'
+      path: '/deals'
+      fullPath: '/admin/deals'
+      preLoaderRoute: typeof AdminDealsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tasks': {
+      id: '/admin/tasks'
+      path: '/tasks'
+      fullPath: '/admin/tasks'
+      preLoaderRoute: typeof AdminTasksRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin_/login': {
+      id: '/admin_/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/properties/': {
+      id: '/properties/'
+      path: '/properties'
+      fullPath: '/properties/'
+      preLoaderRoute: typeof PropertiesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/properties/$slug': {
+      id: '/properties/$slug'
+      path: '/properties/$slug'
+      fullPath: '/properties/$slug'
+      preLoaderRoute: typeof PropertiesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/leads/': {
+      id: '/admin/leads/'
+      path: '/leads'
+      fullPath: '/admin/leads/'
+      preLoaderRoute: typeof AdminLeadsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/leads/$id': {
+      id: '/admin/leads/$id'
+      path: '/leads/$id'
+      fullPath: '/admin/leads/$id'
+      preLoaderRoute: typeof AdminLeadsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/properties/': {
+      id: '/admin/properties/'
+      path: '/properties'
+      fullPath: '/admin/properties/'
+      preLoaderRoute: typeof AdminPropertiesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/properties/$id': {
+      id: '/admin/properties/$id'
+      path: '/properties/$id'
+      fullPath: '/admin/properties/$id'
+      preLoaderRoute: typeof AdminPropertiesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminCalendarRoute: typeof AdminCalendarRoute
+  AdminContactsRoute: typeof AdminContactsRoute
+  AdminDealsRoute: typeof AdminDealsRoute
+  AdminTasksRoute: typeof AdminTasksRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminLeadsIdRoute: typeof AdminLeadsIdRoute
+  AdminPropertiesIdRoute: typeof AdminPropertiesIdRoute
+  AdminLeadsIndexRoute: typeof AdminLeadsIndexRoute
+  AdminPropertiesIndexRoute: typeof AdminPropertiesIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCalendarRoute: AdminCalendarRoute,
+  AdminContactsRoute: AdminContactsRoute,
+  AdminDealsRoute: AdminDealsRoute,
+  AdminTasksRoute: AdminTasksRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminLeadsIdRoute: AdminLeadsIdRoute,
+  AdminPropertiesIdRoute: AdminPropertiesIdRoute,
+  AdminLeadsIndexRoute: AdminLeadsIndexRoute,
+  AdminPropertiesIndexRoute: AdminPropertiesIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  CitizenshipRoute: CitizenshipRoute,
+  ContactRoute: ContactRoute,
+  CookiePolicyRoute: CookiePolicyRoute,
+  InvestmentCatalogRoute: InvestmentCatalogRoute,
+  InvestmentDisclaimerRoute: InvestmentDisclaimerRoute,
+  InvestmentInTurkiyeRoute: InvestmentInTurkiyeRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ServicesRoute: ServicesRoute,
+  TermsRoute: TermsRoute,
+  WhyTurkiyeRoute: WhyTurkiyeRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  PropertiesSlugRoute: PropertiesSlugRoute,
+  PropertiesIndexRoute: PropertiesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

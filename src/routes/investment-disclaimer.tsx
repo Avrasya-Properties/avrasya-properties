@@ -1,0 +1,7 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { LegalDraft, meta } from "@/components/site/TextPage";
+
+export const Route = createFileRoute("/investment-disclaimer")({
+  head: () => ({ ...meta("Investment Disclaimer (draft)", "Draft Investment Disclaimer for Avrasya Properties — approved text pending."), }),
+  component: () => <LegalDraft title="Investment Disclaimer" topics={["Source-advertised prices and availability", "No legal financial or tax advice", "Citizenship and residence eligibility"]} />,
+});
