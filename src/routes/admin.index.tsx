@@ -84,7 +84,7 @@ export function Dashboard() {
       />
 
       {/* Top Metric Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Link
           to="/admin/deals"
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
@@ -143,6 +143,25 @@ export function Dashboard() {
             <span className="text-brass font-medium flex items-center">
               <Flame className="mr-0.5 h-3 w-3" /> Qualified
             </span>
+          </div>
+        </Link>
+
+        <Link
+          to="/admin/inquiries"
+          className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Web Inquiries</span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
+              <Flame className="h-4 w-4" />
+            </span>
+          </div>
+          <p className="mt-3 text-2xl font-bold tracking-tight text-foreground tabular-nums">
+            {db.inquiries?.length || 0}
+          </p>
+          <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+            <span className="text-brass font-medium">{db.inquiries?.filter(i => i.status === "New").length || 0} new pending</span>
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px]">Inbox →</span>
           </div>
         </Link>
 

@@ -117,4 +117,4 @@ Avrasya Properties operates under strict buy-side fiduciary standards:
 - **Headquarters**: Paşalimanı Caddesi No: 42, 34674 Üsküdar / Istanbul, Türkiye
 - **Telephone**: +90 545 924 8042
 - **Direct WhatsApp Desk**: [Chat on WhatsApp](https://wa.me/905459248042)
-- **Official Inquiries**: info.avrasyaproperties@gmail.com
+- **Official Inquiries**: info@avrasyaproperties.com

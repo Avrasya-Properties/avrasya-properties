@@ -23,10 +23,13 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WhyTurkiyeRouteImport } from './routes/why-turkiye'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminCalendarRouteImport } from './routes/admin.calendar'
 import { Route as AdminContactsRouteImport } from './routes/admin.contacts'
 import { Route as AdminDealsRouteImport } from './routes/admin.deals'
+import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as PropertiesSlugRouteImport } from './routes/properties.$slug'
@@ -107,6 +110,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCalendarRoute = AdminCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
@@ -122,9 +130,19 @@ const AdminDealsRoute = AdminDealsRouteImport.update({
   path: '/deals',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
+  id: '/inquiries',
+  path: '/inquiries',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTasksRoute = AdminTasksRouteImport.update({
@@ -187,10 +205,13 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/calendar': typeof AdminCalendarRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -215,10 +236,13 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/calendar': typeof AdminCalendarRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -245,10 +269,13 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/calendar': typeof AdminCalendarRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -276,10 +303,13 @@ export interface FileRouteTypes {
     | '/services'
     | '/terms'
     | '/why-turkiye'
+    | '/admin/analytics'
     | '/admin/calendar'
     | '/admin/contacts'
     | '/admin/deals'
+    | '/admin/inquiries'
     | '/admin/login'
+    | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
     | '/admin/'
@@ -304,10 +334,13 @@ export interface FileRouteTypes {
     | '/services'
     | '/terms'
     | '/why-turkiye'
+    | '/admin/analytics'
     | '/admin/calendar'
     | '/admin/contacts'
     | '/admin/deals'
+    | '/admin/inquiries'
     | '/admin/login'
+    | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
     | '/admin'
@@ -333,10 +366,13 @@ export interface FileRouteTypes {
     | '/services'
     | '/terms'
     | '/why-turkiye'
+    | '/admin/analytics'
     | '/admin/calendar'
     | '/admin/contacts'
     | '/admin/deals'
+    | '/admin/inquiries'
     | '/admin/login'
+    | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
     | '/admin/'
@@ -467,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/calendar': {
       id: '/admin/calendar'
       path: '/calendar'
@@ -488,11 +531,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDealsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inquiries': {
+      id: '/admin/inquiries'
+      path: '/inquiries'
+      fullPath: '/admin/inquiries'
+      preLoaderRoute: typeof AdminInquiriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tasks': {
@@ -562,10 +619,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCalendarRoute: typeof AdminCalendarRoute
   AdminContactsRoute: typeof AdminContactsRoute
   AdminDealsRoute: typeof AdminDealsRoute
+  AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTasksRoute: typeof AdminTasksRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminLeadsIdRoute: typeof AdminLeadsIdRoute
@@ -577,10 +637,13 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCalendarRoute: AdminCalendarRoute,
   AdminContactsRoute: AdminContactsRoute,
   AdminDealsRoute: AdminDealsRoute,
+  AdminInquiriesRoute: AdminInquiriesRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminTasksRoute: AdminTasksRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminLeadsIdRoute: AdminLeadsIdRoute,

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { CONTACT, properties, waLink } from "@/data/properties";
+import { properties } from "@/data/properties";
+import { createInquiry } from "@/admin/store";
+import { useLiveContact } from "@/hooks/useLiveContact";
 
 const SERVICES = ["General consultation", "Investment Advisory", "Property Selection", "Citizenship Consultancy", "Legal & Administrative Coordination", "Property Acquisition", "Residence Permit Support", "Property Management", "Rental Strategy", "Resale Strategy", "International Investor Support", "Investment catalog request"];
 
@@ -8,6 +10,7 @@ export function buildMessage(v: { name: string; topic: string; budget: string; m
 }
 
 export function Enquiry({ defaultTopic, compact }: { defaultTopic?: string; compact?: boolean }) {
+  const contact = useLiveContact();
   const [v, setV] = useState({ name: "", topic: defaultTopic ?? "General consultation", budget: "", message: "" });
   const [err, setErr] = useState<string | null>(null);
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setV({ ...v, [k]: e.target.value });
@@ -17,7 +20,21 @@ export function Enquiry({ defaultTopic, compact }: { defaultTopic?: string; comp
     if (v.name.trim().length < 2) return setErr("Please add your name.");
     if (v.message.trim().length < 5) return setErr("Please add a short message.");
     setErr(null);
-    window.open(waLink(buildMessage(v)), "_blank", "noopener");
+    try {
+      createInquiry({
+        name: v.name.trim(),
+        email: "",
+        phone: "",
+        topic: v.topic,
+        budget: v.budget.trim(),
+        message: v.message.trim(),
+        source: "Website Consultation",
+      });
+    } catch {
+      /* ignore if offline */
+    }
+    const waUrl = `${contact.whatsapp}?text=${encodeURIComponent(buildMessage(v))}`;
+    window.open(waUrl, "_blank", "noopener");
   }
 
   const label = "eyebrow !text-muted-foreground !text-[0.65rem] block mb-1.5";
@@ -47,8 +64,8 @@ export function Enquiry({ defaultTopic, compact }: { defaultTopic?: string; comp
       <button type="submit" className="btn btn-primary w-full">Continue in WhatsApp →</button>
       <p className="text-xs text-muted-foreground">
         Opens WhatsApp with your draft for you to review and send. Prefer email? Write to{" "}
-        <a className="underline" href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(v.topic)}`}>{CONTACT.email}</a> or call{" "}
-        <a className="underline" href={CONTACT.phoneHref}>{CONTACT.phone}</a>.
+        <a className="underline" href={`mailto:${contact.email}?subject=${encodeURIComponent(v.topic)}`}>{contact.email}</a> or call{" "}
+        <a className="underline" href={contact.phoneHref}>{contact.phone}</a>.
       </p>
     </form>
   );

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
-import { CONTACT } from "@/data/properties";
+import { useLiveContact } from "@/hooks/useLiveContact";
 
 export const Route = createFileRoute("/about")({
   head: () =>
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/about")({
 });
 
 export function AboutPage() {
+  const contact = useLiveContact();
   const leadership = [
     {
       name: "Selin Arda",
@@ -118,8 +119,8 @@ export function AboutPage() {
             </p>
             <div className="pt-2">
               <p className="text-sm font-semibold text-foreground">Registered Office & Presence:</p>
-              <p className="text-sm text-muted-foreground">{CONTACT.company}</p>
-              <p className="text-sm text-muted-foreground">{CONTACT.address}</p>
+              <p className="text-sm text-muted-foreground">{contact.company}</p>
+              <p className="text-sm text-muted-foreground">{contact.address}</p>
             </div>
           </div>
 
@@ -240,20 +241,19 @@ export function AboutPage() {
             <div className="grid gap-4 sm:grid-cols-2 pt-2">
               <div className="rounded-lg border bg-card/60 p-4">
                 <p className="text-xs uppercase tracking-wider text-brass font-semibold">Registered Entity</p>
-                <p className="mt-1 text-sm font-medium text-foreground">{CONTACT.company}</p>
+                <p className="mt-1 text-sm font-medium text-foreground">{contact.company}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Istanbul Chamber of Commerce (İTO)</p>
               </div>
               <div className="rounded-lg border bg-card/60 p-4">
                 <p className="text-xs uppercase tracking-wider text-brass font-semibold">Advisory Hours</p>
-                <p className="mt-1 text-sm font-medium text-foreground">Mon – Fri: 09:30 – 18:30 TRT</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Saturday: By Private Appointment</p>
+                <p className="mt-1 text-sm font-medium text-foreground">{contact.advisoryHours}</p>
               </div>
             </div>
 
             <div className="space-y-2 border-t pt-4 text-sm text-muted-foreground">
               <p className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-brass shrink-0 mt-0.5" />
-                <span>{CONTACT.address}</span>
+                <span>{contact.address}</span>
               </p>
               <p className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-brass shrink-0" />

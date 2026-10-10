@@ -38,7 +38,7 @@ export const properties: PropertyRecord[] = data.records;
 export const legacyRecords = data.legacy_snapshot_only_records;
 
 export const CONTACT = {
-  email: "info.avrasyaproperties@gmail.com",
+  email: "info@avrasyaproperties.com",
   phone: "+90 545 924 80 42",
   phoneHref: "tel:+905459248042",
   whatsapp: "https://wa.me/905459248042",

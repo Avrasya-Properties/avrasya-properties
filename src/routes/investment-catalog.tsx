@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, CheckCircle2, ArrowRight, ShieldCheck, TrendingUp, Mail, Phone } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
-import { CONTACT, waLink } from "@/data/properties";
+import { waLink } from "@/data/properties";
+import { useLiveContact } from "@/hooks/useLiveContact";
 
 export const Route = createFileRoute("/investment-catalog")({
   head: () =>
@@ -58,6 +59,7 @@ const METRICS = [
 ];
 
 function Catalog() {
+  const contact = useLiveContact();
   return (
     <>
       <PageIntro
@@ -151,11 +153,11 @@ function Catalog() {
             Whether you are evaluating a $400,000 citizenship qualifying purchase or building an Istanbul commercial portfolio, our consultants provide transparent guidance without sales pressure.
           </p>
           <div className="mt-6 flex flex-wrap gap-4 text-sm font-medium">
-            <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-2 text-primary hover:text-brass">
-              <Mail className="h-4 w-4 text-brass" /> {CONTACT.email}
+            <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-primary hover:text-brass">
+              <Mail className="h-4 w-4 text-brass" /> {contact.email}
             </a>
-            <a href={CONTACT.phoneHref} className="flex items-center gap-2 text-primary hover:text-brass">
-              <Phone className="h-4 w-4 text-brass" /> {CONTACT.phone}
+            <a href={contact.phoneHref} className="flex items-center gap-2 text-primary hover:text-brass">
+              <Phone className="h-4 w-4 text-brass" /> {contact.phone}
             </a>
           </div>
         </div>

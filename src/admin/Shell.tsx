@@ -1,21 +1,49 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck } from "lucide-react";
+import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2 } from "lucide-react";
 import { fmtDate, logout, markRead, useDB, useSession } from "./store";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const NAV = [
-  { group: "Overview", items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard }] },
-  { group: "Inventory", items: [{ to: "/admin/properties", label: "Properties", icon: Building2 }, { to: "/admin/projects", label: "Projects", icon: Layers }] },
-  { group: "Sales & CRM", items: [
-    { to: "/admin/leads", label: "Leads", icon: Users }, { to: "/admin/contacts", label: "Contacts", icon: Contact2 },
-    { to: "/admin/deals", label: "Deals", icon: Handshake }, { to: "/admin/calendar", label: "Calendar", icon: CalendarDays },
-    { to: "/admin/tasks", label: "Tasks", icon: CheckSquare } ] },
+  {
+    group: "Operations",
+    items: [
+      { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin/inquiries", label: "Inquiries & Inbox", icon: Inbox, badge: "inquiries" },
+      { to: "/admin/analytics", label: "Portfolio Analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    group: "Property Inventory",
+    items: [
+      { to: "/admin/properties", label: "Properties", icon: Building2 },
+      { to: "/admin/projects", label: "Developments", icon: Layers },
+    ],
+  },
+  {
+    group: "Client CRM & Pipeline",
+    items: [
+      { to: "/admin/leads", label: "Leads Pipeline", icon: Users },
+      { to: "/admin/contacts", label: "Contacts Directory", icon: Contact2 },
+      { to: "/admin/deals", label: "Deals & Transactions", icon: Handshake },
+      { to: "/admin/calendar", label: "Viewing Calendar", icon: CalendarDays },
+      { to: "/admin/tasks", label: "Advisory Tasks", icon: CheckSquare },
+    ],
+  },
+  {
+    group: "Platform & CMS",
+    items: [
+      { to: "/admin/settings", label: "Website Content & CMS", icon: Settings2 },
+    ],
+  },
 ] as const;
 
 function Nav({ onNav }: { onNav?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const db = useDB();
+  const newInquiriesCount = db.inquiries?.filter((i) => i.status === "New").length ?? 0;
+
   return (
     <nav className="flex flex-col gap-5 px-3 py-4">
       {NAV.map((g) => (
@@ -23,9 +51,18 @@ function Nav({ onNav }: { onNav?: () => void }) {
           <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-on-dark-muted/70">{g.group}</p>
           {g.items.map((it) => {
             const active = it.to === "/admin" ? path === "/admin" : path.startsWith(it.to);
+            const showBadge = "badge" in it && it.badge === "inquiries" && newInquiriesCount > 0;
             return (
-              <Link key={it.to} to={it.to} onClick={onNav} className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${active ? "bg-brass/20 text-brass font-medium shadow-[inset_3px_0_0_var(--brass)]" : "text-on-dark-muted hover:bg-white/5 hover:text-on-dark"}`}>
-                <it.icon className={`h-4 w-4 ${active ? "text-brass" : "text-on-dark-muted"}`} /> {it.label}
+              <Link key={it.to} to={it.to} onClick={onNav} className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors ${active ? "bg-brass/20 text-brass font-medium shadow-[inset_3px_0_0_var(--brass)]" : "text-on-dark-muted hover:bg-white/5 hover:text-on-dark"}`}>
+                <div className="flex items-center gap-2.5">
+                  <it.icon className={`h-4 w-4 ${active ? "text-brass" : "text-on-dark-muted"}`} />
+                  <span>{it.label}</span>
+                </div>
+                {showBadge && (
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold text-primary">
+                    {newInquiriesCount}
+                  </span>
+                )}
               </Link>
             );
           })}

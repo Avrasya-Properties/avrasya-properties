@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Heart, Globe, MessageSquare, Phone, ShieldCheck } from "lucide-react";
 import { CONTACT, type SupportedCurrency } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useLiveContact } from "@/hooks/useLiveContact";
 import { Magnetic } from "./Motion";
 
 export function Logo({ className = "h-10", variant = "auto" }: { className?: string; variant?: "auto" | "light" | "dark" }) {
@@ -44,6 +45,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [currency, setCurrency] = useCurrency();
   const { count: shortlistCount } = useShortlist();
+  const contact = useLiveContact();
   const [time, setTime] = useState("");
 
   useEffect(() => {
@@ -76,6 +78,13 @@ export function Header() {
 
   return (
     <>
+      {/* Site Announcement Banner if enabled */}
+      {contact.announcementActive && contact.announcementText && (
+        <div className="bg-brass text-primary px-4 py-2 text-center text-xs font-semibold tracking-wide border-b border-brass-light/40 flex items-center justify-center gap-2">
+          <span>{contact.announcementText}</span>
+        </div>
+      )}
+
       {/* Top Banner with live stats */}
       <div className="hidden border-b bg-primary text-on-dark md:block">
         <div className="container-site flex h-9 items-center justify-between text-[0.72rem] tracking-wide text-on-dark-muted">
@@ -110,8 +119,8 @@ export function Header() {
               </div>
             </div>
 
-            <a href={`mailto:${CONTACT.email}`} className="text-on-dark-muted hover:text-on-dark transition-colors">
-              {CONTACT.email}
+            <a href={`mailto:${contact.email}`} className="text-on-dark-muted hover:text-on-dark transition-colors">
+              {contact.email}
             </a>
           </div>
         </div>
@@ -156,7 +165,7 @@ export function Header() {
             </Link>
 
             <a
-              href={CONTACT.whatsapp}
+              href={contact.whatsapp}
               target="_blank"
               rel="noreferrer"
               className="btn btn-outline gap-1.5"
@@ -216,7 +225,7 @@ export function Header() {
               ))}
               <div className="pt-3 flex gap-2">
                 <a
-                  href={CONTACT.whatsapp}
+                  href={contact.whatsapp}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-outline flex-1 justify-center"
@@ -240,6 +249,7 @@ export function Header() {
 }
 
 export function Footer() {
+  const contact = useLiveContact();
   const cols = [
     {
       h: "Explore Portfolio",
@@ -266,7 +276,7 @@ export function Footer() {
       <div className="container-site grid gap-10 py-16 md:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         <div className="space-y-4 text-sm text-on-dark-muted">
           <Logo className="h-10" variant="light" />
-          <p className="text-on-dark font-medium">{CONTACT.tagline}</p>
+          <p className="text-on-dark font-medium">{contact.tagline}</p>
           <p className="text-xs leading-relaxed text-on-dark-muted/80">
             Istanbul-headquartered private advisory firm catering exclusively to international property investors, citizenship applicants, and institutional buyers in Türkiye.
           </p>
@@ -297,22 +307,22 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-xs leading-relaxed">
             <li>
               <strong className="text-on-dark block">Direct Advisory Email:</strong>
-              <a href={`mailto:${CONTACT.email}`} className="hover:text-on-dark transition-colors">
-                {CONTACT.email}
+              <a href={`mailto:${contact.email}`} className="hover:text-on-dark transition-colors">
+                {contact.email}
               </a>
             </li>
             <li>
               <strong className="text-on-dark block">Direct & WhatsApp Line:</strong>
-              <a href={CONTACT.phoneHref} className="hover:text-on-dark transition-colors">
-                {CONTACT.phone}
+              <a href={contact.phoneHref} className="hover:text-on-dark transition-colors">
+                {contact.phone}
               </a>
             </li>
             <li>
               <strong className="text-on-dark block">Office Address:</strong>
-              <span>{CONTACT.address}</span>
+              <span>{contact.address}</span>
             </li>
             <li className="pt-1">
-              <span className="text-on-dark-muted/70">Operating entity: {CONTACT.company}</span>
+              <span className="text-on-dark-muted/70">Operating entity: {contact.company}</span>
             </li>
           </ul>
         </div>
@@ -322,8 +332,12 @@ export function Footer() {
         <div className="container-site py-6 text-xs leading-relaxed text-on-dark-muted/80">
           Property valuations, price availability, unit specifications, and legal citizenship eligibility thresholds are subject to ongoing regulatory updates by Turkish authorities. Content on this website is for introductory advisory review and must be confirmed prior to binding contracts.
         </div>
-        <div className="container-site flex flex-col gap-3 pb-8 text-xs text-on-dark-muted md:flex-row md:justify-between">
-          <span>© 2026 {CONTACT.company}. All rights reserved.</span>
+        <div className="container-site flex flex-col gap-3 pb-8 text-xs text-on-dark-muted md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>© 2026 {contact.company}. All rights reserved.</span>
+            <span className="text-on-dark-muted/40" aria-hidden="true">·</span>
+            <span className="text-on-dark-muted/90 font-medium">Built by Zarif</span>
+          </div>
           <span className="flex flex-wrap gap-5">
             <Link to="/privacy-policy" className="hover:text-on-dark transition-colors">
               Privacy Policy

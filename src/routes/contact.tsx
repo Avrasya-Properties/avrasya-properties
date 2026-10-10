@@ -15,7 +15,7 @@ import {
 import { PageIntro } from "@/components/site/Chrome";
 import { Enquiry } from "@/components/site/Enquiry";
 import { meta } from "@/components/site/TextPage";
-import { CONTACT } from "@/data/properties";
+import { useLiveContact } from "@/hooks/useLiveContact";
 
 export const Route = createFileRoute("/contact")({
   head: () =>
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 export function ContactPage() {
+  const contact = useLiveContact();
   const [selectedTopic, setSelectedTopic] = useState("citizenship");
 
   const topics = [
@@ -105,13 +106,13 @@ export function ContactPage() {
                 Need urgent confirmation on a specific project price, layout availability, or CBI eligibility? Our advisors are available directly on WhatsApp.
               </p>
               <a
-                href={CONTACT.whatsapp}
+                href={contact.whatsapp}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span>Chat on WhatsApp: {CONTACT.phone}</span>
+                <span>Chat on WhatsApp: {contact.phone}</span>
               </a>
             </div>
 
@@ -124,7 +125,7 @@ export function ContactPage() {
                   <MapPin className="h-4 w-4 text-brass shrink-0 mt-1" />
                   <div>
                     <span className="font-medium text-foreground block">Headquarters:</span>
-                    <span className="text-muted-foreground">{CONTACT.address}</span>
+                    <span className="text-muted-foreground">{contact.address}</span>
                     <span className="text-xs text-muted-foreground block mt-0.5">Overlooking the Bosphorus · Walking distance to Marmaray</span>
                   </div>
                 </div>
@@ -133,8 +134,8 @@ export function ContactPage() {
                   <Phone className="h-4 w-4 text-brass shrink-0" />
                   <div>
                     <span className="font-medium text-foreground block">Telephone:</span>
-                    <a href={CONTACT.phoneHref} className="text-muted-foreground hover:text-foreground">
-                      {CONTACT.phone}
+                    <a href={contact.phoneHref} className="text-muted-foreground hover:text-foreground">
+                      {contact.phone}
                     </a>
                   </div>
                 </div>
@@ -143,8 +144,8 @@ export function ContactPage() {
                   <Mail className="h-4 w-4 text-brass shrink-0" />
                   <div>
                     <span className="font-medium text-foreground block">Official Inquiries:</span>
-                    <a href={`mailto:${CONTACT.email}`} className="text-muted-foreground hover:text-foreground break-all">
-                      {CONTACT.email}
+                    <a href={`mailto:${contact.email}`} className="text-muted-foreground hover:text-foreground break-all">
+                      {contact.email}
                     </a>
                   </div>
                 </div>
@@ -153,7 +154,7 @@ export function ContactPage() {
                   <Clock className="h-4 w-4 text-brass shrink-0" />
                   <div>
                     <span className="font-medium text-foreground block">Desk Hours:</span>
-                    <span className="text-muted-foreground">Monday – Saturday: 09:00 – 19:00 TRT (UTC+3)</span>
+                    <span className="text-muted-foreground">{contact.advisoryHours}</span>
                   </div>
                 </div>
               </div>
@@ -166,7 +167,7 @@ export function ContactPage() {
                 <span>Licensed Operating Entity</span>
               </div>
               <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                Operating entity: <b>{CONTACT.company}</b>. All transactional agreements are notarized under Turkish commercial law. Client funds are never deposited to unregulated personal accounts.
+                Operating entity: <b>{contact.company}</b>. All transactional agreements are notarized under Turkish commercial law. Client funds are never deposited to unregulated personal accounts.
               </p>
             </div>
           </div>

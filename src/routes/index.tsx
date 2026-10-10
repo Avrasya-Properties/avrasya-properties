@@ -34,6 +34,7 @@ import { Marquee, Tilt } from "@/components/site/Motion";
 import { PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useSiteSettings } from "@/admin/store";
 
 export const Route = createFileRoute("/")({
   head: () =>
@@ -92,6 +93,7 @@ const DISTRICT_CORRIDORS = [
 ];
 
 function Home() {
+  const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
   const f = FEATURED[sel]!;
   const media = getPropertyMedia(f);
@@ -129,7 +131,7 @@ function Home() {
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 mb-3">
                 <span className="eyebrow !text-brass-text">
-                  Private Advisory · Istanbul · Europe & Asia
+                  {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
                 </span>
               </div>
               <h1 className="display-hero">
@@ -147,7 +149,7 @@ function Home() {
                 style={{ ["--d" as string]: "350ms" }}
                 className="mt-5 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed"
               >
-                Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer.
+                {settings.heroSubtitle || "Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer."}
               </p>
 
               {/* Key Highlights Bar */}
@@ -169,7 +171,9 @@ function Home() {
                   <p className="text-xs text-muted-foreground mt-0.5">Title Deed Pre-Audit</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">$400K</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
+                    ${settings.cbiThresholdUsd ? `${Math.round(settings.cbiThresholdUsd / 1000)}K` : "400K"}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-0.5">CBI Program Ready</p>
                 </div>
               </div>

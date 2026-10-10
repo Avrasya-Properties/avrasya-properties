@@ -40,6 +40,7 @@ import {
 import { PropertyCard } from "@/components/site/PropertyCard";
 import { Enquiry } from "@/components/site/Enquiry";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useLiveContact } from "@/hooks/useLiveContact";
 
 export const Route = createFileRoute("/properties/$slug")({
   loader: ({ params }) => {
@@ -145,6 +146,7 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
 function RecordView({ r }: { r: PropertyRecord }) {
   const media = getPropertyMedia(r);
   const p = priceDisplay(r.price);
+  const contact = useLiveContact();
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [currency] = useCurrency();
@@ -524,7 +526,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
             <p className="eyebrow !text-brass">Direct Istanbul Team</p>
             <div className="space-y-2">
               <a
-                href={waLink(`Inquiry regarding ${r.marketing_title} (${r.slug})`)}
+                href={`${contact.whatsapp}?text=${encodeURIComponent(`Inquiry regarding ${r.marketing_title} (${r.slug})`)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 text-foreground hover:text-brass transition-colors font-medium"
@@ -532,10 +534,10 @@ function RecordView({ r }: { r: PropertyRecord }) {
                 <MessageSquare className="h-4 w-4 text-brass" /> Direct WhatsApp Consultation
               </a>
               <a
-                href={CONTACT.phoneHref}
+                href={contact.phoneHref}
                 className="flex items-center gap-2 text-foreground hover:text-brass transition-colors font-medium"
               >
-                <Phone className="h-4 w-4 text-brass" /> {CONTACT.phone}
+                <Phone className="h-4 w-4 text-brass" /> {contact.phone}
               </a>
             </div>
             <p className="pt-2 text-[0.7rem] text-muted-foreground border-t border-border/60">
@@ -570,7 +572,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
       {/* Mobile Sticky Bar */}
       <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border/80 bg-card/95 backdrop-blur-md p-3 lg:hidden shadow-lg">
         <a
-          href={waLink(`Hello, I'm interested in ${r.marketing_title} (${r.slug}).`)}
+          href={`${contact.whatsapp}?text=${encodeURIComponent(`Hello, I'm interested in ${r.marketing_title} (${r.slug}).`)}`}
           target="_blank"
           rel="noreferrer"
           className="btn btn-primary flex-1 justify-center gap-1.5"
@@ -578,7 +580,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
           <MessageSquare className="h-4 w-4" /> WhatsApp
         </a>
         <a
-          href={CONTACT.phoneHref}
+          href={contact.phoneHref}
           className="btn btn-outline flex-1 justify-center gap-1.5"
         >
           <Phone className="h-4 w-4" /> Call Office

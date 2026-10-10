@@ -17,7 +17,7 @@ export const PUBL = ["Draft", "In Review", "Published", "Archived"] as const;
 export const LEAD_STAGES = ["New", "Contacted", "Qualified", "Viewing", "Negotiation", "Converted", "Lost", "On Hold"] as const;
 export const DEAL_STAGES = ["Opportunity", "Offer Prepared", "Offer Accepted", "Reserved", "Due Diligence", "Contract", "Won", "Lost"] as const;
 export const SOURCES = ["Website", "WhatsApp", "Phone", "Referral", "Walk-in", "Campaign"] as const;
-export type Currency = "USD" | "TRY" | "EUR";
+export type Currency = "USD" | "TRY" | "EUR" | "GBP";
 
 export type Property = {
   id: string; ref: string; slug: string; title: string; district: string; city: string; type: string;
@@ -25,6 +25,7 @@ export type Property = {
   amount: number | null; currency: Currency | null; mode: "sale" | "rent"; priceType: "fixed" | "from" | "on-request";
   availability: (typeof AVAIL)[number]; publication: (typeof PUBL)[number]; agentId: string;
   cover: string | null; description: string; project: string; updatedAt: string; sourceNote?: string;
+  cbiEligible?: boolean; side?: "Europe" | "Asia"; tapuStatus?: string;
 };
 export type Contact = { id: string; name: string; kind: "person" | "company"; email: string; phone: string; roles: string[]; language: string; agentId: string; notes: string };
 export type Lead = { id: string; contactId: string; source: string; agentId: string; districts: string; layout: string; budgetMin: number | null; budgetMax: number | null; currency: Currency; stage: (typeof LEAD_STAGES)[number]; lossReason?: string; nextFollowUp: string | null; shortlist: string[]; dealId?: string };
@@ -33,9 +34,83 @@ export type Viewing = { id: string; contactId: string; propertyId: string; agent
 export type Deal = { id: string; title: string; contactId: string; leadId?: string; propertyIds: string[]; agentId: string; stage: (typeof DEAL_STAGES)[number]; amount: number | null; currency: Currency; expectedClose: string | null };
 export type Activity = { id: string; at: string; userId: string; kind: string; text: string; ref?: { kind: string; id: string } };
 
-export type DB = { properties: Property[]; contacts: Contact[]; leads: Lead[]; tasks: Task[]; viewings: Viewing[]; deals: Deal[]; activity: Activity[]; readNotes: string[] };
+export type Inquiry = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  topic: string;
+  budget: string;
+  message: string;
+  source: "Website Consultation" | "WhatsApp Click" | "Contact Brief" | "Property Modal";
+  propertySlug?: string;
+  status: "New" | "Contacted" | "Qualified" | "Archived";
+  createdAt: string;
+  notes?: string;
+};
 
-const KEY = "avrasya-admin-db-v3";
+export type SiteSettings = {
+  companyName: string;
+  registeredEntity: string;
+  taxOffice: string;
+  licenseNo: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  address: string;
+  advisoryHours: string;
+  heroHeadline: string;
+  heroSubtitle: string;
+  eyebrowText: string;
+  cbiThresholdUsd: number;
+  preloaderOpacity: number;
+  exchangeRateEur: number;
+  exchangeRateTry: number;
+  exchangeRateGbp: number;
+  enableFrankfurterSync: boolean;
+  announcementText: string;
+  announcementActive: boolean;
+};
+
+export const DEFAULT_SITE_SETTINGS: SiteSettings = {
+  companyName: "Avrasya Properties Group",
+  registeredEntity: "Albaraka Dış Ticaret Limited Şirketi",
+  taxOffice: "Üsküdar / İstanbul",
+  licenseNo: "İTO-34-78921",
+  tagline: "Your Future Starts with the Right Investment.",
+  email: "info@avrasyaproperties.com",
+  phone: "+90 545 924 80 42",
+  whatsapp: "https://wa.me/905459248042",
+  address: "Mimar Sinan Mahallesi, Selam-i Ali Efendi Caddesi, Ara Kafe Yanı No:17, 34672 Üsküdar / İstanbul, Türkiye",
+  advisoryHours: "Mon – Fri: 09:30 – 18:30 TRT | Sat: By Private Appointment",
+  heroHeadline: "Curated Offers & Developments in Istanbul.",
+  heroSubtitle: "Source-backed investment opportunities across central and Asian-side Istanbul. Every property is subject to preliminary title deed, zoning, and legal clearance before acquisition.",
+  eyebrowText: "Istanbul Portfolio Collection",
+  cbiThresholdUsd: 400000,
+  preloaderOpacity: 0.5,
+  exchangeRateEur: 0.892,
+  exchangeRateTry: 49.17,
+  exchangeRateGbp: 0.756,
+  enableFrankfurterSync: true,
+  announcementText: "",
+  announcementActive: false,
+};
+
+export type DB = {
+  properties: Property[];
+  contacts: Contact[];
+  leads: Lead[];
+  tasks: Task[];
+  viewings: Viewing[];
+  deals: Deal[];
+  inquiries: Inquiry[];
+  siteSettings: SiteSettings;
+  activity: Activity[];
+  readNotes: string[];
+};
+
+const KEY = "avrasya-admin-db-v4";
 const SKEY = "avrasya-admin-session";
 const uid = () => Math.random().toString(36).slice(2, 9);
 const day = (offset: number, h = 10) => { const d = new Date(); d.setDate(d.getDate() + offset); d.setHours(h, 0, 0, 0); return d.toISOString(); };
@@ -46,6 +121,7 @@ function seed(): DB {
     const a = (b: string) => r.areas.find((x) => x.basis === b)?.value_m2 ?? null;
     const media = getPropertyMedia(r);
     const baths = r.layout_label?.startsWith("1") ? 1 : r.layout_label?.startsWith("2") ? 2 : r.layout_label?.startsWith("3") ? 2 : 3;
+    const isCbi = (r.price.amount ?? 0) >= 400000;
     return {
       id: `p${i + 1}`, ref: `AVR-${String(1001 + i)}`, slug: r.slug, title: r.marketing_title,
       district: r.location_label ?? "", city: r.city, type: r.record_type.replace("_", " "),
@@ -56,6 +132,7 @@ function seed(): DB {
       publication: i % 5 === 3 ? "In Review" : i % 7 === 6 ? "Draft" : "Published",
       agentId: agents[i % 2], cover: media.cover, project: String(r.details?.project ?? r.marketing_title.split(" — ")[0]), description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
       sourceNote: (r.details?.claims_requiring_confirmation ?? []).join("; "),
+      cbiEligible: isCbi, side: r.side === "Asia" ? "Asia" : "Europe", tapuStatus: "Kat Mülkiyeti",
     } as Property;
   });
   const contacts: Contact[] = [
@@ -71,8 +148,62 @@ function seed(): DB {
     { id: "l3", contactId: "c3", source: "Referral", agentId: "u3", districts: "Kadıköy", layout: "3+1", budgetMin: 8000000, budgetMax: 15000000, currency: "TRY", stage: "Viewing", nextFollowUp: day(2), shortlist: [] },
     { id: "l4", contactId: "c4", source: "Campaign", agentId: "u2", districts: "", layout: "", budgetMin: null, budgetMax: null, currency: "USD", stage: "Negotiation", nextFollowUp: null, shortlist: [] },
   ];
+  const inquiries: Inquiry[] = [
+    {
+      id: "inq-1",
+      name: "Tariq Mansour",
+      email: "t.mansour@investgcc.com",
+      phone: "+971 50 123 4567",
+      topic: "Citizenship by Investment ($400k+)",
+      budget: "$550,000",
+      message: "Looking for 2 residential units qualifying for CBI with guaranteed title deed delivery before Q4.",
+      source: "Website Consultation",
+      status: "New",
+      createdAt: day(0, 9),
+      propertySlug: "rams-park-house-maslak-1-1xs",
+    },
+    {
+      id: "inq-2",
+      name: "Charlotte Dupont",
+      email: "c.dupont@finance-eu.fr",
+      phone: "+33 6 12 34 56 78",
+      topic: "Property Selection",
+      budget: "$750,000",
+      message: "Interested in Bosphorus view apartments in Beşiktaş or Nişantaşı corridors for long-term rental.",
+      source: "Contact Brief",
+      status: "Contacted",
+      createdAt: day(-1, 14),
+      propertySlug: "besiktas-studio-package-500",
+    },
+    {
+      id: "inq-3",
+      name: "Alexander Becker",
+      email: "a.becker@berlin-capital.de",
+      phone: "+49 170 987 6543",
+      topic: "Commercial / High-Yield Portfolio",
+      budget: "$1,200,000",
+      message: "Inquiring about Istanbul commercial floorplate or packaged residential units with SPK appraisal reports.",
+      source: "WhatsApp Click",
+      status: "Qualified",
+      createdAt: day(-2, 11),
+    },
+    {
+      id: "inq-4",
+      name: "David Sterling",
+      email: "david@sterlingholdings.co.uk",
+      phone: "+44 7700 900123",
+      topic: "Turkish Citizenship (CBI)",
+      budget: "$420,000",
+      message: "Family relocation planning. Requesting full due diligence catalog and private viewing schedule for next week.",
+      source: "Website Consultation",
+      status: "New",
+      createdAt: day(0, 16),
+      propertySlug: "pearl-residence-topkapi-2-1",
+    },
+  ];
   return {
-    properties: props, contacts, leads,
+    properties: props, contacts, leads, inquiries,
+    siteSettings: { ...DEFAULT_SITE_SETTINGS },
     tasks: [
       { id: "t1", title: "Call Amira about Beylikdüzü options", assigneeId: "u3", due: day(-1), priority: "High", done: false, link: { kind: "lead", id: "l1" } },
       { id: "t2", title: "Send floor plans to Jonas", assigneeId: "u2", due: day(0, 15), priority: "Normal", done: false, link: { kind: "lead", id: "l2" } },
@@ -93,10 +224,34 @@ const listeners = new Set<() => void>();
 function load(): DB {
   if (db) return db;
   if (typeof window === "undefined") return (db = seed());
-  try { db = JSON.parse(localStorage.getItem(KEY) || "null") ?? seed(); } catch { db = seed(); }
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed) {
+        if (!parsed.siteSettings) {
+          parsed.siteSettings = { ...DEFAULT_SITE_SETTINGS };
+        } else if (parsed.siteSettings.email === "info.avrasyaproperties@gmail.com") {
+          parsed.siteSettings.email = "info@avrasyaproperties.com";
+        }
+        if (!parsed.inquiries) parsed.inquiries = seed().inquiries;
+        db = parsed;
+        return db!;
+      }
+    }
+    db = seed();
+  } catch {
+    db = seed();
+  }
   return db!;
 }
-function save() { localStorage.setItem(KEY, JSON.stringify(db)); listeners.forEach((l) => l()); }
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(db));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("site-settings-updated", { detail: db?.siteSettings }));
+  }
+  listeners.forEach((l) => l());
+}
 export function useDB(): DB {
   return useSyncExternalStore((l) => (listeners.add(l), () => listeners.delete(l)), load, load);
 }
@@ -132,8 +287,16 @@ function guard(action: Action, ownerId?: string) {
 function log(kind: string, text: string, ref?: Activity["ref"]) {
   load().activity.unshift({ id: uid(), at: new Date().toISOString(), userId: getSession()?.id ?? "", kind, text, ref } as Activity);
 }
-type Coll = "properties" | "contacts" | "leads" | "tasks" | "viewings" | "deals";
-const perm: Record<Coll, Action> = { properties: "edit-inventory", contacts: "edit-crm", leads: "edit-crm", tasks: "edit-crm", viewings: "edit-crm", deals: "edit-crm" };
+type Coll = "properties" | "contacts" | "leads" | "tasks" | "viewings" | "deals" | "inquiries";
+const perm: Record<Coll, Action> = {
+  properties: "edit-inventory",
+  contacts: "edit-crm",
+  leads: "edit-crm",
+  tasks: "edit-crm",
+  viewings: "edit-crm",
+  deals: "edit-crm",
+  inquiries: "edit-crm",
+};
 export function upsert<T extends { id: string }>(coll: Coll, item: Record<string, unknown> & { id?: string }, ownerId?: string): T {
   guard(perm[coll], ownerId);
   const list = load()[coll] as unknown as T[];
@@ -150,6 +313,94 @@ export function remove(coll: Coll, id: string) { guard(perm[coll]); (load()[coll
 export function addActivity(kind: string, text: string, ref?: Activity["ref"]) { log(kind, text, ref); save(); }
 export function markRead(ids: string[], read: boolean) { const d = load(); d.readNotes = read ? [...new Set([...d.readNotes, ...ids])] : d.readNotes.filter((x) => !ids.includes(x)); save(); }
 export function resetData() { guard("admin"); db = seed(); save(); }
+
+export function useSiteSettings(): SiteSettings {
+  const db = useDB();
+  return db.siteSettings || DEFAULT_SITE_SETTINGS;
+}
+
+export function updateSiteSettings(patch: Partial<SiteSettings>) {
+  const d = load();
+  d.siteSettings = { ...d.siteSettings, ...patch };
+  save();
+  log("settings", `Updated website CMS settings: ${Object.keys(patch).join(", ")}`);
+}
+
+export function createInquiry(item: Omit<Inquiry, "id" | "createdAt" | "status"> & { id?: string; status?: Inquiry["status"] }): Inquiry {
+  const d = load();
+  const created: Inquiry = {
+    id: item.id || `inq-${Date.now().toString(36)}`,
+    createdAt: new Date().toISOString(),
+    status: item.status || "New",
+    ...item,
+  };
+  d.inquiries.unshift(created);
+  log("inquiry", `New consultation inquiry from ${created.name} (${created.topic})`, { kind: "inquiries", id: created.id });
+  save();
+  return created;
+}
+
+export function convertInquiryToLead(inquiryId: string): Lead {
+  const d = load();
+  const inq = d.inquiries.find((x) => x.id === inquiryId);
+  if (!inq) throw new Error("Inquiry not found");
+  
+  let contact = d.contacts.find((c) => c.email.toLowerCase() === inq.email.toLowerCase() || (inq.phone && c.phone === inq.phone));
+  if (!contact) {
+    contact = {
+      id: `c${uid()}`,
+      name: inq.name,
+      email: inq.email || "client@inquiry.test",
+      phone: inq.phone || "+90 555 000 0000",
+      kind: "person",
+      roles: ["buyer"],
+      language: "English",
+      agentId: "u2",
+      notes: `Inquiry source: ${inq.source}. Topic: ${inq.topic}. Budget: ${inq.budget || "Unspecified"}`,
+    };
+    d.contacts.unshift(contact);
+  }
+
+  const budgetNum = inq.budget ? parseInt(inq.budget.replace(/\D/g, "")) || null : null;
+
+  const lead: Lead = {
+    id: `l${uid()}`,
+    contactId: contact.id,
+    source: inq.source,
+    agentId: contact.agentId,
+    districts: "",
+    layout: "",
+    budgetMin: budgetNum ? Math.round(budgetNum * 0.8) : null,
+    budgetMax: budgetNum,
+    currency: "USD",
+    stage: "Qualified",
+    nextFollowUp: day(1),
+    shortlist: inq.propertySlug ? [inq.propertySlug] : [],
+  };
+  d.leads.unshift(lead);
+
+  inq.status = "Qualified";
+  log("inquiry", `Inquiry from ${inq.name} converted to CRM Lead`, { kind: "leads", id: lead.id });
+  save();
+  return lead;
+}
+
+export function exportBackup(): string {
+  const d = load();
+  return JSON.stringify(d, null, 2);
+}
+
+export function importBackup(jsonString: string): boolean {
+  try {
+    const parsed = JSON.parse(jsonString);
+    if (!parsed.properties || !Array.isArray(parsed.properties)) throw new Error("Invalid backup: missing properties array");
+    db = parsed;
+    save();
+    return true;
+  } catch (e) {
+    throw new Error(`Import failed: ${(e as Error).message}`);
+  }
+}
 
 export function publishIssues(p: Property, all: Property[]): string[] {
   const out: string[] = [];
