@@ -1,6 +1,6 @@
 // Mock repository: all reads/writes go through this module so a future API can replace it.
 import { useSyncExternalStore } from "react";
-import { properties as sourceRecords } from "@/data/properties";
+import { properties as sourceRecords, getPropertyMedia } from "@/data/properties";
 
 export type Role = "admin" | "manager" | "agent" | "viewer";
 export type User = { id: string; name: string; email: string; role: Role };
@@ -35,7 +35,7 @@ export type Activity = { id: string; at: string; userId: string; kind: string; t
 
 export type DB = { properties: Property[]; contacts: Contact[]; leads: Lead[]; tasks: Task[]; viewings: Viewing[]; deals: Deal[]; activity: Activity[]; readNotes: string[] };
 
-const KEY = "avrasya-admin-db-v2";
+const KEY = "avrasya-admin-db-v3";
 const SKEY = "avrasya-admin-session";
 const uid = () => Math.random().toString(36).slice(2, 9);
 const day = (offset: number, h = 10) => { const d = new Date(); d.setDate(d.getDate() + offset); d.setHours(h, 0, 0, 0); return d.toISOString(); };
@@ -44,15 +44,17 @@ function seed(): DB {
   const agents = ["u2", "u3"];
   const props: Property[] = sourceRecords.map((r, i) => {
     const a = (b: string) => r.areas.find((x) => x.basis === b)?.value_m2 ?? null;
+    const media = getPropertyMedia(r);
+    const baths = r.layout_label?.startsWith("1") ? 1 : r.layout_label?.startsWith("2") ? 2 : r.layout_label?.startsWith("3") ? 2 : 3;
     return {
       id: `p${i + 1}`, ref: `AVR-${String(1001 + i)}`, slug: r.slug, title: r.marketing_title,
       district: r.location_label ?? "", city: r.city, type: r.record_type.replace("_", " "),
-      layout: r.layout_label, bathrooms: null, grossM2: a("gross"), netM2: a("net"), areaM2: a("unspecified"),
+      layout: r.layout_label, bathrooms: baths, grossM2: a("gross"), netM2: a("net"), areaM2: a("unspecified"),
       amount: r.price.amount, currency: (r.price.currency as Currency) ?? null, mode: "sale",
       priceType: r.price.amount == null ? "on-request" : r.record_type === "project" ? "from" : "fixed",
       availability: r.availability_verified ? "Available" : "Unknown",
       publication: i % 5 === 3 ? "In Review" : i % 7 === 6 ? "Draft" : "Published",
-      agentId: agents[i % 2], cover: null, project: String(r.details?.project ?? r.marketing_title.split(" — ")[0]), description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
+      agentId: agents[i % 2], cover: media.main, project: String(r.details?.project ?? r.marketing_title.split(" — ")[0]), description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
       sourceNote: (r.details?.claims_requiring_confirmation ?? []).join("; "),
     } as Property;
   });

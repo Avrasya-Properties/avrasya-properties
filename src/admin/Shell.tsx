@@ -1,7 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode } from "react";
-import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers } from "lucide-react";
-import logo from "@/assets/avrasya-logo.png.asset.json";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck } from "lucide-react";
 import { fmtDate, logout, markRead, useDB, useSession } from "./store";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,12 +20,12 @@ function Nav({ onNav }: { onNav?: () => void }) {
     <nav className="flex flex-col gap-5 px-3 py-4">
       {NAV.map((g) => (
         <div key={g.group}>
-          <p className="px-2 pb-1 text-[11px] uppercase tracking-wider text-on-dark-muted">{g.group}</p>
+          <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-on-dark-muted/70">{g.group}</p>
           {g.items.map((it) => {
             const active = it.to === "/admin" ? path === "/admin" : path.startsWith(it.to);
             return (
-              <Link key={it.to} to={it.to} onClick={onNav} className={`flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm ${active ? "bg-on-dark/10 text-on-dark shadow-[inset_2px_0_0_var(--brass)]" : "text-on-dark-muted hover:text-on-dark"}`}>
-                <it.icon className="h-4 w-4" /> {it.label}
+              <Link key={it.to} to={it.to} onClick={onNav} className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${active ? "bg-brass/20 text-brass font-medium shadow-[inset_3px_0_0_var(--brass)]" : "text-on-dark-muted hover:bg-white/5 hover:text-on-dark"}`}>
+                <it.icon className={`h-4 w-4 ${active ? "text-brass" : "text-on-dark-muted"}`} /> {it.label}
               </Link>
             );
           })}
@@ -42,32 +41,40 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [time, setTime] = useState("");
 
-  const results = useMemo(() => {
-    const s = q.trim().toLowerCase(); if (s.length < 2) return [];
-    return [
-      ...db.properties.filter((p) => (p.title + p.ref + p.district).toLowerCase().includes(s)).map((p) => ({ k: "Property", label: `${p.ref} · ${p.title}`, go: () => nav({ to: "/admin/properties/$id", params: { id: p.id } }) })),
-      ...db.contacts.filter((c) => (c.name + c.email).toLowerCase().includes(s)).map((c) => ({ k: "Contact", label: c.name, go: () => nav({ to: "/admin/contacts" }) })),
-      ...db.leads.filter((l) => db.contacts.find((c) => c.id === l.contactId)?.name.toLowerCase().includes(s)).map((l) => ({ k: "Lead", label: db.contacts.find((c) => c.id === l.contactId)!.name, go: () => nav({ to: "/admin/leads/$id", params: { id: l.id } }) })),
-      ...db.deals.filter((d) => d.title.toLowerCase().includes(s)).map((d) => ({ k: "Deal", label: d.title, go: () => nav({ to: "/admin/deals" }) })),
-    ].slice(0, 8);
-  }, [q, db, nav]);
-
-  const notes = useMemo(() => {
-    const now = Date.now();
-    return [
-      ...db.tasks.filter((t) => !t.done && new Date(t.due).getTime() < now).map((t) => ({ id: "t" + t.id, text: `Overdue: ${t.title}`, to: "/admin/tasks" })),
-      ...db.viewings.filter((v) => { const s = new Date(v.start).getTime(); return s > now && s - now < 2 * 864e5 && v.status !== "Cancelled"; }).map((v) => ({ id: "v" + v.id, text: `Viewing ${fmtDate(v.start, true)}`, to: "/admin/calendar" })),
-      ...db.properties.filter((p) => p.publication === "In Review").map((p) => ({ id: "r" + p.id, text: `Awaiting review: ${p.ref}`, to: "/admin/properties" })),
-    ];
-  }, [db]);
-  const unread = notes.filter((n) => !db.readNotes.includes(n.id));
+  useEffect(() => {
+    const update = () => {
+      try {
+        setTime(new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Europe/Istanbul",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        }).format(new Date()));
+      } catch {
+        setTime("");
+      }
+    };
+    update();
+    const id = setInterval(update, 30000);
+    return () => clearInterval(id);
+  }, []);
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-primary">
-      <div className="flex h-[60px] items-center px-4"><img src={logo.url} alt="Avrasya Property" className="h-8 w-auto object-contain brightness-0 invert" /></div>
+    <div className="flex h-full flex-col bg-ink text-on-dark border-r border-white/10">
+      <div className="flex h-[68px] items-center gap-2.5 px-4 border-b border-white/10">
+        <img src="/images/avrasya-logo-white.svg" alt="Avrasya Properties" className="h-7 w-auto object-contain" />
+        <span className="rounded bg-brass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-brass">CMS</span>
+      </div>
       <Nav onNav={() => setOpen(false)} />
-      <p className="mt-auto px-5 pb-4 text-[11px] text-on-dark-muted">Demo workspace · Data saved in this browser</p>
+      <div className="mt-auto p-4 border-t border-white/10 text-[11px] text-on-dark-muted/80">
+        <div className="flex items-center gap-1.5 text-xs text-on-dark">
+          <ShieldCheck className="h-3.5 w-3.5 text-brass" />
+          <span>Avrasya Internal Workspace</span>
+        </div>
+        <p className="mt-1">Demo sandbox · Session changes persisted locally</p>
+      </div>
     </div>
   );
 
@@ -88,7 +95,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
             )}
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <a href="/" target="_blank" className="hidden items-center gap-1 text-sm text-muted-foreground hover:text-foreground sm:flex"><ExternalLink className="h-4 w-4" />Public site</a>
+            {time && (
+              <div className="hidden items-center gap-1.5 rounded-full border bg-muted/50 px-2.5 py-1 text-xs text-muted-foreground lg:flex">
+                <Clock className="h-3 w-3 text-brass" />
+                <span>Istanbul {time} TRT</span>
+              </div>
+            )}
+            <a href="/" target="_blank" className="flex items-center gap-1 rounded-sm border px-2.5 py-1 text-xs text-muted-foreground hover:border-brass hover:text-foreground">
+              <ExternalLink className="h-3.5 w-3.5 text-brass" />
+              <span>Public Portal</span>
+            </a>
             <Popover>
               <PopoverTrigger className="relative" aria-label="Notifications"><Bell className="h-5 w-5" />{unread.length > 0 && <span className="absolute -right-1.5 -top-1.5 rounded-full bg-brass px-1 text-[10px] text-primary-foreground">{unread.length}</span>}</PopoverTrigger>
               <PopoverContent align="end" className="w-80 p-0">

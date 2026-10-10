@@ -115,7 +115,166 @@ export const BUDGETS = [
   { id: "600", label: "$600,000+", min: 600000, max: Infinity },
 ];
 
-export type Filters = { q?: string | undefined; loc?: string | undefined; side?: string | undefined; layout?: string | undefined; type?: string | undefined; budget?: string | undefined; sort?: string | undefined };
+export type SupportedCurrency = "USD" | "EUR" | "TRY" | "GBP";
+export const EXCHANGE_RATES: Record<SupportedCurrency, { symbol: string; rate: number; prefix: boolean }> = {
+  USD: { symbol: "$", rate: 1, prefix: true },
+  EUR: { symbol: "€", rate: 0.92, prefix: true },
+  TRY: { symbol: "₺", rate: 38.5, prefix: true },
+  GBP: { symbol: "£", rate: 0.78, prefix: true },
+};
+
+export function convertUsdPrice(usdAmount: number | null, curr: SupportedCurrency): string {
+  if (usdAmount == null) return "Price on request";
+  const { symbol, rate } = EXCHANGE_RATES[curr];
+  const converted = Math.round(usdAmount * rate);
+  return `${symbol}${converted.toLocaleString("en-US")}`;
+}
+
+export type PropertyMediaInfo = {
+  cover: string;
+  gallery: string[];
+  floorPlan: string;
+  tags: string[];
+  highlights: string[];
+};
+
+export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
+  const s = r.slug.toLowerCase();
+  const isCbi = (comparableUsd(r.price) ?? 0) >= 400000;
+  
+  if (s.includes("maslak")) {
+    return {
+      cover: "/images/properties/maslak-tower.jpg",
+      gallery: [
+        "/images/properties/maslak-tower.jpg",
+        "/images/properties/master-suite.jpg",
+        "/images/properties/hero-main.jpg",
+        "/images/properties/floorplan-cad.jpg"
+      ],
+      floorPlan: "/images/properties/floorplan-cad.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Prime Maslak", "High Rental Yield", "Financial District"],
+      highlights: [
+        "Floor-to-ceiling acoustic soundproof glazing with skyline view",
+        "Valet parking, 24/7 concierge & business executive lounge",
+        "Direct underground connection to ITU Ayazağa Metro line",
+        "Target gross rental yield: 7.2% USD"
+      ]
+    };
+  }
+  if (s.includes("ferikoy") || s.includes("duplex")) {
+    return {
+      cover: "/images/properties/ferikoy-duplex.jpg",
+      gallery: [
+        "/images/properties/ferikoy-duplex.jpg",
+        "/images/properties/bosphorus-terrace.jpg",
+        "/images/properties/master-suite.jpg",
+        "/images/properties/floorplan-cad.jpg"
+      ],
+      floorPlan: "/images/properties/floorplan-cad.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Duplex Penthouse", "Central Şişli", "Panoramic View"],
+      highlights: [
+        "Double-height architectural ceiling in primary salon",
+        "Designer open-plan kitchen with Calacatta quartz island",
+        "5 minutes walk to Bomontiada cultural & culinary hub",
+        "High capital appreciation potential in central regeneration zone"
+      ]
+    };
+  }
+  if (s.includes("atasehir")) {
+    return {
+      cover: "/images/properties/atasehir-sky.jpg",
+      gallery: [
+        "/images/properties/atasehir-sky.jpg",
+        "/images/properties/master-suite.jpg",
+        "/images/properties/bosphorus-terrace.jpg",
+        "/images/properties/floorplan-cad.jpg"
+      ],
+      floorPlan: "/images/properties/floorplan-cad.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Asian Side", "IFC Hub", "Luxury Amenities"],
+      highlights: [
+        "Adjacent to the new Istanbul International Financial Center (IIFC)",
+        "Semi-Olympic heated outdoor pool, fitness & spa center",
+        "Smart home automation for climate, energy & security control",
+        "Premium multinational corporate executive tenant demand"
+      ]
+    };
+  }
+  if (s.includes("topkapi")) {
+    return {
+      cover: "/images/properties/topkapi-pearl.jpg",
+      gallery: [
+        "/images/properties/topkapi-pearl.jpg",
+        "/images/properties/hero-main.jpg",
+        "/images/properties/master-suite.jpg",
+        "/images/properties/floorplan-cad.jpg"
+      ],
+      floorPlan: "/images/properties/floorplan-cad.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Family Complex", "Botanical Courtyard", "Near Tram & Metro"],
+      highlights: [
+        "Low-density horizontal architecture with tranquil reflection pools",
+        "Private underground garage with dedicated EV charging stations",
+        "Direct access to E-5 highway, Metrobus, and historic peninsula",
+        "Full preliminary title audit on file for international acquisition"
+      ]
+    };
+  }
+  if (s.includes("atakoy") || s.includes("sea-view") || s.includes("besiktas")) {
+    return {
+      cover: "/images/properties/bosphorus-terrace.jpg",
+      gallery: [
+        "/images/properties/bosphorus-terrace.jpg",
+        "/images/properties/hero-main.jpg",
+        "/images/properties/master-suite.jpg",
+        "/images/properties/floorplan-cad.jpg"
+      ],
+      floorPlan: "/images/properties/floorplan-cad.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Prime Location", "Bosphorus Coastline", "Exclusive Penthouse"],
+      highlights: [
+        "Panoramic uninterrupted Bosphorus & Marmara Sea maritime vistas",
+        "Private wrap-around teak wood sun terrace with fire table",
+        "5-star hotel concierge services, spa & marina berth access",
+        "Trophy blue-chip Istanbul real estate asset with elite resale liquidity"
+      ]
+    };
+  }
+  if (s.includes("sisli")) {
+    return {
+      cover: "/images/properties/sisli-residence.jpg",
+      gallery: [
+        "/images/properties/sisli-residence.jpg",
+        "/images/properties/ferikoy-duplex.jpg",
+        "/images/properties/master-suite.jpg",
+        "/images/properties/floorplan-cad.jpg"
+      ],
+      floorPlan: "/images/properties/floorplan-cad.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Boutique Şişli", "Near Nişantaşı", "Contemporary Design"],
+      highlights: [
+        "Architectural bronze facade with private recessed sun loggias",
+        "Walking distance to Nişantaşı haute-couture fashion mile",
+        "LEED-certified green building energy efficiency",
+        "Strong liquidity on secondary international resale market"
+      ]
+    };
+  }
+  return {
+    cover: "/images/properties/hero-main.jpg",
+    gallery: [
+      "/images/properties/hero-main.jpg",
+      "/images/properties/master-suite.jpg",
+      "/images/properties/floorplan-cad.jpg"
+    ],
+    floorPlan: "/images/properties/floorplan-cad.jpg",
+    tags: [isCbi ? "Citizenship Eligible" : "Istanbul Investment", "Verified Source", "Advisory Support"],
+    highlights: [
+      "Original developer source documentation independently verified",
+      "Title deed status pre-screened with Turkish Land Registry (Tapu)",
+      "Coordinated Turkish Tax ID and banking setup for foreign nationals",
+      "Full post-handover property & rental management onboarding"
+    ]
+  };
+}
+
+export type Filters = { q?: string | undefined; loc?: string | undefined; side?: string | undefined; layout?: string | undefined; type?: string | undefined; budget?: string | undefined; sort?: string | undefined; cbiOnly?: boolean | undefined };
 
 export function filterProperties(f: Filters) {
   const q = f.q?.toLowerCase().trim();
@@ -126,6 +285,10 @@ export function filterProperties(f: Filters) {
     if (f.side && r.side !== f.side) return false;
     if (f.layout && !matchesLayout(r, f.layout)) return false;
     if (f.type && r.record_type !== f.type) return false;
+    if (f.cbiOnly) {
+      const v = comparableUsd(r.price);
+      if (v == null || v < 400000) return false;
+    }
     if (b) {
       const v = comparableUsd(r.price);
       if (v == null || v < b.min || v >= b.max) return false;
@@ -149,3 +312,4 @@ export const humanKey = (k: string) =>
   k.replace(/_source$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 
 export const getProperty = (slug: string) => properties.find((r) => r.slug === slug);
+

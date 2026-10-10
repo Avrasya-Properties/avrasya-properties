@@ -44,9 +44,51 @@ function Editor() {
           <p className="text-xs text-muted-foreground sm:col-span-2">No automatic currency conversion is performed.</p>
         </div>}
         {tab === "Media" && <div>
-          <p className="mb-2 text-xs text-muted-foreground">Images up to 5 MB (JPG/PNG/WebP). Stored in this browser only.</p>
-          {!ro && <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 5e6) return toast.error("File exceeds 5 MB"); const r = new FileReader(); r.onload = () => f("cover", r.result as string); r.readAsDataURL(file); return undefined; }} />}
-          {d.cover && <div className="mt-3"><img src={d.cover} alt="Cover" className="h-48 rounded-sm object-cover" />{!ro && <button className="mt-2 text-sm text-destructive" onClick={() => confirm("Remove cover image?") && f("cover", null)}>Remove</button>}</div>}
+          <p className="mb-2 text-xs text-muted-foreground">Select a high-resolution project visual preset or upload a custom file (up to 5 MB).</p>
+          {!ro && (
+            <div className="space-y-4">
+              <div>
+                <p className="mb-2 text-xs font-semibold text-foreground uppercase tracking-wider">Stock Architectural Library</p>
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  {[
+                    { label: "Bosphorus Hero", url: "/images/properties/hero-main.jpg" },
+                    { label: "Maslak Tower", url: "/images/properties/maslak-tower.jpg" },
+                    { label: "Feriköy Penthouse", url: "/images/properties/ferikoy-duplex.jpg" },
+                    { label: "Ataşehir Sky", url: "/images/properties/atasehir-sky.jpg" },
+                    { label: "Topkapı Pearl", url: "/images/properties/topkapi-pearl.jpg" },
+                    { label: "Şişli Residence", url: "/images/properties/sisli-residence.jpg" },
+                    { label: "Bosphorus Terrace", url: "/images/properties/bosphorus-terrace.jpg" },
+                    { label: "Master Suite", url: "/images/properties/master-suite.jpg" },
+                  ].map((preset) => (
+                    <button
+                      type="button"
+                      key={preset.url}
+                      onClick={() => f("cover", preset.url)}
+                      className={`group relative overflow-hidden rounded-md border text-left transition-all ${
+                        d.cover === preset.url ? "ring-2 ring-brass border-brass" : "hover:border-foreground/40"
+                      }`}
+                    >
+                      <img src={preset.url} alt={preset.label} className="aspect-[4/3] w-full object-cover" />
+                      <span className="block truncate bg-card/90 p-1 text-[10px] font-medium text-foreground">
+                        {preset.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="pt-2 border-t">
+                <p className="mb-1 text-xs font-medium text-muted-foreground">Custom Upload</p>
+                <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 5e6) return toast.error("File exceeds 5 MB"); const r = new FileReader(); r.onload = () => f("cover", r.result as string); r.readAsDataURL(file); return undefined; }} />
+              </div>
+            </div>
+          )}
+          {d.cover && (
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Active Cover Image:</p>
+              <img src={d.cover} alt="Cover" className="h-48 w-auto rounded-md object-cover border" />
+              {!ro && <button className="mt-2 text-xs font-medium text-destructive hover:underline" onClick={() => confirm("Remove cover image?") && f("cover", null)}>Remove cover image</button>}
+            </div>
+          )}
         </div>}
         {tab === "Source & Review" && <div className="space-y-3 text-sm">
           <p>Publication: <Status v={d.publication} /> · Availability: <Status v={d.availability} /> <span className="text-xs text-muted-foreground">(independent)</span></p>
