@@ -12,12 +12,12 @@ function Calendar() {
   const db = useDB(); const user = useSession();
   const [v, setV] = useState({ contactId: db.contacts[0]?.id ?? "", propertyId: db.properties[0]?.id ?? "", agentId: user!.id, start: "", hours: 1 });
   const list = [...db.viewings].sort((a, b) => a.start.localeCompare(b.start));
-  const add = () => {
+  const add = async () => {
     try {
     const start = new Date(istanbulDateTime(v.start)); const end = new Date(start.getTime() + v.hours * 36e5);
     const clash = db.viewings.find((x) => x.agentId === v.agentId && x.status !== "Cancelled" && new Date(x.start) < end && new Date(x.end) > start);
     if (clash && !confirm(`${userName(v.agentId)} already has a viewing at ${fmtDate(clash.start, true)}. Book anyway?`)) return;
-    upsert<Viewing>("viewings", { contactId: v.contactId, propertyId: v.propertyId, agentId: v.agentId, start: start.toISOString(), end: end.toISOString(), status: "Scheduled", notes: "" }, v.agentId); setV({ ...v, start: "" }); } catch (e) { toast.error((e as Error).message); }
+    await upsert<Viewing>("viewings", { contactId: v.contactId, propertyId: v.propertyId, agentId: v.agentId, start: start.toISOString(), end: end.toISOString(), status: "Scheduled", notes: "" }, v.agentId); setV({ ...v, start: "" }); } catch (e) { toast.error((e as Error).message); }
   };
   return (
     <>
@@ -33,7 +33,7 @@ function Calendar() {
           <span className="w-32 tabular-nums">{fmtDate(x.start, true)}</span>
           <span className="flex-1">{db.contacts.find((c) => c.id === x.contactId)?.name} · {db.properties.find((p) => p.id === x.propertyId)?.ref}</span>
           <span className="text-xs">{userName(x.agentId)}</span>
-          <select disabled={!can(user, "edit-crm", x.agentId)} className="rounded-sm border bg-card px-1 text-xs" value={x.status} onChange={(e) => { try { upsert<Viewing>("viewings", { id: x.id, status: e.target.value as Viewing["status"] }, x.agentId); } catch (er) { toast.error((er as Error).message); } }}>{ST.map((s) => <option key={s}>{s}</option>)}</select></div>))}</div>
+          <select disabled={!can(user, "edit-crm", x.agentId)} className="rounded-sm border bg-card px-1 text-xs" value={x.status} onChange={async (e) => { try { await upsert<Viewing>("viewings", { id: x.id, status: e.target.value as Viewing["status"] }, x.agentId); } catch (er) { toast.error((er as Error).message); } }}>{ST.map((s) => <option key={s}>{s}</option>)}</select></div>))}</div>
     </>
   );
 }

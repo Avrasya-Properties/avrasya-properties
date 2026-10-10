@@ -1,3 +1,6 @@
+import { useServices,useFaqs } from "@/data/live";
+import { DEMO_MODE } from "@/lib/supabase";
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { 
@@ -24,7 +27,7 @@ export const Route = createFileRoute("/services")({
       "Comprehensive Real Estate Advisory Services · Avrasya Properties",
       "Ten end-to-end luxury property advisory services covering investment structuring, citizenship, legal coordination, turnkey management, and resale."
     ),
-  component: ServicesPage,
+  component: () => <ManagedPage slug="services"><ServicesPage /></ManagedPage>,
 });
 
 type ServiceItem = {
@@ -153,11 +156,14 @@ const PHASES = [
 ];
 
 export function ServicesPage() {
+  const serviceQuery=useServices();
+  const faqQuery=useFaqs();
+  const services:ServiceItem[]=DEMO_MODE?SERVICES:(serviceQuery.data||[]).map((s,i)=>({num:String(i+1).padStart(2,"0"),title:s.title,category:s.category||"Advisory",desc:s.description,deliverables:s.process_steps.filter((x):x is string=>typeof x==="string"),icon:Building2}));
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
-  const categories = ["All", "Pre-Acquisition", "Acquisition", "Legal & Residency", "Transaction", "Post-Acquisition", "Wealth Management"];
+  const categories = ["All",...new Set(services.map(s=>s.category))];
 
-  const filtered = activeCategory === "All" ? SERVICES : SERVICES.filter(s => s.category === activeCategory);
+  const filtered = activeCategory === "All" ? services : services.filter(s => s.category === activeCategory);
 
   return (
     <>
@@ -266,7 +272,7 @@ export function ServicesPage() {
         </Link>
       </div>
 
-      <CtaBand />
+      {!DEMO_MODE && <section className="container-site py-10">{serviceQuery.isError && <p role="alert">Services are temporarily unavailable.</p>}{(faqQuery.data||[]).map(faq=><details key={faq.id} className="border-b py-4"><summary className="cursor-pointer font-medium">{faq.question}</summary><p className="mt-3 text-muted-foreground">{faq.answer}</p></details>)}</section>}<CtaBand />
     </>
   );
 }

@@ -1,3 +1,6 @@
+import { usePublishedDocuments } from "@/data/live";
+import { DEMO_MODE,publicSupabase } from "@/lib/supabase";
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, CheckCircle2, ArrowRight, ShieldCheck, TrendingUp, Mail, Phone } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
@@ -11,10 +14,10 @@ export const Route = createFileRoute("/investment-catalog")({
       "Avrasya Investment Catalog — Comprehensive Portfolio & Citizenship Guide",
       "Official 17-page Avrasya Properties Group Investment Catalog. Detailed six-phase acquisition pathway, verified 10-year financial projections, and Turkish Citizenship by Investment framework."
     ),
-  component: Catalog,
+  component: () => <ManagedPage slug="investment-catalog"><Catalog /></ManagedPage>,
 });
 
-const PDF_DOWNLOAD_URL = "/downloads/Avrasya_Properties_Investment_Catalog.pdf";
+
 
 const PHASES = [
   {
@@ -59,6 +62,9 @@ const METRICS = [
 ];
 
 function Catalog() {
+  const docs=usePublishedDocuments();
+  const doc=docs.data?.[0];
+  const PDF_DOWNLOAD_URL=DEMO_MODE?"/downloads/Avrasya_Properties_Investment_Catalog.pdf":doc?.storage_path?.startsWith("/")?doc.storage_path:doc?publicSupabase.storage.from("public-marketing").getPublicUrl(doc.storage_path).data.publicUrl:undefined;
   const contact = useLiveContact();
   return (
     <>

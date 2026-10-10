@@ -2,7 +2,7 @@ import raw from "./source.json";
 
 export type Area = { value_m2: number; basis: "gross" | "net" | "unspecified"; layout?: string; scope?: string; unit_count?: number };
 export type Price = {
-  currency: "USD" | "TRY" | null;
+  currency: "USD" | "TRY" | "EUR" | "GBP" | null;
   amount: number | null;
   basis: string;
   status: string;
@@ -29,6 +29,8 @@ export type PropertyRecord = {
   price: Price;
   areas: Area[];
   source_ids: string[];
+  cover?: string | null;
+  availability?: string;
   availability_verified: boolean;
   details: { [k: string]: unknown; project?: string; note?: string; delivery_source?: string | null; installment_offer?: unknown; claims_requiring_confirmation?: string[]; supporting_plan?: unknown };
 };
@@ -57,7 +59,7 @@ export const TYPE_LABEL: Record<RecordType, string> = {
   ambiguous_offer: "Offer to confirm",
 };
 
-const fmt = (n: number, c = "USD") => (c === "USD" ? "$" : "TRY ") + n.toLocaleString("en-US");
+const fmt = (n:number,c="USD") => new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:0}).format(n);
 
 /** Human price headline + qualifier appropriate to the record's price basis. */
 export function priceDisplay(p: Price): { main: string; note: string } {
@@ -138,7 +140,7 @@ export type PropertyMediaInfo = {
   highlights: string[];
 };
 
-export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
+function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   const s = r.slug.toLowerCase();
   const isCbi = (comparableUsd(r.price) ?? 0) >= 400000;
   
@@ -522,10 +524,10 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
 
 export type Filters = { q?: string | undefined; loc?: string | undefined; side?: string | undefined; layout?: string | undefined; type?: string | undefined; budget?: string | undefined; sort?: string | undefined; cbiOnly?: boolean | undefined };
 
-export function filterProperties(f: Filters) {
+export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties) {
   const q = f.q?.toLowerCase().trim();
   const b = BUDGETS.find((x) => x.id === f.budget);
-  let list = properties.filter((r) => {
+  let list = catalogue.filter((r) => {
     if (q && !`${r.marketing_title} ${r.location_label ?? ""} ${r.layout_label ?? ""}`.toLowerCase().includes(q)) return false;
     if (f.loc && r.location_label !== f.loc) return false;
     if (f.side && r.side !== f.side) return false;
@@ -552,10 +554,12 @@ export function filterProperties(f: Filters) {
 }
 
 /** Records excluded from a budget filter because their price is not comparable in USD. */
-export const unmatchablePrices = () => properties.filter((r) => comparableUsd(r.price) == null);
+export const unmatchablePrices = (catalogue: PropertyRecord[] = properties) => catalogue.filter((r) => comparableUsd(r.price) == null);
 
 export const humanKey = (k: string) =>
   k.replace(/_source$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 
 export const getProperty = (slug: string) => properties.find((r) => r.slug === slug);
 
+
+export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {const media=originalPropertyMedia(r);return r.cover?{...media,cover:r.cover,gallery:[r.cover,...media.gallery.filter(x=>x!==r.cover)]}:media;}

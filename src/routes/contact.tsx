@@ -86,7 +86,7 @@ export function ContactPage() {
               </div>
             </div>
 
-            <Enquiry />
+            <Enquiry key={selectedTopic} defaultTopic={topics.find(t=>t.id===selectedTopic)?.label} />
           </div>
 
           {/* Direct Office & Desk Info */}

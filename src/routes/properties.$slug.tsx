@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,27 +26,29 @@ import {
   areaText,
   comparableUsd,
   convertUsdPrice,
-  getProperty,
   getPropertyMedia,
   humanKey,
   legacyRecords,
   locationText,
   priceDisplay,
-  properties,
   sideText,
   waLink,
   type PropertyRecord,
 } from "@/data/properties";
+import { loadCatalogue, resolveRedirect, useCatalogue } from "@/data/live";
+import { DEMO_MODE } from "@/lib/supabase";
 import { PropertyCard } from "@/components/site/PropertyCard";
 import { Enquiry } from "@/components/site/Enquiry";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLiveContact } from "@/hooks/useLiveContact";
 
 export const Route = createFileRoute("/properties/$slug")({
-  loader: ({ params }) => {
-    const r = getProperty(params.slug);
+  loader: async ({ params }) => {
+    const records=await loadCatalogue();
+    const r = records.find(x=>x.slug===params.slug);
     if (r) return { record: r, legacy: false };
     if (legacyRecords.some((l) => l.slug === params.slug)) return { record: null, legacy: true };
+    if(!DEMO_MODE){const target=await resolveRedirect(params.slug);if(target)throw redirect({to:"/properties/$slug",params:{slug:target}});}
     throw notFound();
   },
   head: ({ loaderData }) => {
@@ -162,6 +164,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
   );
   const claims = (d.claims_requiring_confirmation as string[] | undefined) ?? [];
   const plan = d.supporting_plan as Record<string, unknown> | undefined;
+  const { properties }=useCatalogue();
   const related = properties.filter((x) => x.slug !== r.slug && x.side === r.side).slice(0, 3);
 
   const images = media.gallery;

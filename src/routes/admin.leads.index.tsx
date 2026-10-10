@@ -6,8 +6,8 @@ import { LEAD_STAGES, SOURCES, can, fmtDate, setStage, upsert, useDB, useSession
 
 export const Route = createFileRoute("/admin/leads/")({ component: Leads });
 
-export function moveStage(l: Lead, stage: Lead["stage"]) {
-  try { const r = stage === "Lost" ? prompt("Loss reason (required)") ?? "" : undefined; if (stage === "Lost" && !r) return; setStage(l.id, stage, r); } catch (e) { toast.error((e as Error).message); }
+export async function moveStage(l: Lead, stage: Lead["stage"]) {
+  try { const r = stage === "Lost" ? prompt("Loss reason (required)") ?? "" : undefined; if (stage === "Lost" && !r) return; await setStage(l.id, stage, r); } catch (e) { toast.error((e as Error).message); }
 }
 
 function Leads() {
@@ -15,10 +15,10 @@ function Leads() {
   const [view, setView] = useState<"table" | "kanban">("table"); const [adding, setAdding] = useState(false);
   const [n, setN] = useState({ name: "", email: "", phone: "", source: "Website" });
   const name = (l: Lead) => db.contacts.find((c) => c.id === l.contactId)?.name ?? "—";
-  const create = () => {
+  const create = async () => {
     try {
-      const c = upsert<Contact>("contacts", { name: n.name, email: n.email, phone: n.phone, kind: "person", roles: ["buyer"], language: "English", agentId: user!.id, notes: "" });
-      upsert<Lead>("leads", { contactId: c.id, source: n.source, agentId: user!.id, districts: "", layout: "", budgetMin: null, budgetMax: null, currency: "USD", stage: "New", nextFollowUp: null, shortlist: [] });
+      const c = await upsert<Contact>("contacts", { name: n.name, email: n.email, phone: n.phone, kind: "person", roles: ["buyer"], language: "English", agentId: user!.id, notes: "" });
+      await upsert<Lead>("leads", { contactId: c.id, source: n.source, agentId: user!.id, districts: "", layout: "", budgetMin: null, budgetMax: null, currency: "USD", stage: "New", nextFollowUp: null, shortlist: [] });
       setAdding(false); setN({ name: "", email: "", phone: "", source: "Website" }); toast.success("Lead created");
     } catch (e) { toast.error((e as Error).message); }
   };

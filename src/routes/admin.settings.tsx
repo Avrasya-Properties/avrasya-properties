@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { 
+  DEMO_ENABLED,
   DEFAULT_SITE_SETTINGS, 
   exportBackup, 
   importBackup, 
@@ -50,19 +51,19 @@ export function AdminSettingsPage() {
     setForm((prev) => ({ ...prev, [key]: val }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      updateSiteSettings(form);
+      await updateSiteSettings(form);
       setDirty(false);
-      toast.success("Demo settings saved in this browser. Global publishing requires the backend.");
+      toast.success(DEMO_ENABLED ? "Demo settings saved in this browser." : "Website settings published.");
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const handleDownloadBackup = () => {
+  const handleDownloadBackup = async () => {
     try {
-      const dataStr = exportBackup();
+      const dataStr = await exportBackup();
       const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -70,17 +71,17 @@ export function AdminSettingsPage() {
       a.download = `avrasya-properties-backup-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Browser workspace exported; linked external files are not included");
+      toast.success("Workspace records exported; linked files are not included");
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const handleImportSubmit = () => {
+  const handleImportSubmit = async () => {
     try {
       if (!importJson.trim()) { toast.error("Please paste JSON backup data"); return; }
       if (!confirm("Replace this browser’s workspace with the validated backup? Export the current workspace first.")) return;
-      importBackup(importJson);
+      await importBackup(importJson);
       setDirty(false);
       toast.success("Database restored successfully from backup");
       setIsImportOpen(false);
@@ -90,10 +91,10 @@ export function AdminSettingsPage() {
     }
   };
 
-  const handleResetFactory = () => {
+  const handleResetFactory = async () => {
     if (!confirm("Reset this browser’s properties, leads, contacts and settings to demo data? Export a backup first.")) return;
     try {
-      resetData();
+      await resetData();
       setForm({ ...DEFAULT_SITE_SETTINGS }); setDirty(false);
       toast.success("Demo workspace reset");
     } catch (error) { toast.error((error as Error).message); }
@@ -119,7 +120,7 @@ export function AdminSettingsPage() {
       />
 
       <p role="status" className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
-        Browser demo only. Settings affect this browser; property publishing does not update the public catalogue yet.
+        {DEMO_ENABLED ? "Browser demo. Use fictional data only." : "Changes are saved to Supabase and shared with the public website."}
         {!editable && " Your role has read-only access."}
       </p>
       {/* Tabs */}
@@ -448,7 +449,7 @@ export function AdminSettingsPage() {
                 <Download className="h-4 w-4" />
                 <span>Export JSON Backup</span>
               </button>
-              <button disabled={!isAdmin} onClick={() => setIsImportOpen(!isImportOpen)} className={btnGhost}>
+              <button disabled={!isAdmin || !DEMO_ENABLED} onClick={() => setIsImportOpen(!isImportOpen)} className={btnGhost}>
                 <Upload className="h-4 w-4" />
                 <span>Restore from JSON</span>
               </button>
@@ -465,7 +466,7 @@ export function AdminSettingsPage() {
                   value={importJson}
                   onChange={(e) => setImportJson(e.target.value)}
                 />
-                <button disabled={!isAdmin} onClick={handleImportSubmit} className={btnPrimary}>
+                <button disabled={!isAdmin || !DEMO_ENABLED} onClick={handleImportSubmit} className={btnPrimary}>
                   Confirm Database Restore
                 </button>
               </div>
@@ -481,7 +482,7 @@ export function AdminSettingsPage() {
               Replace this browser’s data with source-derived listing examples, fictional CRM records, and default settings. This does not restore a production database.
             </p>
             <button
-              disabled={!isAdmin}
+              disabled={!isAdmin || !DEMO_ENABLED}
               onClick={handleResetFactory}
               className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-destructive/40 bg-destructive/10 px-3 text-sm font-medium text-destructive hover:bg-destructive/20"
             >

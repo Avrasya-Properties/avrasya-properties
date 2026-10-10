@@ -73,18 +73,18 @@ export function AdminInquiriesPage() {
   const contactedCount = inquiries.filter((i) => i.status === "Contacted").length;
   const qualifiedCount = inquiries.filter((i) => Boolean(i.leadId)).length;
 
-  const handleStatusChange = (id: string, newStatus: Inquiry["status"]) => {
+  const handleStatusChange = async (id: string, newStatus: Inquiry["status"]) => {
     try {
-      upsert<Inquiry>("inquiries", { id, status: newStatus });
+      await upsert<Inquiry>("inquiries", { id, status: newStatus });
       toast.success(`Inquiry marked as ${newStatus}`);
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const handleConvertToLead = (id: string) => {
+  const handleConvertToLead = async (id: string) => {
     try {
-      const lead = convertInquiryToLead(id);
+      const lead = await convertInquiryToLead(id);
       toast.success("Converted inquiry to active CRM Lead!");
       nav({ to: "/admin/leads/$id", params: { id: lead.id } });
     } catch (e) {
@@ -92,10 +92,10 @@ export function AdminInquiriesPage() {
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Archive this inquiry? It will remain available in the Archived filter.")) {
       try {
-        remove("inquiries", id);
+        await remove("inquiries", id);
         toast.success("Inquiry archived");
         if (selectedInquiry?.id === id) setSelectedId(null);
       } catch (e) {
@@ -104,11 +104,11 @@ export function AdminInquiriesPage() {
     }
   };
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newForm.name.trim()) { toast.error("Client name is required"); return; }
     try {
-      createInquiry(newForm);
+      await createInquiry(newForm);
       toast.success("Inquiry registered in inbox");
       setIsAddOpen(false);
       setNewForm({

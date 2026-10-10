@@ -1,7 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2 } from "lucide-react";
-import { fmtDate, logout, markRead, useDB, useSession } from "./store";
+import { DEMO_ENABLED, fmtDate, logout, markRead, useDB, useSession, useBackendStatus } from "./store";
+import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -34,6 +35,7 @@ const NAV = [
   {
     group: "Platform & CMS",
     items: [
+      { to: "/admin/manage", label: "Management & Control", icon: Layers },
       { to: "/admin/settings", label: "Website Content & CMS", icon: Settings2 },
     ],
   },
@@ -74,6 +76,7 @@ function Nav({ onNav }: { onNav?: () => void }) {
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const user = useSession();
+  const backend = useBackendStatus();
   const db = useDB();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
@@ -134,7 +137,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <ShieldCheck className="h-3.5 w-3.5 text-brass" />
           <span>Avrasya Internal Workspace</span>
         </div>
-        <p className="mt-1">Demo sandbox · Session changes persisted locally</p>
+        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Supabase · Shared team workspace"}</p>
       </div>
     </div>
   );
@@ -169,20 +172,20 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <Popover>
               <PopoverTrigger className="relative" aria-label="Notifications"><Bell className="h-5 w-5" />{unread.length > 0 && <span className="absolute -right-1.5 -top-1.5 rounded-full bg-brass px-1 text-[10px] text-primary-foreground">{unread.length}</span>}</PopoverTrigger>
               <PopoverContent align="end" className="w-80 p-0">
-                <div className="flex justify-between border-b px-3 py-2 text-sm"><b>Notifications</b><button className="text-brass-text" onClick={() => markRead(notes.map((n) => n.id), true)}>Mark all read</button></div>
+                <div className="flex justify-between border-b px-3 py-2 text-sm"><b>Notifications</b><button className="text-brass-text" onClick={async () => { try { await markRead(notes.map((n) => n.id), true); } catch(error) { toast.error((error as Error).message); } }}>Mark all read</button></div>
                 {notes.length === 0 && <p className="p-3 text-sm text-muted-foreground">Nothing needs attention.</p>}
                 {notes.map((n) => { const r = db.readNotes.includes(n.id); return (
                   <div key={n.id} className="flex items-center gap-2 border-b px-3 py-2 text-sm last:border-0">
                     <Link to={n.to} className={`flex-1 ${r ? "text-muted-foreground" : "font-medium"}`}>{n.text}</Link>
-                    <button className="text-xs text-muted-foreground" onClick={() => markRead([n.id], !r)}>{r ? "Unread" : "Read"}</button>
+                    <button className="text-xs text-muted-foreground" onClick={async () => { try { await markRead([n.id], !r); } catch(error) { toast.error((error as Error).message); } }}>{r ? "Unread" : "Read"}</button>
                   </div>); })}
               </PopoverContent>
             </Popover>
-            <div className="hidden text-right text-xs leading-tight sm:block"><div className="font-medium">{user?.name}</div><div className="capitalize text-muted-foreground">{user?.role} (demo)</div></div>
-            <button onClick={() => { logout(); nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
+            <div className="hidden text-right text-xs leading-tight sm:block"><div className="font-medium">{user?.name}</div><div className="capitalize text-muted-foreground">{user?.role}{DEMO_ENABLED ? " (demo)" : ""}</div></div>
+            <button onClick={async () => { try { await logout(); } catch(error) { toast.error((error as Error).message); } nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving to Supabase…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
       </div>
     </div>
   );

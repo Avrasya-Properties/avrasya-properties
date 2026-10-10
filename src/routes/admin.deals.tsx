@@ -9,17 +9,17 @@ export const Route = createFileRoute("/admin/deals")({ component: Deals });
 function Deals() {
   const db = useDB(); const user = useSession();
   const [draft, setDraft] = useState<Deal | null>(null);
-  const move = (deal: Deal, stage: Deal["stage"]) => {
+  const move = async (deal: Deal, stage: Deal["stage"]) => {
     const refs = deal.propertyIds.map((id) => db.properties.find((p) => p.id === id)?.ref).join(", ") || "none";
     if (stage === "Won" && !confirm(`Complete this deal for ${refs}? Only these units will become Sold or Rented according to their listing mode.`)) return;
     if (stage === "Lost" && ["Reserved", "Due Diligence", "Contract"].includes(deal.stage) && !confirm("Mark lost and release the units reserved by this transaction?")) return;
-    try { setDealStage(deal.id, stage); toast.success("Deal stage updated"); }
+    try { await setDealStage(deal.id, stage); toast.success("Deal stage updated"); }
     catch (error) { toast.error((error as Error).message); }
   };
-  const save = (event: React.FormEvent) => {
+  const save = async (event: React.FormEvent) => {
     event.preventDefault(); if (!draft) return;
     try {
-      upsert<Deal>("deals", draft);
+      await upsert<Deal>("deals", draft);
       setDraft(null); toast.success("Deal details saved");
     } catch (error) { toast.error((error as Error).message); }
   };

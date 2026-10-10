@@ -13,8 +13,8 @@ function Tasks() {
   const [t, setT] = useState({ title: "", due: "", assigneeId: user!.id, priority: "Normal" as Task["priority"] });
   const now = new Date();
   const list = db.tasks.filter((x) => view === "all" || (view === "mine" ? x.assigneeId === user!.id : !x.done && new Date(x.due) < now));
-  const run = (f: () => void) => { try { f(); } catch (e) { toast.error((e as Error).message); } };
-  const toggle = (x: Task) => run(() => { upsert<Task>("tasks", { id: x.id, done: !x.done }, x.assigneeId); if (x.link) addActivity("task", `Task ${x.done ? "reopened" : "completed"}: ${x.title}`, x.link); });
+  const run = async (f: () => void | Promise<unknown>) => { try { await f(); } catch (e) { toast.error((e as Error).message); } };
+  const toggle = (x: Task) => run(async () => { await upsert<Task>("tasks", { id: x.id, done: !x.done }, x.assigneeId); if (x.link) await addActivity("task", `Task ${x.done ? "reopened" : "completed"}: ${x.title}`, x.link); });
   return (
     <>
       <PageHead title="Tasks" crumbs="Sales & CRM" />
@@ -23,7 +23,7 @@ function Tasks() {
         <input className={`${field} sm:col-span-2`} placeholder="Task title" aria-label="Task title" value={t.title} onChange={(e) => setT({ ...t, title: e.target.value })} />
         <input type="datetime-local" aria-label="Due time in Istanbul (UTC+03:00)" className={field} value={t.due} onChange={(e) => setT({ ...t, due: e.target.value })} />
         <select disabled={user?.role === "agent"} className={field} value={t.assigneeId} onChange={(e) => setT({ ...t, assigneeId: e.target.value })}>{USERS.filter((u) => u.role !== "viewer").map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}</select>
-        <button className={btnPrimary} disabled={!t.title || !t.due} onClick={() => run(() => { upsert<Task>("tasks", { ...t, due: istanbulDateTime(t.due), done: false }, t.assigneeId); setT({ ...t, title: "", due: "" }); })}>Add task</button></div>}
+        <button className={btnPrimary} disabled={!t.title || !t.due} onClick={() => run(async () => { await upsert<Task>("tasks", { ...t, due: istanbulDateTime(t.due), done: false }, t.assigneeId); setT({ ...t, title: "", due: "" }); })}>Add task</button></div>}
       <div className="rounded-md border bg-card">{list.map((x) => (
         <div key={x.id} className="flex items-center gap-3 border-b p-2 text-sm last:border-0">
           <input type="checkbox" checked={x.done} disabled={!can(user, "edit-crm", x.assigneeId)} onChange={() => toggle(x)} aria-label="Complete" />

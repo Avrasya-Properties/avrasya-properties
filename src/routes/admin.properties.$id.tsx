@@ -1,8 +1,11 @@
+import { managedRows,linkUnit } from "@/admin/management";
+import { rawRecord } from "@/admin/remote";
+import type { Row } from "@/admin/mappers";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
-import { AVAIL, USERS, can, fmtMoney, publishIssues, upsert, useDB, useSession, type Property } from "@/admin/store";
+import { AVAIL, DEMO_ENABLED, uploadImage, USERS, can, fmtMoney, publishIssues, upsert, useDB, useSession, type Property } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/properties/$id")({ component: Editor });
 const TABS = ["Essentials", "Pricing", "Media", "Source & Review", "Website Preview"] as const;
@@ -10,13 +13,15 @@ const TABS = ["Essentials", "Pricing", "Media", "Source & Review", "Website Prev
 function Editor() {
   const { id } = Route.useParams(); const db = useDB(); const user = useSession();
   const saved = db.properties.find((p) => p.id === id);
+  const [units,setUnits]=useState<Row[]>([]);const [unitId,setUnitId]=useState("");
+  useEffect(()=>{if(DEMO_ENABLED)return;void managedRows("physical_units").then(setUnits).catch(error=>toast.error(error.message));},[]);
   const [d, setD] = useState<Property | undefined>(saved); const [tab, setTab] = useState<(typeof TABS)[number]>("Essentials");
   useEffect(() => { setD(saved); }, [id]);
   if (!saved || !d) return <p>Property not found. <Link to="/admin/properties" className="text-brass-text">Back to inventory</Link></p>;
   const ro = !can(user, "edit-inventory");
   const f = <K extends keyof Property>(k: K, v: Property[K]) => setD({ ...d, [k]: v });
   const num = (v: string) => (v === "" ? null : Number(v));
-  const save = (patch: Partial<Property> = {}) => { try { const n = upsert<Property>("properties", { ...d, ...patch }); setD(n); toast.success("Saved"); } catch (e) { toast.error((e as Error).message); } };
+  const save = async (patch: Partial<Property> = {}) => { try { const n = await upsert<Property>("properties", { ...d, ...patch }); setD(n); toast.success("Saved"); } catch (e) { toast.error((e as Error).message); } };
   const issues = publishIssues(d, db.properties);
   const inp = (label: string, k: keyof Property, type = "text") => (
     <label className="text-sm">{label}<input disabled={ro} type={type} className={field} value={(d[k] as string | number | null) ?? ""} onChange={(e) => f(k, (type === "number" ? num(e.target.value) : e.target.value) as never)} placeholder={type === "number" ? "Unknown" : ""} /></label>
@@ -32,6 +37,8 @@ function Editor() {
       <div className="max-w-3xl rounded-md border bg-card p-4">
         {tab === "Essentials" && <div className="grid gap-3 sm:grid-cols-2">
           {inp("Title", "title")}{inp("Slug", "slug")}{inp("Reference", "ref")}{inp("District", "district")}{inp("City", "city")}{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
+          <label className="text-sm">Development name<input disabled={ro} className={field} value={d.project} onChange={e=>f("project",e.target.value)} placeholder="Use a registered development name"/></label>
+          {!DEMO_ENABLED&&<div className="sm:col-span-2 rounded border p-3"><label className="block text-sm">Verified physical unit<select disabled={ro} className={field} value={unitId||String(rawRecord("properties",id)?.["physical_unit_id"]||"")} onChange={e=>setUnitId(e.target.value)}><option value="">No identified unit</option>{units.map(unit=><option key={String(unit["id"])} value={String(unit["id"])}>{String(unit["unit_number"])} · {String(unit["layout_label"]||"")}</option>)}</select></label><button disabled={ro||!unitId} className={btnGhost+" mt-2"} onClick={async()=>{try{await linkUnit(id,unitId,Number(rawRecord("properties",id)?.["version"]));toast.success("Physical unit linked");}catch(error){toast.error((error as Error).message);}}}>Link verified unit</button><p className="mt-2 text-xs text-muted-foreground">Create the actual unit number in Management before reserving this offer. Packages and unit types cannot be reserved as individual units.</p></div>}
           {inp("Gross area m²", "grossM2", "number")}{inp("Net area m²", "netM2", "number")}{inp("Area m² (basis unspecified)", "areaM2", "number")}
           <label className="text-sm">Record type<select disabled={ro} className={field} value={d.type} onChange={(e) => f("type", e.target.value)}><option value="unit offer">Individual unit offer</option><option value="package">Packaged offer</option><option value="unit type">Unit type / not an identified unit</option><option value="ambiguous offer">Offer to confirm</option><option value="project">Development / project</option></select></label>
           <label className="text-sm">Availability<select disabled={ro} className={field} value={d.availability} onChange={(e) => f("availability", e.target.value as Property["availability"])}>{AVAIL.map((a) => <option key={a}>{a}</option>)}</select></label>
@@ -46,7 +53,7 @@ function Editor() {
           <p className="text-xs text-muted-foreground sm:col-span-2">No automatic currency conversion is performed.</p>
         </div>}
         {tab === "Media" && <div>
-          <p className="mb-2 text-xs text-muted-foreground">Select a high-resolution project visual preset or upload a custom demo cover (JPEG, PNG or WebP, up to 1 MB). These files remain in this browser.</p>
+          <p className="mb-2 text-xs text-muted-foreground">Select a high-resolution project visual preset or upload a custom demo cover (JPEG, PNG or WebP, up to 1 MB). {DEMO_ENABLED ? "Demo uploads remain in this browser." : "Uploads are stored in Supabase Storage."}</p>
           {!ro && (
             <div className="space-y-4">
               <div>
@@ -80,7 +87,7 @@ function Editor() {
               </div>
               <div className="pt-2 border-t">
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Custom Upload</p>
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return toast.error("Use JPEG, PNG or WebP"); if (file.size > 1e6) return toast.error("Demo cover exceeds 1 MB. Persistent uploads require Storage."); const r = new FileReader(); r.onerror = () => toast.error("The image could not be read"); r.onload = () => f("cover", r.result as string); r.readAsDataURL(file); return undefined; }} />
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={async (e) => { const file=e.target.files?.[0];if(!file)return;try{if(DEMO_ENABLED){if(file.size>1e6)throw new Error("Demo cover exceeds 1 MB.");const reader=new FileReader();reader.onerror=()=>toast.error("The image could not be read");reader.onload=()=>f("cover",reader.result as string);reader.readAsDataURL(file);}else{f("cover",await uploadImage(file));toast.success("Image uploaded. Save the listing to apply it.");}}catch(error){toast.error((error as Error).message);}}} />
               </div>
             </div>
           )}

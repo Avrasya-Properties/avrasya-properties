@@ -13,9 +13,9 @@ function Contacts() {
   const [draft, setDraft] = useState<(Omit<Contact, "id"> & { id?: string }) | null>(null);
   const duplicateOf = (contact: Contact) => db.contacts.filter((other) => other.id !== contact.id && contactMatch(other, contact));
   const contacts = db.contacts.filter((contact) => [contact.name, contact.email, contact.phone].some((value) => value.toLowerCase().includes(query.trim().toLowerCase())));
-  const save = (event: React.FormEvent) => {
+  const save = async (event: React.FormEvent) => {
     event.preventDefault(); if (!draft) return;
-    try { upsert<Contact>("contacts", draft); setDraft(null); toast.success("Contact saved"); }
+    try { await upsert<Contact>("contacts", draft); setDraft(null); toast.success("Contact saved"); }
     catch (error) { toast.error((error as Error).message); }
   };
   return (

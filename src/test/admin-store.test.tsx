@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { act, render, renderHook, fireEvent, screen, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as store from "@/admin/store";
+import * as store from "@/admin/demo";
 import { AdminSettingsPage } from "@/routes/admin.settings";
-import type { Contact, Deal, Lead, Property, Task, Viewing } from "@/admin/store";
+import type { Contact, Deal, Lead, Property, Task, Viewing } from "@/admin/demo";
 
 const workspace = () => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")!) as store.DB;
 const signIn = (role: store.Role) => store.login(role + "@avrasya.test", store.DEMO_PASSWORD);

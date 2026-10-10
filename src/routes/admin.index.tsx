@@ -37,18 +37,18 @@ export function Dashboard() {
   }));
   const maxLeadCount = Math.max(...leadCounts.map((s) => s.count), 1);
 
-  const toggleTask = (t: Task) => {
+  const toggleTask = async (t: Task) => {
     try {
-      upsert<Task>("tasks", { id: t.id, done: !t.done });
+      await upsert<Task>("tasks", { id: t.id, done: !t.done });
       toast.success(t.done ? "Task reopened" : "Task completed");
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const confirmViewing = (v: Viewing) => {
+  const confirmViewing = async (v: Viewing) => {
     try {
-      upsert<Viewing>("viewings", { id: v.id, status: "Confirmed" });
+      await upsert<Viewing>("viewings", { id: v.id, status: "Confirmed" });
       toast.success("Viewing marked confirmed; no message was sent");
     } catch (e) {
       toast.error((e as Error).message);
