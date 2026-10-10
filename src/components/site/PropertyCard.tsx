@@ -113,7 +113,9 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
         <div className="flex flex-1 flex-col p-5">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
             <span className="eyebrow !text-brass-text text-[0.65rem]">{TYPE_LABEL[r.record_type]}</span>
-            {r.areas.length > 0 && <span className="text-[0.72rem] font-medium">{areaText(r)}</span>}
+            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+              Ref: {r.slug.slice(0, 8).toUpperCase()}
+            </span>
           </div>
 
           <h3 className="font-display text-lg font-medium leading-snug text-foreground transition-colors group-hover:text-brass">
@@ -122,12 +124,21 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
             </Link>
           </h3>
 
-          {/* Property Tag Pills */}
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {media.tags.slice(0, 2).map((t) => (
+          {/* Property Tag Pills & Verification Stamp */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-xs bg-primary/8 px-1.5 py-0.5 text-[0.62rem] font-medium text-foreground/80">
+              <ShieldCheck className="h-3 w-3 text-brass" />
+              <span>Verified Title</span>
+            </span>
+            {r.areas.length > 0 && (
+              <span className="rounded-xs border border-border/70 bg-card px-1.5 py-0.5 text-[0.65rem] font-medium text-foreground">
+                {areaText(r)}
+              </span>
+            )}
+            {media.tags.slice(0, 1).map((t) => (
               <span
                 key={t}
-                className="rounded-xs border border-border/80 bg-secondary/80 px-1.5 py-0.5 text-[0.65rem] text-muted-foreground"
+                className="rounded-xs border border-border/80 bg-secondary/60 px-1.5 py-0.5 text-[0.65rem] text-muted-foreground"
               >
                 {t}
               </span>
@@ -138,11 +149,11 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
           <div className="mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
             <div>
               <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
-              <p className="text-xl font-display font-semibold text-foreground tracking-tight">
+              <p className="text-xl font-sans font-semibold text-foreground tracking-tight tabular-nums">
                 {displayPrice}
               </p>
               {currency !== "USD" && usdVal && (
-                <p className="text-[0.65rem] text-muted-foreground">USD {p.main}</p>
+                <p className="text-[0.68rem] text-muted-foreground font-medium">USD ${usdVal.toLocaleString("en-US")}</p>
               )}
             </div>
 

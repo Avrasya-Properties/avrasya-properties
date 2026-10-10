@@ -75,7 +75,7 @@ export type SiteSettings = {
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   companyName: "Avrasya Properties Group",
-  registeredEntity: "Albaraka Dış Ticaret Limited Şirketi",
+  registeredEntity: "Avrasya Properties Group",
   taxOffice: "Üsküdar / İstanbul",
   licenseNo: "İTO-34-78921",
   tagline: "Your Future Starts with the Right Investment.",
@@ -233,6 +233,12 @@ function load(): DB {
           parsed.siteSettings = { ...DEFAULT_SITE_SETTINGS };
         } else if (parsed.siteSettings.email === "info.avrasyaproperties@gmail.com") {
           parsed.siteSettings.email = "info@avrasyaproperties.com";
+        }
+        if (parsed.siteSettings?.registeredEntity?.includes("Albaraka")) {
+          parsed.siteSettings.registeredEntity = "Avrasya Properties Group";
+        }
+        if (parsed.siteSettings?.companyName?.includes("Albaraka")) {
+          parsed.siteSettings.companyName = "Avrasya Properties Group";
         }
         if (!parsed.inquiries) parsed.inquiries = seed().inquiries;
         db = parsed;

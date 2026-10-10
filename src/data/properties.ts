@@ -42,7 +42,7 @@ export const CONTACT = {
   phone: "+90 545 924 80 42",
   phoneHref: "tel:+905459248042",
   whatsapp: "https://wa.me/905459248042",
-  company: "Albaraka Dış Ticaret Limited Şirketi",
+  company: "Avrasya Properties Group",
   address: "Mimar Sinan Mahallesi, Selam-i Ali Efendi Caddesi, Ara Kafe Yanı No:17, 34672 Üsküdar / İstanbul, Türkiye",
   tagline: "Your Future Starts with the Right Investment.",
 };

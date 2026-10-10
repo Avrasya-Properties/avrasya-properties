@@ -7,27 +7,13 @@ import { useLiveContact } from "@/hooks/useLiveContact";
 import { Magnetic } from "./Motion";
 
 export function Logo({ className = "h-10", variant = "auto" }: { className?: string; variant?: "auto" | "light" | "dark" }) {
-  const isDark = variant === "light";
+  const isLight = variant === "light";
   return (
-    <div className={`flex items-center gap-3 select-none ${className}`}>
-      <svg className="h-full w-auto aspect-square shrink-0 drop-shadow-sm" viewBox="0 0 76 68" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M 4 60 Q 38 52 72 60" stroke="#B78C4D" strokeWidth="3" strokeLinecap="round" />
-        <path d="M 14 57 L 14 38 L 22 34 L 22 56" fill={isDark ? "#FFFFFF" : "#17384A"} stroke="#B78C4D" strokeWidth="1.2" />
-        <path d="M 26 55 L 26 26 L 35 20 L 35 54" fill={isDark ? "#FFFFFF" : "#17384A"} stroke="#B78C4D" strokeWidth="1.2" />
-        <path d="M 35 54 L 35 14 L 43 6 L 51 14 L 51 54" fill="#B78C4D" stroke={isDark ? "#FFFFFF" : "#17384A"} strokeWidth="1.2" />
-        <path d="M 43 14 L 43 50" stroke={isDark ? "#17384A" : "#F7F6F2"} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M 51 54 L 51 20 L 60 26 L 60 55" fill={isDark ? "#FFFFFF" : "#17384A"} stroke="#B78C4D" strokeWidth="1.2" />
-        <path d="M 64 56 L 64 34 L 72 38 L 72 57" fill={isDark ? "#FFFFFF" : "#17384A"} stroke="#B78C4D" strokeWidth="1.2" />
-      </svg>
-      <div className="flex flex-col justify-center leading-none">
-        <span className={`font-display text-lg md:text-xl tracking-[0.14em] font-semibold ${isDark ? "text-on-dark" : "text-foreground"}`}>
-          AVRASYA
-        </span>
-        <span className="font-sans text-[0.58rem] tracking-[0.24em] font-bold text-brass uppercase mt-0.5">
-          Properties Group
-        </span>
-      </div>
-    </div>
+    <img
+      src={isLight ? "/images/avrasya-logo-pure-white.svg" : "/images/avrasya-logo.svg"}
+      alt="Avrasya Properties Group"
+      className={`w-auto shrink-0 select-none object-contain ${className}`}
+    />
   );
 }
 
@@ -88,13 +74,10 @@ export function Header() {
       {/* Top Banner with live stats */}
       <div className="hidden border-b bg-primary text-on-dark md:block">
         <div className="container-site flex h-9 items-center justify-between text-[0.72rem] tracking-wide text-on-dark-muted">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center font-medium text-brass">
-              Istanbul Office · {time || "Europe/Istanbul"}
-            </span>
-            <span className="text-on-dark-muted/40">|</span>
-            <span className="text-on-dark-muted">
-              Independent Advisory & Legal Due Diligence
+          <div className="flex items-center gap-3">
+            <span className="flex items-center font-medium text-brass text-[0.74rem]">
+              <span className="pulse-live h-1.5 w-1.5 rounded-full bg-emerald-400 mr-2" />
+              Bosphorus Advisory Desk · {time || "Istanbul"}
             </span>
           </div>
 
@@ -321,9 +304,6 @@ export function Footer() {
               <strong className="text-on-dark block">Office Address:</strong>
               <span>{contact.address}</span>
             </li>
-            <li className="pt-1">
-              <span className="text-on-dark-muted/70">Operating entity: {contact.company}</span>
-            </li>
           </ul>
         </div>
       </div>
@@ -373,13 +353,12 @@ export function PageIntro({
     <section className="relative overflow-hidden border-b bg-gradient-to-b from-card/60 to-background">
       <div
         aria-hidden
-        data-parallax="0.25"
-        className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-center text-center opacity-40 z-0"
+        className="pointer-events-none absolute right-4 lg:right-10 top-8 hidden select-none md:flex md:flex-col items-end text-right opacity-30 z-0"
       >
-        <span className="outline-word text-[13rem] leading-none">
+        <span className="outline-word text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
           AVRASYA
         </span>
-        <span className="outline-word text-[4rem] tracking-[0.28em] mt-3 uppercase leading-none">
+        <span className="outline-word text-[2.4rem] lg:text-[3.2rem] tracking-[0.32em] mt-1 uppercase leading-none pr-1">
           PROPERTIES
         </span>
       </div>

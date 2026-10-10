@@ -67,12 +67,12 @@ export function Preloader() {
           isDone ? "scale-98 opacity-0 -translate-y-6" : "scale-100 opacity-100 translate-y-0"
         }`}
       >
-        {/* Dominant Screen-Present White Vector Logo */}
-        <div className="relative w-full flex justify-center py-6">
+        {/* Refined Luxury Vector Logo */}
+        <div className="relative w-full flex justify-center py-4">
           <img
             src="/images/avrasya-logo-pure-white.svg"
             alt="Avrasya Properties Group"
-            className="w-[88vw] max-w-xl md:max-w-2xl lg:max-w-3xl h-auto max-h-[30vh] object-contain drop-shadow-[0_8px_32px_rgba(0,0,0,0.5)] filter brightness-110"
+            className="w-[58vw] max-w-sm md:max-w-md lg:max-w-[420px] h-auto max-h-[14vh] object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
           />
         </div>
 

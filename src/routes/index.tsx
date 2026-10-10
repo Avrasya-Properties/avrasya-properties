@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight,
   Building,
+  Calculator,
   CheckCircle2,
   Compass,
   FileCheck2,
@@ -32,6 +33,8 @@ import {
 import { CtaBand, Logo } from "@/components/site/Chrome";
 import { Marquee, Tilt } from "@/components/site/Motion";
 import { PropertyCard } from "@/components/site/PropertyCard";
+import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
+import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useSiteSettings } from "@/admin/store";
@@ -57,41 +60,6 @@ const EDITORIAL = [
   "oryapark-1-1-325",
 ].map((s) => getProperty(s)!) as PropertyRecord[];
 
-const DISTRICT_CORRIDORS = [
-  {
-    title: "Maslak Financial Hub",
-    district: "Maslak · Sariyer",
-    desc: "Corporate skyscraper axis with direct metro links, multinational executive tenants, and strong USD yields.",
-    image: "/images/properties/istanbul-project-01.jpg",
-    avgYield: "7.2% Yield",
-    slugParam: "Maslak",
-  },
-  {
-    title: "Central Şişli & Bomonti",
-    district: "Şişli · Bomonti",
-    desc: "Minutes from Nişantaşı luxury shopping. High resale liquidity and vibrant cosmopolitan urban lifestyle.",
-    image: "/images/properties/sisli-luxury-1.jpg",
-    avgYield: "Prime Capital Growth",
-    slugParam: "Şişli",
-  },
-  {
-    title: "Istanbul Financial Center",
-    district: "Ataşehir · Ümraniye",
-    desc: "The Asian side's multi-billion dollar banking capital with world-class residential towers and family amenities.",
-    image: "/images/properties/atasehir-residence-1.jpg",
-    avgYield: "High Appreciation",
-    slugParam: "Ataşehir",
-  },
-  {
-    title: "Avrupa Residence Oryapark",
-    district: "Ümraniye · Küçüksu",
-    desc: "Signature twin-tower development with integrated shopping boulevard and direct highway arterial links.",
-    image: "/images/properties/orya-park-exterior.jpg",
-    avgYield: "12–18% Appreciation",
-    slugParam: "Ümraniye",
-  },
-];
-
 function Home() {
   const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
@@ -114,13 +82,12 @@ function Home() {
         {/* Ambient Brand Watermark in Hero */}
         <div
           aria-hidden
-          data-parallax="0.25"
-          className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-center text-center opacity-25 z-0"
+          className="pointer-events-none absolute right-4 lg:right-10 top-8 lg:top-6 hidden select-none md:flex md:flex-col items-end text-right opacity-30 dark:opacity-20 z-0"
         >
-          <span className="outline-word text-[13rem] leading-none">
+          <span className="outline-word text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
             AVRASYA
           </span>
-          <span className="outline-word text-[4rem] tracking-[0.28em] mt-3 uppercase leading-none">
+          <span className="outline-word text-[2.2rem] lg:text-[3rem] tracking-[0.32em] mt-1.5 uppercase leading-none pr-1">
             PROPERTIES
           </span>
         </div>
@@ -184,7 +151,7 @@ function Home() {
               <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
                 <span>Browse All 18 Offers</span> <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/contact" className="btn btn-outline gap-2">
+              <Link to="/contact" className="btn btn-outline gap-1.5">
                 <span>Book Consultation</span>
               </Link>
             </div>
@@ -465,61 +432,11 @@ function Home() {
         </div>
       </section>
 
-      {/* Prime Investment Corridors Showcase */}
-      <section className="border-y border-border/80 bg-card py-20 relative">
-        <div className="container-site">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end mb-12">
-            <div>
-              <p className="eyebrow eyebrow-mark">Istanbul Geography</p>
-              <h2 className="headline mt-2 text-3xl md:text-4xl">Prime investment corridors</h2>
-            </div>
-            <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-              Istanbul's two continents offer distinct investment profiles: corporate expatriate leasing, historical trophy status, or rapid financial district infrastructure appreciation.
-            </p>
-          </div>
+      {/* Bosphorus Cross-Strait Geographical Corridor Navigator */}
+      <BosphorusNavigator />
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {DISTRICT_CORRIDORS.map((c) => (
-              <div
-                key={c.title}
-                className="group relative overflow-hidden rounded-xs border border-border/70 bg-background transition-all duration-300 hover:border-brass/70 hover:shadow-lg flex flex-col"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-                  <img
-                    src={c.image}
-                    alt={c.title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <span className="absolute bottom-2.5 left-2.5 rounded-xs bg-black/60 backdrop-blur-xs px-2 py-0.5 text-[0.68rem] font-semibold text-brass">
-                    {c.avgYield}
-                  </span>
-                </div>
-                <div className="p-5 flex flex-1 flex-col">
-                  <p className="text-[0.7rem] font-semibold text-muted-foreground uppercase tracking-wider">{c.district}</p>
-                  <h3 className="font-display text-lg font-medium text-foreground mt-1 group-hover:text-brass transition-colors">
-                    {c.title}
-                  </h3>
-                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed flex-1">
-                    {c.desc}
-                  </p>
-                  <div className="mt-4 pt-3 border-t border-border/60">
-                    <button
-                      onClick={() => navigate({ to: "/properties", search: { loc: c.slugParam } })}
-                      className="text-xs font-semibold text-foreground flex items-center gap-1.5 hover:text-brass transition-colors"
-                    >
-                      <span>View listings in {c.slugParam}</span> <ArrowRight className="h-3 w-3 arrow" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Turkish Citizenship Banner with Value Calculator */}
-      <section className="container-site py-20">
+      {/* Turkish Citizenship Banner with Value Barometer */}
+      <section className="container-site pt-20 pb-12">
         <div
           data-reveal="mask"
           className="relative overflow-hidden rounded-xs border border-brass/40 bg-primary p-8 md:p-14 text-on-dark shadow-xl"
@@ -553,15 +470,19 @@ function Home() {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/citizenship" className="btn btn-light shadow-sm">
-                Read Official CBI Guide & Requirements
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href="#calculator" className="btn btn-light shadow-sm gap-2">
+                <Calculator className="h-4 w-4 text-brass" />
+                <span>Calculate Total All-In Closing Costs</span>
+              </a>
+              <Link to="/citizenship" className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10">
+                Official CBI Guide & Requirements
               </Link>
               <a
                 href={waLink("Hello Avrasya Properties, I would like to consult on Turkish Citizenship by Investment ($400,000 CBI).")}
                 target="_blank"
                 rel="noreferrer"
-                className="btn btn-outline !border-on-dark/30 !text-on-dark hover:!bg-on-dark/10"
+                className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10"
               >
                 <MessageSquare className="h-3.5 w-3.5 text-brass" /> Consult a Citizenship Adviser
               </a>
@@ -576,6 +497,11 @@ function Home() {
             TÜRKİYE
           </div>
         </div>
+      </section>
+
+      {/* Interactive Title Deed (Tapu) & Acquisition Cost Ledger */}
+      <section className="container-site pb-20">
+        <AcquisitionCalculator />
       </section>
 
       {/* Advisory Directory Process Framework */}

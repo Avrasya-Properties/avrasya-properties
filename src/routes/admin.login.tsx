@@ -1,9 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import logo from "@/assets/avrasya-logo.png.asset.json";
 import { DEMO_PASSWORD, USERS, login, getSession } from "@/admin/store";
 import { btnPrimary, field } from "@/admin/Shell";
-
 export const Route = createFileRoute("/admin/login")({
   validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s["redirect"] === "string" ? s["redirect"] : undefined }),
   head: () => ({ meta: [{ title: "Sign in — Avrasya Admin" }, { name: "robots", content: "noindex" }, { name: "description", content: "Demo sign-in for the Avrasya workspace." }, { property: "og:title", content: "Sign in — Avrasya Admin" }, { property: "og:description", content: "Demo sign-in for the Avrasya workspace." }] }),
@@ -25,7 +23,7 @@ function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 font-sans">
       <div className="w-full max-w-md rounded-md border bg-card p-6">
-        <img src={logo.url} alt="Avrasya Property" className="mb-5 h-10 w-auto object-contain" />
+        <img src="/images/avrasya-logo.svg" alt="Avrasya Properties Group" className="mb-5 h-10 w-auto object-contain" />
         <h1 className="text-lg font-semibold">Sign in to the workspace</h1>
         <p className="mb-4 text-xs text-muted-foreground">Use fictional information only. Demo accounts, not secure authentication.</p>
         <form onSubmit={submit} className="space-y-3">

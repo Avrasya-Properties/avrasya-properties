@@ -156,7 +156,15 @@ details[open] .faq-body { animation: rise 200ms ease-out; }
 
 /* Architectural blueprint backdrop */
 .blueprint { background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 48px 48px; }
-.outline-word { font-family: var(--font-display); color: transparent; -webkit-text-stroke: 1px color-mix(in oklab, var(--ink) 18%, transparent); line-height: .8; letter-spacing: -0.04em; }
+.outline-word {
+  font-family: var(--font-display);
+  color: transparent;
+  -webkit-text-stroke: 1.2px color-mix(in oklab, var(--ink) 22%, transparent);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  padding-top: 0.05em;
+  display: block;
+}
 
 /* 3D tower model */
 .tower-scene { perspective: 900px; }
@@ -221,4 +229,68 @@ details[open] .faq-body { animation: rise 200ms ease-out; }
 .hover-glow:hover {
   box-shadow: 0 16px 36px -12px rgba(183, 140, 77, 0.18);
   border-color: rgba(183, 140, 77, 0.55);
+}
+
+/* Editorial Architectural Monograph & Ledger Styling */
+.arch-crosshair {
+  position: relative;
+}
+.arch-crosshair::before,
+.arch-crosshair::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--brass);
+  opacity: 0.6;
+}
+.arch-crosshair-tl::before { top: -4px; left: -1px; width: 2px; height: 9px; }
+.arch-crosshair-tl::after  { top: -1px; left: -4px; width: 9px; height: 2px; }
+.arch-crosshair-tr::before { top: -4px; right: -1px; width: 2px; height: 9px; }
+.arch-crosshair-tr::after  { top: -1px; right: -4px; width: 9px; height: 2px; }
+.arch-crosshair-br::before { bottom: -4px; right: -1px; width: 2px; height: 9px; }
+.arch-crosshair-br::after  { bottom: -1px; right: -4px; width: 9px; height: 2px; }
+.arch-crosshair-bl::before { bottom: -4px; left: -1px; width: 2px; height: 9px; }
+.arch-crosshair-bl::after  { bottom: -1px; left: -4px; width: 9px; height: 2px; }
+
+/* Micro-Pulse for Live Advisory Desk Status */
+.pulse-live {
+  position: relative;
+  display: inline-flex;
+}
+.pulse-live::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background-color: #10B981;
+  opacity: 0.75;
+  animation: pingLive 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes pingLive {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Subtle Architectural Grid Background */
+.bg-blueprint-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(23, 56, 74, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(23, 56, 74, 0.04) 1px, transparent 1px);
+}
+.bg-blueprint-grid-dark {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Monograph Ledger Badges */
+.ledger-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
