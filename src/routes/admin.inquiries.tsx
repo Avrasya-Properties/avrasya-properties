@@ -264,7 +264,7 @@ export function AdminInquiriesPage() {
                           )}
                           {!inq.leadId && inq.status !== "Archived" && (
                             <button
-                              disabled={!can(user, "edit-crm", inq.agentId) || (user?.role === "agent" && inq.agentId !== user.id) || Boolean(inq.leadId) || inq.status === "Archived"}
+                              disabled={!can(user, "edit-crm", inq.agentId) || (user?.role === "agent" && inq.agentId !== user.id)}
                               onClick={() => handleConvertToLead(inq.id)}
                               className="rounded p-1 text-brass hover:bg-brass/10"
                               title="Convert to CRM Lead"

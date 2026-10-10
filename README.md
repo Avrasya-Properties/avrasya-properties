@@ -13,6 +13,7 @@ bun install --frozen-lockfile
 bun run dev
 bun run test
 bun run build
+bun run typecheck
 ```
 
 Demo sign-in is enabled during development. A production preview must explicitly opt in with `VITE_ENABLE_ADMIN_DEMO=true` at build time. Leave it false/unset on a production deployment. There is no production sign-in replacement yet.
@@ -28,8 +29,8 @@ Use fictional information in the demo. Browser backups contain personal records 
 - Deal agreements with explicit units, amounts and stages. A shortlist is not a purchase agreement.
 - Demo website settings and validated, administrator-only backup/restore.
 
-Unknown source facts remain unknown. A asking price alone does not verify citizenship eligibility, and source records are not independent legal/title/availability verification.
+Unknown source facts remain unknown. An asking price alone does not verify citizenship eligibility, and source records are not independent legal/title/availability verification.
 
 ## Checks
 
-`.github/workflows/admin-checks.yml` runs the regression suite and a production build on pull requests. A passing build confirms compilation/bundling; live Supabase policies, migrations, authentication, shared persistence and cross-device publishing still require their own integration tests.
+`.github/workflows/admin-checks.yml` runs the regression suite, a production build and type checking on pull requests. A passing build confirms compilation/bundling; live Supabase policies, migrations, authentication, shared persistence and cross-device publishing still require their own integration tests.
