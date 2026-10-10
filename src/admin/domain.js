@@ -151,3 +151,12 @@ export function istanbulDateTime(value) {
   if (local !== value) throw new Error("This calendar date does not exist.");
   return date.toISOString();
 }
+
+export function currencyTotals(records) {
+  const totals = {};
+  for (const record of records) {
+    if (!["USD", "EUR", "TRY", "GBP"].includes(record.currency) || typeof record.amount !== "number" || !Number.isFinite(record.amount) || record.amount < 0) continue;
+    totals[record.currency] = (totals[record.currency] || 0) + record.amount;
+  }
+  return totals;
+}

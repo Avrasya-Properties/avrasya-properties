@@ -162,7 +162,7 @@ try {
   assert.deepEqual(deal.propertyIds, [unit.id]);
   results.push("Explicit unit agreement, reservation and sale completion");
 
-  for (const [path, heading] of [["/admin/calendar", "Calendar"], ["/admin/tasks", "Tasks"], ["/admin/projects", "Developments"], ["/admin/analytics", "Portfolio Analytics"]]) {
+  for (const [path, heading] of [["/admin/calendar", "Calendar"], ["/admin/tasks", "Tasks"], ["/admin/projects", "Projects"], ["/admin/analytics", "Portfolio Analytics & Intelligence"]]) {
     await visit(path, heading);
   }
   results.push("Calendar, tasks, projects and analytics load");

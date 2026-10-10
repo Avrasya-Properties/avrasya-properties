@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contactMatch, exactBudget, istanbulDateTime, validateDealSelection, validateWorkspace } from "@/admin/domain.js";
+import { contactMatch, currencyTotals, exactBudget, istanbulDateTime, validateDealSelection, validateWorkspace } from "@/admin/domain.js";
 import type { Deal, Property } from "@/admin/store";
 
 const property = (patch: Partial<Property> = {}): Property => ({
@@ -64,5 +64,11 @@ describe("backup validation", () => {
     expect(() => validateWorkspace({ schemaVersion: 99, data: {} })).toThrow(/version/);
     expect(() => validateWorkspace({ properties: [] })).toThrow(/array/);
     expect(() => validateWorkspace(null)).toThrow();
+  });
+});
+
+describe("management totals", () => {
+  it("keeps currencies separate and ignores unknown or invalid amounts", () => {
+    expect(currencyTotals([{ amount: 100, currency: "USD" }, { amount: 200, currency: "EUR" }, { amount: 50, currency: "USD" }, { amount: 10000, currency: "TRY" }, { amount: null, currency: "USD" }, { amount: NaN, currency: "GBP" }, { amount: 999, currency: null }])).toEqual({ USD: 150, EUR: 200, TRY: 10000 });
   });
 });

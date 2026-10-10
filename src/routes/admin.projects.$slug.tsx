@@ -14,7 +14,7 @@ function ProjectDetail() {
   const addUnit = () => {
     try {
       const { id: _id, ...rest } = base;
-      const p = upsert<Property>("properties", { ...rest, ref: `AVR-${1001 + db.properties.length}`, slug: `${base.slug}-${Date.now() % 10000}`, title: `${base.project} — new unit`, layout: null, grossM2: null, netM2: null, areaM2: null, amount: null, availability: "Unknown", publication: "Draft", cover: null, agentId: user!.id });
+      const p = upsert<Property>("properties", { ...rest, ref: `AVR-${Math.max(1000, ...db.properties.map((p) => Number(p.ref.replace(/^AVR-/, ""))).filter(Number.isFinite)) + 1}`, slug: `${base.slug}-${crypto.randomUUID()}`, title: `${base.project} — new unit`, type: "unit offer", layout: null, bathrooms: null, grossM2: null, netM2: null, areaM2: null, amount: null, sourceNote: "New unit identity and source details require confirmation", availability: "Unknown", publication: "Draft", cover: null, agentId: user!.id });
       nav({ to: "/admin/properties/$id", params: { id: p.id } });
     } catch (e) { toast.error((e as Error).message); }
   };

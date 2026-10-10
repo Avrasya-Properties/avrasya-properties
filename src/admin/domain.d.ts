@@ -10,3 +10,4 @@ export function validateWorkspace(input: unknown): DB;
 export function validateDealSelection(deal: Deal, properties: Property[], otherDeals: Deal[]): Property[];
 
 export function istanbulDateTime(value: string): string;
+export function currencyTotals(records: readonly { amount: number | null; currency: string | null }[]): Partial<Record<"USD" | "EUR" | "TRY" | "GBP", number>>;
