@@ -62,7 +62,7 @@ const DISTRICT_CORRIDORS = [
     title: "Maslak Financial Hub",
     district: "Maslak · Sariyer",
     desc: "Corporate skyscraper axis with direct metro links, multinational executive tenants, and strong USD yields.",
-    image: "/images/properties/maslak-tower.jpg",
+    image: "/images/properties/istanbul-project-01.jpg",
     avgYield: "7.2% Yield",
     slugParam: "Maslak",
   },
@@ -70,7 +70,7 @@ const DISTRICT_CORRIDORS = [
     title: "Central Şişli & Bomonti",
     district: "Şişli · Bomonti",
     desc: "Minutes from Nişantaşı luxury shopping. High resale liquidity and vibrant cosmopolitan urban lifestyle.",
-    image: "/images/properties/sisli-residence.jpg",
+    image: "/images/properties/sisli-luxury-1.jpg",
     avgYield: "Prime Capital Growth",
     slugParam: "Şişli",
   },
@@ -78,17 +78,17 @@ const DISTRICT_CORRIDORS = [
     title: "Istanbul Financial Center",
     district: "Ataşehir · Ümraniye",
     desc: "The Asian side's multi-billion dollar banking capital with world-class residential towers and family amenities.",
-    image: "/images/properties/atasehir-sky.jpg",
+    image: "/images/properties/atasehir-residence-1.jpg",
     avgYield: "High Appreciation",
     slugParam: "Ataşehir",
   },
   {
-    title: "Bosphorus & Coastal Belt",
-    district: "Beşiktaş · Ataköy",
-    desc: "Prestigious maritime residences with sea vistas, marina berths, and private terraces.",
-    image: "/images/properties/bosphorus-terrace.jpg",
-    avgYield: "Trophy Asset",
-    slugParam: "Beşiktaş",
+    title: "Avrupa Residence Oryapark",
+    district: "Ümraniye · Küçüksu",
+    desc: "Signature twin-tower development with integrated shopping boulevard and direct highway arterial links.",
+    image: "/images/properties/orya-park-exterior.jpg",
+    avgYield: "12–18% Appreciation",
+    slugParam: "Ümraniye",
   },
 ];
 
@@ -110,7 +110,21 @@ function Home() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-8 pb-16 md:pt-14 md:pb-24 bg-gradient-to-b from-card/30 via-background to-background">
-        <div className="container-site">
+        {/* Ambient Brand Watermark in Hero */}
+        <div
+          aria-hidden
+          data-parallax="0.25"
+          className="pointer-events-none absolute -right-6 top-6 hidden select-none md:flex md:flex-col items-start opacity-25 z-0"
+        >
+          <span className="outline-word text-[9.5rem] lg:text-[13rem] leading-[0.82]">
+            AVRASYA
+          </span>
+          <span className="outline-word text-[3rem] lg:text-[4.2rem] tracking-[0.14em] -mt-3 lg:-mt-5 pl-2 leading-[0.85]">
+            Properties
+          </span>
+        </div>
+
+        <div className="container-site relative z-10">
           {/* Header Typography & Intro */}
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">

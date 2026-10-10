@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { IstanbulSkyline } from "./IstanbulSkyline";
 
 export function Preloader() {
   const [percent, setPercent] = useState(0);
@@ -16,13 +17,13 @@ export function Preloader() {
       /* ignore */
     }
 
-    const duration = 1350; // 1.35s luxury duration
+    const duration = 1400; // 1.4s smooth luxury timing
     const startTime = performance.now();
 
     const update = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
-      // Refined cubic-out easing curve
+      // Precision cubic-out easing curve
       const eased = 1 - Math.pow(1 - progress, 3);
       const val = Math.floor(eased * 100);
       setPercent(val);
@@ -31,7 +32,7 @@ export function Preloader() {
         requestAnimationFrame(update);
       } else {
         setPercent(100);
-        setTimeout(() => setIsDone(true), 180); // Brief hold at 100%
+        setTimeout(() => setIsDone(true), 200); // Dignified pause at 100%
         setTimeout(() => {
           setDismissed(true);
           try {
@@ -39,7 +40,7 @@ export function Preloader() {
           } catch {
             /* ignore */
           }
-        }, 950);
+        }, 900);
       }
     };
 
@@ -52,47 +53,53 @@ export function Preloader() {
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#07080a] transition-transform duration-800 ease-[cubic-bezier(0.77,0,0.175,1)] ${
-        isDone ? "-translate-y-full pointer-events-none" : "translate-y-0"
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B2228] transition-all duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
+        isDone ? "-translate-y-full opacity-90 pointer-events-none" : "translate-y-0 opacity-100"
       }`}
+      style={{
+        backgroundColor: "#0B2228",
+        backgroundImage: "radial-gradient(ellipse at 50% 40%, #133942 0%, #0B2228 65%, #07171B 100%)",
+      }}
     >
-      {/* Subtle ambient architectural vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(183,140,77,0.06)_0%,transparent_70%)]" />
-
-      {/* Center Stage: Grand Screen-Covering Logo & Clean Minimal Numerals */}
+      {/* Centerpiece Stage: Crisp White Logo & Refined Gold Loading */}
       <div
-        className={`relative z-10 flex w-full max-w-5xl flex-col items-center px-6 transition-all duration-700 ease-out ${
-          isDone ? "scale-105 opacity-0 -translate-y-8" : "scale-100 opacity-100 translate-y-0"
+        className={`relative z-10 flex w-full max-w-4xl flex-col items-center px-6 transition-all duration-600 ease-out ${
+          isDone ? "scale-98 opacity-0 -translate-y-6" : "scale-100 opacity-100 translate-y-0"
         }`}
       >
-        {/* Grand High-Impact Logo across the screen */}
-        <div className="relative w-full flex justify-center py-4">
+        {/* Dominant Screen-Present White Vector Logo */}
+        <div className="relative w-full flex justify-center py-6">
           <img
-            src="/images/avrasya-logo-white.svg"
-            alt="Avrasya Properties"
-            className="w-[85vw] max-w-2xl md:max-w-3xl lg:max-w-4xl h-auto max-h-[35vh] object-contain drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)] filter brightness-105"
+            src="/images/avrasya-logo-pure-white.svg"
+            alt="Avrasya Properties Group"
+            className="w-[88vw] max-w-xl md:max-w-2xl lg:max-w-3xl h-auto max-h-[30vh] object-contain drop-shadow-[0_8px_32px_rgba(0,0,0,0.5)] filter brightness-110"
           />
         </div>
 
-        {/* Minimal Precision Hairline Progress Rule */}
-        <div className="relative mt-8 md:mt-12 h-[1px] w-56 md:w-80 overflow-hidden bg-white/10">
+        {/* Minimal Precision Hairline Gold Progress Bar */}
+        <div className="relative mt-8 md:mt-10 h-[1.5px] w-64 md:w-80 overflow-hidden rounded-full bg-white/10 shadow-[0_0_8px_rgba(0,0,0,0.3)]">
           <div
-            className="h-full bg-gradient-to-r from-brass/50 via-brass to-[#e2c17c] transition-all duration-75 ease-out"
+            className="h-full bg-gradient-to-r from-[#B78C4D] via-[#E5C378] to-[#D4AF37] transition-all duration-75 ease-out shadow-[0_0_12px_rgba(212,175,55,0.7)]"
             style={{ width: `${percent}%` }}
           />
         </div>
 
-        {/* Pure Minimal Counter Numerals */}
-        <div className="mt-4 flex items-baseline gap-1">
-          <span className="font-mono text-3xl md:text-4xl font-light tracking-tight text-white/90 tabular-nums">
+        {/* Minimal Gold Progress Numeral (Zero AI labels below) */}
+        <div className="mt-5 flex items-baseline gap-1 text-[#D4AF37]">
+          <span className="font-sans text-2xl md:text-3xl font-light tracking-wider tabular-nums">
             {percent}
           </span>
-          <span className="font-mono text-xs text-brass font-normal tracking-widest">%</span>
+          <span className="text-[10px] md:text-xs font-normal tracking-widest text-[#B78C4D] uppercase">
+            %
+          </span>
         </div>
       </div>
 
-      {/* Razor-thin bottom golden guide line on curtain exit */}
-      <div className="absolute bottom-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-brass to-transparent opacity-60" />
+      {/* Istanbul Architectural Skyline Outline along the bottom */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 w-full overflow-hidden select-none">
+        <IstanbulSkyline className="w-full h-24 sm:h-32 md:h-40 lg:h-48" />
+        <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#D4AF37]/45 to-transparent" />
+      </div>
     </div>
   );
 }

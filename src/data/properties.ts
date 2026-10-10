@@ -142,133 +142,175 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   const s = r.slug.toLowerCase();
   const isCbi = (comparableUsd(r.price) ?? 0) >= 400000;
   
-  if (s.includes("maslak")) {
+  if (s.includes("oryapark") || s.includes("umraniye")) {
     return {
-      cover: "/images/properties/maslak-tower.jpg",
+      cover: "/images/properties/orya-park-exterior.jpg",
       gallery: [
-        "/images/properties/maslak-tower.jpg",
-        "/images/properties/master-suite.jpg",
-        "/images/properties/hero-main.jpg",
-        "/images/properties/floorplan-cad.jpg"
+        "/images/properties/orya-park-exterior.jpg",
+        "/images/properties/orya-park-1.jpg",
+        "/images/properties/orya-park-2.jpg",
+        "/images/properties/orya-park-interior-1.jpg",
+        "/images/properties/orya-park-interior-2.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
       ],
-      floorPlan: "/images/properties/floorplan-cad.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Prime Maslak", "High Rental Yield", "Financial District"],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Avrupa Residence", "Ümraniye Corridor", "Prime Twin Towers"],
       highlights: [
-        "Floor-to-ceiling acoustic soundproof glazing with skyline view",
-        "Valet parking, 24/7 concierge & business executive lounge",
-        "Direct underground connection to ITU Ayazağa Metro line",
-        "Target gross rental yield: 7.2% USD"
+        "Iconic dual-tower mixed development on Küçüksu Avenue",
+        "Direct highway access to FSM & Bosphorus bridge corridors",
+        "Curated ground-floor retail street and private wellness club",
+        "Strong rental yields fueled by Istanbul Financial Center professionals"
       ]
     };
   }
-  if (s.includes("ferikoy") || s.includes("duplex")) {
+  if (s.includes("gunesli") || s.includes("avrupa-gunesli")) {
     return {
-      cover: "/images/properties/ferikoy-duplex.jpg",
+      cover: "/images/properties/gunesli-express-1.jpg",
       gallery: [
-        "/images/properties/ferikoy-duplex.jpg",
-        "/images/properties/bosphorus-terrace.jpg",
-        "/images/properties/master-suite.jpg",
-        "/images/properties/floorplan-cad.jpg"
+        "/images/properties/gunesli-express-1.jpg",
+        "/images/properties/gunesli-express-2.jpg",
+        "/images/properties/gunesli-express-3.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
       ],
-      floorPlan: "/images/properties/floorplan-cad.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Duplex Penthouse", "Central Şişli", "Panoramic View"],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "High Rental Demand", "Modern Complex"],
       highlights: [
-        "Double-height architectural ceiling in primary salon",
-        "Designer open-plan kitchen with Calacatta quartz island",
-        "5 minutes walk to Bomontiada cultural & culinary hub",
-        "High capital appreciation potential in central regeneration zone"
+        "Positioned on the Basın Ekspres prime business axis",
+        "Close proximity to metro links and major transit arteries",
+        "Comprehensive landscaped gardens, indoor pools, and fitness club",
+        "Flexible installment and cash purchase options available"
       ]
     };
   }
   if (s.includes("atasehir")) {
     return {
-      cover: "/images/properties/atasehir-sky.jpg",
+      cover: "/images/properties/atasehir-residence-1.jpg",
       gallery: [
-        "/images/properties/atasehir-sky.jpg",
-        "/images/properties/master-suite.jpg",
-        "/images/properties/bosphorus-terrace.jpg",
-        "/images/properties/floorplan-cad.jpg"
+        "/images/properties/atasehir-residence-1.jpg",
+        "/images/properties/atasehir-residence-2.jpg",
+        "/images/properties/atasehir-residence-3.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
       ],
-      floorPlan: "/images/properties/floorplan-cad.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Asian Side", "IFC Hub", "Luxury Amenities"],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Asian Side", "IIFC Financial Hub", "Executive Living"],
       highlights: [
         "Adjacent to the new Istanbul International Financial Center (IIFC)",
-        "Semi-Olympic heated outdoor pool, fitness & spa center",
-        "Smart home automation for climate, energy & security control",
-        "Premium multinational corporate executive tenant demand"
+        "Semi-Olympic heated pool, fitness suite & private resident parking",
+        "Smart home automation for climate and energy efficiency",
+        "Strong blue-chip executive tenant demand and dollar liquidity"
+      ]
+    };
+  }
+  if (s.includes("sisli") || s.includes("ferikoy")) {
+    return {
+      cover: "/images/properties/sisli-luxury-1.jpg",
+      gallery: [
+        "/images/properties/sisli-luxury-1.jpg",
+        "/images/properties/sisli-luxury-2.jpg",
+        "/images/properties/istanbul-project-44.jpg",
+        "/images/properties/istanbul-project-45.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
+      ],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Central Şişli", "Near Nişantaşı", "High Liquidity"],
+      highlights: [
+        "Prime European-side location walking distance from Bomonti and Nişantaşı",
+        "Boutique low-rise architecture with high acoustic insulation",
+        "Rapid capital appreciation zone in central Istanbul",
+        "Complete legal title deed verification conducted"
       ]
     };
   }
   if (s.includes("topkapi")) {
     return {
-      cover: "/images/properties/topkapi-pearl.jpg",
+      cover: "/images/properties/istanbul-project-47.jpg",
       gallery: [
-        "/images/properties/topkapi-pearl.jpg",
-        "/images/properties/hero-main.jpg",
-        "/images/properties/master-suite.jpg",
-        "/images/properties/floorplan-cad.jpg"
+        "/images/properties/istanbul-project-47.jpg",
+        "/images/properties/istanbul-project-48.jpg",
+        "/images/properties/istanbul-project-39.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
       ],
-      floorPlan: "/images/properties/floorplan-cad.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Family Complex", "Botanical Courtyard", "Near Tram & Metro"],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Historic Peninsula Axis", "Family Residence", "Transit Hub"],
       highlights: [
-        "Low-density horizontal architecture with tranquil reflection pools",
-        "Private underground garage with dedicated EV charging stations",
-        "Direct access to E-5 highway, Metrobus, and historic peninsula",
-        "Full preliminary title audit on file for international acquisition"
+        "Spacious layouts designed for family comfort with inner courtyards",
+        "Direct connection to tram, Metrobus, and E-5 transport spine",
+        "Full title deed clearance and citizenship compliance ready",
+        "Underground assigned parking with 24/7 guarded security"
       ]
     };
   }
-  if (s.includes("atakoy") || s.includes("sea-view") || s.includes("besiktas")) {
+  if (s.includes("maslak") || s.includes("rams")) {
     return {
-      cover: "/images/properties/bosphorus-terrace.jpg",
+      cover: "/images/properties/istanbul-project-01.jpg",
       gallery: [
-        "/images/properties/bosphorus-terrace.jpg",
-        "/images/properties/hero-main.jpg",
-        "/images/properties/master-suite.jpg",
-        "/images/properties/floorplan-cad.jpg"
+        "/images/properties/istanbul-project-01.jpg",
+        "/images/properties/istanbul-project-04.jpg",
+        "/images/properties/istanbul-project-46.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
       ],
-      floorPlan: "/images/properties/floorplan-cad.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Prime Location", "Bosphorus Coastline", "Exclusive Penthouse"],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Maslak CBD", "Skyscraper Axis", "High Yield"],
       highlights: [
-        "Panoramic uninterrupted Bosphorus & Marmara Sea maritime vistas",
-        "Private wrap-around teak wood sun terrace with fire table",
-        "5-star hotel concierge services, spa & marina berth access",
-        "Trophy blue-chip Istanbul real estate asset with elite resale liquidity"
+        "Floor-to-ceiling soundproof acoustic glass with skyline panorama",
+        "Valet service, executive lounge, and private meeting facilities",
+        "Direct covered access to ITU Ayazağa Metro station",
+        "Premium multinational corporate executive tenancy"
       ]
     };
   }
-  if (s.includes("sisli")) {
+  if (s.includes("besiktas") || s.includes("turkerler") || s.includes("ciftci")) {
     return {
-      cover: "/images/properties/sisli-residence.jpg",
+      cover: "/images/properties/istanbul-project-00.jpg",
       gallery: [
-        "/images/properties/sisli-residence.jpg",
-        "/images/properties/ferikoy-duplex.jpg",
-        "/images/properties/master-suite.jpg",
-        "/images/properties/floorplan-cad.jpg"
+        "/images/properties/istanbul-project-00.jpg",
+        "/images/properties/istanbul-project-01.jpg",
+        "/images/properties/istanbul-project-02.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
       ],
-      floorPlan: "/images/properties/floorplan-cad.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Boutique Şişli", "Near Nişantaşı", "Contemporary Design"],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Trophy Asset", "Beşiktaş Core", "Exclusive Tower"],
       highlights: [
-        "Architectural bronze facade with private recessed sun loggias",
-        "Walking distance to Nişantaşı haute-couture fashion mile",
-        "LEED-certified green building energy efficiency",
-        "Strong liquidity on secondary international resale market"
+        "Signature architectural landmark in central Istanbul",
+        "Ultra-luxury concierge, helipad, and private resident wellness club",
+        "Unrivaled Bosphorus and skyline orientation",
+        "Blue-chip international wealth preservation asset"
+      ]
+    };
+  }
+  if (s.includes("atakoy") || s.includes("terrace")) {
+    return {
+      cover: "/images/properties/istanbul-project-02.jpg",
+      gallery: [
+        "/images/properties/istanbul-project-02.jpg",
+        "/images/properties/istanbul-project-03.jpg",
+        "/images/properties/istanbul-project-43.jpg",
+        "/images/properties/gunesli-floorplan.jpg"
+      ],
+      floorPlan: "/images/properties/gunesli-floorplan.jpg",
+      tags: [isCbi ? "Citizenship Eligible" : "Coastal Belt", "Marina Proximity", "Panoramic Terrace"],
+      highlights: [
+        "Expansive private sun terrace with coastal sea views",
+        "5-star concierge services, marina access, and landscaped gardens",
+        "Minutes to Marmaray rail link and coastal expressway",
+        "Exceptional resale liquidity in high-demand residential precinct"
       ]
     };
   }
   return {
-    cover: "/images/properties/hero-main.jpg",
+    cover: "/images/properties/orya-park-exterior.jpg",
     gallery: [
-      "/images/properties/hero-main.jpg",
-      "/images/properties/master-suite.jpg",
-      "/images/properties/floorplan-cad.jpg"
+      "/images/properties/orya-park-exterior.jpg",
+      "/images/properties/atasehir-residence-1.jpg",
+      "/images/properties/gunesli-express-1.jpg",
+      "/images/properties/gunesli-floorplan.jpg"
     ],
-    floorPlan: "/images/properties/floorplan-cad.jpg",
-    tags: [isCbi ? "Citizenship Eligible" : "Istanbul Investment", "Verified Source", "Advisory Support"],
+    floorPlan: "/images/properties/gunesli-floorplan.jpg",
+    tags: [isCbi ? "Citizenship Eligible" : "Istanbul Portfolio", "Verified Source", "Advisory Support"],
     highlights: [
       "Original developer source documentation independently verified",
       "Title deed status pre-screened with Turkish Land Registry (Tapu)",
-      "Coordinated Turkish Tax ID and banking setup for foreign nationals",
+      "Coordinated Turkish Tax ID and banking setup for international investors",
       "Full post-handover property & rental management onboarding"
     ]
   };
