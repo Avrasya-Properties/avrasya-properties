@@ -826,3 +826,5 @@ end $$;
 revoke all on function private.refresh_snapshot_availability() from public,anon,authenticated;
 create trigger snapshot_availability before update on public.marketing_offers for each row execute function private.refresh_snapshot_availability();
 -- A scheduler can call the service-only RPC every five minutes. No external cron is created here.
+
+grant update on public.notification_receipts to authenticated;
