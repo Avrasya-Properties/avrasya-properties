@@ -792,3 +792,37 @@ end $$;
 revoke all on function private.activity_guard() from public,anon;
 grant execute on function private.activity_guard() to authenticated;
 create trigger activity_guard before insert on public.activities for each row when(current_user='authenticated') execute function private.activity_guard();
+
+create function private.unit_guard() returns trigger language plpgsql set search_path='' as $$
+begin
+if old.status in ('Reserved','Sold','Rented') and (new.status is distinct from old.status or new.unit_number is distinct from old.unit_number or new.project_id is distinct from old.project_id or new.building_id is distinct from old.building_id) then raise exception 'Reserved or closed units require a reviewed transaction';end if;return new;
+end $$;
+revoke all on function private.unit_guard() from public,anon;
+grant execute on function private.unit_guard() to authenticated;
+create trigger guard_unit before update on public.physical_units for each row when(current_user='authenticated') execute function private.unit_guard();
+create function private.expire_reservations() returns integer language plpgsql security definer set search_path='' as $$
+declare r record;counter integer=0;
+begin
+if not private.manager() and coalesce(auth.jwt()->>'role','')<>'service_role' and not(session_user='postgres' and auth.uid() is null) then raise exception 'Manager or scheduler access required' using errcode='42501';end if;
+for r in select id,physical_unit_id,offer_id from public.reservations where status='active' and expires_at<=now() order by physical_unit_id loop
+perform 1 from public.physical_units where id=r.physical_unit_id for update;
+update public.reservations set status='expired' where id=r.id and status='active' and expires_at<=now();
+if found then
+update public.physical_units set status='Available' where id=r.physical_unit_id and status='Reserved';
+update public.marketing_offers set availability='Available',version=version+1 where physical_unit_id=r.physical_unit_id and availability='Reserved';
+counter=counter+1;
+end if;end loop;
+return counter;
+end $$;
+create function public.expire_reservations() returns integer language sql security invoker set search_path='' as $$select private.expire_reservations()$$;
+revoke all on function private.expire_reservations(),public.expire_reservations() from public,anon;
+grant execute on function private.expire_reservations(),public.expire_reservations() to authenticated,service_role;
+create function private.refresh_snapshot_availability() returns trigger language plpgsql set search_path='' as $$
+begin
+if new.published_snapshot is not null and new.availability is distinct from old.availability then
+new.published_snapshot=jsonb_set(jsonb_set(new.published_snapshot,'{availability}',to_jsonb(new.availability)),'{availability_verified}',to_jsonb(new.availability='Available'));
+end if;return new;
+end $$;
+revoke all on function private.refresh_snapshot_availability() from public,anon,authenticated;
+create trigger snapshot_availability before update on public.marketing_offers for each row execute function private.refresh_snapshot_availability();
+-- A scheduler can call the service-only RPC every five minutes. No external cron is created here.

@@ -65,7 +65,7 @@ export function upsert<T extends {id:string}>(collection:Collection,item:Row & {
  return write(async()=>{
  const original=item.id?rows.get(TABLES[collection]+":"+item.id):undefined;
  if(item.id&&!original)throw new Error("Record missing or inaccessible. Refresh before saving.");
- const merged={...(item.id?(snapshot[collection] as {id:string}[]).find(x=>x.id===item.id):{}),...item};
+ const merged:Row={...(item.id?(snapshot[collection] as {id:string}[]).find(x=>x.id===item.id):{}),...item};
  const payload=encode(collection,merged);
  let result:Row;
  if(collection==="properties"){
