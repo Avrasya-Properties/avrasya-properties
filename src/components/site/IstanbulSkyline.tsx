@@ -16,8 +16,8 @@ export function IstanbulSkyline({ className = "", opacity = 1 }: IstanbulSkyline
         style={{ opacity }}
         loading="eager"
         decoding="sync"
-        width={1558}
-        height={260}
+        width={1909}
+        height={354}
       />
     </div>
   );
