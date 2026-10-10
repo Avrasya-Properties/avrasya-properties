@@ -4,7 +4,7 @@ import logo from "@/assets/avrasya-logo.png.asset.json";
 import { DEMO_PASSWORD, USERS, login } from "@/admin/store";
 import { btnPrimary, field } from "@/admin/Shell";
 
-export const Route = createFileRoute("/admin_/login")({
+export const Route = createFileRoute("/admin/login")({
   validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s["redirect"] === "string" ? s["redirect"] : undefined }),
   head: () => ({ meta: [{ title: "Sign in — Avrasya Admin" }, { name: "robots", content: "noindex" }, { name: "description", content: "Demo sign-in for the Avrasya workspace." }, { property: "og:title", content: "Sign in — Avrasya Admin" }, { property: "og:description", content: "Demo sign-in for the Avrasya workspace." }] }),
   component: Login,

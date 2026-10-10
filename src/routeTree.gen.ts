@@ -26,8 +26,8 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCalendarRouteImport } from './routes/admin.calendar'
 import { Route as AdminContactsRouteImport } from './routes/admin.contacts'
 import { Route as AdminDealsRouteImport } from './routes/admin.deals'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
-import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as PropertiesSlugRouteImport } from './routes/properties.$slug'
 import { Route as AdminLeadsIndexRouteImport } from './routes/admin.leads.index'
@@ -120,15 +120,15 @@ const AdminDealsRoute = AdminDealsRouteImport.update({
   path: '/deals',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminTasksRoute = AdminTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
   getParentRoute: () => AdminRoute,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin_/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
   id: '/properties/',
@@ -178,8 +178,8 @@ export interface FileRoutesByFullPath {
   '/admin/calendar': typeof AdminCalendarRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
-  '/admin/tasks': typeof AdminTasksRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/properties/': typeof PropertiesIndexRoute
@@ -204,8 +204,8 @@ export interface FileRoutesByTo {
   '/admin/calendar': typeof AdminCalendarRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
-  '/admin/tasks': typeof AdminTasksRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/properties': typeof PropertiesIndexRoute
@@ -232,8 +232,8 @@ export interface FileRoutesById {
   '/admin/calendar': typeof AdminCalendarRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/tasks': typeof AdminTasksRoute
-  '/admin_/login': typeof AdminLoginRoute
   '/properties/$slug': typeof PropertiesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/properties/': typeof PropertiesIndexRoute
@@ -261,8 +261,8 @@ export interface FileRouteTypes {
     | '/admin/calendar'
     | '/admin/contacts'
     | '/admin/deals'
-    | '/admin/tasks'
     | '/admin/login'
+    | '/admin/tasks'
     | '/properties/$slug'
     | '/admin/'
     | '/properties/'
@@ -287,8 +287,8 @@ export interface FileRouteTypes {
     | '/admin/calendar'
     | '/admin/contacts'
     | '/admin/deals'
-    | '/admin/tasks'
     | '/admin/login'
+    | '/admin/tasks'
     | '/properties/$slug'
     | '/admin'
     | '/properties'
@@ -314,8 +314,8 @@ export interface FileRouteTypes {
     | '/admin/calendar'
     | '/admin/contacts'
     | '/admin/deals'
+    | '/admin/login'
     | '/admin/tasks'
-    | '/admin_/login'
     | '/properties/$slug'
     | '/admin/'
     | '/properties/'
@@ -339,7 +339,6 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   TermsRoute: typeof TermsRoute
   WhyTurkiyeRoute: typeof WhyTurkiyeRoute
-  AdminLoginRoute: typeof AdminLoginRoute
   PropertiesSlugRoute: typeof PropertiesSlugRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
 }
@@ -465,19 +464,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDealsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/tasks': {
       id: '/admin/tasks'
       path: '/tasks'
       fullPath: '/admin/tasks'
       preLoaderRoute: typeof AdminTasksRouteImport
       parentRoute: typeof AdminRoute
-    }
-    '/admin_/login': {
-      id: '/admin_/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/properties/': {
       id: '/properties/'
@@ -528,6 +527,7 @@ interface AdminRouteChildren {
   AdminCalendarRoute: typeof AdminCalendarRoute
   AdminContactsRoute: typeof AdminContactsRoute
   AdminDealsRoute: typeof AdminDealsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdminTasksRoute: typeof AdminTasksRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminLeadsIdRoute: typeof AdminLeadsIdRoute
@@ -540,6 +540,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCalendarRoute: AdminCalendarRoute,
   AdminContactsRoute: AdminContactsRoute,
   AdminDealsRoute: AdminDealsRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdminTasksRoute: AdminTasksRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminLeadsIdRoute: AdminLeadsIdRoute,
@@ -564,7 +565,6 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   TermsRoute: TermsRoute,
   WhyTurkiyeRoute: WhyTurkiyeRoute,
-  AdminLoginRoute: AdminLoginRoute,
   PropertiesSlugRoute: PropertiesSlugRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
 }
