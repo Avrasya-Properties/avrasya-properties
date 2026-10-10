@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { act, renderHook, cleanup } from "@testing-library/react";
+import { act, render, renderHook, fireEvent, screen, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as store from "@/admin/store";
+import { AdminSettingsPage } from "@/routes/admin.settings";
 import type { Contact, Deal, Lead, Property, Task, Viewing } from "@/admin/store";
 
 const workspace = () => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")!) as store.DB;
@@ -153,5 +154,14 @@ describe("deal transitions", () => {
     const { purchased, opportunity } = prepareDeal(); store.setDealStage(opportunity.id, "Reserved");
     store.setDealStage(opportunity.id, "Lost");
     expect(workspace().properties.find((p) => p.id === purchased.id)?.availability).toBe("Available");
+  });
+});
+
+describe("settings form integration", () => {
+  it("saves the typed brand field through its actual management form", () => {
+    render(<AdminSettingsPage />);
+    fireEvent.change(screen.getByLabelText("Brand Name"), { target: { value: "Smoke Test Brand" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save CMS Changes" }));
+    expect(workspace().siteSettings.companyName).toBe("Smoke Test Brand");
   });
 });

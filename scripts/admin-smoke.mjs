@@ -25,7 +25,7 @@ async function clickText(text, root = "body") {
 async function fill(selector, value) {
   await page.waitForSelector(selector);
   const input = await page.$(selector);
-  await input.click({ clickCount: 3 });
+  await input.focus(); await page.keyboard.down("Control"); await page.keyboard.press("A"); await page.keyboard.up("Control");
   await input.press("Backspace");
   if (value) await input.type(value);
 }
@@ -36,7 +36,7 @@ async function fillLabel(labelText, value) {
       const inputHandle = await label.evaluateHandle((element) => element.control || element.querySelector("input"));
       const input = inputHandle.asElement();
       if (!input) throw new Error("Input missing for label: " + labelText);
-      await input.click({ clickCount: 3 }); await input.press("Backspace"); await input.type(value);
+      await input.focus(); await page.keyboard.down("Control"); await page.keyboard.press("A"); await page.keyboard.up("Control"); await input.press("Backspace"); await input.type(value);
       return;
     }
   }
@@ -220,6 +220,8 @@ try {
   await mkdir("test-results", { recursive: true });
   if (page) await page.screenshot({ path: "test-results/admin-smoke-failure.png", fullPage: true }).catch(() => {});
   console.error("Browser smoke failure:", error.message);
+  console.error("Completed steps:", JSON.stringify(results));
+  if (page) console.error("CMS diagnostics:", await page.evaluate(() => ({ draft: document.getElementById("cms-companyName")?.value, saved: JSON.parse(localStorage.getItem("avrasya-admin-db-v4") || "{}").siteSettings?.companyName, messages: [...document.querySelectorAll("[data-sonner-toast]")].map((toast) => toast.textContent) })).catch(() => ({})));
   console.error("Page errors:", JSON.stringify(pageErrors));
   if (page) console.error("Failure page:", page.url(), await page.evaluate(() => document.body.innerText.slice(0, 3000)).catch(() => ""));
   console.error(serverOutput);
