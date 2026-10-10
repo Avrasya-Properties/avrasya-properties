@@ -403,10 +403,10 @@ export function AdminInquiriesPage() {
             </h3>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="inquiry-name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Full Name *
                 </label>
-                <input
+                <input id="inquiry-name"
                   required
                   className={field}
                   value={newForm.name}
@@ -457,10 +457,10 @@ export function AdminInquiriesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="inquiry-budget" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Stated Budget
                   </label>
-                  <input
+                <input id="inquiry-budget"
                     className={field}
                     value={newForm.budget}
                     onChange={(e) => setNewForm({ ...newForm, budget: e.target.value })}

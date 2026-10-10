@@ -348,10 +348,10 @@ export function AdminSettingsPage() {
               </label>
               {form.announcementActive && (
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="cms-announcementText" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Announcement Banner Text
                   </label>
-                  <input
+                <input id="cms-announcementText"
                     className={field}
                     placeholder="e.g. Q4 2026 Istanbul Central Bank Currency Briefing Now Available"
                     value={form.announcementText}
