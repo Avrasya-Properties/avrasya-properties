@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "@/assets/avrasya-logo.png.asset.json";
-import { DEMO_PASSWORD, USERS, login } from "@/admin/store";
+import { DEMO_PASSWORD, USERS, login, getSession } from "@/admin/store";
 import { btnPrimary, field } from "@/admin/Shell";
 
 export const Route = createFileRoute("/admin/login")({
@@ -18,8 +18,10 @@ function Login() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!login(email, pw)) return setErr("Email or password is incorrect.");
-    if (redirect?.startsWith("/admin")) window.location.assign(redirect); else nav({ to: "/admin" });
+    go();
   };
+  const go = () => { const r = redirect && redirect.startsWith("/admin") && !redirect.startsWith("/admin/login") ? redirect : "/admin"; nav({ to: r as "/admin" }); };
+  useEffect(() => { if (getSession()) go(); }, []);
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 font-sans">
       <div className="w-full max-w-md rounded-md border bg-card p-6">
