@@ -43,7 +43,7 @@ const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 const bool = (v: unknown) => (v === "true" || v === true ? true : undefined);
 
 export const Route = createFileRoute("/properties/")({
-  validateSearch: (s: Record<string, unknown>): Filters & { savedOnly?: boolean } => ({
+  validateSearch: (s: Record<string, unknown>): Filters & { savedOnly?: boolean | undefined } => ({
     q: str(s["q"]),
     loc: str(s["loc"]),
     side: str(s["side"]),
@@ -74,7 +74,7 @@ function Catalog() {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
 
-  const set = (k: keyof (Filters & { savedOnly?: boolean }), v: unknown) =>
+  const set = (k: keyof (Filters & { savedOnly?: boolean | undefined }), v: unknown) =>
     navigate({
       search: (p) => ({ ...p, [k]: v || undefined }),
       replace: true,
@@ -87,7 +87,7 @@ function Catalog() {
   const sel = (k: keyof Filters, label: string, any: string, opts: [string, string][]) => (
     <label className="block">
       <span className={lbl}>{label}</span>
-      <select className="field text-xs md:text-sm" value={f[k] ?? ""} onChange={(e) => set(k, e.target.value)}>
+      <select className="field text-xs md:text-sm" value={String(f[k] ?? "")} onChange={(e) => set(k, e.target.value)}>
         <option value="">{any}</option>
         {opts.map(([v, t]) => (
           <option key={v} value={v}>

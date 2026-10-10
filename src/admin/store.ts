@@ -54,7 +54,7 @@ function seed(): DB {
       priceType: r.price.amount == null ? "on-request" : r.record_type === "project" ? "from" : "fixed",
       availability: r.availability_verified ? "Available" : "Unknown",
       publication: i % 5 === 3 ? "In Review" : i % 7 === 6 ? "Draft" : "Published",
-      agentId: agents[i % 2], cover: media.main, project: String(r.details?.project ?? r.marketing_title.split(" — ")[0]), description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
+      agentId: agents[i % 2], cover: media.cover, project: String(r.details?.project ?? r.marketing_title.split(" — ")[0]), description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
       sourceNote: (r.details?.claims_requiring_confirmation ?? []).join("; "),
     } as Property;
   });
