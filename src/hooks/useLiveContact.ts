@@ -33,7 +33,7 @@ export function getLiveContact(): LiveContact {
       if (parsed && parsed.siteSettings) {
         const s: SiteSettings = parsed.siteSettings;
         return {
-          company: s.registeredEntity || CONTACT.company,
+          company: s.companyName || CONTACT.company,
           email: s.email || CONTACT.email,
           phone: s.phone || CONTACT.phone,
           phoneHref: `tel:${(s.phone || CONTACT.phone).replace(/\s/g, "")}`,
@@ -66,7 +66,7 @@ export function useLiveContact(): LiveContact {
       if (customEvent.detail) {
         const s = customEvent.detail;
         setContact({
-          company: s.registeredEntity || CONTACT.company,
+          company: s.companyName || CONTACT.company,
           email: s.email || CONTACT.email,
           phone: s.phone || CONTACT.phone,
           phoneHref: `tel:${(s.phone || CONTACT.phone).replace(/\s/g, "")}`,

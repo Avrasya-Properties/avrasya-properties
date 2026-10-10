@@ -14,6 +14,7 @@ const pageErrors = [];
 const results = [];
 
 async function clickText(text, root = "body") {
+  await page.waitForFunction((text, root) => [...document.querySelectorAll(root + " button")].some((button) => button.textContent.trim() === text && !button.disabled), {}, text, root);
   const handles = await page.$$(root + " button");
   for (const handle of handles) {
     const matches = await handle.evaluate((button, wanted) => button.textContent.trim() === wanted && !button.disabled, text);
@@ -163,10 +164,36 @@ try {
   assert.deepEqual(deal.propertyIds, [unit.id]);
   results.push("Explicit unit agreement, reservation and sale completion");
 
-  for (const [path, heading] of [["/admin/calendar", "Calendar"], ["/admin/tasks", "Tasks"], ["/admin/projects", "Projects"], ["/admin/analytics", "Portfolio Analytics & Intelligence"]]) {
+  await visit("/admin/calendar", "Calendar");
+  await page.$eval('input[type="datetime-local"]', (input) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(input, "2026-12-20T10:00");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await clickText("Schedule viewing");
+  await waitSaved("viewings", "start", "2026-12-20T07:00:00.000Z");
+  results.push("Viewing creation uses Istanbul wall time");
+
+  await visit("/admin/tasks", "Tasks");
+  await fill('[aria-label="Task title"]', "Smoke Test Task");
+  await page.$eval('input[type="datetime-local"]', (input) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(input, "2026-12-20T10:00");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await clickText("Add task");
+  await waitSaved("tasks", "title", "Smoke Test Task");
+  const taskChecks = await page.$$('input[type="checkbox"]');
+  for (const checkbox of taskChecks) {
+    if (await checkbox.evaluate((input) => input.parentElement.textContent.includes("Smoke Test Task"))) { await checkbox.click(); break; }
+  }
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")).tasks.some((task) => task.title === "Smoke Test Task" && task.done));
+  results.push("Task creation and completion");
+
+  for (const [path, heading] of [["/admin/projects", "Projects"], ["/admin/analytics", "Portfolio Analytics & Intelligence"]]) {
     await visit(path, heading);
   }
-  results.push("Calendar, tasks, projects and analytics load");
+  results.push("Projects and analytics load");
 
   await visit("/admin/settings", "Website Content & CMS");
   await fillLabel("Brand Name", "Smoke Test Brand");
