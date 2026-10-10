@@ -4,9 +4,9 @@ import { toast } from "sonner";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { AVAIL, PUBL, can, fmtDate, fmtMoney, upsert, useDB, useSession, userName, type Property } from "@/admin/store";
 
-type S = { q?: string; avail?: string; pub?: string; sort?: string; page?: number; view?: string };
+type S = { q?: string | undefined; avail?: string | undefined; pub?: string | undefined; sort?: string | undefined; page?: number | undefined; view?: string | undefined };
 export const Route = createFileRoute("/admin/properties/")({
-  validateSearch: (s: Record<string, unknown>): S => ({ q: s.q as string, avail: s.avail as string, pub: s.pub as string, sort: s.sort as string, page: Number(s.page) || 1, view: s.view as string }),
+  validateSearch: (s: Record<string, unknown>): S => ({ q: s["q"] as string, avail: s["avail"] as string, pub: s["pub"] as string, sort: s["sort"] as string, page: Number(s["page"]) || 1, view: s["view"] as string }),
   component: Inventory,
 });
 const PER = 15;

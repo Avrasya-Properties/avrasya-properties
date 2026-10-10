@@ -54,7 +54,7 @@ function seed(): DB {
       publication: i % 5 === 3 ? "In Review" : i % 7 === 6 ? "Draft" : "Published",
       agentId: agents[i % 2], cover: null, description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
       sourceNote: (r.details?.claims_requiring_confirmation ?? []).join("; "),
-    };
+    } as Property;
   });
   const contacts: Contact[] = [
     ["Amira Haddad", "amira.h@example.test", "+90 555 010 0001", "Arabic"],
@@ -62,7 +62,7 @@ function seed(): DB {
     ["Leyla Rahimi", "leyla@example.test", "+90 555 010 0003", "English"],
     ["Northgate Holdings", "office@northgate.test", "+44 20 0000 0004", "English"],
     ["A. Haddad", "AMIRA.H@example.test", "+905550100001", "Arabic"],
-  ].map(([name, email, phone, language], i) => ({ id: `c${i + 1}`, name, email, phone, language, kind: i === 3 ? "company" : "person", roles: ["buyer"], agentId: agents[i % 2], notes: "" }));
+  ].map(([name, email, phone, language], i) => ({ id: `c${i + 1}`, name, email, phone, language, kind: i === 3 ? "company" : "person", roles: ["buyer"], agentId: agents[i % 2], notes: "" }) as Contact);
   const leads: Lead[] = [
     { id: "l1", contactId: "c1", source: "Website", agentId: "u3", districts: "Beylikdüzü", layout: "2+1", budgetMin: 150000, budgetMax: 250000, currency: "USD", stage: "New", nextFollowUp: day(-1), shortlist: [] },
     { id: "l2", contactId: "c2", source: "WhatsApp", agentId: "u2", districts: "Esenyurt", layout: "1+1", budgetMin: 80000, budgetMax: 140000, currency: "USD", stage: "Qualified", nextFollowUp: day(1), shortlist: ["p1"] },
@@ -128,18 +128,18 @@ function guard(action: Action, ownerId?: string) {
 
 // ---------- mutations ----------
 function log(kind: string, text: string, ref?: Activity["ref"]) {
-  load().activity.unshift({ id: uid(), at: new Date().toISOString(), userId: getSession()?.id ?? "", kind, text, ref });
+  load().activity.unshift({ id: uid(), at: new Date().toISOString(), userId: getSession()?.id ?? "", kind, text, ref } as Activity);
 }
 type Coll = "properties" | "contacts" | "leads" | "tasks" | "viewings" | "deals";
 const perm: Record<Coll, Action> = { properties: "edit-inventory", contacts: "edit-crm", leads: "edit-crm", tasks: "edit-crm", viewings: "edit-crm", deals: "edit-crm" };
-export function upsert<T extends { id: string }>(coll: Coll, item: Partial<T> & { id?: string }, ownerId?: string): T {
+export function upsert<T extends { id: string }>(coll: Coll, item: Record<string, unknown> & { id?: string }, ownerId?: string): T {
   guard(perm[coll], ownerId);
   const list = load()[coll] as unknown as T[];
   if (item.id) {
     const i = list.findIndex((x) => x.id === item.id);
-    list[i] = { ...list[i], ...item };
+    list[i] = { ...list[i], ...item } as T;
     if (coll === "properties") (list[i] as unknown as Property).updatedAt = new Date().toISOString();
-    save(); return list[i];
+    save(); return list[i]!;
   }
   const created = { ...item, id: coll[0] + uid() } as T;
   list.unshift(created); log(coll, `Created ${coll.slice(0, -1)}`, { kind: coll, id: created.id }); save(); return created;
@@ -162,7 +162,7 @@ export function publishIssues(p: Property, all: Property[]): string[] {
 export function setStage(leadId: string, stage: Lead["stage"], lossReason?: string) {
   const l = load().leads.find((x) => x.id === leadId)!;
   if (stage === "Lost" && !lossReason) throw new Error("A loss reason is required");
-  upsert<Lead>("leads", { id: leadId, stage, lossReason }, l.agentId);
+  upsert<Lead>("leads", { id: leadId, stage, ...(lossReason ? { lossReason } : {}) }, l.agentId);
   addActivity("lead", `Stage changed ${l.stage === stage ? "" : ""}to ${stage}${lossReason ? ` (${lossReason})` : ""}`, { kind: "lead", id: leadId });
 }
 export function convertLead(leadId: string): Deal {

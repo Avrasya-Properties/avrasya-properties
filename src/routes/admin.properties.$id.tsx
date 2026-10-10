@@ -45,7 +45,7 @@ function Editor() {
         </div>}
         {tab === "Media" && <div>
           <p className="mb-2 text-xs text-muted-foreground">Images up to 5 MB (JPG/PNG/WebP). Stored in this browser only.</p>
-          {!ro && <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 5e6) return toast.error("File exceeds 5 MB"); const r = new FileReader(); r.onload = () => f("cover", r.result as string); r.readAsDataURL(file); }} />}
+          {!ro && <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (!file) return; if (file.size > 5e6) return toast.error("File exceeds 5 MB"); const r = new FileReader(); r.onload = () => f("cover", r.result as string); r.readAsDataURL(file); return undefined; }} />}
           {d.cover && <div className="mt-3"><img src={d.cover} alt="Cover" className="h-48 rounded-sm object-cover" />{!ro && <button className="mt-2 text-sm text-destructive" onClick={() => confirm("Remove cover image?") && f("cover", null)}>Remove</button>}</div>}
         </div>}
         {tab === "Source & Review" && <div className="space-y-3 text-sm">

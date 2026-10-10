@@ -102,7 +102,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </PopoverContent>
             </Popover>
             <div className="hidden text-right text-xs leading-tight sm:block"><div className="font-medium">{user?.name}</div><div className="capitalize text-muted-foreground">{user?.role} (demo)</div></div>
-            <button onClick={() => { logout(); nav({ to: "/admin/login" }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
+            <button onClick={() => { logout(); nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
         <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
