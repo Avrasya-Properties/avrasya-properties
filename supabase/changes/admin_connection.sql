@@ -546,8 +546,8 @@ end if;
 if wanted is distinct from old_row.publication or wanted='Published' then
 insert into public.publication_history(offer_id,old_status,new_status,snapshot,changed_by) values(r.id,old_row.publication,wanted,r.published_snapshot,auth.uid());
 end if;
-return to_jsonb(r);
-end $$;
+return (select to_jsonb(saved) from public.marketing_offers saved where saved.id=r.id);
+end $;
 create function public.save_offer(p_data jsonb,p_version integer default null) returns jsonb language sql security invoker set search_path='' as $$select private.save_offer(p_data,p_version)$$;
 
 create or replace function private.convert_enquiry(p_id uuid) returns uuid language plpgsql security definer set search_path='' as $$

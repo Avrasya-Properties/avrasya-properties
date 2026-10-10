@@ -64,6 +64,8 @@ export async function rpc<T>(name:string,args:Row):Promise<T>{const {data,error}
 export function upsert<T extends {id:string}>(collection:Collection,item:Row & {id?:string}):Promise<T>{
  return write(async()=>{
  const original=item.id?rows.get(TABLES[collection]+":"+item.id):undefined;
+ if(original && item["revision"] && item["revision"]!==original["updated_at"])throw new Error("This record changed while you were editing. Refresh before saving.");
+ if(original && collection==="properties" && item["updatedAt"] && item["updatedAt"]!==original["updated_at"])throw new Error("This offer changed while you were editing. Refresh before saving.");
  if(item.id&&!original)throw new Error("Record missing or inaccessible. Refresh before saving.");
  const merged:Row={...(item.id?(snapshot[collection] as {id:string}[]).find(x=>x.id===item.id):{}),...item};
  const payload=encode(collection,merged);

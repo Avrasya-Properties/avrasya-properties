@@ -22,7 +22,7 @@ AS $function$
         nullif(current_setting('request.jwt.claims', true), '')
     )::jsonb
 $function$
-
+;
 CREATE OR REPLACE FUNCTION auth.uid()
  RETURNS uuid
  LANGUAGE sql
@@ -34,4 +34,6 @@ AS $function$
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')
   )::uuid
 $function$
-
+;
+create role authenticator login password 'isolated-test-only' noinherit;
+grant anon,authenticated,service_role to authenticator;

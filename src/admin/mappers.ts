@@ -15,7 +15,7 @@ export const SETTINGS: Record<keyof SiteSettings,string> = {
 companyName:"company_name",registeredEntity:"registered_entity",taxOffice:"tax_office",licenseNo:"license_no",tagline:"tagline",email:"email",phone:"phone",whatsapp:"whatsapp",address:"address",advisoryHours:"advisory_hours",heroHeadline:"hero_headline",heroSubtitle:"hero_subtitle",eyebrowText:"eyebrow_text",cbiThresholdUsd:"cbi_threshold_usd",preloaderOpacity:"preloader_opacity",exchangeRateEur:"exchange_rate_eur",exchangeRateTry:"exchange_rate_try",exchangeRateGbp:"exchange_rate_gbp",enableFrankfurterSync:"enable_frankfurter_sync",announcementText:"announcement_text",announcementActive:"announcement_active"
 };
 export function decode<C extends Collection>(collection:C,row:Row): DB[C][number] {
- const value:Row={};
+ const value:Row={revision:row["updated_at"]};
  for(const [key,column] of Object.entries(FIELDS[collection])) {
   const v=row[column];
   if(v!==null && v!==undefined) value[key]=v;

@@ -140,7 +140,7 @@ export function AdminSettingsPage() {
         ))}
       </div>
 
-      <fieldset disabled={!editable} className="min-w-0">
+      <fieldset id="cms-fields" disabled={!editable} className="min-w-0">
       {/* TAB 1: Company Profile */}
       {tab === "Company Profile" && (
         <div className="max-w-4xl space-y-6">

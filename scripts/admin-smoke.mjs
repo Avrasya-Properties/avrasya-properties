@@ -206,7 +206,7 @@ try {
   await page.waitForSelector('input[type="email"]');
   await login("viewer");
   await visit("/admin/settings", "Website Content & CMS");
-  assert.equal(await page.$eval("fieldset", (element) => element.disabled), true);
+  assert.equal(await page.$eval("#cms-fields", (element) => element.disabled), true);
   const saveDisabled = await page.evaluate(() => [...document.querySelectorAll("button")].find((button) => button.textContent.trim() === "Save CMS Changes")?.disabled);
   assert.equal(saveDisabled, true);
   await clickText("Backup & Restore");
