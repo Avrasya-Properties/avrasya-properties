@@ -16,7 +16,7 @@ const subscribe=(fn:()=>void)=>{listeners.add(fn);return()=>{listeners.delete(fn
 function message(error:unknown){return error instanceof Error?error.message:String((error as {message?:string})?.message||"The request failed");}
 export async function fetchRows(table:string):Promise<Row[]> {
  const output:Row[]=[];
- for(let offset=0;;offset+=1000){const {data,error}=await supabase.from(table).select("*").order("id").range(offset,offset+999);if(error)throw error;const batch=data as Row[];output.push(...batch);if(batch.length<1000)break;if(offset>100000)throw new Error("Use filtered exports for large tables.");}
+ for(let offset=0;;offset+=1000){const {data,error}=await supabase.from(table).select("*").order(table==="notification_receipts"?"notification_key":"id").range(offset,offset+999);if(error)throw error;const batch=data as Row[];output.push(...batch);if(batch.length<1000)break;if(offset>100000)throw new Error("Use filtered exports for large tables.");}
  return output;
 }
 export async function refresh(){

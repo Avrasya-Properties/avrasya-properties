@@ -1031,484 +1031,7 @@ BEGIN
   IF char_length(trim(v_offer.marketing_title)) = 0 THEN
     RAISE EXCEPTION 'Title cannot be empty.';
   END IF;
-  IF NOT (v_offer.slug ~ '^[a-z0-9-]+CREATE OR REPLACE FUNCTION public.unpublish_offer(p_offer_id uuid, p_user_id uuid)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_old_pub publication_status;
-BEGIN
-  SELECT publication INTO v_old_pub
-  FROM public.marketing_offers
-  WHERE id = p_offer_id
-  FOR UPDATE;
-
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'Offer % not found.', p_offer_id;
-  END IF;
-
-  INSERT INTO public.publication_history (
-    offer_id, old_status, new_status, changed_by, reason
-  ) VALUES (
-    p_offer_id, v_old_pub, 'Draft', p_user_id, 'Unpublished to Draft'
-  );
-
-  UPDATE public.marketing_offers
-  SET publication = 'Draft',
-      version = version + 1,
-      updated_by = p_user_id,
-      updated_at = now()
-  WHERE id = p_offer_id;
-
-  INSERT INTO public.audit_events (
-    actor_id, action, target_table, target_id
-  ) VALUES (
-    p_user_id, 'UNPUBLISH_OFFER', 'marketing_offers', p_offer_id
-  );
-END;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.create_reservation_atomic(p_deal_id uuid, p_offer_id uuid, p_unit_id uuid, p_contact_id uuid, p_user_id uuid, p_deposit numeric, p_currency currency_code, p_duration_hours integer DEFAULT 72)
- RETURNS uuid
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_res_id UUID;
-  v_unit_status property_availability;
-  v_offer_avail property_availability;
-BEGIN
-  IF p_unit_id IS NOT NULL THEN
-    SELECT status INTO v_unit_status
-    FROM public.physical_units
-    WHERE id = p_unit_id
-    FOR UPDATE;
-
-    IF v_unit_status IN ('Reserved', 'Sold', 'Rented') THEN
-      RAISE EXCEPTION 'Physical unit % is not available (status: %).', p_unit_id, v_unit_status;
-    END IF;
-
-    IF EXISTS (SELECT 1 FROM public.reservations WHERE physical_unit_id = p_unit_id AND status = 'active' AND expires_at > now()) THEN
-      RAISE EXCEPTION 'Physical unit % already has an active reservation.', p_unit_id;
-    END IF;
-
-    UPDATE public.physical_units
-    SET status = 'Reserved', updated_at = now()
-    WHERE id = p_unit_id;
-
-    INSERT INTO public.availability_history (physical_unit_id, old_status, new_status, changed_by, reason)
-    VALUES (p_unit_id, v_unit_status, 'Reserved', p_user_id, 'Reservation created');
-  END IF;
-
-  IF p_offer_id IS NOT NULL THEN
-    SELECT availability INTO v_offer_avail
-    FROM public.marketing_offers
-    WHERE id = p_offer_id
-    FOR UPDATE;
-
-    IF v_offer_avail IN ('Reserved', 'Sold', 'Rented') THEN
-      RAISE EXCEPTION 'Marketing offer % is not available (status: %).', p_offer_id, v_offer_avail;
-    END IF;
-
-    UPDATE public.marketing_offers
-    SET availability = 'Reserved', updated_at = now()
-    WHERE id = p_offer_id;
-
-    INSERT INTO public.availability_history (offer_id, old_status, new_status, changed_by, reason)
-    VALUES (p_offer_id, v_offer_avail, 'Reserved', p_user_id, 'Reservation created');
-  END IF;
-
-  INSERT INTO public.reservations (
-    deal_id, offer_id, physical_unit_id, contact_id, reserved_by,
-    deposit_amount, deposit_currency, reserved_from, expires_at, status
-  ) VALUES (
-    p_deal_id, p_offer_id, p_unit_id, p_contact_id, p_user_id,
-    p_deposit, p_currency, now(), now() + (p_duration_hours || ' hours')::interval, 'active'
-  )
-  RETURNING id INTO v_res_id;
-
-  INSERT INTO public.audit_events (actor_id, action, target_table, target_id)
-  VALUES (p_user_id, 'CREATE_RESERVATION', 'reservations', v_res_id);
-
-  RETURN v_res_id;
-END;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.complete_deal_win(p_deal_id uuid, p_user_id uuid)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_selected RECORD;
-BEGIN
-  PERFORM 1 FROM public.deals WHERE id = p_deal_id FOR UPDATE;
-
-  FOR v_selected IN (
-    SELECT dsu.physical_unit_id, dsu.offer_id
-    FROM public.deal_selected_units dsu
-    WHERE dsu.deal_id = p_deal_id
-  ) LOOP
-    IF v_selected.physical_unit_id IS NOT NULL THEN
-      UPDATE public.physical_units
-      SET status = 'Sold', updated_at = now()
-      WHERE id = v_selected.physical_unit_id;
-
-      INSERT INTO public.availability_history (physical_unit_id, old_status, new_status, changed_by, reason)
-      VALUES (v_selected.physical_unit_id, 'Reserved', 'Sold', p_user_id, 'Deal won');
-    END IF;
-
-    IF v_selected.offer_id IS NOT NULL THEN
-      UPDATE public.marketing_offers
-      SET availability = 'Sold', updated_at = now()
-      WHERE id = v_selected.offer_id;
-
-      INSERT INTO public.availability_history (offer_id, old_status, new_status, changed_by, reason)
-      VALUES (v_selected.offer_id, 'Reserved', 'Sold', p_user_id, 'Deal won');
-    END IF;
-  END LOOP;
-
-  UPDATE public.reservations
-  SET status = 'converted', updated_at = now()
-  WHERE deal_id = p_deal_id AND status = 'active';
-
-  UPDATE public.deals
-  SET stage = 'Won',
-      actual_close_date = now(),
-      version = version + 1,
-      updated_at = now()
-  WHERE id = p_deal_id;
-
-  INSERT INTO public.audit_events (actor_id, action, target_table, target_id)
-  VALUES (p_user_id, 'COMPLETE_DEAL_WIN', 'deals', p_deal_id);
-END;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.reserve_package_atomic(p_deal_id uuid, p_package_offer_id uuid, p_contact_id uuid, p_user_id uuid, p_duration_hours integer DEFAULT 72)
- RETURNS uuid
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_res_id UUID;
-  v_member RECORD;
-BEGIN
-  PERFORM 1 FROM public.marketing_offers WHERE id = p_package_offer_id FOR UPDATE;
-
-  FOR v_member IN (
-    SELECT pm.member_unit_id, u.status
-    FROM public.package_memberships pm
-    JOIN public.physical_units u ON u.id = pm.member_unit_id
-    WHERE pm.package_offer_id = p_package_offer_id
-    FOR UPDATE OF u
-  ) LOOP
-    IF v_member.status IN ('Reserved', 'Sold', 'Rented') THEN
-      RAISE EXCEPTION 'Constituent unit % is not available (status: %).', v_member.member_unit_id, v_member.status;
-    END IF;
-  END LOOP;
-
-  FOR v_member IN (
-    SELECT member_unit_id FROM public.package_memberships WHERE package_offer_id = p_package_offer_id
-  ) LOOP
-    UPDATE public.physical_units SET status = 'Reserved', updated_at = now() WHERE id = v_member.member_unit_id;
-    INSERT INTO public.availability_history (physical_unit_id, old_status, new_status, changed_by, reason)
-    VALUES (v_member.member_unit_id, 'Available', 'Reserved', p_user_id, 'Package reservation constituent');
-  END LOOP;
-
-  UPDATE public.marketing_offers SET availability = 'Reserved', updated_at = now() WHERE id = p_package_offer_id;
-
-  INSERT INTO public.reservations (
-    deal_id, offer_id, contact_id, reserved_by, reserved_from, expires_at, status
-  ) VALUES (
-    p_deal_id, p_package_offer_id, p_contact_id, p_user_id, now(), now() + (p_duration_hours || ' hours')::interval, 'active'
-  ) RETURNING id INTO v_res_id;
-
-  RETURN v_res_id;
-END;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.convert_enquiry_to_lead(p_enquiry_id uuid, p_user_id uuid)
- RETURNS uuid
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_enq public.enquiries%ROWTYPE;
-  v_contact_id UUID;
-  v_lead_id UUID;
-  v_budget_num NUMERIC;
-BEGIN
-  SELECT * INTO v_enq FROM public.enquiries WHERE id = p_enquiry_id FOR UPDATE;
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'Enquiry % not found.', p_enquiry_id;
-  END IF;
-
-  IF v_enq.lead_id IS NOT NULL THEN
-    RETURN v_enq.lead_id;
-  END IF;
-
-  SELECT id INTO v_contact_id
-  FROM public.contacts
-  WHERE (lower(email) = lower(v_enq.email) AND email IS NOT NULL)
-     OR (phone = v_enq.phone AND phone IS NOT NULL)
-  LIMIT 1;
-
-  IF v_contact_id IS NULL THEN
-    INSERT INTO public.contacts (
-      name, email, phone, kind, roles, language, notes, created_by
-    ) VALUES (
-      v_enq.name, v_enq.email, v_enq.phone, 'person', '{"buyer"}', 'English',
-      'Converted from enquiry ' || v_enq.ref_number || ': ' || v_enq.topic, p_user_id
-    ) RETURNING id INTO v_contact_id;
-  END IF;
-
-  BEGIN
-    v_budget_num := NULLIF(regexp_replace(v_enq.budget, '[^0-9.]', '', 'g'), '')::NUMERIC;
-  EXCEPTION
-    WHEN OTHERS THEN v_budget_num := NULL;
-  END;
-
-  INSERT INTO public.leads (
-    contact_id, enquiry_id, source, assigned_agent_id,
-    budget_min, budget_max, currency, stage, shortlist, created_by
-  ) VALUES (
-    v_contact_id, v_enq.id, v_enq.source, p_user_id,
-    CASE WHEN v_budget_num IS NOT NULL THEN v_budget_num * 0.8 ELSE NULL END,
-    v_budget_num, 'USD', 'Qualified',
-    CASE WHEN v_enq.offer_id IS NOT NULL THEN ARRAY[v_enq.offer_id] ELSE '{}' END,
-    p_user_id
-  ) RETURNING id INTO v_lead_id;
-
-  UPDATE public.enquiries
-  SET lead_id = v_lead_id, contact_id = v_contact_id, status = 'Qualified', updated_at = now()
-  WHERE id = p_enquiry_id;
-
-  INSERT INTO public.activities (user_id, kind, text, ref_kind, ref_id)
-  VALUES (p_user_id, 'lead', 'Enquiry ' || v_enq.ref_number || ' converted to lead', 'leads', v_lead_id);
-
-  RETURN v_lead_id;
-END;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.get_current_staff_role()
- RETURNS staff_role
- LANGUAGE sql
- STABLE SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-  SELECT role FROM public.staff_profiles
-  WHERE id = auth.uid() AND is_active = true;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.release_expired_reservations()
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_count INT := 0;
-  v_res RECORD;
-BEGIN
-  FOR v_res IN (
-    SELECT id, offer_id, physical_unit_id
-    FROM public.reservations
-    WHERE status = 'active' AND expires_at < now()
-    FOR UPDATE
-  ) LOOP
-    UPDATE public.reservations
-    SET status = 'expired', updated_at = now()
-    WHERE id = v_res.id;
-
-    IF v_res.physical_unit_id IS NOT NULL THEN
-      UPDATE public.physical_units
-      SET status = 'Available', updated_at = now()
-      WHERE id = v_res.physical_unit_id AND status = 'Reserved';
-
-      INSERT INTO public.availability_history (physical_unit_id, old_status, new_status, reason)
-      VALUES (v_res.physical_unit_id, 'Reserved', 'Available', 'Automatic reservation expiration');
-    END IF;
-
-    IF v_res.offer_id IS NOT NULL THEN
-      UPDATE public.marketing_offers
-      SET availability = 'Available', updated_at = now()
-      WHERE id = v_res.offer_id AND availability = 'Reserved';
-
-      INSERT INTO public.availability_history (offer_id, old_status, new_status, reason)
-      VALUES (v_res.offer_id, 'Reserved', 'Available', 'Automatic reservation expiration');
-    END IF;
-
-    v_count := v_count + 1;
-  END LOOP;
-
-  RETURN v_count;
-END;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.generate_rent_charges_for_month(p_year integer, p_month integer)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-DECLARE
-  v_count INT := 0;
-  v_lease RECORD;
-  v_period_start DATE;
-  v_period_end DATE;
-  v_days_in_month INT;
-  v_due_day INT;
-  v_due_date DATE;
-BEGIN
-  v_period_start := make_date(p_year, p_month, 1);
-  v_days_in_month := EXTRACT(DAY FROM (v_period_start + interval '1 month - 1 day'));
-  v_period_end := make_date(p_year, p_month, v_days_in_month);
-
-  FOR v_lease IN (
-    SELECT id, rent_amount, rent_currency, payment_due_day
-    FROM public.leases
-    WHERE status = 'active'
-      AND start_date <= v_period_end
-      AND end_date >= v_period_start
-  ) LOOP
-    v_due_day := LEAST(v_lease.payment_due_day, v_days_in_month);
-    v_due_date := make_date(p_year, p_month, v_due_day);
-
-    INSERT INTO public.rent_charges (
-      lease_id, period_start, period_end, due_date, charge_amount, currency, status
-    ) VALUES (
-      v_lease.id, v_period_start, v_period_end, v_due_date, v_lease.rent_amount, v_lease.rent_currency, 'pending'
-    )
-    ON CONFLICT (lease_id, period_start) DO NOTHING;
-
-    IF FOUND THEN
-      v_count := v_count + 1;
-    END IF;
-  END LOOP;
-
-  RETURN v_count;
-END;
-$function$
-;
-CREATE TRIGGER trg_staff_profiles_last_admin BEFORE DELETE OR UPDATE ON public.staff_profiles FOR EACH ROW EXECUTE FUNCTION check_last_admin_protection();
-CREATE TRIGGER trg_leases_overlap_check BEFORE INSERT OR UPDATE ON public.leases FOR EACH ROW EXECUTE FUNCTION check_lease_overlap();
-CREATE TRIGGER trg_rent_alloc_currency_check BEFORE INSERT OR UPDATE ON public.rent_payment_allocations FOR EACH ROW EXECUTE FUNCTION check_rent_allocation_currency();
-create policy "staff_read_profiles" on public.staff_profiles as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "admin_manage_staff" on public.staff_profiles as PERMISSIVE for ALL to public using(is_admin()) with check(is_admin());
-create policy "public_read_site_settings" on public.site_settings as PERMISSIVE for SELECT to public using(true);
-create policy "public_read_published_offers" on public.marketing_offers as PERMISSIVE for SELECT to public using(((publication = 'Published'::publication_status) OR is_active_staff()));
-create policy "public_read_pricing_options" on public.pricing_options as PERMISSIVE for SELECT to public using((EXISTS ( SELECT 1
-   FROM marketing_offers
-  WHERE ((marketing_offers.id = pricing_options.offer_id) AND ((marketing_offers.publication = 'Published'::publication_status) OR is_active_staff())))));
-create policy "public_read_instalment_schedules" on public.instalment_schedules as PERMISSIVE for SELECT to public using((EXISTS ( SELECT 1
-   FROM (pricing_options po
-     JOIN marketing_offers mo ON ((mo.id = po.offer_id)))
-  WHERE ((po.id = instalment_schedules.pricing_option_id) AND ((mo.publication = 'Published'::publication_status) OR is_active_staff())))));
-create policy "public_read_projects" on public.projects as PERMISSIVE for SELECT to public using(true);
-create policy "public_read_developers" on public.developers as PERMISSIVE for SELECT to public using(true);
-create policy "public_read_amenities" on public.amenities as PERMISSIVE for SELECT to public using(true);
-create policy "public_read_offer_amenities" on public.offer_amenities as PERMISSIVE for SELECT to public using(true);
-create policy "public_read_package_memberships" on public.package_memberships as PERMISSIVE for SELECT to public using((EXISTS ( SELECT 1
-   FROM marketing_offers
-  WHERE ((marketing_offers.id = package_memberships.package_offer_id) AND ((marketing_offers.publication = 'Published'::publication_status) OR is_active_staff())))));
-create policy "public_read_redirects" on public.property_slug_redirects as PERMISSIVE for SELECT to public using(true);
-create policy "public_read_content_pages" on public.content_pages as PERMISSIVE for SELECT to public using(((published_status = 'Published'::publication_status) OR is_active_staff()));
-create policy "manager_manage_pricing" on public.pricing_options as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "public_read_content_sections" on public.content_sections as PERMISSIVE for SELECT to public using((EXISTS ( SELECT 1
-   FROM content_pages
-  WHERE ((content_pages.id = content_sections.page_id) AND ((content_pages.published_status = 'Published'::publication_status) OR is_active_staff())))));
-create policy "public_read_services" on public.services as PERMISSIVE for SELECT to public using(((is_published = true) OR is_active_staff()));
-create policy "public_read_faqs" on public.faqs as PERMISSIVE for SELECT to public using(((is_published = true) OR is_active_staff()));
-create policy "public_read_catalog_documents" on public.catalog_documents as PERMISSIVE for SELECT to public using(((is_published = true) OR is_active_staff()));
-create policy "public_insert_enquiry" on public.enquiries as PERMISSIVE for INSERT to public with check(((char_length(name) >= 2) AND (char_length(email) >= 5) AND (char_length(phone) >= 7) AND (char_length(message) >= 5) AND (status = 'New'::text) AND (lead_id IS NULL) AND (contact_id IS NULL)));
-create policy "staff_read_enquiries" on public.enquiries as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_enquiries" on public.enquiries as PERMISSIVE for UPDATE to public using((is_manager() OR (is_agent() AND (EXISTS ( SELECT 1
-   FROM leads l
-  WHERE ((l.enquiry_id = enquiries.id) AND (l.assigned_agent_id = auth.uid())))))));
-create policy "staff_manage_inventory_managers" on public.marketing_offers as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "agent_update_own_offers" on public.marketing_offers as PERMISSIVE for UPDATE to public using((is_agent() AND (assigned_agent_id = auth.uid()))) with check((is_agent() AND (assigned_agent_id = auth.uid())));
-create policy "manager_manage_schedules" on public.instalment_schedules as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_units" on public.physical_units as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "manager_manage_units" on public.physical_units as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_buildings" on public.buildings as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "manager_manage_buildings" on public.buildings as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_projects" on public.projects as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_developers" on public.developers as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_amenities" on public.amenities as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_offer_amenities" on public.offer_amenities as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_packages" on public.package_memberships as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_history" on public.price_history as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_read_avail_history" on public.availability_history as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_read_publ_history" on public.publication_history as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "manager_manage_redirects" on public.property_slug_redirects as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_contacts" on public.contacts as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_contacts" on public.contacts as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND ((assigned_agent_id IS NULL) OR (assigned_agent_id = auth.uid()))))) with check((is_manager() OR (is_agent() AND ((assigned_agent_id IS NULL) OR (assigned_agent_id = auth.uid())))));
-create policy "staff_read_leads" on public.leads as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_reservations" on public.reservations as PERMISSIVE for ALL to public using(is_agent());
-create policy "staff_manage_checklists" on public.document_checklists as PERMISSIVE for ALL to public using(is_agent());
-create policy "staff_manage_leads" on public.leads as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND ((assigned_agent_id IS NULL) OR (assigned_agent_id = auth.uid()))))) with check((is_manager() OR (is_agent() AND ((assigned_agent_id IS NULL) OR (assigned_agent_id = auth.uid())))));
-create policy "staff_read_buyer_reqs" on public.buyer_requirements as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_buyer_reqs" on public.buyer_requirements as PERMISSIVE for ALL to public using(is_agent());
-create policy "staff_read_shortlists" on public.contact_shortlists as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_shortlists" on public.contact_shortlists as PERMISSIVE for ALL to public using(is_agent());
-create policy "staff_read_tasks" on public.tasks as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_tasks" on public.tasks as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND ((assignee_id = auth.uid()) OR (created_by = auth.uid()))))) with check((is_manager() OR (is_agent() AND ((assignee_id = auth.uid()) OR (created_by = auth.uid())))));
-create policy "staff_read_viewings" on public.viewings as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_viewings" on public.viewings as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND (agent_id = auth.uid())))) with check((is_manager() OR (is_agent() AND (agent_id = auth.uid()))));
-create policy "staff_read_activities" on public.activities as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_insert_activities" on public.activities as PERMISSIVE for INSERT to public with check(is_active_staff());
-create policy "staff_manage_milestones" on public.payment_milestones as PERMISSIVE for ALL to public using(is_manager());
-create policy "staff_read_payments" on public.recorded_payments as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_read_notes" on public.notes as PERMISSIVE for SELECT to public using((is_active_staff() AND ((NOT is_private) OR (author_id = auth.uid()) OR is_admin())));
-create policy "staff_manage_notes" on public.notes as PERMISSIVE for ALL to public using(((author_id = auth.uid()) OR is_admin())) with check(((author_id = auth.uid()) OR is_admin()));
-create policy "staff_manage_merges" on public.contact_merges as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_deals" on public.deals as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "staff_manage_deals" on public.deals as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND (assigned_agent_id = auth.uid())))) with check((is_manager() OR (is_agent() AND (assigned_agent_id = auth.uid()))));
-create policy "staff_manage_selected_units" on public.deal_selected_units as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND (EXISTS ( SELECT 1
-   FROM deals
-  WHERE ((deals.id = deal_selected_units.deal_id) AND (deals.assigned_agent_id = auth.uid())))))));
-create policy "staff_manage_revisions" on public.offer_revisions as PERMISSIVE for ALL to public using((is_manager() OR (is_agent() AND (EXISTS ( SELECT 1
-   FROM deals
-  WHERE ((deals.id = offer_revisions.deal_id) AND (deals.assigned_agent_id = auth.uid())))))));
-create policy "manager_manage_payments" on public.recorded_payments as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_commissions" on public.commission_allocations as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "agent_read_own_commissions" on public.commission_allocations as PERMISSIVE for SELECT to public using((agent_id = auth.uid()));
-create policy "staff_read_leases" on public.leases as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "manager_manage_leases" on public.leases as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_charges" on public.rent_charges as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "manager_manage_charges" on public.rent_charges as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_allocations" on public.rent_payment_allocations as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_deposits" on public.rental_deposits as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_vendors" on public.vendors as PERMISSIVE for SELECT to public using(is_active_staff());
-create policy "manager_manage_vendors" on public.vendors as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_manage_tickets" on public.maintenance_tickets as PERMISSIVE for ALL to public using(is_agent());
-create policy "manager_manage_settings" on public.site_settings as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_pages" on public.content_pages as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_sections" on public.content_sections as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_services" on public.services as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_faqs" on public.faqs as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "manager_manage_catalog" on public.catalog_documents as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "staff_read_audit" on public.audit_events as PERMISSIVE for SELECT to public using(is_manager());
-create policy "staff_read_own_notifications" on public.notifications as PERMISSIVE for SELECT to public using((recipient_id = auth.uid()));
-create policy "staff_update_own_notifications" on public.notifications as PERMISSIVE for UPDATE to public using((recipient_id = auth.uid())) with check((recipient_id = auth.uid()));
-create policy "staff_manage_storage_files" on public.storage_files as PERMISSIVE for ALL to public using(is_active_staff());
-create policy "admin_manage_source_files" on public.source_files as PERMISSIVE for ALL to public using(is_admin()) with check(is_admin());
-create policy "admin_manage_candidates" on public.extraction_candidates as PERMISSIVE for ALL to public using(is_manager()) with check(is_manager());
-create policy "admin_manage_import_runs" on public.import_runs as PERMISSIVE for ALL to public using(is_admin()) with check(is_admin());
-create policy "rate_limit_policy" on public.rate_limit_entries as PERMISSIVE for ALL to public using(true) with check(true);
-create policy "public_view_marketing_media" on storage.objects as PERMISSIVE for SELECT to public using((bucket_id = 'public-marketing'::text));
-create policy "staff_manage_marketing_media" on storage.objects as PERMISSIVE for ALL to public using(((bucket_id = 'public-marketing'::text) AND is_active_staff())) with check(((bucket_id = 'public-marketing'::text) AND is_active_staff()));
-create policy "staff_view_source_media" on storage.objects as PERMISSIVE for SELECT to public using(((bucket_id = 'private-source'::text) AND is_active_staff()));
-create policy "admin_manage_source_media" on storage.objects as PERMISSIVE for ALL to public using(((bucket_id = 'private-source'::text) AND is_admin())) with check(((bucket_id = 'private-source'::text) AND is_admin()));
-create policy "staff_view_documents" on storage.objects as PERMISSIVE for SELECT to public using(((bucket_id = 'private-documents'::text) AND is_active_staff()));
-create policy "agent_manage_documents" on storage.objects as PERMISSIVE for ALL to public using(((bucket_id = 'private-documents'::text) AND is_agent())) with check(((bucket_id = 'private-documents'::text) AND is_agent()));
-) THEN
+  IF NOT (v_offer.slug ~ '^[a-z0-9-]+$') THEN
     RAISE EXCEPTION 'Slug must contain only lowercase alphanumeric characters and hyphens.';
   END IF;
   IF char_length(trim(v_offer.district)) = 0 THEN
@@ -1612,7 +1135,7 @@ BEGIN
   );
 END;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.create_reservation_atomic(p_deal_id uuid, p_offer_id uuid, p_unit_id uuid, p_contact_id uuid, p_user_id uuid, p_deposit numeric, p_currency currency_code, p_duration_hours integer DEFAULT 72)
  RETURNS uuid
  LANGUAGE plpgsql
@@ -1679,7 +1202,7 @@ BEGIN
   RETURN v_res_id;
 END;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.complete_deal_win(p_deal_id uuid, p_user_id uuid)
  RETURNS void
  LANGUAGE plpgsql
@@ -1730,7 +1253,7 @@ BEGIN
   VALUES (p_user_id, 'COMPLETE_DEAL_WIN', 'deals', p_deal_id);
 END;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.reserve_package_atomic(p_deal_id uuid, p_package_offer_id uuid, p_contact_id uuid, p_user_id uuid, p_duration_hours integer DEFAULT 72)
  RETURNS uuid
  LANGUAGE plpgsql
@@ -1774,7 +1297,7 @@ BEGIN
   RETURN v_res_id;
 END;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.convert_enquiry_to_lead(p_enquiry_id uuid, p_user_id uuid)
  RETURNS uuid
  LANGUAGE plpgsql
@@ -1838,7 +1361,7 @@ BEGIN
   RETURN v_lead_id;
 END;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.get_current_staff_role()
  RETURNS staff_role
  LANGUAGE sql
@@ -1848,7 +1371,7 @@ AS $function$
   SELECT role FROM public.staff_profiles
   WHERE id = auth.uid() AND is_active = true;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.release_expired_reservations()
  RETURNS integer
  LANGUAGE plpgsql
@@ -1893,7 +1416,7 @@ BEGIN
   RETURN v_count;
 END;
 $function$
-
+;
 CREATE OR REPLACE FUNCTION public.generate_rent_charges_for_month(p_year integer, p_month integer)
  RETURNS integer
  LANGUAGE plpgsql
@@ -1938,7 +1461,7 @@ BEGIN
   RETURN v_count;
 END;
 $function$
-
+;
 CREATE TRIGGER trg_staff_profiles_last_admin BEFORE DELETE OR UPDATE ON public.staff_profiles FOR EACH ROW EXECUTE FUNCTION check_last_admin_protection();
 CREATE TRIGGER trg_leases_overlap_check BEFORE INSERT OR UPDATE ON public.leases FOR EACH ROW EXECUTE FUNCTION check_lease_overlap();
 CREATE TRIGGER trg_rent_alloc_currency_check BEFORE INSERT OR UPDATE ON public.rent_payment_allocations FOR EACH ROW EXECUTE FUNCTION check_rent_allocation_currency();

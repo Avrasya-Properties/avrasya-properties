@@ -46,6 +46,14 @@ jobs:
       - run: bun run build
       - run: bun run typecheck
       - run: bun scripts/admin-smoke.mjs
+      - name: Persistent browser workflows
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/browser-fixtures.sql
+          docker run --detach --network host --name avrasya-test-api -e PGRST_DB_URI=postgres://authenticator:isolated-test-only@127.0.0.1:5432/postgres -e PGRST_DB_SCHEMA=public -e PGRST_DB_ANON_ROLE=anon -e PGRST_JWT_SECRET=isolated-browser-test-secret-at-least-32-characters -e PGRST_SERVER_PORT=3001 postgrest/postgrest:v13.0.7
+          for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:3001/site_settings && break || sleep 1; done
+          bun scripts/backend-smoke.mjs
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
