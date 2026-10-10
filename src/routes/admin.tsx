@@ -13,7 +13,7 @@ function AdminLayout() {
   const user = useSession();
   const nav = useNavigate();
   const href = useRouterState({ select: (s) => s.location.href });
-  const isLogin = href.startsWith("/admin/login");
+  const isLogin = useRouterState({ select: (s) => s.location.pathname }) === "/admin/login";
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
   useEffect(() => { if (ready && !user && !isLogin) nav({ to: "/admin/login", search: { redirect: href } }); }, [ready, user, href, nav, isLogin]);
