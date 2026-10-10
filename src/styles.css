@@ -190,3 +190,35 @@ details[open] .faq-body { animation: rise 200ms ease-out; }
   .pl-curtain { display: none; }
 }
 .outline-light { -webkit-text-stroke-color: color-mix(in oklab, var(--on-dark) 22%, transparent); }
+
+/* Spatial glassmorphism and weightless motion utilities */
+.glass-panel {
+  background: color-mix(in oklab, var(--card) 85%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+
+.glass-panel-dark {
+  background: rgba(10, 11, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.float-gentle {
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.hover-glow {
+  transition: box-shadow 350ms cubic-bezier(.2,.8,.2,1), border-color 350ms;
+}
+.hover-glow:hover {
+  box-shadow: 0 16px 36px -12px rgba(183, 140, 77, 0.18);
+  border-color: rgba(183, 140, 77, 0.55);
+}
