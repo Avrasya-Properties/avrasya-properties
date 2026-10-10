@@ -33,7 +33,8 @@ async function fillLabel(labelText, value) {
   const labels = await page.$$("label");
   for (const label of labels) {
     if (await label.evaluate((element, text) => element.textContent.trim() === text, labelText)) {
-      const input = await label.$("input");
+      const inputHandle = await label.evaluateHandle((element) => element.control || element.querySelector("input"));
+      const input = inputHandle.asElement();
       if (!input) throw new Error("Input missing for label: " + labelText);
       await input.click({ clickCount: 3 }); await input.press("Backspace"); await input.type(value);
       return;

@@ -150,70 +150,70 @@ export function AdminSettingsPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-companyName" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Brand Name
                 </label>
-                <input
+                <input id="cms-companyName"
                   className={field}
                   value={form.companyName}
                   onChange={(e) => setField("companyName", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-tagline" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Brand Tagline
                 </label>
-                <input
+                <input id="cms-tagline"
                   className={field}
                   value={form.tagline}
                   onChange={(e) => setField("tagline", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-registeredEntity" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Registered Legal Entity
                 </label>
-                <input
+                <input id="cms-registeredEntity"
                   className={field}
                   value={form.registeredEntity}
                   onChange={(e) => setField("registeredEntity", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-licenseNo" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Chamber / Trade License
                 </label>
-                <input
+                <input id="cms-licenseNo"
                   className={field}
                   value={form.licenseNo}
                   onChange={(e) => setField("licenseNo", e.target.value)}
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Registered Headquarters Address
                 </label>
-                <textarea
+                <textarea id="cms-address"
                   className={`${field} h-20 py-2`}
                   value={form.address}
                   onChange={(e) => setField("address", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-advisoryHours" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Advisory Working Hours
                 </label>
-                <input
+                <input id="cms-advisoryHours"
                   className={field}
                   value={form.advisoryHours}
                   onChange={(e) => setField("advisoryHours", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-taxOffice" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Tax Office & Registration
                 </label>
-                <input
+                <input id="cms-taxOffice"
                   className={field}
                   value={form.taxOffice}
                   onChange={(e) => setField("taxOffice", e.target.value)}
@@ -229,30 +229,30 @@ export function AdminSettingsPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Direct Phone Line
                 </label>
-                <input
+                <input id="cms-phone"
                   className={field}
                   value={form.phone}
                   onChange={(e) => setField("phone", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-whatsapp" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   WhatsApp Direct URL
                 </label>
-                <input
+                <input id="cms-whatsapp"
                   className={field}
                   value={form.whatsapp}
                   onChange={(e) => setField("whatsapp", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Official Advisory Email
                 </label>
-                <input
+                <input id="cms-email"
                   className={field}
                   value={form.email}
                   onChange={(e) => setField("email", e.target.value)}
@@ -272,30 +272,30 @@ export function AdminSettingsPage() {
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-eyebrowText" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Eyebrow Text (Header Category)
                 </label>
-                <input
+                <input id="cms-eyebrowText"
                   className={field}
                   value={form.eyebrowText}
                   onChange={(e) => setField("eyebrowText", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-heroHeadline" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Hero Headline
                 </label>
-                <input
+                <input id="cms-heroHeadline"
                   className={field}
                   value={form.heroHeadline}
                   onChange={(e) => setField("heroHeadline", e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-heroSubtitle" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Hero Subtitle
                 </label>
-                <textarea
+                <textarea id="cms-heroSubtitle"
                   className={`${field} h-24 py-2`}
                   value={form.heroSubtitle}
                   onChange={(e) => setField("heroSubtitle", e.target.value)}
@@ -310,10 +310,10 @@ export function AdminSettingsPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 items-center">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="cms-cbiThresholdUsd" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Turkish CBI Minimum Threshold (USD)
                 </label>
-                <input
+                <input id="cms-cbiThresholdUsd"
                   type="number"
                   className={field}
                   value={form.cbiThresholdUsd}

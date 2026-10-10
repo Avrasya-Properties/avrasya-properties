@@ -416,10 +416,10 @@ export function AdminInquiriesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="inquiry-email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Email
                   </label>
-                  <input
+                <input id="inquiry-email"
                     type="email"
                     className={field}
                     value={newForm.email}
@@ -428,10 +428,10 @@ export function AdminInquiriesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="inquiry-phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Phone / WhatsApp
                   </label>
-                  <input
+                <input id="inquiry-phone"
                     className={field}
                     value={newForm.phone}
                     onChange={(e) => setNewForm({ ...newForm, phone: e.target.value })}
@@ -469,10 +469,10 @@ export function AdminInquiriesPage() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="inquiry-message" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Inquiry Details / Message
                 </label>
-                <textarea
+                <textarea id="inquiry-message"
                   className={`${field} h-24 py-2`}
                   value={newForm.message}
                   onChange={(e) => setNewForm({ ...newForm, message: e.target.value })}
