@@ -89,6 +89,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
+  if (isAdmin) return <QueryClientProvider client={queryClient}><Outlet /></QueryClientProvider>;
   return (
     <QueryClientProvider client={queryClient}>
       <a href="#main" className="sr-only focus:not-sr-only">Skip to content</a>
