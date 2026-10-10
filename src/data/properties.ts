@@ -142,7 +142,7 @@ export type PropertyMediaInfo = {
 
 function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   const s = r.slug.toLowerCase();
-  const isCbi = (comparableUsd(r.price) ?? 0) >= 400000;
+  const isCbi = r.details["cbi_verified"] === true;
   
   // 1. RAMS Park House Maslak (1+1 XS 50m2, $270k)
   if (s === "rams-park-house-maslak-1-1xs" || s.includes("rams")) {

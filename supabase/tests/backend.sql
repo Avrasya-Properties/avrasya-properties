@@ -2,7 +2,7 @@
 begin;
 create schema test;
 create function test.ok(condition boolean,label text) returns void language plpgsql as $$begin if condition is distinct from true then raise exception 'FAILED: %',label;end if;raise notice 'PASS: %',label;end$$;
-create function test.denied(statement text,label text) returns void language plpgsql security invoker as $$begin begin execute statement;exception when others then raise notice 'PASS: % (%)',label,sqlerrm;return;end;raise exception 'FAILED: expected denial: %',label;end$$;
+create function test.denied(statement text,label text) returns void language plpgsql security invoker as $$begin begin execute statement;exception when insufficient_privilege or check_violation or raise_exception or serialization_failure or foreign_key_violation or unique_violation then raise notice 'PASS: % (%)',label,sqlerrm;return;end;raise exception 'FAILED: expected denial: %',label;end$$;
 grant usage on schema test to anon,authenticated,service_role;
 grant execute on all functions in schema test to anon,authenticated,service_role;
 insert into auth.users(id) select ('00000000-0000-4000-8000-'||lpad(i::text,12,'0'))::uuid from generate_series(1,6) i;
@@ -47,7 +47,7 @@ select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-
 set local role authenticated;
 select save_offer('{"ref":"TEST-1","slug":"verified-unit","marketing_title":"Verified unit","district":"Istanbul","city":"Istanbul","record_type":"unit_offer","mode":"sale","price_type":"fixed","amount":420000,"currency":"USD","availability":"Available","publication":"Published"}',null);
 select test.ok((select count(*) from published_catalogue())=1,'Manager publication creates one public snapshot');
-select test.denied('select save_offer(''{"id":"''||(select id from marketing_offers where ref=''TEST-1'')||''","marketing_title":"Stale edit"}'',0)','Stale offer edits are rejected');
+select test.denied(format('select save_offer(%L::jsonb,0)',jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'marketing_title','Stale edit')),'Stale offer edits are rejected');
 select link_physical_unit((select id from marketing_offers where ref='TEST-1'),'00000000-0000-4000-8000-000000002001',(select version from marketing_offers where ref='TEST-1'));
 insert into leads(id,contact_id,assigned_agent_id,stage,shortlist) values('00000000-0000-4000-8000-000000003001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000003','Qualified',array[(select id from marketing_offers where ref='TEST-1')]);
 select convert_lead('00000000-0000-4000-8000-000000003001');

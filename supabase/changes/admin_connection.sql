@@ -535,7 +535,7 @@ snapshot=coalesce(r.source_record,'{}'::jsonb)||jsonb_build_object('id',r.id,'sl
 'areas',(select coalesce(jsonb_agg(x),'[]') from (select jsonb_build_object('value_m2',r.gross_m2,'basis','gross') x where r.gross_m2 is not null union all select jsonb_build_object('value_m2',r.net_m2,'basis','net') where r.net_m2 is not null union all select jsonb_build_object('value_m2',r.area_m2,'basis','unspecified') where r.area_m2 is not null) a),
 'source_ids',coalesce(r.source_record->'source_ids','[]'::jsonb),'availability_verified',r.availability='Available',
 'cover',r.cover_image_path,'availability',r.availability,
-'details',coalesce(r.source_record->'details','{}'::jsonb)||jsonb_build_object('project',(select name from public.projects where id=r.project_id),'note',r.description,'claims_requiring_confirmation',coalesce(to_jsonb(r.claims_requiring_confirmation),'[]')));
+'details',coalesce(r.source_record->'details','{}'::jsonb)||jsonb_build_object('project',(select name from public.projects where id=r.project_id),'note',r.description,'cbi_verified',r.cbi_verified and r.cbi_eligible,'claims_requiring_confirmation',coalesce(to_jsonb(r.claims_requiring_confirmation),'[]')));
 r.published_snapshot=snapshot;r.published_at=now();
 end if;
 if old_row.version=0 then insert into public.marketing_offers select (r).*;
@@ -828,3 +828,17 @@ create trigger snapshot_availability before update on public.marketing_offers fo
 -- A scheduler can call the service-only RPC every five minutes. No external cron is created here.
 
 grant update on public.notification_receipts to authenticated;
+
+alter table public.contacts add constraint contact_name_valid check(length(trim(name)) between 1 and 200);
+alter table public.tasks add constraint task_title_valid check(length(trim(title)) between 1 and 500);
+alter table public.site_settings add constraint settings_values_valid check(preloader_opacity between 0 and 1 and exchange_rate_eur>0 and exchange_rate_try>0 and exchange_rate_gbp>0 and cbi_threshold_usd>0);
+create trigger record_audit after insert or update on public.projects for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.buildings for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.physical_units for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.content_sections for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.catalog_documents for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.leases for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.vendors for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.maintenance_tickets for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.extraction_candidates for each row execute function private.audit_record();
+create trigger record_audit after insert or update on public.document_checklists for each row execute function private.audit_record();

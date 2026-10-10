@@ -81,6 +81,7 @@ export function upsert<T extends {id:string}>(collection:Collection,item:Row & {
  result={...original,...payload,property_ids:merged["propertyIds"]||[]};
  }else{
  delete payload["id"];
+ if(collection==="inquiries")for(const key of Object.keys(payload))if(!["status","notes","assigned_agent_id"].includes(key))delete payload[key];
  let query=original?supabase.from(TABLES[collection]).update(payload).eq("id",item.id!).eq("updated_at",original["updated_at"]):supabase.from(TABLES[collection]).insert(payload);
  const {data,error}=await query.select().single();if(error)throw error;result=data as Row;
  }

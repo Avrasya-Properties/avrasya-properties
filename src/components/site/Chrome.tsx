@@ -396,6 +396,7 @@ export function Margin({ label, children }: { label: string; children: React.Rea
 }
 
 export function CtaBand() {
+  const contact=useLiveContact();
   return (
     <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-20">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/10 via-transparent to-transparent pointer-events-none" />
@@ -416,7 +417,7 @@ export function CtaBand() {
             </Link>
           </Magnetic>
           <a
-            href={CONTACT.whatsapp}
+            href={contact.whatsapp}
             target="_blank"
             rel="noreferrer"
             className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"

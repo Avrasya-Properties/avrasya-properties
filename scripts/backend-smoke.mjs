@@ -77,7 +77,7 @@ async function attachProxy(target){
    }else if(url.pathname==="/auth/v1/logout"){status=204;body=null;}
    else if(url.pathname.startsWith("/rest/v1")){
     const auth=request.headers().authorization;const token=auth?.startsWith("Bearer ey")?auth:undefined;
-    const response=await fetch(api+url.pathname.replace("/rest/v1","")+url.search,{method:request.method(),headers:{"Content-Type":"application/json",...(token?{Authorization:token}:{}),...(request.headers().prefer?{Prefer:request.headers().prefer}:{}),...(request.headers().range?{Range:request.headers().range}:{})},...(request.postData()?{body:request.postData()}:{})});
+    const response=await fetch(api+url.pathname.replace("/rest/v1","")+url.search,{method:request.method(),headers:{"Content-Type":"application/json",Accept:request.headers().accept||"application/json",...(token?{Authorization:token}:{}),...(request.headers().prefer?{Prefer:request.headers().prefer}:{}),...(request.headers().range?{Range:request.headers().range}:{})},...(request.postData()?{body:request.postData()}:{})});
     status=response.status;body=await response.text();headers={...headers,...Object.fromEntries([...response.headers].filter(([name])=>["content-range","content-type","preference-applied"].includes(name)))};
    }else{status=404;body={error:"Unsupported test endpoint"};}
    await request.respond({status,headers,body:body===null?"":typeof body==="string"?body:JSON.stringify(body)});
