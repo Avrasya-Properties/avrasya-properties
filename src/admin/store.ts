@@ -24,7 +24,7 @@ export type Property = {
   layout: string | null; bathrooms: number | null; grossM2: number | null; netM2: number | null; areaM2: number | null;
   amount: number | null; currency: Currency | null; mode: "sale" | "rent"; priceType: "fixed" | "from" | "on-request";
   availability: (typeof AVAIL)[number]; publication: (typeof PUBL)[number]; agentId: string;
-  cover: string | null; description: string; updatedAt: string; sourceNote?: string;
+  cover: string | null; description: string; project: string; updatedAt: string; sourceNote?: string;
 };
 export type Contact = { id: string; name: string; kind: "person" | "company"; email: string; phone: string; roles: string[]; language: string; agentId: string; notes: string };
 export type Lead = { id: string; contactId: string; source: string; agentId: string; districts: string; layout: string; budgetMin: number | null; budgetMax: number | null; currency: Currency; stage: (typeof LEAD_STAGES)[number]; lossReason?: string; nextFollowUp: string | null; shortlist: string[]; dealId?: string };
@@ -35,7 +35,7 @@ export type Activity = { id: string; at: string; userId: string; kind: string; t
 
 export type DB = { properties: Property[]; contacts: Contact[]; leads: Lead[]; tasks: Task[]; viewings: Viewing[]; deals: Deal[]; activity: Activity[]; readNotes: string[] };
 
-const KEY = "avrasya-admin-db-v1";
+const KEY = "avrasya-admin-db-v2";
 const SKEY = "avrasya-admin-session";
 const uid = () => Math.random().toString(36).slice(2, 9);
 const day = (offset: number, h = 10) => { const d = new Date(); d.setDate(d.getDate() + offset); d.setHours(h, 0, 0, 0); return d.toISOString(); };
@@ -52,7 +52,7 @@ function seed(): DB {
       priceType: r.price.amount == null ? "on-request" : r.record_type === "project" ? "from" : "fixed",
       availability: r.availability_verified ? "Available" : "Unknown",
       publication: i % 5 === 3 ? "In Review" : i % 7 === 6 ? "Draft" : "Published",
-      agentId: agents[i % 2], cover: null, description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
+      agentId: agents[i % 2], cover: null, project: String(r.details?.project ?? r.marketing_title.split(" — ")[0]), description: String(r.details?.note ?? ""), updatedAt: day(-i % 9),
       sourceNote: (r.details?.claims_requiring_confirmation ?? []).join("; "),
     } as Property;
   });

@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode } from "react";
-import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink } from "lucide-react";
+import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers } from "lucide-react";
 import logo from "@/assets/avrasya-logo.png.asset.json";
 import { fmtDate, logout, markRead, useDB, useSession } from "./store";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 const NAV = [
   { group: "Overview", items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard }] },
-  { group: "Inventory", items: [{ to: "/admin/properties", label: "Properties", icon: Building2 }] },
+  { group: "Inventory", items: [{ to: "/admin/properties", label: "Properties", icon: Building2 }, { to: "/admin/projects", label: "Projects", icon: Layers }] },
   { group: "Sales & CRM", items: [
     { to: "/admin/leads", label: "Leads", icon: Users }, { to: "/admin/contacts", label: "Contacts", icon: Contact2 },
     { to: "/admin/deals", label: "Deals", icon: Handshake }, { to: "/admin/calendar", label: "Calendar", icon: CalendarDays },
