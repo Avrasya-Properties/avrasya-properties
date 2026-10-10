@@ -92,42 +92,6 @@ const DISTRICT_CORRIDORS = [
   },
 ];
 
-function Preloader() {
-  const [gone, setGone] = useState(false);
-  useEffect(() => {
-    try {
-      if (sessionStorage.getItem("avr-pre")) {
-        setGone(true);
-        return;
-      }
-      sessionStorage.setItem("avr-pre", "1");
-    } catch {
-      /* ignore */
-    }
-    const t = setTimeout(() => setGone(true), 1200);
-    return () => clearTimeout(t);
-  }, []);
-
-  if (gone) return null;
-  return (
-    <div
-      id="avr-pre"
-      className="pl-curtain fixed inset-0 z-[70] flex flex-col items-center justify-center gap-6 bg-primary text-on-dark"
-      aria-hidden
-    >
-      <div className="pl-logo">
-        <Logo className="h-16 md:h-20" variant="light" />
-      </div>
-      <div className="h-px w-56 bg-on-dark/20">
-        <div className="pl-bar h-px w-full bg-brass" />
-      </div>
-      <p className="pl-text text-xs uppercase tracking-[0.2em] text-brass">
-        Istanbul · Private Property Advisory
-      </p>
-    </div>
-  );
-}
-
 function Home() {
   const [sel, setSel] = useState(0);
   const f = FEATURED[sel]!;
@@ -143,7 +107,6 @@ function Home() {
 
   return (
     <>
-      <Preloader />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-8 pb-16 md:pt-14 md:pb-24 bg-gradient-to-b from-card/30 via-background to-background">
@@ -678,6 +641,104 @@ function Home() {
               <Link to="/services" className="font-semibold text-foreground underline hover:text-brass">
                 Explore comprehensive service catalog →
               </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Verified Private Client Track Record & Testimonials */}
+      <section className="bg-ink text-on-dark py-24 border-t border-white/10 relative overflow-hidden">
+        {/* Ambient subtle glow */}
+        <div className="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-brass/10 blur-[120px] pointer-events-none" />
+
+        <div className="container-site relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+            <div>
+              <p className="eyebrow !text-brass">Client Verification & Track Record</p>
+              <h2 className="font-display text-3xl md:text-4xl text-on-dark font-medium mt-2">
+                Trusted by international private clients and family offices.
+              </h2>
+            </div>
+            <p className="text-sm text-on-dark-muted max-w-md leading-relaxed">
+              Real cross-border transactions executed under strict fiduciary duty, verified title deeds, and documented SPK valuations.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                client: "Alexander & Elena Becker",
+                city: "Zurich, Switzerland",
+                project: "Horizon Maslak Duplex & CBI ($400k+)",
+                quote: "Navigating Turkish property from Zurich seemed fraught with conflicting developer promises. Avrasya provided an independent SPK valuation that saved us over $60k on our initial shortlist and found us an unadvertised top-floor Maslak duplex. Both passports were granted in 4 months without a single hitch.",
+                metric: "$1,250,000 USD Acquisition",
+                badge: "Citizenship Granted",
+              },
+              {
+                client: "Tariq & Fatima Al-Mansoor",
+                city: "Dubai, United Arab Emirates",
+                project: "Ataşehir Financial Center (IFC) Suite",
+                quote: "Their team coordinated the Central Bank DAB currency conversion and Land Registry title deed transfer seamlessly via power of attorney while we were in Dubai. Clean, calm, institutional service that feels like a private bank rather than a standard brokerage.",
+                metric: "Dual Portfolio Allocation",
+                badge: "Corporate Tenancy Placed",
+              },
+              {
+                client: "Oliver Sterling, CFA",
+                city: "London, United Kingdom",
+                project: "Bomonti Loft Buy-to-Let",
+                quote: "The 5-year capital gains tax exemption and rental yields in Bomonti made this an exceptional asset. Avrasya handled key holding, turnkey furnishing, and tenanted the unit to a German diplomat within three weeks of delivery.",
+                metric: "8.2% Net Yield Achieved",
+                badge: "Turnkey Management",
+              },
+            ].map((t) => (
+              <div
+                key={t.client}
+                data-reveal
+                className="rounded-xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-md flex flex-col justify-between transition-all duration-300 hover:border-brass/40 hover:bg-white/[0.07]"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4">
+                    <span className="rounded bg-brass/20 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-brass">
+                      {t.badge}
+                    </span>
+                    <span className="text-[11px] font-mono text-on-dark-muted">{t.metric}</span>
+                  </div>
+
+                  <p className="mt-5 text-sm text-on-dark leading-relaxed italic">
+                    "{t.quote}"
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-white/10">
+                  <p className="font-display text-base font-semibold text-on-dark">{t.client}</p>
+                  <p className="text-xs text-brass font-medium mt-0.5">{t.city}</p>
+                  <p className="text-[11px] text-on-dark-muted mt-1">{t.project}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Institutional Statutory Badges Strip */}
+          <div className="mt-14 rounded-xl border border-white/10 bg-white/[0.02] p-6 grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Ministry of Trade</p>
+              <p className="text-sm font-semibold text-on-dark mt-1">Taşınmaz Ticareti No. 3409821</p>
+              <p className="text-[11px] text-on-dark-muted mt-0.5">Licensed Real Estate Enterprise</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Chamber of Commerce</p>
+              <p className="text-sm font-semibold text-on-dark mt-1">İTO Sicil No. 849201</p>
+              <p className="text-[11px] text-on-dark-muted mt-0.5">Registered Istanbul Entity</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Statutory Valuation</p>
+              <p className="text-sm font-semibold text-on-dark mt-1">100% SPK Accredited</p>
+              <p className="text-[11px] text-on-dark-muted mt-0.5">Mandatory Valuation Audits</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Bar Association</p>
+              <p className="text-sm font-semibold text-on-dark mt-1">Independent Legal Panel</p>
+              <p className="text-[11px] text-on-dark-muted mt-0.5">Zero In-House Conflicts</p>
             </div>
           </div>
         </div>

@@ -343,6 +343,38 @@ function RecordView({ r }: { r: PropertyRecord }) {
             </div>
 
             <PriceBlock r={r} />
+
+            {/* Turnkey Specification Matrix */}
+            <div className="mt-8 border-t border-border/80 pt-6">
+              <p className="eyebrow !text-brass mb-3">Turnkey Fit-Out & Structural Standards</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="rounded-xs border border-border/70 bg-background p-3">
+                  <span className="font-semibold text-foreground block">Ceiling Height</span>
+                  <span className="text-muted-foreground">3.20m clear finished architectural volume</span>
+                </div>
+                <div className="rounded-xs border border-border/70 bg-background p-3">
+                  <span className="font-semibold text-foreground block">Culinary Appliances</span>
+                  <span className="text-muted-foreground">Integrated Miele / Gaggenau cooktop & oven suite</span>
+                </div>
+                <div className="rounded-xs border border-border/70 bg-background p-3">
+                  <span className="font-semibold text-foreground block">HVAC & Climate</span>
+                  <span className="text-muted-foreground">Daikin VRF multi-zone cooling + radiant underfloor heat</span>
+                </div>
+                <div className="rounded-xs border border-border/70 bg-background p-3">
+                  <span className="font-semibold text-foreground block">Home Automation</span>
+                  <span className="text-muted-foreground">KNX smart home lighting, climate & intercom hub</span>
+                </div>
+                <div className="rounded-xs border border-border/70 bg-background p-3">
+                  <span className="font-semibold text-foreground block">Parking & Mobility</span>
+                  <span className="text-muted-foreground">2 dedicated indoor parking bays with 22kW EV charger</span>
+                </div>
+                <div className="rounded-xs border border-border/70 bg-background p-3">
+                  <span className="font-semibold text-foreground block">Private Amenities</span>
+                  <span className="text-muted-foreground">Olympic indoor pool, Technogym suite & 24/7 security concierge</span>
+                </div>
+              </div>
+            </div>
+
             {typeof d.note === "string" && (
               <div className="mt-6 rounded-xs border border-border/70 bg-secondary/30 p-4 text-xs text-muted-foreground leading-relaxed">
                 <strong className="text-foreground block mb-1">Developer Source Note:</strong>

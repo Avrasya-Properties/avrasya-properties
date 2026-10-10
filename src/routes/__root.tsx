@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { MotionRoot } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
+import { Preloader } from "@/components/site/Preloader";
 
 function NotFoundComponent() {
   return (
@@ -95,6 +96,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <a href="#main" className="sr-only focus:not-sr-only">Skip to content</a>
+      <Preloader />
       <MotionRoot />
       <Header />
       <main id="main">

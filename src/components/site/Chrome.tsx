@@ -91,8 +91,8 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-6">
-            {/* Currency switcher in top bar */}
-            <div className="flex items-center gap-1">
+            {/* Currency switcher in top bar with live Frankfurter ECB status */}
+            <div className="flex items-center gap-2">
               <span className="text-on-dark-muted/70 text-[0.68rem] uppercase font-semibold">Currency:</span>
               <div className="flex rounded border border-on-dark/20 bg-primary/40 p-0.5">
                 {(["USD", "EUR", "TRY", "GBP"] as SupportedCurrency[]).map((c) => (
@@ -109,6 +109,13 @@ export function Header() {
                   </button>
                 ))}
               </div>
+              <span
+                className="hidden items-center gap-1 rounded bg-brass/15 px-1.5 py-0.5 text-[0.62rem] font-mono text-brass xl:flex"
+                title="Live ECB conversion rates powered by Frankfurter"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live ECB (Frankfurter)
+              </span>
             </div>
 
             <a href={`mailto:${CONTACT.email}`} className="text-on-dark-muted hover:text-on-dark transition-colors">
