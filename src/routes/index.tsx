@@ -11,7 +11,6 @@ import {
   MapPin,
   MessageSquare,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import {
@@ -129,7 +128,6 @@ function Home() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="flex h-2 w-2 rounded-full bg-brass animate-pulse" />
                 <span className="eyebrow !text-brass-text">
                   Private Advisory · Istanbul · Europe & Asia
                 </span>
@@ -210,7 +208,7 @@ function Home() {
                     </span>
                     {(fUsd ?? 0) >= 400000 && (
                       <span className="flex items-center gap-1 rounded-xs bg-brass px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary shadow-xs">
-                        <Sparkles className="h-3 w-3" /> CBI Eligible ($400k+)
+                        CBI Eligible ($400k+)
                       </span>
                     )}
                   </div>
@@ -436,8 +434,7 @@ function Home() {
       <section className="container-site py-20">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-brass" />
+            <div className="mb-1.5">
               <p className="eyebrow eyebrow-mark">Handpicked Portfolio</p>
             </div>
             <h2 className="headline mt-2 text-3xl md:text-4xl">Editorial portfolio selection</h2>

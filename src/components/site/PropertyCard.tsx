@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Heart, MapPin, Sparkles, MessageSquare, ArrowRight, ShieldCheck } from "lucide-react";
+import { Heart, MapPin, MessageSquare, ArrowRight, ShieldCheck } from "lucide-react";
 import { Tilt } from "./Motion";
 import {
   areaText,
@@ -17,13 +18,20 @@ import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 
 export function ImageFallback({ r, className = "" }: { r: PropertyRecord; className?: string }) {
   const media = getPropertyMedia(r);
+  const [imgSrc, setImgSrc] = useState(media.cover);
+  const [loaded, setLoaded] = useState(false);
+
   return (
-    <div className={`relative h-full w-full overflow-hidden bg-secondary ${className}`}>
+    <div className={`relative h-full w-full overflow-hidden bg-[#0C1E23] ${className}`}>
       <img
-        src={media.cover}
+        src={imgSrc}
         alt={r.marketing_title}
         loading="lazy"
-        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        onLoad={() => setLoaded(true)}
+        onError={() => setImgSrc("/images/properties/hero-main.jpg")}
+        className={`h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+          loaded ? "opacity-100" : "opacity-90"
+        }`}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
     </div>
@@ -43,11 +51,10 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
   return (
     <Tilt className="h-full">
       <article
-        data-reveal
         className="group relative flex h-full flex-col overflow-hidden rounded-xs border border-border/70 bg-card transition-all duration-300 hover:border-brass/70 hover:shadow-xl"
       >
         {/* Card Image Banner */}
-        <div className="relative aspect-[16/11] overflow-hidden bg-muted">
+        <div className="relative aspect-[16/11] overflow-hidden bg-[#0C1E23]">
           <Link
             to="/properties/$slug"
             params={{ slug: r.slug }}
@@ -67,7 +74,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
             )}
             {isCbiEligible && (
               <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-wider text-primary shadow-xs">
-                <Sparkles className="h-2.5 w-2.5" /> CBI $400k
+                CBI $400k
               </span>
             )}
           </div>

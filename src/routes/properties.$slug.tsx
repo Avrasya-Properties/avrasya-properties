@@ -18,7 +18,6 @@ import {
   Scale,
   Share2,
   ShieldCheck,
-  Sparkles,
   X,
 } from "lucide-react";
 import {
@@ -218,7 +217,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
               </span>
               {isCbi ? (
                 <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
-                  <Sparkles className="h-3 w-3" /> Turkish Citizenship Eligible ($400k+)
+                  Turkish Citizenship Eligible ($400k+)
                 </span>
               ) : (
                 <span className="rounded-xs border border-brass/50 bg-brass/10 px-2 py-0.5 text-xs font-medium text-brass-text">
@@ -386,7 +385,6 @@ function RecordView({ r }: { r: PropertyRecord }) {
           {/* Section 02: Architectural Highlights */}
           <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-3.5 w-3.5 text-brass" />
               <span className="eyebrow !text-brass">Key Property Highlights</span>
             </div>
             <h2 className="headline text-2xl font-semibold">Architectural & lifestyle assets</h2>

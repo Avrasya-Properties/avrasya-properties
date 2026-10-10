@@ -4,7 +4,6 @@ import {
   Grid3X3,
   List,
   Heart,
-  Sparkles,
   Search,
   SlidersHorizontal,
   ArrowUpDown,
@@ -101,17 +100,14 @@ function Catalog() {
   return (
     <>
       <PageIntro
-        eyebrow="Istanbul Portfolio · 18 Verified Developments"
+        eyebrow="Istanbul Portfolio Collection"
         title={<>Curated Offers & Developments in <em>Istanbul.</em></>}
         aside={
-          <div className="flex flex-col gap-2 text-right">
+          <div className="flex flex-col gap-1 text-right">
             <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-              Live Verified Database · Europe & Asia
+              Prime Corridors · European & Asian Side
             </span>
-            <div className="flex items-center justify-end gap-2 text-xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-foreground font-medium">18 Active Listings Available</span>
-            </div>
+            <span className="text-xs text-foreground font-medium">18 Curated Opportunities</span>
           </div>
         }
       >
@@ -159,7 +155,6 @@ function Catalog() {
                     : "border-border bg-secondary hover:border-brass/70 text-foreground"
                 }`}
               >
-                <Sparkles className="h-3 w-3" />
                 <span>CBI Eligible ($400k+)</span>
               </button>
 
@@ -278,11 +273,14 @@ function Catalog() {
                       <Link
                         to="/properties/$slug"
                         params={{ slug: r.slug }}
-                        className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xs bg-muted"
+                        className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xs bg-[#0C1E23]"
                       >
                         <img
                           src={media.cover}
                           alt=""
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/properties/hero-main.jpg";
+                          }}
                           className="h-full w-full object-cover transition-transform group-hover:scale-105"
                         />
                         {isCbi && (

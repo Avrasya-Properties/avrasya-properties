@@ -86,7 +86,7 @@
 
 @utility container-site { width: 100%; max-width: 80rem; margin-inline: auto; padding-inline: 1rem; @media (min-width: 768px) { padding-inline: 2rem; } }
 @utility eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass-text); }
-@utility eyebrow-mark { &::before { content: ""; display: inline-block; width: 6px; height: 6px; background: var(--brass); margin-right: 0.6rem; vertical-align: middle; } }
+@utility eyebrow-mark { &::before { content: ""; display: inline-block; width: 14px; height: 1.5px; background: var(--brass); margin-right: 0.6rem; vertical-align: middle; } }
 @utility display-hero { font-family: var(--font-display); font-weight: 500; font-size: 2.5rem; line-height: 1.15; letter-spacing: -0.02em; @media (min-width: 768px) { font-size: 4.25rem; line-height: 1.1; } }
 @utility headline { font-family: var(--font-display); font-weight: 500; font-size: 1.75rem; line-height: 1.25; @media (min-width: 768px) { font-size: 2.25rem; } }
 @utility field { width: 100%; min-height: 44px; border: 1px solid var(--control); background: var(--card); padding: 0.5rem 0.75rem; font-size: 0.9rem; border-radius: var(--radius); }

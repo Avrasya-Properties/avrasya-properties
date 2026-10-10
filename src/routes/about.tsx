@@ -156,7 +156,7 @@ export function AboutPage() {
       </section>
 
       {/* Leadership Team */}
-      <section className="container-site py-20">
+      <section className="container-site py-20 border-b">
         <div className="max-w-2xl mb-12">
           <p className="eyebrow">Client Directors</p>
           <h2 className="font-display text-3xl font-semibold md:text-4xl">
@@ -175,6 +175,155 @@ export function AboutPage() {
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{l.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Legal & Fiduciary Verification Framework */}
+      <section className="container-site py-20 border-b">
+        <div className="max-w-2xl mb-12">
+          <p className="eyebrow">Due Diligence Protocol</p>
+          <h2 className="font-display text-3xl font-semibold md:text-4xl">
+            Institutional Verification Framework
+          </h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">
+            Every property recommended by Avrasya Properties undergoes strict multi-tier vetting before any client capital commitment.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="rounded-xl border bg-card p-6">
+            <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+              <Scale className="h-5 w-5" />
+            </div>
+            <h3 className="font-display text-lg font-semibold text-foreground">Independent Title Audit</h3>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Direct verification at the Land Registry (Tapu Sicil) ensuring clean freehold title deed, absence of mortgages or judicial liens (haciz), and confirmed Kat Mülkiyeti status.
+            </p>
+          </div>
+
+          <div className="rounded-xl border bg-card p-6">
+            <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <h3 className="font-display text-lg font-semibold text-foreground">SPK-Accredited Valuation</h3>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Mandatory appraisal reports by Capital Markets Board (SPK) certified assessors confirming real market value and Turkish Citizenship qualifying threshold eligibility.
+            </p>
+          </div>
+
+          <div className="rounded-xl border bg-card p-6">
+            <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+              <Globe2 className="h-5 w-5" />
+            </div>
+            <h3 className="font-display text-lg font-semibold text-foreground">Central Bank DAB Execution</h3>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Coordinated Foreign Exchange Purchase Certificate (Döviz Alım Belgesi) processing directly through the Central Bank of Türkiye (TCMB) to secure statutory exchange rates.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Headquarters & Consultation Facilities */}
+      <section className="container-site py-20 border-b">
+        <div className="grid gap-12 lg:grid-cols-12 items-center">
+          <div className="lg:col-span-6 space-y-6">
+            <div>
+              <p className="eyebrow">Istanbul Headquarters</p>
+              <h2 className="font-display text-3xl font-semibold md:text-4xl">
+                Üsküdar Waterfront Advisory Suites
+              </h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Our headquarters is situated on Istanbul's historic Asian shoreline in Üsküdar overlooking the Bosphorus. We host private investors and family offices for confidential portfolio reviews, legal title examinations, and direct developer consultations.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-2 pt-2">
+              <div className="rounded-lg border bg-card/60 p-4">
+                <p className="text-xs uppercase tracking-wider text-brass font-semibold">Registered Entity</p>
+                <p className="mt-1 text-sm font-medium text-foreground">{CONTACT.company}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Istanbul Chamber of Commerce (İTO)</p>
+              </div>
+              <div className="rounded-lg border bg-card/60 p-4">
+                <p className="text-xs uppercase tracking-wider text-brass font-semibold">Advisory Hours</p>
+                <p className="mt-1 text-sm font-medium text-foreground">Mon – Fri: 09:30 – 18:30 TRT</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Saturday: By Private Appointment</p>
+              </div>
+            </div>
+
+            <div className="space-y-2 border-t pt-4 text-sm text-muted-foreground">
+              <p className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-brass shrink-0 mt-0.5" />
+                <span>{CONTACT.address}</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-brass shrink-0" />
+                <span>Private boardroom meetings & chauffeured property viewings arranged upon request</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 overflow-hidden rounded-2xl border bg-muted aspect-[4/3] relative">
+            <img
+              src="/images/properties/maslak-tower.jpg"
+              alt="Istanbul Corporate Skyline"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+              <p className="text-white text-sm font-medium">Avrasya Advisory · Prime Corridors Across Istanbul</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Advisory FAQs */}
+      <section className="container-site py-20">
+        <div className="max-w-2xl mb-12">
+          <p className="eyebrow">Frequently Asked Questions</p>
+          <h2 className="font-display text-3xl font-semibold md:text-4xl">
+            Key Questions for International Investors
+          </h2>
+        </div>
+
+        <div className="max-w-3xl space-y-4">
+          <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
+              <span>How does Avrasya Properties differ from conventional real estate agents?</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+              We operate exclusively as buy-side client fiduciaries rather than sales intermediaries. We do not accept undisclosed commissions or promote speculative inventory. Every property in our portfolio has undergone pre-clearance checks on title deeds, developer balance sheets, and SPK appraisal compliance.
+            </p>
+          </details>
+
+          <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
+              <span>Are the prices shown on your website verified directly with developers?</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+              Yes. All pricing is cross-referenced with developer price lists and recent transaction records. For projects offering installment schedules or cash payment discounts, our advisors negotiate directly on your behalf to obtain institutional-grade pricing.
+            </p>
+          </details>
+
+          <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
+              <span>How is client capital protected before the Land Registry transfer?</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+              Funds are held in secure escrow accounts and converted through official Central Bank DAB foreign exchange certificates. Payments are released only upon verification that the title deed (Tapu) is clean, unencumbered, and ready for notarized registration into the buyer's name.
+            </p>
+          </details>
+
+          <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
+              <span>What ongoing management services are provided after the sale completes?</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+              We provide full turnkey post-acquisition support, including Turkish tax number issuance, bank account setup, utility connections, interior design management, corporate tenant leasing, and citizenship dossier coordination through accredited legal counsel.
+            </p>
+          </details>
         </div>
       </section>
 

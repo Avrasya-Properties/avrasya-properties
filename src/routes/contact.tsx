@@ -10,8 +10,7 @@ import {
   MessageSquare, 
   Phone, 
   Send, 
-  ShieldCheck, 
-  Sparkles 
+  ShieldCheck 
 } from "lucide-react";
 import { PageIntro } from "@/components/site/Chrome";
 import { Enquiry } from "@/components/site/Enquiry";
