@@ -20,7 +20,8 @@ GitHub access was available for this review. The execution environment was offli
 - Explicit deal-unit editor and sequential transitions. Reservations require available individual units, source review and an agreed amount; reserved and completed transactions cannot be edited silently.
 - Completion changes only agreed units and distinguishes sales from rentals. Lost reservations release their selected units.
 - Unknown source bathrooms, title-deed status and citizenship eligibility are not inferred into the demo seed.
-- Contact editing, duplicate review, explicit Istanbul input and demo upload limits.
+- Contact editing, duplicate review, editable lead currency/follow-up, removable shortlist entries, guarded activity errors, explicit Istanbul input and demo upload limits.
+- Dashboard and analytics keep currencies separate, distinguish unknown locations, and label listing figures and eligibility flags accurately.
 - Production builds disable fixed demo sign-in unless explicitly opted in.
 - Public WhatsApp drafts no longer write fictitious incoming inquiries into a visitor’s browser.
 
@@ -79,4 +80,4 @@ Do not import demo contacts, leads, deals, tasks or account passwords into produ
 
 ## Access needed to continue live work
 
-Connect the existing Supabase project in this ChatGPT session and supply its project reference. Restore a running execution environment for installation, type checks, browser tests and local migration tests. Project reference and public URL are sufficient identifiers; do not paste a service-role key or database password into chat. Repository changes remain reviewable on a branch until the integration is verified.
+Connect the existing Supabase project in this ChatGPT session and supply its project reference. GitHub Actions provides test, build, typecheck and headless browser validation for this draft. A local execution environment is still needed for local migration tooling or interactive browser inspection. Project reference and public URL are sufficient identifiers; do not paste a service-role key or database password into chat. Repository changes remain reviewable on a branch until the integration is verified.

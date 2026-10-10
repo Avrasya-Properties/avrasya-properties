@@ -33,4 +33,4 @@ Unknown source facts remain unknown. An asking price alone does not verify citiz
 
 ## Checks
 
-`.github/workflows/admin-checks.yml` runs the regression suite, a production build and type checking on pull requests. A passing build confirms compilation/bundling; live Supabase policies, migrations, authentication, shared persistence and cross-device publishing still require their own integration tests.
+`.github/workflows/admin-checks.yml` runs the regression suite, a production build and type checking on pull requests. The browser smoke script exercises admin sign-in, contacts, inventory, inquiry-to-deal conversion, selected-unit completion, calendar/tasks and viewer restrictions. A passing build confirms compilation/bundling; live Supabase policies, migrations, authentication, shared persistence and cross-device publishing still require their own integration tests.
