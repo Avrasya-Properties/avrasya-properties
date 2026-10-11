@@ -192,7 +192,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           </div>
 
           <div className="lg:text-right flex flex-col items-start lg:items-end">
-            <p className="eyebrow !text-muted-foreground">Indicative Acquisition Valuation</p>
+            <p className="eyebrow !text-muted-foreground">{r.mode==="rent"?"Monthly rent":"Asking price"}</p>
             <p className="font-display text-3xl md:text-5xl font-semibold text-foreground tracking-tight">
               {displayPrice}
             </p>
@@ -209,15 +209,17 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
         <div className="mt-8 space-y-3">
           {/* Main Display Image */}
           <div className="relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xs border border-border/80 bg-muted group">
-            <img
+            {images[activeImg]||media.cover?<img
               src={images[activeImg] || media.cover}
               alt={r.marketing_title}
               className="h-full w-full object-cover transition-transform duration-500"
             />
+            :<div className="flex h-full items-center justify-center text-sm text-muted-foreground">Property photos have not been added.</div>}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
             {/* Lightbox / Expand Button */}
             <button
+              disabled={!images.length}
               onClick={() => setLightbox(true)}
               className="absolute right-4 bottom-4 flex items-center gap-1.5 rounded-xs bg-black/60 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white hover:bg-black/80 transition-colors"
             >

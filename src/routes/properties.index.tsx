@@ -264,7 +264,7 @@ function Catalog() {
                 const media = getPropertyMedia(r);
                 const p = priceDisplay(r.price);
                 const usd = comparableUsd(r.price);
-                const displayPrice = currency === "USD"||usdVal===null ? p.main : convertUsdPrice(usd, currency);
+                const displayPrice = currency === "USD"||comparableUsd(r.price)===null ? p.main : convertUsdPrice(usd, currency);
                 const isCbi = (usd ?? 0) >= 400000;
                 const saved = isSaved(r.slug);
 
