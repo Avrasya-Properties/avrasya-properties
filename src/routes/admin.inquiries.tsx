@@ -319,12 +319,12 @@ export function AdminInquiriesPage() {
                 <p>{selectedInquiry.message || "No message body provided."}</p>
               </div>
 
-              {selectedInquiry.propertyWeb address ending && (
+              {selectedInquiry.propertySlug && (
                 <div className="rounded-lg border p-3 bg-card text-xs">
                   <p className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Attached Listing:</p>
                   <Link
                     to="/properties/$slug"
-                    params={{ slug: selectedInquiry.propertyWeb address ending }}
+                    params={{ slug: selectedInquiry.propertySlug }}
                     target="_blank"
                     className="flex items-center gap-1.5 text-brass hover:underline font-medium"
                   >

@@ -42,4 +42,10 @@ const endpoint = await response.json();
 assert.equal(typeof endpoint.error, "string");
 checks.push("Deployed enquiry endpoint rejects unconfigured/originless requests");
 
-console.log(JSON.stringify({ hostedReadOnlyChecks: checks, publicOffers: offers.length, enquiryStatus: response.status, writesPerformed: 0 }, null, 2));
+response = await request("/functions/v1/staff-accounts", {method:"POST",body:"{}"});
+assert.equal(response.status,401,"Anonymous users cannot create staff accounts");
+checks.push("Hosted team-account endpoint denies anonymous creation");
+response = await request("/functions/v1/initial-admin-setup",{method:"POST",body:"{}"});
+assert.ok([401,410].includes(response.status),"One-time account setup is disabled");
+checks.push("Initial account setup is disabled");
+console.log(JSON.stringify({ hostedReadOnlyChecks: checks, publicOffers: offers.length, enquiryStatus: endpoint.error, writesPerformed: 0 }, null, 2));

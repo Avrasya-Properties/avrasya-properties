@@ -44,11 +44,12 @@ const NAV = [
 function Nav({ onNav }: { onNav?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const db = useDB();
+  const user = useSession();
   const newInquiriesCount = db.inquiries?.filter((i) => i.status === "New").length ?? 0;
 
   return (
     <nav className="flex flex-col gap-5 px-3 py-4">
-      {NAV.map((g) => (
+      {NAV.filter(g=>g.group!=="Website and team"||user?.role==="admin"||user?.role==="manager"||user?.role==="viewer").map((g) => (
         <div key={g.group}>
           <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-on-dark-muted/70">{g.group}</p>
           {g.items.map((it) => {

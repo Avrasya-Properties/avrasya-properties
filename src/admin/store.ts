@@ -18,7 +18,8 @@ export function useSiteSettings(){
  if(DEMO_MODE)return demo.useSiteSettings();
  return usePublicSettings().settings;
 }
-export const updateSiteSettings=(patch:Partial<demo.SiteSettings>)=>DEMO_MODE?demo.updateSiteSettings(patch):remote.updateSettings(patch);
+export const settingsRevision=()=>DEMO_MODE?"":remote.settingsRevision();
+export const updateSiteSettings=(patch:Partial<demo.SiteSettings>,expectedRevision?:string)=>DEMO_MODE?demo.updateSiteSettings(patch):remote.updateSettings(patch,expectedRevision);
 export function upsert<T extends {id:string}>(coll:Collection,item:Record<string,unknown>&{id?:string},owner?:string):T|Promise<T>{
  return DEMO_MODE?demo.upsert<T>(coll,item,owner):remote.upsert<T>(coll,item);
 }

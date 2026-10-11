@@ -12,7 +12,7 @@ select * into old_row from public.marketing_offers where id=(p_data->>'id')::uui
 if not found then raise exception 'Offer not found'; end if;
 if old_row.version is distinct from p_version then raise exception 'This offer changed. Refresh before saving' using errcode='40001'; end if;
 if exists(select 1 from public.reservations where offer_id=old_row.id and status='active') and
-((p_data->>'availability')::public.property_availability is distinct from old_row.availability or p_data->>'mode' is distinct from old_row.mode) then raise exception 'Reserved inventory requires a deal transition';end if;
+((p_data ? 'availability' and (p_data->>'availability')::public.property_availability is distinct from old_row.availability) or (p_data ? 'mode' and p_data->>'mode' is distinct from old_row.mode)) then raise exception 'Reserved inventory requires a deal transition';end if;
 else
 old_row.id=gen_random_uuid();old_row.version=0;old_row.created_at=now();old_row.publication='Draft';old_row.availability='Unknown';old_row.mode='sale';old_row.city='Istanbul';old_row.side='unknown';old_row.price_basis='advertised';old_row.cbi_eligible=false;old_row.cbi_verified=false;old_row.claims_requiring_confirmation='{}';
 end if;

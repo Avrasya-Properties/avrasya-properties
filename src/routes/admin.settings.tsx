@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { 
   Building2, 
@@ -20,7 +20,8 @@ import {
   exportBackup, 
   importBackup, 
   resetData, 
-  updateSiteSettings, 
+  updateSiteSettings,
+  settingsRevision, 
   useDB, 
   useSession, 
   can, 
@@ -43,8 +44,9 @@ export function AdminSettingsPage() {
 
   const isAdmin = can(user, "admin");
   const editable = can(user, "publish");
+  const revision=useRef("");
   const [dirty, setDirty] = useState(false);
-  useEffect(() => { if (!dirty) setForm({ ...db.siteSettings }); }, [db.siteSettings, dirty]);
+  useEffect(() => { if (!dirty) {setForm({ ...db.siteSettings });revision.current=settingsRevision();} }, [db.siteSettings, dirty]);
 
   const setField = <K extends keyof SiteSettings>(key: K, val: SiteSettings[K]) => {
     setDirty(true);
@@ -53,7 +55,7 @@ export function AdminSettingsPage() {
 
   const handleSave = async () => {
     try {
-      await updateSiteSettings(form);
+      await updateSiteSettings(form,revision.current);
       setDirty(false);
       toast.success(DEMO_ENABLED ? "Demo settings saved in this browser." : "Website settings published.");
     } catch (e) {
@@ -124,7 +126,7 @@ export function AdminSettingsPage() {
         {!editable && " Your role has read-only access."}
       </p>
       <div className="flex flex-wrap gap-2">
-        {([["content_pages","Website pages"],["content_sections","Page sections"],["services","Services"],["faqs","Questions and answers"],["catalog_documents","Brochures"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section}} className={btnGhost}>{label}</Link>)}
+        {([["content_pages","Website pages"],["content_sections","Page sections"],["services","Services"],["faqs","Questions and answers"],["catalog_documents","Brochures"]] as const).map(([section,label])=><a key={section} href={"/admin/manage?section="+section} className={btnGhost}>{label}</a>)}
       </div>
       {/* Tabs */}
       <div className="flex gap-1 overflow-x-auto border-b">

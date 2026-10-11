@@ -161,7 +161,7 @@ describe("settings form integration", () => {
   it("saves the typed brand field through its actual management form", () => {
     render(<AdminSettingsPage />);
     fireEvent.change(screen.getByLabelText("Brand Name"), { target: { value: "Smoke Test Brand" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save CMS Changes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save website settings" }));
     expect(workspace().siteSettings.companyName).toBe("Smoke Test Brand");
   });
 });
