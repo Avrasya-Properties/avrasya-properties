@@ -16,10 +16,10 @@ const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdi
 let serverOutput="";for(const stream of [child.stdout,child.stderr])stream.on("data",c=>serverOutput=(serverOutput+c).slice(-4000));
 let browser,page;const pageErrors=[];const results=[];
 async function clickText(text, root = "body") {
-  await page.waitForFunction((text, root) => [...document.querySelectorAll(root + " button")].some((button) => button.textContent.trim() === text && !button.disabled), {}, text, root);
+  await page.waitForFunction((text, root) => [...document.querySelectorAll(root + " button")].some((button) => button.textContent.trim() === text && !button.matches(":disabled")), {}, text, root);
   const handles = await page.$$(root + " button");
   for (const handle of handles) {
-    const matches = await handle.evaluate((button, wanted) => button.textContent.trim() === wanted && !button.disabled, text);
+    const matches = await handle.evaluate((button, wanted) => button.textContent.trim() === wanted && !button.matches(":disabled"), text);
     if (matches) { await handle.click(); return; }
   }
   throw new Error("Enabled button not found: " + text);
@@ -99,7 +99,8 @@ try{
  await visit("/admin/inquiries","Consultations & Inquiries");await clickText("Log Client Inquiry");await page.waitForSelector("form textarea");const inputs=await page.$$("form input");await inputs[0].type("Persistent enquiry");await inputs[1].type("enquiry@example.test");await page.type("form textarea","Please advise on this unit.");await clickText("Save to Inbox");await waitRow("enquiries","name","Persistent enquiry");
  for(const row of await page.$$("tbody tr"))if(await row.evaluate(node=>node.textContent.includes("Persistent enquiry"))){await row.click();break;}
  await clickText("Convert to CRM Lead");await page.waitForFunction(()=>location.pathname.startsWith("/admin/leads/"));await clickText("Convert to deal");await page.waitForFunction(()=>location.pathname==="/admin/deals");let deals=await rest("/deals");assert.equal(deals.length,1);assert.equal((await rest("/deal_selected_units")).length,0);results.push("Enquiry to lead to opportunity persists without inventing selected units");
- await clickText("Edit details");await fillLabel("Agreed amount","420000");const checkbox=await page.$('input[type="checkbox"]');await checkbox.click();await clickText("Save details");await clickText("Move to Offer Prepared");await clickText("Move to Offer Accepted");await clickText("Move to Reserved");await clickText("Move to Due Diligence");await clickText("Move to Contract");await clickText("Complete");await waitRow("deals","stage","Won");assert.equal((await rest("/physical_units?id=eq."+uuid(2001)))[0].status,"Sold");results.push("Real RPC transitions reserve and complete only the chosen physical unit");
+ await clickText("Edit details");await fillLabel("Agreed amount","420000");const checkbox=await page.$('input[type="checkbox"]');await checkbox.click();await clickText("Save details");await waitRow("deal_selected_units","deal_id",deals[0].id);
+ for(const [button,stage] of [["Move to Offer Prepared","Offer Prepared"],["Move to Offer Accepted","Offer Accepted"],["Move to Reserved","Reserved"],["Move to Due Diligence","Due Diligence"],["Move to Contract","Contract"],["Complete","Won"]]) {await clickText(button);await waitRow("deals","stage",stage);}assert.equal((await rest("/physical_units?id=eq."+uuid(2001)))[0].status,"Sold");results.push("Real RPC transitions reserve and complete only the chosen physical unit");
  await visit("/admin/manage","Management & control");await clickText("FAQs");await clickText("Add faqs");await fillLabel("Question","Database FAQ");await fillLabel("Answer","Managed answer");await clickText("Save");await waitRow("faqs","question","Database FAQ");results.push("CMS management writes to the public content database");
  await page.click('[aria-label="Log out"]');await page.waitForSelector('input[type="email"]');await login("viewer");await visit("/admin/settings","Website Content & CMS");assert.equal(await page.$eval("#cms-fields",e=>e.disabled),true);results.push("Viewer has read-only management controls");
  assert.deepEqual(pageErrors,[]);console.log(JSON.stringify({persistentBrowserChecks:results},null,2));
