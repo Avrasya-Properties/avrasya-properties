@@ -56,6 +56,7 @@ async function selectLabel(labelText, value) {
   throw new Error("Select label not found: " + labelText);
 }
 async function visit(path, heading) {
+  await page.bringToFront();
   await page.goto(origin + path, { waitUntil: "domcontentloaded" });
   await page.waitForFunction((text) => [...document.querySelectorAll("h1")].some((element) => element.textContent.trim() === text), {}, heading);
 }
@@ -105,7 +106,7 @@ try{
  assert.equal(await publicPage.$eval("[data-property-detail]",e=>e.textContent.includes("Approved persistent description")),true);
  assert.equal(await publicPage.$eval("[data-property-detail]",e=>e.textContent.includes("Citizenship eligibility verified")),false);
  await visit("/admin/properties/"+property.id,"Persistent property");await fillLabel("Description","Changed while the website stays open");await clickText("Save changes");await waitRow("marketing_offers","description","Changed while the website stays open");
- await publicPage.waitForFunction(()=>document.querySelector("[data-property-detail]")?.textContent.includes("Changed while the website stays open"),{timeout:10000});
+ await publicPage.waitForFunction(()=>document.querySelector("[data-property-detail]")?.textContent.includes("Changed while the website stays open"),{timeout:10000,polling:"mutation"});
  results.push("Open public property details refresh after an admin save without reloading");
  await visit("/admin/settings","Website settings");await clickText("Homepage");await fill("#cms-heroHeadline","Managed homepage headline");await clickText("Save website settings");await waitRow("site_settings","hero_headline","Managed homepage headline");await publicPage.goto(origin+"/",{waitUntil:"domcontentloaded"});await publicPage.waitForFunction(()=>document.querySelector("h1")?.textContent.includes("Managed homepage headline"));await publicPage.close();results.push("Homepage heading and shared website settings follow saved admin fields");
  await visit("/admin/inquiries","Enquiries");await clickText("Add enquiry");await page.waitForSelector("form textarea");const inputs=await page.$$("form input");await inputs[0].type("Persistent enquiry");await inputs[1].type("enquiry@example.test");await page.type("form textarea","Please advise on this unit.");await clickText("Save to Inbox");await waitRow("enquiries","name","Persistent enquiry");
@@ -123,5 +124,7 @@ try{
 
  await page.click('[aria-label="Log out"]');await page.waitForSelector('input[type="email"]');await login("viewer");await visit("/admin/settings","Website settings");assert.equal(await page.$eval("#cms-fields",e=>e.disabled),true);results.push("Viewer has read-only management controls");
  assert.deepEqual(pageErrors,[]);console.log(JSON.stringify({persistentBrowserChecks:results},null,2));
-}catch(error){await mkdir("test-results",{recursive:true});await page?.screenshot({path:"test-results/backend-smoke-failure.png",fullPage:true}).catch(()=>{});console.error("Persistent browser failure:",error.message);console.error("Passed:",JSON.stringify(results));console.error("Page errors:",pageErrors);if(page)console.error(await page.evaluate(()=>document.body.innerText.slice(0,3500)).catch(()=>""));console.error(serverOutput);process.exitCode=1;}
+}catch(error){await mkdir("test-results",{recursive:true});await page?.screenshot({path:"test-results/backend-smoke-failure.png",fullPage:true}).catch(()=>{});console.error("Persistent browser failure:",error.stack);console.error("Passed:",JSON.stringify(results));console.error("Page errors:",pageErrors);if(page)console.error(await page.evaluate(()=>document.body.innerText.slice(0,3500)).catch(()=>""));console.error("Database listing:",await rest("/marketing_offers?select=id,marketing_title,description,version,project_id,publication").catch(e=>e.message));
+ for(const tab of await browser?.pages()||[]){console.error("Tab:",tab.url(),await tab.evaluate(()=>({body:document.body.innerText.slice(-2500),toasts:[...document.querySelectorAll("[data-sonner-toast]")].map(t=>t.textContent),description:[...document.querySelectorAll("textarea")].map(t=>t.value)})).catch(()=>null));}
+ console.error(serverOutput);process.exitCode=1;}
 finally{await browser?.close();child.kill("SIGTERM");apiProxy.stop(true);}

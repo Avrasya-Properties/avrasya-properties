@@ -62,5 +62,5 @@ export function editorRecord(row:Row|null,table:string):Row{
 export async function deleteManaged(table:string,row:Row){
  if(!["faqs","services","content_sections","content_pages","catalog_documents"].includes(table))throw new Error("This record must be archived rather than deleted.");
  let query=supabase.from(table).delete().eq("id",row["id"]);if(row["updated_at"])query=query.eq("updated_at",row["updated_at"]);
- const {error}=await query.select().single();if(error)throw error;await refresh();
+ const {error}=await query.select().single();if(error)throw error;await refresh();websiteChanged();
 }
