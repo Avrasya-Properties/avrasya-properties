@@ -2,7 +2,7 @@ import raw from "./source.json";
 
 export type Area = { value_m2: number; basis: "gross" | "net" | "unspecified"; layout?: string; scope?: string; unit_count?: number };
 export type Price = {
-  currency: "USD" | "TRY" | null;
+  currency: "USD" | "TRY" | "EUR" | "GBP" | null;
   amount: number | null;
   basis: string;
   status: string;
@@ -29,6 +29,8 @@ export type PropertyRecord = {
   price: Price;
   areas: Area[];
   source_ids: string[];
+  cover?: string | null;
+  availability?: string;
   availability_verified: boolean;
   details: { [k: string]: unknown; project?: string; note?: string; delivery_source?: string | null; installment_offer?: unknown; claims_requiring_confirmation?: string[]; supporting_plan?: unknown };
 };
@@ -57,7 +59,7 @@ export const TYPE_LABEL: Record<RecordType, string> = {
   ambiguous_offer: "Offer to confirm",
 };
 
-const fmt = (n: number, c = "USD") => (c === "USD" ? "$" : "TRY ") + n.toLocaleString("en-US");
+const fmt = (n:number,c="USD") => new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:0}).format(n);
 
 /** Human price headline + qualifier appropriate to the record's price basis. */
 export function priceDisplay(p: Price): { main: string; note: string } {
@@ -133,14 +135,14 @@ export function convertUsdPrice(usdAmount: number | null, curr: SupportedCurrenc
 export type PropertyMediaInfo = {
   cover: string;
   gallery: string[];
-  floorPlan: string;
+  floorPlan?: string;
   tags: string[];
   highlights: string[];
 };
 
-export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
+function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   const s = r.slug.toLowerCase();
-  const isCbi = (comparableUsd(r.price) ?? 0) >= 400000;
+  const isCbi = r.details["cbi_verified"] === true;
   
   // 1. RAMS Park House Maslak (1+1 XS 50m2, $270k)
   if (s === "rams-park-house-maslak-1-1xs" || s.includes("rams")) {
@@ -220,7 +222,7 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       highlights: [
         "Direct connection to tram, Metrobus, and E-5 transport spine",
         "Comprehensive landscaped gardens, indoor pools, and fitness club",
-        "Full title deed clearance and citizenship compliance ready",
+        "Title deed and citizenship status require independent review",
         "Underground assigned parking with 24/7 guarded security"
       ]
     };
@@ -279,9 +281,9 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/gunesli-floorplan.jpg"
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "CBI Qualified Package", "Capital Growth"],
+      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "Investment Package", "Capital Growth"],
       highlights: [
-        "Pre-audited Turkish Citizenship by Investment eligibility threshold",
+        "Citizenship suitability requires independent legal review",
         "Prime location adjacent to Metro station entrance",
         "Modern architectural compound with commercial shopping arcade",
         "High occupancy rate driven by multinational corporate tenants"
@@ -388,7 +390,7 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       highlights: [
         "Two independent residential units bundled under unified purchase",
         "Dual rental income stream from medical and university precinct",
-        "Meets cumulative $400,000 threshold for Turkish Citizenship",
+        "Package price does not establish citizenship eligibility",
         "Managed handover and tenant placement services provided"
       ]
     };
@@ -522,18 +524,17 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
 
 export type Filters = { q?: string | undefined; loc?: string | undefined; side?: string | undefined; layout?: string | undefined; type?: string | undefined; budget?: string | undefined; sort?: string | undefined; cbiOnly?: boolean | undefined };
 
-export function filterProperties(f: Filters) {
+export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties) {
   const q = f.q?.toLowerCase().trim();
   const b = BUDGETS.find((x) => x.id === f.budget);
-  let list = properties.filter((r) => {
+  let list = catalogue.filter((r) => {
     if (q && !`${r.marketing_title} ${r.location_label ?? ""} ${r.layout_label ?? ""}`.toLowerCase().includes(q)) return false;
     if (f.loc && r.location_label !== f.loc) return false;
     if (f.side && r.side !== f.side) return false;
     if (f.layout && !matchesLayout(r, f.layout)) return false;
     if (f.type && r.record_type !== f.type) return false;
     if (f.cbiOnly) {
-      const v = comparableUsd(r.price);
-      if (v == null || v < 400000) return false;
+      if (r.details["cbi_verified"] !== true) return false;
     }
     if (b) {
       const v = comparableUsd(r.price);
@@ -552,10 +553,19 @@ export function filterProperties(f: Filters) {
 }
 
 /** Records excluded from a budget filter because their price is not comparable in USD. */
-export const unmatchablePrices = () => properties.filter((r) => comparableUsd(r.price) == null);
+export const unmatchablePrices = (catalogue: PropertyRecord[] = properties) => catalogue.filter((r) => comparableUsd(r.price) == null);
 
 export const humanKey = (k: string) =>
   k.replace(/_source$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 
 export const getProperty = (slug: string) => properties.find((r) => r.slug === slug);
 
+
+export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {
+ const media=originalPropertyMedia(r);
+ const custom=r.details["gallery_images"];
+ const gallery=Array.isArray(custom)?custom.filter((x):x is string=>typeof x==="string"):media.gallery;
+ const result:PropertyMediaInfo={...media,cover:r.cover||media.cover,gallery:r.cover?[r.cover,...gallery.filter(x=>x!==r.cover)]:gallery};
+ if(r.details["floor_plan"]===null)delete result.floorPlan;else if(typeof r.details["floor_plan"]==="string")result.floorPlan=r.details["floor_plan"];
+ return result;
+}

@@ -11,16 +11,16 @@ function ProjectDetail() {
   const units = db.properties.filter((p) => slugify(p.project || "Unassigned") === slug);
   if (!units.length) return <p>Project not found. <Link to="/admin/projects" className="text-brass-text">Back</Link></p>;
   const base = units[0]!;
-  const addUnit = () => {
+  const addUnit = async () => {
     try {
-      const { id: _id, ...rest } = base;
-      const p = upsert<Property>("properties", { ...rest, ref: `AVR-${1001 + db.properties.length}`, slug: `${base.slug}-${Date.now() % 10000}`, title: `${base.project} — new unit`, layout: null, grossM2: null, netM2: null, areaM2: null, amount: null, availability: "Unknown", publication: "Draft", cover: null, agentId: user!.id });
+      const { id: _id, cbiEligible: _cbi, tapuStatus: _tapu, ...rest } = base;
+      const p = await upsert<Property>("properties", { ...rest, ref: `AVR-${Math.max(1000, ...db.properties.map((p) => Number(p.ref.replace(/^AVR-/, ""))).filter(Number.isFinite)) + 1}`, slug: `${base.slug}-${crypto.randomUUID()}`, title: `${base.project} — new unit`, type: "unit offer", layout: null, bathrooms: null, grossM2: null, netM2: null, areaM2: null, amount: null, priceType: "on-request", sourceNote: "New unit identity and source details require confirmation", availability: "Unknown", publication: "Draft", cover: null, agentId: user!.id });
       nav({ to: "/admin/properties/$id", params: { id: p.id } });
     } catch (e) { toast.error((e as Error).message); }
   };
   return (
     <>
-      <PageHead title={base.project || "Unassigned"} crumbs="Inventory / Projects" action={can(user, "edit-inventory") && <button className={btnPrimary} onClick={addUnit}>Add unit from project</button>} />
+      <PageHead title={base.project || "Unassigned"} crumbs="Properties / Developments" action={can(user, "edit-inventory") && <button className={btnPrimary} onClick={addUnit}>Add unit from project</button>} />
       <div className="mb-4 grid gap-3 sm:grid-cols-4">
         {AVAIL.filter((a) => units.some((u) => u.availability === a)).map((a) => <div key={a} className="rounded-md border bg-card p-3"><p className="text-xs text-muted-foreground">{a}</p><p className="text-xl font-semibold tabular-nums">{units.filter((u) => u.availability === a).length}</p></div>)}
       </div>

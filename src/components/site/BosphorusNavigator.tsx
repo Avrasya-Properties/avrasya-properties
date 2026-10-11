@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { 
@@ -13,7 +14,6 @@ import {
   TrendingUp, 
   Waves 
 } from "lucide-react";
-import { waLink } from "@/data/properties";
 
 type CorridorData = {
   id: string;
@@ -217,6 +217,7 @@ const CORRIDORS: CorridorData[] = [
 ];
 
 export function BosphorusNavigator() {
+  const waLink=useWhatsAppLink();
   const [side, setSide] = useState<"European" | "Asian">("European");
   const filteredCorridors = CORRIDORS.filter((c) => c.side === side);
   const [selectedId, setSelectedId] = useState<string>(filteredCorridors[0]!.id);

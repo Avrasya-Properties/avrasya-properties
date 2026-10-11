@@ -1,0 +1,19 @@
+name: Hosted backend checks
+on:
+  pull_request:
+    paths:
+      - "scripts/hosted-backend-check.mjs"
+      - ".github/workflows/hosted-backend-checks.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.11"
+      - name: Verify hosted backend without writes
+        run: bun scripts/hosted-backend-check.mjs

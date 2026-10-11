@@ -17,7 +17,6 @@ import {
 import {
   BUDGETS,
   LAYOUTS,
-  LOCATIONS,
   TYPE_LABEL,
   areaText,
   comparableUsd,
@@ -26,13 +25,13 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
-  properties,
   sideText,
   unmatchablePrices,
   waLink,
   type Filters,
   type PropertyRecord,
 } from "@/data/properties";
+import { useCatalogue } from "@/data/live";
 import { PageIntro } from "@/components/site/Chrome";
 import { PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
@@ -62,13 +61,16 @@ export const Route = createFileRoute("/properties/")({
 });
 
 function Catalog() {
+  const catalogue=useCatalogue();
+  const properties=catalogue.properties;
+  const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
   const f = Route.useSearch();
   const navigate = useNavigate({ from: "/properties/" });
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currency] = useCurrency();
   const { shortlist, count: savedCount, isSaved, toggle } = useShortlist();
 
-  let list = filterProperties(f);
+  let list = filterProperties(f, properties);
   if (f.savedOnly) {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
@@ -107,7 +109,7 @@ function Catalog() {
             <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
               Prime Corridors · European & Asian Side
             </span>
-            <span className="text-xs text-foreground font-medium">18 Curated Opportunities</span>
+            <span className="text-xs text-foreground font-medium">{properties.length} Published Opportunities</span>
           </div>
         }
       >
@@ -117,6 +119,8 @@ function Catalog() {
       </PageIntro>
 
       <section className="container-site py-8">
+        {catalogue.isPending && <p role="status">Loading current offers…</p>}
+        {catalogue.isError && <p role="alert">The catalogue is temporarily unavailable. Please contact our advisory team.</p>}
         {/* Search & Filter Panel */}
         <div className="rounded-xs border border-border/80 bg-card p-5 shadow-xs">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1.5fr_repeat(5,1fr)]">

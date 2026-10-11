@@ -1,0 +1,68 @@
+name: Admin checks
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "supabase/**"
+      - "scripts/**"
+      - "package.json"
+      - "bun.lock"
+      - "vite.config.ts"
+      - "vitest.config.ts"
+      - ".github/workflows/admin-checks.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.11"
+      - run: bun install --frozen-lockfile
+      - name: Verify isolated database migration and permissions
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/bootstrap.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/baseline.sql
+          for migration in supabase/migrations/*.sql; do
+            if [[ "$migration" == *enable_auth_admin_transport.sql ]]; then continue; fi
+            psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$migration"
+          done
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/backend.sql
+          bun scripts/backend-concurrency.mjs
+      - run: bun scripts/enquiry-endpoint-check.mjs
+      - run: bun scripts/staff-accounts-check.mjs
+      - run: bun run test
+      - run: bun run build
+      - run: bun run typecheck
+      - run: bun scripts/admin-smoke.mjs
+      - name: Persistent browser workflows
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/browser-fixtures.sql
+          docker run --detach --network host --name avrasya-test-api -e PGRST_DB_URI=postgres://authenticator:isolated-test-only@127.0.0.1:5432/postgres -e PGRST_DB_SCHEMA=public -e PGRST_DB_ANON_ROLE=anon -e PGRST_JWT_SECRET=isolated-browser-test-secret-at-least-32-characters -e PGRST_SERVER_PORT=3001 postgrest/postgrest:v13.0.7
+          for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:3001/site_settings && break || sleep 1; done
+          bun scripts/backend-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: admin-smoke-failure
+          path: test-results/
+          if-no-files-found: ignore

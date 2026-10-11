@@ -1,6 +1,7 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Heart, MapPin, MessageSquare, ArrowRight, ShieldCheck } from "lucide-react";
+import { Heart, MapPin, MessageSquare, ArrowRight } from "lucide-react";
 import { Tilt } from "./Motion";
 import {
   areaText,
@@ -10,8 +11,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-  waLink,
-  TYPE_LABEL,
+    TYPE_LABEL,
   type PropertyRecord,
 } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
@@ -39,6 +39,7 @@ export function ImageFallback({ r, className = "" }: { r: PropertyRecord; classN
 }
 
 export function PropertyCard({ r }: { r: PropertyRecord }) {
+  const waLink=useWhatsAppLink();
   const p = priceDisplay(r.price);
   const media = getPropertyMedia(r);
   const [currency] = useCurrency();
@@ -46,7 +47,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
   const saved = isSaved(r.slug);
   const usdVal = comparableUsd(r.price);
   const displayPrice = currency === "USD" ? p.main : convertUsdPrice(usdVal, currency);
-  const isCbiEligible = (usdVal ?? 0) >= 400000;
+  const isCbiEligible = r.details["cbi_verified"] === true;
 
   return (
     <Tilt className="h-full">
@@ -74,7 +75,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
             )}
             {isCbiEligible && (
               <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-wider text-primary shadow-xs">
-                CBI $400k
+                CBI verified
               </span>
             )}
           </div>
@@ -126,10 +127,6 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
 
           {/* Property Tag Pills & Verification Stamp */}
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-xs bg-primary/8 px-1.5 py-0.5 text-[0.62rem] font-medium text-foreground/80">
-              <ShieldCheck className="h-3 w-3 text-brass" />
-              <span>Verified Title</span>
-            </span>
             {r.areas.length > 0 && (
               <span className="rounded-xs border border-border/70 bg-card px-1.5 py-0.5 text-[0.65rem] font-medium text-foreground">
                 {areaText(r)}

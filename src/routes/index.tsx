@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
@@ -17,18 +18,14 @@ import {
 import {
   BUDGETS,
   LAYOUTS,
-  LOCATIONS,
   areaText,
   comparableUsd,
   convertUsdPrice,
-  getProperty,
   getPropertyMedia,
   locationText,
   priceDisplay,
-  properties,
   sideText,
-  waLink,
-  type PropertyRecord,
+    type PropertyRecord,
 } from "@/data/properties";
 import { CtaBand, Logo } from "@/components/site/Chrome";
 import { Marquee, Tilt } from "@/components/site/Motion";
@@ -37,6 +34,8 @@ import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
 import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useCatalogue } from "@/data/live";
+import { Enquiry } from "@/components/site/Enquiry";
 import { useSiteSettings } from "@/admin/store";
 
 export const Route = createFileRoute("/")({
@@ -48,19 +47,19 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const FEATURED = [
-  "sisli-block5-floor2-unit21-497",
-  "atasehir-173-1-1-420",
-  "sisli-ferikoy-duplex-490",
-].map((s) => getProperty(s)!) as PropertyRecord[];
-
-const EDITORIAL = [
-  "pearl-topkapi-2-1-410",
-  "rams-park-house-maslak-1-1xs",
-  "oryapark-1-1-325",
-].map((s) => getProperty(s)!) as PropertyRecord[];
 
 function Home() {
+ const catalogue=useCatalogue();
+ if(catalogue.isPending)return <div className="container-site py-24" role="status">Loading the property collection…</div>;
+ if(!catalogue.properties.length)return <><section className="container-site py-20"><p className="eyebrow">Avrasya Properties</p><h1 className="headline mt-4 text-4xl">Your next investment starts with a conversation.</h1><p className="mt-5 max-w-xl text-muted-foreground">{catalogue.isError ? "Our online catalogue is temporarily unavailable. Our advisory team can help you with current options." : "Our team is preparing the next collection. Contact us for current opportunities."}</p><Link to="/contact" className="btn btn-primary mt-6">Speak with an advisor</Link></section><section className="container-site max-w-xl py-12"><Enquiry compact /></section></>;
+ return <HomeCollection properties={catalogue.properties}/>;
+}
+function HomeCollection({properties}:{properties:PropertyRecord[]}) {
+  const waLink=useWhatsAppLink();
+ const FEATURED=properties.slice(0,3);
+ const EDITORIAL=properties.slice(3,6);
+ const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
+
   const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
   const f = FEATURED[sel]!;
