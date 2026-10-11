@@ -12,7 +12,7 @@ const jwt=role=>{const head=Buffer.from(JSON.stringify({alg:"HS256",typ:"JWT"}))
 const actor=role=>({id:uuid(ids[role]),email:role+"@example.test",aud:"authenticated",role:"authenticated",app_metadata:{provider:"email"},user_metadata:{},created_at:"2026-10-10T00:00:00Z"});
 const adminToken=jwt("admin");
 async function rest(path,method="GET",data,token=adminToken){const response=await fetch(api+path,{method,headers:{Authorization:"Bearer "+token,"Content-Type":"application/json",Prefer:"return=representation"},...(data?{body:JSON.stringify(data)}:{})});const text=await response.text();if(!response.ok)throw new Error(response.status+" "+text);return text?JSON.parse(text):null;}
-const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdio:["ignore","pipe","pipe"],env:{...process.env,VITE_ENABLE_ADMIN_DEMO:"false"}});
+const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdio:["ignore","pipe","pipe"],env:{...process.env,VITE_ENABLE_ADMIN_DEMO:"false",VITE_SUPABASE_URL:"http://127.0.0.1:8082"}});
 let serverOutput="";for(const stream of [child.stdout,child.stderr])stream.on("data",c=>serverOutput=(serverOutput+c).slice(-4000));
 let browser,page;const pageErrors=[];const results=[];
 async function clickText(text, root = "body") {
@@ -59,13 +59,12 @@ async function visit(path, heading) {
   await page.goto(origin + path, { waitUntil: "domcontentloaded" });
   await page.waitForFunction((text) => [...document.querySelectorAll("h1")].some((element) => element.textContent.trim() === text), {}, heading);
 }
-async function attachProxy(target){
- await target.setRequestInterception(true);
- target.on("request",async request=>{
-  const url=new URL(request.url());
-  if(!url.hostname.endsWith(".supabase.co"))return request.continue();
+// Both SSR loaders and browser reads use this isolated Auth/PostgREST adapter.
+const apiProxy=Bun.serve({hostname:"127.0.0.1",port:8082,async fetch(req){
+ const url=new URL(req.url),body=await req.text();
+ const request={method:()=>req.method,headers:()=>Object.fromEntries(req.headers),postData:()=>body};
   try{
-   if(request.method()==="OPTIONS")return request.respond({status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"*","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS"}});
+   if(request.method()==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"*","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS"}});
    let status=200,body,headers={"content-type":"application/json","access-control-allow-origin":"*"};
    if(url.pathname.startsWith("/auth/v1/token")){
     const input=JSON.parse(request.postData()||"{}");const role=String(input.email||"").split("@")[0];
@@ -80,15 +79,16 @@ async function attachProxy(target){
     const response=await fetch(api+url.pathname.replace("/rest/v1","")+url.search,{method:request.method(),headers:{"Content-Type":"application/json",Accept:request.headers().accept||"application/json",...(token?{Authorization:token}:{}),...(request.headers().prefer?{Prefer:request.headers().prefer}:{}),...(request.headers().range?{Range:request.headers().range}:{})},...(request.postData()?{body:request.postData()}:{})});
     status=response.status;body=await response.text();headers={...headers,...Object.fromEntries([...response.headers].filter(([name])=>["content-range","content-type","preference-applied"].includes(name)))};
    }else{status=404;body={error:"Unsupported test endpoint"};}
-   await request.respond({status,headers,body:body===null?"":typeof body==="string"?body:JSON.stringify(body)});
-  }catch(error){await request.respond({status:500,contentType:"application/json",body:JSON.stringify({error:error.message})});}
- });
-}
+   return new Response(status===204?null:body===null?"":typeof body==="string"?body:JSON.stringify(body),{status,headers});
+  }catch(error){return Response.json({error:error.message},{status:500,headers:{"access-control-allow-origin":"*"}});}
+
+}});
+async function attachProxy(target){target.on("pageerror",error=>pageErrors.push(error.message));}
 async function login(role){await page.goto(origin+"/admin/login",{waitUntil:"domcontentloaded"});await page.waitForSelector('form[data-ready="true"]');await fill('input[type="email"]',role+"@example.test");await fill('input[type="password"]',"IsolatedTestPassword!26");await clickText("Sign in");await page.waitForSelector('a[href="/admin/manage"]');}
 async function waitRow(table,field,value){for(let i=0;i<50;i++){const rows=await rest("/"+table+"?"+field+"=eq."+encodeURIComponent(value));if(rows?.length)return rows[0];await new Promise(r=>setTimeout(r,100));}throw new Error("Record not saved: "+table+" "+value);}
 try{
  for(let i=0;i<60;i++){try{if((await fetch(origin+"/admin/login")).ok)break;}catch{}if(i===59)throw new Error("Server did not start: "+serverOutput);await new Promise(r=>setTimeout(r,1000));}
- browser=await puppeteer.launch({executablePath:process.env.CHROME_PATH||"/usr/bin/google-chrome",headless:true,args:["--no-sandbox","--disable-dev-shm-usage"]});page=await browser.newPage();await page.setViewport({width:1440,height:1000});page.setDefaultTimeout(20000);page.on("pageerror",e=>pageErrors.push(e.message));page.on("dialog",d=>d.accept());await attachProxy(page);
+ browser=await puppeteer.launch({executablePath:process.env.CHROME_PATH||"/usr/bin/google-chrome",headless:true,args:["--no-sandbox","--disable-dev-shm-usage"]});page=await browser.newPage();await page.setViewport({width:1440,height:1000});page.setDefaultTimeout(20000);page.on("dialog",d=>d.accept());await attachProxy(page);
  await login("admin");assert.equal(await page.evaluate(()=>localStorage.getItem("avrasya-admin-db-v4")),null);results.push("Production authentication mode has no demo workspace");
  await visit("/admin/contacts","Contacts");await clickText("Add contact");await fillLabel("Name","Persistent buyer");await fillLabel("Email","persistent@example.test");await clickText("Save contact");await waitRow("contacts","name","Persistent buyer");await page.reload({waitUntil:"domcontentloaded"});await page.waitForFunction(()=>document.body.textContent.includes("Persistent buyer"));results.push("Contact CRUD persists in PostgreSQL after reload");
  await visit("/admin/properties","Properties");await clickText("New property");await page.waitForSelector('input[placeholder="Unknown"]');await fillLabel("Title","Persistent property");await fillLabel("District","Test district");await selectLabel("Availability","Available");await selectLabel("Development name","Test development");await fillLabel("Bathrooms","2");await fillLabel("Description","Approved persistent description");await clickText("Save changes");let property=await waitRow("marketing_offers","marketing_title","Persistent property");
@@ -124,4 +124,4 @@ try{
  await page.click('[aria-label="Log out"]');await page.waitForSelector('input[type="email"]');await login("viewer");await visit("/admin/settings","Website settings");assert.equal(await page.$eval("#cms-fields",e=>e.disabled),true);results.push("Viewer has read-only management controls");
  assert.deepEqual(pageErrors,[]);console.log(JSON.stringify({persistentBrowserChecks:results},null,2));
 }catch(error){await mkdir("test-results",{recursive:true});await page?.screenshot({path:"test-results/backend-smoke-failure.png",fullPage:true}).catch(()=>{});console.error("Persistent browser failure:",error.message);console.error("Passed:",JSON.stringify(results));console.error("Page errors:",pageErrors);if(page)console.error(await page.evaluate(()=>document.body.innerText.slice(0,3500)).catch(()=>""));console.error(serverOutput);process.exitCode=1;}
-finally{await browser?.close();child.kill("SIGTERM");}
+finally{await browser?.close();child.kill("SIGTERM");apiProxy.stop(true);}
