@@ -1,5 +1,5 @@
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, MessageSquare, ArrowRight } from "lucide-react";
 import { Tilt } from "./Motion";
@@ -20,19 +20,21 @@ export function ImageFallback({ r, className = "" }: { r: PropertyRecord; classN
   const media = getPropertyMedia(r);
   const [imgSrc, setImgSrc] = useState(media.cover);
   const [loaded, setLoaded] = useState(false);
+  useEffect(()=>{setImgSrc(media.cover);setLoaded(false);},[media.cover]);
 
   return (
     <div className={`relative h-full w-full overflow-hidden bg-[#0C1E23] ${className}`}>
-      <img
+      {imgSrc?<img
         src={imgSrc}
         alt={r.marketing_title}
         loading="lazy"
         onLoad={() => setLoaded(true)}
-        onError={() => setImgSrc("/images/properties/hero-main.jpg")}
+        onError={() => setImgSrc("")}
         className={`h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
           loaded ? "opacity-100" : "opacity-90"
         }`}
       />
+      :<span className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-white/70">Property photo not supplied</span>}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
     </div>
   );
@@ -46,7 +48,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(r.slug);
   const usdVal = comparableUsd(r.price);
-  const displayPrice = currency === "USD" ? p.main : convertUsdPrice(usdVal, currency);
+  const displayPrice = currency === "USD"||usdVal===null ? p.main : convertUsdPrice(usdVal, currency);
   const isCbiEligible = r.details["cbi_verified"] === true;
 
   return (

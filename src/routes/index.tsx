@@ -49,9 +49,9 @@ export const Route = createFileRoute("/")({
 
 
 function Home() {
- const catalogue=useCatalogue();
+ const catalogue=useCatalogue();const settings=useSiteSettings();
  if(catalogue.isPending)return <div className="container-site py-24" role="status">Loading the property collection…</div>;
- if(!catalogue.properties.length)return <><section className="container-site py-20"><p className="eyebrow">Avrasya Properties</p><h1 className="headline mt-4 text-4xl">Your next investment starts with a conversation.</h1><p className="mt-5 max-w-xl text-muted-foreground">{catalogue.isError ? "Our online catalogue is temporarily unavailable. Our advisory team can help you with current options." : "Our team is preparing the next collection. Contact us for current opportunities."}</p><Link to="/contact" className="btn btn-primary mt-6">Speak with an advisor</Link></section><section className="container-site max-w-xl py-12"><Enquiry compact /></section></>;
+ if(!catalogue.properties.length)return <><section className="container-site py-20"><p className="eyebrow">Avrasya Properties</p><h1 className="headline mt-4 text-4xl">{settings.heroHeadline||"Your next investment starts with a conversation."}</h1><p className="mt-4 max-w-xl text-muted-foreground">{settings.heroSubtitle}</p><p className="mt-5 max-w-xl text-muted-foreground">{catalogue.isError ? "Our online catalogue is temporarily unavailable. Our advisory team can help you with current options." : "Our team is preparing the next collection. Contact us for current opportunities."}</p><Link to="/contact" className="btn btn-primary mt-6">Speak with an advisor</Link></section><section className="container-site max-w-xl py-12"><Enquiry compact /></section></>;
  return <HomeCollection properties={catalogue.properties}/>;
 }
 function HomeCollection({properties}:{properties:PropertyRecord[]}) {
@@ -62,7 +62,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
 
   const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
-  const f = FEATURED[sel]!;
+  const f = FEATURED[Math.min(sel,FEATURED.length-1)]!;
   const media = getPropertyMedia(f);
   const fp = priceDisplay(f.price);
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(f.slug);
   const fUsd = comparableUsd(f.price);
-  const fDisplayPrice = currency === "USD" ? fp.main : convertUsdPrice(fUsd, currency);
+  const fDisplayPrice = currency === "USD"||fUsd===null ? fp.main : convertUsdPrice(fUsd, currency);
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
   return (
@@ -100,16 +100,8 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                   {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
                 </span>
               </div>
-              <h1 className="display-hero">
-                <span className="split-line">
-                  <span style={{ ["--d" as string]: "150ms" }}>An Istanbul address.</span>
-                </span>
-                <span className="split-line">
-                  <em style={{ ["--d" as string]: "280ms" }} className="text-brass italic">
-                    A considered acquisition.
-                  </em>
-                </span>
-              </h1>
+              <h1 className="display-hero"><span className="split-line"><span style={{["--d" as string]:"150ms"}}>{settings.heroHeadline}</span></span></h1>
+
               <p
                 data-reveal
                 style={{ ["--d" as string]: "350ms" }}

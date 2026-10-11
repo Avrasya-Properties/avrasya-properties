@@ -22,7 +22,7 @@ export const SOURCES = ["Website", "WhatsApp", "Phone", "Referral", "Walk-in", "
 export type Currency = "USD" | "TRY" | "EUR" | "GBP";
 
 export type Property = {
-  galleryImages?: string[]; floorPlan?: string | null;
+  galleryImages?: string[]; floorPlan?: string | null; highlights?:string[];
   id: string; ref: string; slug: string; title: string; district: string; city: string; type: string;
   layout: string | null; bathrooms: number | null; grossM2: number | null; netM2: number | null; areaM2: number | null;
   amount: number | null; currency: Currency | null; mode: "sale" | "rent"; priceType: "fixed" | "from" | "on-request"; priceBasis?: string;

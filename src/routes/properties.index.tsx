@@ -54,8 +54,8 @@ export const Route = createFileRoute("/properties/")({
   }),
   head: () =>
     meta(
-      "Istanbul Real Estate Portfolio — 18 Curated Developments",
-      "Browse 18 verified Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
+      "Istanbul Property Listings — Avrasya Properties",
+      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
     ),
   component: Catalog,
 });
@@ -264,7 +264,7 @@ function Catalog() {
                 const media = getPropertyMedia(r);
                 const p = priceDisplay(r.price);
                 const usd = comparableUsd(r.price);
-                const displayPrice = currency === "USD" ? p.main : convertUsdPrice(usd, currency);
+                const displayPrice = currency === "USD"||usdVal===null ? p.main : convertUsdPrice(usd, currency);
                 const isCbi = (usd ?? 0) >= 400000;
                 const saved = isSaved(r.slug);
 

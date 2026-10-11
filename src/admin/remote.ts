@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { websiteChanged } from "@/lib/website-sync";
 import { supabase } from "@/lib/supabase";
 import { decode,decodeSettings,encode,encodeSettings,TABLES,type Collection,type Row } from "./mappers";
 import { DEFAULT_SITE_SETTINGS,type DB,type User,type SiteSettings,type Property,type Lead,type Deal,type Inquiry,type Activity } from "./demo";
@@ -57,7 +58,7 @@ export async function resetPassword(email:string){requireText(email,"Email",254)
 export async function changePassword(password:string){if(password.length<12)throw new Error("Use at least 12 characters.");const {error}=await supabase.auth.updateUser({password});if(error)throw error;}
 let queue:Promise<unknown>=Promise.resolve();
 async function write<T>(operation:()=>Promise<T>):Promise<T>{
- const run=async()=>{status={...status,saving:status.saving+1};notify();try{const result=await operation();await refresh();return result;}finally{status={...status,saving:Math.max(0,status.saving-1)};notify();}};
+ const run=async()=>{status={...status,saving:status.saving+1};notify();try{const result=await operation();await refresh();websiteChanged();return result;}finally{status={...status,saving:Math.max(0,status.saving-1)};notify();}};
  const result=queue.then(run,run);queue=result.catch(()=>undefined);return result;
 }
 export async function rpc<T>(name:string,args:Row):Promise<T>{const {data,error}=await supabase.rpc(name,args);if(error)throw error;return data as T;}
@@ -85,7 +86,7 @@ export function upsert<T extends {id:string}>(collection:Collection,item:Row & {
  let query=original?supabase.from(TABLES[collection]).update(payload).eq("id",item.id!).eq("updated_at",original["updated_at"]):supabase.from(TABLES[collection]).insert(payload);
  const {data,error}=await query.select().single();if(error)throw error;result=data as Row;
  }
- return decode(collection,result) as unknown as T;
+ return decode(collection,{...result,project_name:merged["project"]}) as unknown as T;
  });
 }
 export function settingsRevision(){return String(Array.from(rows.entries()).find(([key])=>key.startsWith("site_settings:"))?.[1]?.["updated_at"]||"");}

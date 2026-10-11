@@ -1,3 +1,4 @@
+import { websiteChanged } from "@/lib/website-sync";
 import { supabase } from "@/lib/supabase";
 import { fetchRows,refresh,rpc } from "./remote";
 import type { Row } from "./mappers";
@@ -43,7 +44,7 @@ export async function saveManaged(table:string,data:Row,original:Row|null){
  if(table==="physical_units"&&original&&["Reserved","Sold","Rented"].includes(String(original["status"])))throw new Error("Use the linked transaction to manage reserved or closed unit availability.");
  let query=original?supabase.from(table).update(payload).eq("id",original["id"]):supabase.from(table).insert(payload);
  if(original&&original["updated_at"])query=query.eq("updated_at",original["updated_at"]);
- const {error}=await query.select().single();if(error)throw error;await refresh();
+ const {error}=await query.select().single();if(error)throw error;await refresh();websiteChanged();
 }
 export async function linkUnit(offerId:string,unitId:string,version:number){await rpc("link_physical_unit",{p_offer:offerId,p_unit:unitId,p_version:version});await refresh();}
 

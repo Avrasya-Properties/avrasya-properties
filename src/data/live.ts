@@ -11,7 +11,7 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
  if(error)throw new Error("The property catalogue is unavailable. Please contact our advisory team.");
  return z.array(record).parse(data) as PropertyRecord[];
 }
-export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,refetchInterval:30000});return {...q,properties:q.data||[]};}
+export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:0,refetchOnMount:"always",refetchOnWindowFocus:"always",refetchInterval:15000});return {...q,properties:q.data||[]};}
 export function usePublicSettings(){
  const q=useQuery({queryKey:["site-settings"],queryFn:async()=>{const {data,error}=await publicSupabase.from("site_settings").select("*").eq("singleton_key","default").single();if(error)throw error;return decodeSettings(data as Row);},enabled:!DEMO_MODE,staleTime:15000,refetchInterval:30000});
  return {...q,settings:q.data||DEFAULT_SITE_SETTINGS};

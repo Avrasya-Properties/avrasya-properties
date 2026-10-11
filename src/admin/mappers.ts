@@ -3,7 +3,7 @@ export type Row = Record<string, unknown>;
 export const TABLES = {properties:"marketing_offers",contacts:"contacts",leads:"leads",tasks:"tasks",viewings:"viewings",deals:"deals",inquiries:"enquiries"} as const;
 export type Collection = keyof typeof TABLES;
 export const FIELDS: Record<Collection, Record<string,string>> = {
- properties:{galleryImages:"gallery_images",floorPlan:"floor_plan",id:"id",ref:"ref",slug:"slug",title:"marketing_title",district:"district",city:"city",type:"record_type",layout:"layout_label",bathrooms:"bathrooms",grossM2:"gross_m2",netM2:"net_m2",areaM2:"area_m2",amount:"amount",currency:"currency",mode:"mode",priceType:"price_type",priceBasis:"price_basis",availability:"availability",publication:"publication",agentId:"assigned_agent_id",cover:"cover_image_path",description:"description",sourceNote:"source_note",side:"side",tapuStatus:"tapu_status",updatedAt:"updated_at"},
+ properties:{highlights:"highlights",galleryImages:"gallery_images",floorPlan:"floor_plan",id:"id",ref:"ref",slug:"slug",title:"marketing_title",district:"district",city:"city",type:"record_type",layout:"layout_label",bathrooms:"bathrooms",grossM2:"gross_m2",netM2:"net_m2",areaM2:"area_m2",amount:"amount",currency:"currency",mode:"mode",priceType:"price_type",priceBasis:"price_basis",availability:"availability",publication:"publication",agentId:"assigned_agent_id",cover:"cover_image_path",description:"description",sourceNote:"source_note",side:"side",tapuStatus:"tapu_status",updatedAt:"updated_at"},
  contacts:{id:"id",name:"name",kind:"kind",email:"email",phone:"phone",roles:"roles",language:"language",agentId:"assigned_agent_id",notes:"notes"},
  leads:{id:"id",contactId:"contact_id",source:"source",agentId:"assigned_agent_id",districts:"districts",layout:"layout",budgetMin:"budget_min",budgetMax:"budget_max",currency:"currency",stage:"stage",lossReason:"loss_reason",nextFollowUp:"next_follow_up",shortlist:"shortlist",dealId:"deal_id"},
  tasks:{id:"id",title:"title",assigneeId:"assignee_id",due:"due_date",priority:"priority",done:"is_done"},
@@ -23,7 +23,7 @@ export function decode<C extends Collection>(collection:C,row:Row): DB[C][number
   else if(["leadId","dealId","propertySlug"].includes(key)) continue;
   else value[key]=null;
  }
- if(collection==="properties"){const details=((row["source_record"] as Row|undefined)?.["details"]||{}) as Row;value["galleryImages"]=Array.isArray(details["gallery_images"])?details["gallery_images"]:[];value["floorPlan"]=typeof details["floor_plan"]==="string"?details["floor_plan"]:null;value["type"]=String(row["record_type"]).replaceAll("_"," ");value["project"]=row["project_name"]||"";value["cbiEligible"]=row["cbi_verified"]===true&&row["cbi_eligible"]===true;}
+ if(collection==="properties"){const details=((row["source_record"] as Row|undefined)?.["details"]||{}) as Row;value["highlights"]=Array.isArray(details["highlights"])?details["highlights"]:[];value["galleryImages"]=Array.isArray(details["gallery_images"])?details["gallery_images"]:[];value["floorPlan"]=typeof details["floor_plan"]==="string"?details["floor_plan"]:null;value["type"]=String(row["record_type"]).replaceAll("_"," ");value["project"]=row["project_name"]||"";value["cbiEligible"]=row["cbi_verified"]===true&&row["cbi_eligible"]===true;}
  if(collection==="deals")value["propertyIds"]=row["property_ids"]||[];
  if(collection==="tasks"&&row["link_id"])value["link"]={kind:row["link_kind"],id:row["link_id"]};
  return value as DB[C][number];

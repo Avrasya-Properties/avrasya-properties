@@ -19,6 +19,7 @@ export type Price = {
 };
 export type RecordType = "unit_offer" | "unit_type" | "package" | "project" | "ambiguous_offer";
 export type PropertyRecord = {
+  id?:string; ref?:string; mode?:"sale"|"rent"; bathrooms?:number|null; tapu_status?:string|null; source_note?:string|null;
   slug: string;
   marketing_title: string;
   city: string;
@@ -77,7 +78,7 @@ export function priceDisplay(p: Price): { main: string; note: string } {
     special_offer: "Special offer · source-advertised",
   };
   const extra = p.expenses_amount ? ` + ${fmt(p.expenses_amount)} stated expenses` : "";
-  return { main: fmt(p.amount, c), note: (notes[p.basis] ?? "Source-advertised") + extra };
+  return { main: (p.basis==="from"?"From ":"")+fmt(p.amount, c), note: (notes[p.basis] ?? "Source-advertised") + extra };
 }
 
 /** USD amount usable for sorting / budget matching; null when not comparable. */
@@ -562,10 +563,11 @@ export const getProperty = (slug: string) => properties.find((r) => r.slug === s
 
 
 export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {
- const media=originalPropertyMedia(r);
- const custom=r.details["gallery_images"];
- const gallery=Array.isArray(custom)?custom.filter((x):x is string=>typeof x==="string"):media.gallery;
- const result:PropertyMediaInfo={...media,cover:r.cover||media.cover,gallery:r.cover?[r.cover,...gallery.filter(x=>x!==r.cover)]:gallery};
- if(r.details["floor_plan"]===null)delete result.floorPlan;else if(typeof r.details["floor_plan"]==="string")result.floorPlan=r.details["floor_plan"];
- return result;
+ if(!r.id&&!("gallery_images" in r.details))return originalPropertyMedia(r);
+ const raw=r.details["gallery_images"],cover=r.cover||"";
+ const photos=Array.isArray(raw)?raw.filter((x):x is string=>typeof x==="string"&&!!x):[];
+ const gallery=[...new Set([cover,...photos].filter(Boolean))];
+ const highlights=Array.isArray(r.details["highlights"])?r.details["highlights"].filter((x):x is string=>typeof x==="string"):[];
+ const floorPlan=typeof r.details["floor_plan"]==="string"&&r.details["floor_plan"]?r.details["floor_plan"]:undefined;
+ return {cover,gallery,highlights,tags:[TYPE_LABEL[r.record_type],...(r.details["cbi_verified"]===true?["Citizenship eligibility verified"]:[])],...(floorPlan?{floorPlan}:{})};
 }
