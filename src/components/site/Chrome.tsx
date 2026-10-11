@@ -238,9 +238,9 @@ export function Footer() {
       h: "Explore Portfolio",
       l: [
         ["/properties", "All Offers & Projects"],
-        ["/citizenship", "Citizenship Program ($400k)"],
-        ["/services", "Advisory Framework (10 Services)"],
-        ["/investment-catalog", "Investment Catalog (17 Pages)"],
+        ["/citizenship", "Citizenship advice"],
+        ["/services", "Advisory services"],
+        ["/investment-catalog", "Investment catalogue"],
       ],
     },
     {
@@ -265,7 +265,7 @@ export function Footer() {
           </p>
           <div className="pt-2 flex items-center gap-3">
             <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-[0.7rem] font-semibold text-brass">
-              Licensed Istanbul Real Estate Advisory
+              Istanbul Real Estate Advisory
             </span>
           </div>
         </div>
