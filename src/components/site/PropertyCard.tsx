@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, MessageSquare, ArrowRight, ShieldCheck } from "lucide-react";
@@ -10,8 +11,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-  waLink,
-  TYPE_LABEL,
+    TYPE_LABEL,
   type PropertyRecord,
 } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
@@ -39,6 +39,7 @@ export function ImageFallback({ r, className = "" }: { r: PropertyRecord; classN
 }
 
 export function PropertyCard({ r }: { r: PropertyRecord }) {
+  const waLink=useWhatsAppLink();
   const p = priceDisplay(r.price);
   const media = getPropertyMedia(r);
   const [currency] = useCurrency();

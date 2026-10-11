@@ -523,16 +523,17 @@ else
 old_row.id=gen_random_uuid();old_row.version=0;old_row.created_at=now();old_row.publication='Draft';old_row.availability='Unknown';old_row.mode='sale';old_row.city='Istanbul';old_row.side='unknown';old_row.price_basis='advertised';old_row.cbi_eligible=false;old_row.cbi_verified=false;old_row.claims_requiring_confirmation='{}';
 end if;
 -- Explicit fields prevent actor, verified-claim and snapshot forgery.
-r=jsonb_populate_record(old_row,(select coalesce(jsonb_object_agg(key,value),'{}') from jsonb_each(p_data) where key=any(array['ref','slug','marketing_title','district','city','record_type','mode','layout_label','bathrooms','gross_m2','net_m2','area_m2','amount','currency','price_type','availability','publication','assigned_agent_id','cover_image_path','description','source_note','side','tapu_status','project_id'])));
+r=jsonb_populate_record(old_row,(select coalesce(jsonb_object_agg(key,value),'{}') from jsonb_each(p_data) where key=any(array['ref','slug','marketing_title','district','city','record_type','mode','layout_label','bathrooms','gross_m2','net_m2','area_m2','amount','currency','price_type','price_basis','availability','publication','assigned_agent_id','cover_image_path','description','source_note','side','tapu_status','project_id'])));
 if nullif(trim(r.marketing_title),'') is null or nullif(trim(r.ref),'') is null or r.slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$' then raise exception 'Title, reference and a valid slug are required'; end if;
 if r.price_type<>'on-request' and (r.amount is null or r.currency is null) then raise exception 'Price and currency are required';end if;
+if r.price_basis='installment_schedule' and r.currency is distinct from old_row.currency and old_row.version>0 then raise exception 'Confirm a new price basis before changing an instalment offer currency';end if;
 wanted=r.publication;
 r.version=old_row.version+1;r.updated_by=auth.uid();r.created_by=coalesce(old_row.created_by,auth.uid());r.updated_at=now();
 if wanted='Published' then
 if nullif(trim(r.district),'') is null then raise exception 'Confirm the location before publishing';end if;
 if nullif(trim(r.cover_image_path),'') is null then raise exception 'Select a cover image before publishing';end if;
 snapshot=coalesce(r.source_record,'{}'::jsonb)||jsonb_build_object('id',r.id,'slug',r.slug,'marketing_title',r.marketing_title,'city',r.city,'location_label',r.district,'side',r.side,'record_type',r.record_type,'mode',r.mode,'layout_label',r.layout_label,
-'price',coalesce(r.source_record->'price','{}'::jsonb)||jsonb_build_object('amount',r.amount,'currency',r.currency,'basis',case when r.price_type='on-request' then 'on_request' when r.price_type='from' and r.price_basis='advertised' then 'from' else r.price_basis::text end,'status','staff-published'),
+'price',(case when r.price_basis=old_row.price_basis then coalesce(r.source_record->'price','{}'::jsonb) else '{}'::jsonb end)||jsonb_build_object('amount',r.amount,'currency',r.currency,'basis',case when r.price_type='on-request' then 'on_request' when r.price_type='from' and r.price_basis='advertised' then 'from' else r.price_basis::text end,'status','staff-published'),
 'areas',(select coalesce(jsonb_agg(x),'[]') from (select jsonb_build_object('value_m2',r.gross_m2,'basis','gross') x where r.gross_m2 is not null union all select jsonb_build_object('value_m2',r.net_m2,'basis','net') where r.net_m2 is not null union all select jsonb_build_object('value_m2',r.area_m2,'basis','unspecified') where r.area_m2 is not null) a),
 'source_ids',coalesce(r.source_record->'source_ids','[]'::jsonb),'availability_verified',r.availability='Available',
 'cover',r.cover_image_path,'availability',r.availability,
@@ -542,7 +543,7 @@ end if;
 if old_row.version=0 then insert into public.marketing_offers select (r).*;
 else
 if old_row.slug<>r.slug then insert into public.property_slug_redirects(old_slug,new_slug,target_offer_id) values(old_row.slug,r.slug,r.id) on conflict(old_slug) do update set new_slug=excluded.new_slug,target_offer_id=excluded.target_offer_id; end if;
-update public.marketing_offers set ref=r.ref,slug=r.slug,marketing_title=r.marketing_title,district=r.district,city=r.city,record_type=r.record_type,mode=r.mode,layout_label=r.layout_label,bathrooms=r.bathrooms,gross_m2=r.gross_m2,net_m2=r.net_m2,area_m2=r.area_m2,amount=r.amount,currency=r.currency,price_type=r.price_type,availability=r.availability,publication=r.publication,assigned_agent_id=r.assigned_agent_id,cover_image_path=r.cover_image_path,description=r.description,source_note=r.source_note,side=r.side,tapu_status=r.tapu_status,project_id=r.project_id,version=r.version,published_snapshot=r.published_snapshot,published_at=r.published_at,updated_by=r.updated_by where id=r.id;
+update public.marketing_offers set ref=r.ref,slug=r.slug,marketing_title=r.marketing_title,district=r.district,city=r.city,record_type=r.record_type,mode=r.mode,layout_label=r.layout_label,bathrooms=r.bathrooms,gross_m2=r.gross_m2,net_m2=r.net_m2,area_m2=r.area_m2,amount=r.amount,currency=r.currency,price_type=r.price_type,price_basis=r.price_basis,availability=r.availability,publication=r.publication,assigned_agent_id=r.assigned_agent_id,cover_image_path=r.cover_image_path,description=r.description,source_note=r.source_note,side=r.side,tapu_status=r.tapu_status,project_id=r.project_id,version=r.version,published_snapshot=r.published_snapshot,published_at=r.published_at,updated_by=r.updated_by where id=r.id;
 end if;
 if wanted is distinct from old_row.publication or wanted='Published' then
 insert into public.publication_history(offer_id,old_status,new_status,snapshot,changed_by) values(r.id,old_row.publication,wanted,r.published_snapshot,auth.uid());

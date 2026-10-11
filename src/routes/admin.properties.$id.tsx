@@ -49,6 +49,7 @@ function Editor() {
           <label className="text-sm">Price type<select disabled={ro} className={field} value={d.priceType} onChange={(e) => f("priceType", e.target.value as Property["priceType"])}><option value="fixed">Fixed</option><option value="from">From</option><option value="on-request">On request</option></select></label>
           <label className="text-sm">Sale / rent<select disabled={ro} className={field} value={d.mode} onChange={(e) => f("mode", e.target.value as Property["mode"])}><option value="sale">Sale</option><option value="rent">Rent (monthly)</option></select></label>
           {inp("Amount", "amount", "number")}
+          <label className="text-sm">Price basis<select disabled={ro} className={field} value={d.priceBasis||"advertised"} onChange={e=>f("priceBasis",e.target.value)}>{["cash","installment_schedule","package","fixed","from","on_request","conflicting_starting_prices","scope_unconfirmed","special_offer","advertised"].map(basis=><option key={basis} value={basis}>{basis.replaceAll("_"," ")}</option>)}</select></label>
           <label className="text-sm">Currency<select disabled={ro} className={field} value={d.currency ?? ""} onChange={(e) => f("currency", (e.target.value || null) as Property["currency"])}><option value="">—</option><option>USD</option><option>TRY</option><option>EUR</option><option>GBP</option></select></label>
           <p className="text-xs text-muted-foreground sm:col-span-2">No automatic currency conversion is performed.</p>
         </div>}

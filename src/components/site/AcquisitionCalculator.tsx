@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
 import { 
   Building, 
@@ -14,10 +15,10 @@ import {
   ShieldCheck, 
   TrendingUp 
 } from "lucide-react";
-import { waLink } from "@/data/properties";
 import { useCurrency } from "@/hooks/usePreferences";
 
 export function AcquisitionCalculator() {
+  const waLink=useWhatsAppLink();
   const [priceUsd, setPriceUsd] = useState<number>(450000);
   const [tapuSplit, setTapuSplit] = useState<"full" | "split">("full");
   const [vatExempt, setVatExempt] = useState<boolean>(true); // Law 3065 foreigner exemption

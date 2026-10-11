@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
@@ -24,8 +25,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-  waLink,
-  type PropertyRecord,
+    type PropertyRecord,
 } from "@/data/properties";
 import { CtaBand, Logo } from "@/components/site/Chrome";
 import { Marquee, Tilt } from "@/components/site/Motion";
@@ -55,6 +55,7 @@ function Home() {
  return <HomeCollection properties={catalogue.properties}/>;
 }
 function HomeCollection({properties}:{properties:PropertyRecord[]}) {
+  const waLink=useWhatsAppLink();
  const FEATURED=properties.slice(0,3);
  const EDITORIAL=properties.slice(3,6);
  const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));

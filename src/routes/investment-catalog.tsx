@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { usePublishedDocuments } from "@/data/live";
 import { DEMO_MODE,publicSupabase } from "@/lib/supabase";
 import { ManagedPage } from "@/components/site/ManagedPage";
@@ -5,7 +6,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, CheckCircle2, ArrowRight, ShieldCheck, TrendingUp, Mail, Phone } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
-import { waLink } from "@/data/properties";
 import { useLiveContact } from "@/hooks/useLiveContact";
 
 export const Route = createFileRoute("/investment-catalog")({
@@ -62,6 +62,7 @@ const METRICS = [
 ];
 
 function Catalog() {
+  const waLink=useWhatsAppLink();
   const docs=usePublishedDocuments();
   const doc=docs.data?.[0];
   const PDF_DOWNLOAD_URL=DEMO_MODE?"/downloads/Avrasya_Properties_Investment_Catalog.pdf":doc?.storage_path?.startsWith("/")?doc.storage_path:doc?publicSupabase.storage.from("public-marketing").getPublicUrl(doc.storage_path).data.publicUrl:undefined;

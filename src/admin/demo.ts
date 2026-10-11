@@ -24,7 +24,7 @@ export type Currency = "USD" | "TRY" | "EUR" | "GBP";
 export type Property = {
   id: string; ref: string; slug: string; title: string; district: string; city: string; type: string;
   layout: string | null; bathrooms: number | null; grossM2: number | null; netM2: number | null; areaM2: number | null;
-  amount: number | null; currency: Currency | null; mode: "sale" | "rent"; priceType: "fixed" | "from" | "on-request";
+  amount: number | null; currency: Currency | null; mode: "sale" | "rent"; priceType: "fixed" | "from" | "on-request"; priceBasis?: string;
   availability: (typeof AVAIL)[number]; publication: (typeof PUBL)[number]; agentId: string;
   cover: string | null; description: string; project: string; updatedAt: string; sourceNote?: string;
   cbiEligible?: boolean; side?: "Europe" | "Asia" | "unknown"; tapuStatus?: string;

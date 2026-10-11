@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -32,8 +33,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-  waLink,
-  type PropertyRecord,
+    type PropertyRecord,
 } from "@/data/properties";
 import { loadCatalogue, resolveRedirect, useCatalogue } from "@/data/live";
 import { DEMO_MODE } from "@/lib/supabase";
@@ -77,6 +77,7 @@ function Detail() {
 }
 
 function Legacy() {
+  const waLink=useWhatsAppLink();
   return (
     <div className="container-site max-w-2xl py-24 text-center">
       <p className="eyebrow eyebrow-mark">Availability Under Review</p>
@@ -146,6 +147,7 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
 }
 
 function RecordView({ r }: { r: PropertyRecord }) {
+  const waLink=useWhatsAppLink();
   const media = getPropertyMedia(r);
   const p = priceDisplay(r.price);
   const contact = useLiveContact();
