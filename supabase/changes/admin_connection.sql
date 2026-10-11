@@ -552,7 +552,7 @@ end $$;
 create function public.save_offer(p_data jsonb,p_version integer default null) returns jsonb language sql security invoker set search_path='' as $$select private.save_offer(p_data,p_version)$$;
 
 create or replace function private.convert_enquiry(p_id uuid) returns uuid language plpgsql security definer set search_path='' as $$
-declare e public.enquiries;c uuid;l uuid;n int;owner uuid;
+declare e public.enquiries;c uuid;l uuid;n int;owner uuid;identity_key text;budget_match text[];budget_amount numeric;budget_currency public.currency_code='USD';
 begin
 select * into e from public.enquiries where id=p_id for update;
 if not private.writer(e.assigned_agent_id) then raise exception 'Enquiry access denied' using errcode='42501';end if;
@@ -560,7 +560,10 @@ if not found then raise exception 'Enquiry not found';end if;
 if e.lead_id is not null then return e.lead_id;end if;
 if e.status='Archived' then raise exception 'Restore the archived enquiry before conversion';end if;
 -- Serialize matching identities so simultaneous conversions cannot create duplicate contacts.
-perform pg_advisory_xact_lock(hashtextextended(lower(trim(e.email))||regexp_replace(e.phone,'\D','','g'),0));
+for identity_key in select key from (
+select 'email:'||lower(trim(e.email)) as key where nullif(trim(e.email),'') is not null
+union select 'phone:'||regexp_replace(e.phone,'\D','','g') where nullif(regexp_replace(e.phone,'\D','','g'),'') is not null
+) identities order by key loop perform pg_advisory_xact_lock(hashtextextended(identity_key,0));end loop;
 select count(*),(array_agg(id))[1] into n,c from public.contacts where
 (nullif(trim(e.email),'') is not null and lower(trim(email))=lower(trim(e.email))) or
 (nullif(regexp_replace(e.phone,'\D','','g'),'') is not null and regexp_replace(phone,'\D','','g')=regexp_replace(e.phone,'\D','','g'));
@@ -569,9 +572,11 @@ owner=coalesce(e.assigned_agent_id,auth.uid());
 if c is not null and not private.manager() and not exists(select 1 from public.contacts where id=c and assigned_agent_id=auth.uid()) then raise exception 'A matching contact belongs to another advisor. Ask a manager to review it';end if;
 if c is null then insert into public.contacts(name,email,phone,assigned_agent_id,language,created_by,notes)
 values(e.name,nullif(e.email,''),nullif(e.phone,''),owner,'',auth.uid(),'Original enquiry budget: '||coalesce(e.raw_budget_text,e.budget,'')) returning id into c;end if;
-insert into public.leads(contact_id,enquiry_id,source,assigned_agent_id,stage,shortlist,created_by)
-values(c,e.id,e.source,owner,'Qualified',case when e.offer_id is not null then array[e.offer_id] else '{}'::uuid[] end,auth.uid()) returning id into l;
--- Preserve free-text budget; never invent numeric ranges or assume currency.
+budget_match=regexp_match(trim(coalesce(e.raw_budget_text,e.budget,'')),'^(USD|TRY|EUR|GBP)[[:space:]]+([0-9]+(,[0-9]{3})*(\.[0-9]{1,2})?)$','i');
+if budget_match is not null then budget_currency=upper(budget_match[1])::public.currency_code;budget_amount=replace(budget_match[2],',','')::numeric;end if;
+insert into public.leads(contact_id,enquiry_id,source,assigned_agent_id,stage,budget_max,currency,shortlist,created_by)
+values(c,e.id,e.source,owner,'Qualified',budget_amount,budget_currency,case when e.offer_id is not null then array[e.offer_id] else '{}'::uuid[] end,auth.uid()) returning id into l;
+-- Preserve original budget text; parse only an exact amount with an explicit supported currency.
 update public.enquiries set contact_id=c,lead_id=l,status='Qualified',assigned_agent_id=owner where id=e.id;
 return l;
 end $$;
