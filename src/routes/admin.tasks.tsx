@@ -17,7 +17,7 @@ function Tasks() {
   const toggle = (x: Task) => run(async () => { await upsert<Task>("tasks", { id: x.id, done: !x.done }, x.assigneeId); if (x.link) await addActivity("task", `Task ${x.done ? "reopened" : "completed"}: ${x.title}`, x.link); });
   return (
     <>
-      <PageHead title="Tasks" crumbs="Sales & CRM" />
+      <PageHead title="Tasks" crumbs="Clients" />
       <div className="mb-3 flex gap-2">{(["mine", "overdue", "all"] as const).map((v) => <button key={v} className={view === v ? btnPrimary : btnGhost} onClick={() => setView(v)}>{v === "mine" ? "My tasks" : v === "overdue" ? "Overdue" : "All"}</button>)}</div>
       {can(user, "edit-crm") && <div className="mb-3 grid gap-2 rounded-md border bg-card p-3 sm:grid-cols-5">
         <input className={`${field} sm:col-span-2`} placeholder="Task title" aria-label="Task title" value={t.title} onChange={(e) => setT({ ...t, title: e.target.value })} />

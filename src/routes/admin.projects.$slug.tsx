@@ -20,7 +20,7 @@ function ProjectDetail() {
   };
   return (
     <>
-      <PageHead title={base.project || "Unassigned"} crumbs="Inventory / Projects" action={can(user, "edit-inventory") && <button className={btnPrimary} onClick={addUnit}>Add unit from project</button>} />
+      <PageHead title={base.project || "Unassigned"} crumbs="Properties / Developments" action={can(user, "edit-inventory") && <button className={btnPrimary} onClick={addUnit}>Add unit from project</button>} />
       <div className="mb-4 grid gap-3 sm:grid-cols-4">
         {AVAIL.filter((a) => units.some((u) => u.availability === a)).map((a) => <div key={a} className="rounded-md border bg-card p-3"><p className="text-xs text-muted-foreground">{a}</p><p className="text-xl font-semibold tabular-nums">{units.filter((u) => u.availability === a).length}</p></div>)}
       </div>

@@ -296,7 +296,7 @@ export function Dashboard() {
           {/* Overdue Tasks */}
           <div className="rounded-xl border bg-card p-5">
             <div className="flex items-center justify-between border-b pb-3">
-              <h2 className="text-sm font-semibold text-foreground">Action Tasks</h2>
+              <h2 className="text-sm font-semibold text-foreground">Tasks</h2>
               <span className="text-xs text-destructive font-medium">{overdue.length} overdue</span>
             </div>
             <div className="mt-3 divide-y">
@@ -368,7 +368,7 @@ export function Dashboard() {
 
         <section className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between border-b pb-3">
-            <h2 className="text-sm font-semibold text-foreground">Audit Log & Agent Activity</h2>
+            <h2 className="text-sm font-semibold text-foreground">Recent changes</h2>
             <span className="text-[11px] text-muted-foreground">Browser demo history</span>
           </div>
           <div className="mt-3 divide-y">

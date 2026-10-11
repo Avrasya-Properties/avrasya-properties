@@ -24,7 +24,7 @@ function Leads() {
   };
   return (
     <>
-      <PageHead title="Leads" crumbs="Sales & CRM" action={<div className="flex gap-2"><button className={btnGhost} onClick={() => setView(view === "table" ? "kanban" : "table")}>{view === "table" ? "Kanban" : "Table"}</button>{can(user, "edit-crm") && <button className={btnPrimary} onClick={() => setAdding(!adding)}>New lead</button>}</div>} />
+      <PageHead title="Buyer enquiries" crumbs="Clients" action={<div className="flex gap-2"><button className={btnGhost} onClick={() => setView(view === "table" ? "kanban" : "table")}>{view === "table" ? "Kanban" : "Table"}</button>{can(user, "edit-crm") && <button className={btnPrimary} onClick={() => setAdding(!adding)}>New lead</button>}</div>} />
       {adding && <div className="mb-4 grid gap-2 rounded-md border bg-card p-3 sm:grid-cols-5">
         <input className={field} placeholder="Name (fictional)" value={n.name} onChange={(e) => setN({ ...n, name: e.target.value })} />
         <input className={field} placeholder="Email" value={n.email} onChange={(e) => setN({ ...n, email: e.target.value })} />

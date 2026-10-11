@@ -274,7 +274,7 @@ export function AdminSettingsPage() {
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
-              Homepage Hero & Main Editorial Text
+              Homepage heading and text
             </h2>
             <div className="space-y-4">
               <div>
@@ -312,7 +312,7 @@ export function AdminSettingsPage() {
 
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
-              Statutory Citizenship (CBI) Threshold
+              Citizenship investment amount
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 items-center">
               <div>
@@ -340,7 +340,7 @@ export function AdminSettingsPage() {
 
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
-              Top Notification / Announcement Banner
+              Website announcement
             </h2>
             <div className="space-y-4">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -375,7 +375,7 @@ export function AdminSettingsPage() {
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
-              Multi-Currency Conversion Engine
+              Exchange rates
             </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/20">
@@ -398,7 +398,7 @@ export function AdminSettingsPage() {
 
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  Fallback / Statutory Exchange Rates (Base: 1 USD)
+                  Manual rates (for 1 USD)
                 </p>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="rounded-lg border p-3 bg-card">
@@ -444,10 +444,10 @@ export function AdminSettingsPage() {
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
-              Database Export & Snapshot
+              Download your records
             </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Export all 18+ property records, active leads, CRM contacts, deals, scheduled calendar viewings, and website CMS configurations into a single standalone JSON file.
+              Download property listings, contacts, buyer enquiries, deals, viewings and website settings as a JSON file. Linked images and documents are not included.
             </p>
             <div className="flex flex-wrap gap-3">
               <button disabled={!isAdmin} onClick={handleDownloadBackup} className={btnPrimary}>

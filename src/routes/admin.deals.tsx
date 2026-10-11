@@ -25,7 +25,7 @@ function Deals() {
   };
   return (
     <>
-      <PageHead title="Deals" crumbs="Sales & CRM" />
+      <PageHead title="Deals" crumbs="Clients" />
       <div className="overflow-x-auto rounded-md border bg-card"><table className="w-full text-sm">
         <thead className="border-b text-left text-xs text-muted-foreground"><tr><th className="p-2">Deal</th><th>Buyer</th><th>Selected units</th><th className="text-right">Agreed amount</th><th className="px-2">Expected close</th><th>Agent</th><th>Stage</th><th>Actions</th></tr></thead>
         <tbody>{db.deals.map((deal) => {
@@ -47,7 +47,7 @@ function Deals() {
       <p className="mt-2 text-xs text-muted-foreground">A shortlist does not select purchased units. Confirm individual unit identity and source review, choose units and enter the agreed amount before reserving. Currencies are never combined. Payments and commissions are recorded separately; moving a deal does not imply payment receipt.</p>
       {draft && <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="deal-editor-title">
         <form onSubmit={save} className="mx-auto my-12 max-w-xl space-y-4 rounded-md border bg-card p-5">
-          <h2 id="deal-editor-title" className="text-lg font-semibold">Edit opportunity</h2>
+          <h2 id="deal-editor-title" className="text-lg font-semibold">Edit deal</h2>
           <label className="block text-sm">Title<input required className={field} value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></label>
           <div className="grid grid-cols-2 gap-3">
             <label className="text-sm">Agreed amount<input className={field} type="number" min="0" step="0.01" value={draft.amount ?? ""} onChange={(event) => setDraft({ ...draft, amount: event.target.value === "" ? null : Number(event.target.value) })} /></label>

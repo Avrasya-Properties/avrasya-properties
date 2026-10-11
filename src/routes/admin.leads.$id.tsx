@@ -20,7 +20,7 @@ function LeadDetail() {
   const patch = async (p: Partial<Lead>) => { try { await upsert<Lead>("leads", { id, ...p }, l.agentId); } catch (e) { toast.error((e as Error).message); } };
   return (
     <>
-      <PageHead title={c?.name ?? "Lead"} crumbs="Sales & CRM / Leads" action={<div className="flex gap-2">
+      <PageHead title={c?.name ?? "Lead"} crumbs="Clients / Leads" action={<div className="flex gap-2">
         <button className={btnGhost} onClick={() => setMsg(`Hello ${c?.name},\n\nThank you for your enquiry with Avrasya Property...`)}>Compose message</button>
         {edit && (l.dealId ? <Link to="/admin/deals" className={btnGhost}>View deal</Link> : <button className={btnPrimary} onClick={async () => { try { await convertLead(id); toast.success("Deal created"); nav({ to: "/admin/deals" }); } catch (e) { toast.error((e as Error).message); } }}>Convert to deal</button>)}
       </div>} />

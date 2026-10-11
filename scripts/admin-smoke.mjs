@@ -165,7 +165,7 @@ try {
   assert.deepEqual(deal.propertyIds, [unit.id]);
   results.push("Explicit unit agreement, reservation and sale completion");
 
-  await visit("/admin/calendar", "Calendar");
+  await visit("/admin/calendar", "Viewings");
   await page.$eval('input[type="datetime-local"]', (input) => {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(input, "2026-12-20T10:00");
     input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -191,7 +191,7 @@ try {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")).tasks.some((task) => task.title === "Smoke Test Task" && task.done));
   results.push("Task creation and completion");
 
-  for (const [path, heading] of [["/admin/projects", "Projects"], ["/admin/analytics", "Reports & Intelligence"]]) {
+  for (const [path, heading] of [["/admin/projects", "Developments"], ["/admin/analytics", "Reports"]]) {
     await visit(path, heading);
   }
   results.push("Projects and analytics load");

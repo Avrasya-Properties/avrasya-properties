@@ -20,7 +20,7 @@ function Contacts() {
   };
   return (
     <>
-      <PageHead title="Contacts" crumbs="Sales & CRM" action={<button disabled={!can(user, "edit-crm")} className={btnPrimary} onClick={() => setDraft({ name: "", kind: "person", email: "", phone: "", roles: ["buyer"], language: "", agentId: user!.id, notes: "" })}>Add contact</button>} />
+      <PageHead title="Contacts" crumbs="Clients" action={<button disabled={!can(user, "edit-crm")} className={btnPrimary} onClick={() => setDraft({ name: "", kind: "person", email: "", phone: "", roles: ["buyer"], language: "", agentId: user!.id, notes: "" })}>Add contact</button>} />
       <input aria-label="Search contacts" className={`${field} mb-4 max-w-md`} placeholder="Search name, email or phone" value={query} onChange={(event) => setQuery(event.target.value)} />
       <div className="overflow-x-auto rounded-md border bg-card"><table className="w-full text-sm">
         <thead className="border-b text-left text-xs text-muted-foreground"><tr><th className="p-2">Name</th><th>Type</th><th>Email</th><th>Phone</th><th>Language</th><th>Agent</th><th>Review</th><th>Actions</th></tr></thead>

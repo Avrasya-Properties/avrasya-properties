@@ -72,7 +72,7 @@ export function AdminAnalyticsPage() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Reports & Intelligence"
+        title="Reports"
         crumbs="Operations / Analytics"
         action={
           <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export function AdminAnalyticsPage() {
         <section className="rounded-xl border bg-card p-6 lg:col-span-7">
           <div className="flex items-center justify-between border-b pb-3 mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-foreground">District Concentration Breakdown</h2>
+              <h2 className="text-sm font-semibold text-foreground">Listings by district</h2>
               <p className="text-xs text-muted-foreground">Active inventory distribution across Istanbul prime zones</p>
             </div>
             <span className="text-xs text-brass font-medium">{metrics.districts.length} districts active</span>
@@ -179,7 +179,7 @@ export function AdminAnalyticsPage() {
         <section className="rounded-xl border bg-card p-6 lg:col-span-5 space-y-6">
           <div>
             <div className="border-b pb-3 mb-4">
-              <h2 className="text-sm font-semibold text-foreground">Continental Side Split</h2>
+              <h2 className="text-sm font-semibold text-foreground">European and Asian sides</h2>
               <p className="text-xs text-muted-foreground">Bosphorus geographic distribution</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -204,7 +204,7 @@ export function AdminAnalyticsPage() {
           {/* Lead Source Acquisition */}
           <div>
             <div className="border-b pb-3 mb-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Lead Acquisition Channels</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Where enquiries came from</h3>
             </div>
             <div className="space-y-2">
               {Object.entries(metrics.sourceCounts).map(([src, count]) => (

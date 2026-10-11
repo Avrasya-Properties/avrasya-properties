@@ -17,7 +17,7 @@ function Editor() {
   useEffect(()=>{if(DEMO_ENABLED)return;void Promise.all([managedRows("physical_units"),managedRows("projects")]).then(([units,projects])=>{setUnits(units);setProjects(projects);}).catch(error=>toast.error(error.message));},[]);
   const [d, setD] = useState<Property | undefined>(saved); const [tab, setTab] = useState<(typeof TABS)[number]>("Property details");
   useEffect(() => { setD(saved); }, [id]);
-  if (!saved || !d) return <p>Property not found. <Link to="/admin/properties" className="text-brass-text">Back to inventory</Link></p>;
+  if (!saved || !d) return <p>Property not found. <Link to="/admin/properties" className="text-brass-text">Back to listings</Link></p>;
   const ro = !can(user, "edit-inventory");
   const f = <K extends keyof Property>(k: K, v: Property[K]) => setD({ ...d, [k]: v });
   const num = (v: string) => (v === "" ? null : Number(v));

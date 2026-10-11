@@ -399,7 +399,7 @@ export function AdminInquiriesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div className="w-full max-w-lg rounded-xl border bg-card p-6 shadow-xl">
             <h3 className="font-display text-lg font-bold text-foreground mb-4">
-              Log Direct Client Inquiry
+              Add an enquiry
             </h3>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>

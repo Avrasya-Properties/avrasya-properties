@@ -21,7 +21,7 @@ function Calendar() {
   };
   return (
     <>
-      <PageHead title="Calendar" crumbs="Sales & CRM · Agenda (Europe/Istanbul)" />
+      <PageHead title="Viewings" crumbs="Clients · Agenda (Europe/Istanbul)" />
       {can(user, "edit-crm") && <div className="mb-4 grid gap-2 rounded-md border bg-card p-3 sm:grid-cols-6">
         <select className={field} value={v.contactId} onChange={(e) => setV({ ...v, contactId: e.target.value })}>{db.contacts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
         <select className={`${field} sm:col-span-2`} value={v.propertyId} onChange={(e) => setV({ ...v, propertyId: e.target.value })}>{db.properties.map((p) => <option key={p.id} value={p.id}>{p.ref} · {p.title.slice(0, 40)}</option>)}</select>
