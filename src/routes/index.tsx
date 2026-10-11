@@ -168,9 +168,9 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                     <span className="rounded-xs bg-primary/90 backdrop-blur-xs px-2.5 py-1 text-xs font-semibold tracking-wider text-primary-foreground shadow-xs">
                       Spotlight · {f.location_label}
                     </span>
-                    {(fUsd ?? 0) >= 400000 && (
+                    {f.details["cbi_verified"]===true && (
                       <span className="flex items-center gap-1 rounded-xs bg-brass px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary shadow-xs">
-                        CBI Eligible ($400k+)
+                        Citizenship eligibility verified
                       </span>
                     )}
                   </div>

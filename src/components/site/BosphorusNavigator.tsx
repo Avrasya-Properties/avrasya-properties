@@ -431,7 +431,7 @@ export function BosphorusNavigator() {
             {/* Direct Action CTAs */}
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-5">
               <button
-                onClick={() => navigate({ to: "/properties", search: { loc: active.locParam } })}
+                onClick={() => navigate({ to: "/properties", search: { q: active.locParam } })}
                 className="btn btn-primary shadow-xs gap-2"
               >
                 <span>View All Properties in {active.name}</span>

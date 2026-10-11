@@ -159,7 +159,7 @@ function Catalog() {
                     : "border-border bg-secondary hover:border-brass/70 text-foreground"
                 }`}
               >
-                <span>CBI Eligible ($400k+)</span>
+                <span>Citizenship eligibility verified</span>
               </button>
 
               {/* Saved Shortlist Filter */}
@@ -265,7 +265,7 @@ function Catalog() {
                 const p = priceDisplay(r.price);
                 const usd = comparableUsd(r.price);
                 const displayPrice = currency === "USD"||comparableUsd(r.price)===null ? p.main : convertUsdPrice(usd, currency);
-                const isCbi = (usd ?? 0) >= 400000;
+                const isCbi = r.details["cbi_verified"]===true;
                 const saved = isSaved(r.slug);
 
                 return (

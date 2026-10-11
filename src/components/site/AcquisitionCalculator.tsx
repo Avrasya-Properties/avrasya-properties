@@ -15,7 +15,8 @@ import {
   ShieldCheck, 
   TrendingUp 
 } from "lucide-react";
-import { useCurrency } from "@/hooks/usePreferences";
+import {useSiteSettings} from "@/admin/store";
+import { useCurrency,useLiveRates } from "@/hooks/usePreferences";
 
 export function AcquisitionCalculator() {
   const waLink=useWhatsAppLink();
@@ -25,14 +26,7 @@ export function AcquisitionCalculator() {
   const [copied, setCopied] = useState<boolean>(false);
   const [currency] = useCurrency();
 
-  // Exchange approximate rates for reference
-  const rates: Record<string, number> = {
-    USD: 1,
-    EUR: 0.92,
-    TRY: 34.2,
-    GBP: 0.79,
-  };
-
+  const {rates}=useLiveRates();const settings=useSiteSettings();
   const currentRate = rates[currency] || 1;
   const currencySymbol = currency === "USD" ? "$" : currency === "EUR" ? "€" : currency === "TRY" ? "₺" : "£";
 
@@ -55,7 +49,7 @@ export function AcquisitionCalculator() {
   const closingPercentage = ((totalClosingCostsUsd / priceUsd) * 100).toFixed(1);
 
   // CBI Status
-  const cbiThreshold = 400000;
+  const cbiThreshold = settings.cbiThresholdUsd;
   const isCbiQualified = priceUsd >= cbiThreshold;
   const cbiDeficitUsd = Math.max(0, cbiThreshold - priceUsd);
   const cbiProgressPercent = Math.min(100, Math.round((priceUsd / cbiThreshold) * 100));
