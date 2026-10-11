@@ -44,7 +44,7 @@ function Deals() {
             </div></td>
           </tr>;
         })}{db.deals.length === 0 && <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Convert a qualified lead to create an opportunity.</td></tr>}</tbody></table></div>
-      <p className="mt-2 text-xs text-muted-foreground">A shortlist does not select purchased units. Confirm individual unit identity and source review, choose units and enter the agreed amount before reserving. Currencies are never combined. This demo does not record payments or commissions.</p>
+      <p className="mt-2 text-xs text-muted-foreground">A shortlist does not select purchased units. Confirm individual unit identity and source review, choose units and enter the agreed amount before reserving. Currencies are never combined. Payments and commissions are recorded separately; moving a deal does not imply payment receipt.</p>
       {draft && <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="deal-editor-title">
         <form onSubmit={save} className="mx-auto my-12 max-w-xl space-y-4 rounded-md border bg-card p-5">
           <h2 id="deal-editor-title" className="text-lg font-semibold">Edit opportunity</h2>

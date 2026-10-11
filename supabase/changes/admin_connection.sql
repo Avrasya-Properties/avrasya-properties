@@ -530,6 +530,7 @@ wanted=r.publication;
 r.version=old_row.version+1;r.updated_by=auth.uid();r.created_by=coalesce(old_row.created_by,auth.uid());r.updated_at=now();
 if wanted='Published' then
 if nullif(trim(r.district),'') is null then raise exception 'Confirm the location before publishing';end if;
+if nullif(trim(r.cover_image_path),'') is null then raise exception 'Select a cover image before publishing';end if;
 snapshot=coalesce(r.source_record,'{}'::jsonb)||jsonb_build_object('id',r.id,'slug',r.slug,'marketing_title',r.marketing_title,'city',r.city,'location_label',r.district,'side',r.side,'record_type',r.record_type,'mode',r.mode,'layout_label',r.layout_label,
 'price',coalesce(r.source_record->'price','{}'::jsonb)||jsonb_build_object('amount',r.amount,'currency',r.currency,'basis',case when r.price_type='on-request' then 'on_request' when r.price_type='from' and r.price_basis='advertised' then 'from' else r.price_basis::text end,'status','staff-published'),
 'areas',(select coalesce(jsonb_agg(x),'[]') from (select jsonb_build_object('value_m2',r.gross_m2,'basis','gross') x where r.gross_m2 is not null union all select jsonb_build_object('value_m2',r.net_m2,'basis','net') where r.net_m2 is not null union all select jsonb_build_object('value_m2',r.area_m2,'basis','unspecified') where r.area_m2 is not null) a),
@@ -621,10 +622,10 @@ if p_stage in ('Reserved','Due Diligence','Contract','Won') then
 if d.total_amount is null or d.total_amount<=0 or not exists(select 1 from public.deal_selected_units where deal_id=d.id) then raise exception 'Choose identified units and an agreed price before reserving';end if;
 -- Global order avoids deadlocks for multi-unit transactions.
 for s in select x.* from public.deal_selected_units x where x.deal_id=d.id order by x.physical_unit_id,x.offer_id loop
-select * into o from public.marketing_offers where id=s.offer_id for update;
-if not found or o.record_type<>'unit_offer' or o.physical_unit_id is null or o.physical_unit_id is distinct from s.physical_unit_id then raise exception 'Only offers linked to verified physical units can be reserved';end if;
 select * into u from public.physical_units where id=s.physical_unit_id for update;
 if not found or nullif(trim(u.unit_number),'') is null then raise exception 'Confirm unit identity first';end if;
+select * into o from public.marketing_offers where id=s.offer_id for update;
+if not found or o.record_type<>'unit_offer' or o.physical_unit_id is null or o.physical_unit_id is distinct from s.physical_unit_id then raise exception 'Only offers linked to verified physical units can be reserved';end if;
 if p_stage='Reserved' then
 if u.status not in ('Available','Under Offer') or o.availability not in ('Available','Under Offer') then raise exception 'Selected unit is not available';end if;
 insert into public.reservations(deal_id,offer_id,physical_unit_id,contact_id,reserved_by,reserved_from,expires_at)
@@ -641,11 +642,13 @@ end loop;
 end if;
 if p_stage='Won' then update public.reservations set status='converted' where deal_id=d.id and status='active';
 elsif p_stage='Lost' then
-for s in select * from public.reservations where deal_id=d.id and status='active' order by physical_unit_id for update loop
+for s in select * from public.reservations where deal_id=d.id and status='active' order by physical_unit_id loop
 perform 1 from public.physical_units where id=s.physical_unit_id for update;
-update public.reservations set status='cancelled',cancellation_reason='Deal lost' where id=s.id;
+update public.reservations set status='cancelled',cancellation_reason='Deal lost' where id=s.id and status='active';
+if found then
 update public.physical_units set status='Available' where id=s.physical_unit_id and status='Reserved';
 update public.marketing_offers set availability='Available',version=version+1 where physical_unit_id=s.physical_unit_id and availability='Reserved';
+end if;
 end loop;
 end if;
 update public.deals set stage=p_stage,version=version+1,actual_close_date=case when p_stage='Won' then now() else actual_close_date end where id=d.id;

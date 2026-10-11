@@ -45,7 +45,7 @@ select test.denied('select save_offer(''{}'',null)','Agent cannot edit inventory
 reset role;
 select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000002","session_id":"00000000-0000-4000-8000-000000000102"}',true);
 set local role authenticated;
-select save_offer('{"ref":"TEST-1","slug":"verified-unit","marketing_title":"Verified unit","district":"Istanbul","city":"Istanbul","record_type":"unit_offer","mode":"sale","price_type":"fixed","amount":420000,"currency":"USD","availability":"Available","publication":"Published"}',null);
+select save_offer('{"ref":"TEST-1","cover_image_path":"/images/test.jpg","slug":"verified-unit","marketing_title":"Verified unit","district":"Istanbul","city":"Istanbul","record_type":"unit_offer","mode":"sale","price_type":"fixed","amount":420000,"currency":"USD","availability":"Available","publication":"Published"}',null);
 select test.ok((select count(*) from published_catalogue())=1,'Manager publication creates one public snapshot');
 select test.denied(format('select save_offer(%L::jsonb,0)',jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'marketing_title','Stale edit')),'Stale offer edits are rejected');
 select link_physical_unit((select id from marketing_offers where ref='TEST-1'),'00000000-0000-4000-8000-000000002001',(select version from marketing_offers where ref='TEST-1'));

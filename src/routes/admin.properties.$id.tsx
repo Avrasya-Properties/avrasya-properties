@@ -53,7 +53,7 @@ function Editor() {
           <p className="text-xs text-muted-foreground sm:col-span-2">No automatic currency conversion is performed.</p>
         </div>}
         {tab === "Media" && <div>
-          <p className="mb-2 text-xs text-muted-foreground">Select a high-resolution project visual preset or upload a custom demo cover (JPEG, PNG or WebP, up to 1 MB). {DEMO_ENABLED ? "Demo uploads remain in this browser." : "Uploads are stored in Supabase Storage."}</p>
+          <p className="mb-2 text-xs text-muted-foreground">Select a high-resolution project visual preset or upload a cover (JPEG, PNG or WebP, up to {DEMO_ENABLED ? "1 MB" : "5 MB"}). {DEMO_ENABLED ? "Demo uploads remain in this browser." : "Uploads are stored in Supabase Storage."}</p>
           {!ro && (
             <div className="space-y-4">
               <div>
@@ -103,7 +103,7 @@ function Editor() {
           <p>Publication: <Status v={d.publication} /> · Availability: <Status v={d.availability} /> <span className="text-xs text-muted-foreground">(independent)</span></p>
           {d.sourceNote && <p className="rounded-sm border border-brass bg-warn-bg p-2 text-xs">Source claims requiring confirmation: {d.sourceNote}</p>}
           <label className="block text-sm">Source claims requiring confirmation<textarea disabled={ro} className={`${field} mt-1 h-24 py-2`} value={d.sourceNote ?? ""} onChange={(e) => f("sourceNote", e.target.value)} /></label>
-          <p className="text-xs text-muted-foreground">Keep unresolved claims here. Before reserving a unit, confirm its physical identity, availability and source claims with the client. Demo publication changes do not update the static public catalogue.</p>
+          <p className="text-xs text-muted-foreground">Keep unresolved claims here. Before reserving a unit, confirm its physical identity, availability and source claims with the client. {DEMO_ENABLED ? "Demo publication affects this browser only." : "Publishing updates the shared public catalogue."}</p>
           <h3 className="font-medium">Publish checklist</h3>
           {issues.length === 0 ? <p className="text-primary">Ready to publish.</p> : <ul className="list-disc pl-5 text-destructive">{issues.map((i) => <li key={i}>{i}</li>)}</ul>}
           {!ro && d.publication === "Draft" && <button className={btnGhost} onClick={() => save({ publication: "In Review" })}>Send to review</button>}

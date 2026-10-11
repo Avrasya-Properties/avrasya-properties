@@ -5,7 +5,7 @@ import { AdminShell } from "@/admin/Shell";
 import { useSession, useBackendStatus } from "@/admin/store";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — Avrasya Property" }, { name: "robots", content: "noindex" }, { name: "description", content: "Avrasya Property team workspace (demo)." }, { property: "og:title", content: "Admin — Avrasya Property" }, { property: "og:description", content: "Avrasya Property team workspace (demo)." }] }),
+  head: () => ({ meta: [{ title: "Admin — Avrasya Property" }, { name: "robots", content: "noindex" }, { name: "description", content: "Avrasya Property staff workspace." }, { property: "og:title", content: "Admin — Avrasya Property" }, { property: "og:description", content: "Avrasya Property staff workspace." }] }),
   component: AdminLayout,
 });
 
