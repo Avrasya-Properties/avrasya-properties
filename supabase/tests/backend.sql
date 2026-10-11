@@ -47,6 +47,13 @@ select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-
 set local role authenticated;
 select save_offer('{"ref":"TEST-1","cover_image_path":"/images/test.jpg","slug":"verified-unit","marketing_title":"Verified unit","district":"Istanbul","city":"Istanbul","record_type":"unit_offer","mode":"sale","price_type":"fixed","amount":420000,"currency":"USD","availability":"Available","publication":"Published"}',null);
 select test.ok((select count(*) from published_catalogue())=1,'Manager publication creates one public snapshot');
+select save_offer(jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'bathrooms',2,'source_note','Confirm the terrace','tapu_status','Review needed','highlights',jsonb_build_array('Confirmed garden','')),(select version from marketing_offers where ref='TEST-1'));
+select test.ok((select published_snapshot->>'ref' from marketing_offers where ref='TEST-1')='TEST-1','Public reference matches the editor');
+select test.ok((select published_snapshot->>'bathrooms' from marketing_offers where ref='TEST-1')='2','Public bathrooms match the editor');
+select test.ok((select published_snapshot->>'source_note' from marketing_offers where ref='TEST-1')='Confirm the terrace','Confirmation notes reach the public record');
+select test.ok((select published_snapshot->'details'->'highlights' from marketing_offers where ref='TEST-1')='["Confirmed garden"]'::jsonb,'Approved highlights publish without blank lines');
+select test.denied(format('select save_offer(%L::jsonb,%s)',jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'highlights',jsonb_build_array(42)),(select version from marketing_offers where ref='TEST-1')),'Non-text highlights rejected');
+
 select save_offer(jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'gallery_images',jsonb_build_array('https://approved.example/photo.jpg'),'floor_plan','https://approved.example/plan.jpg'),(select version from marketing_offers where ref='TEST-1'));
 select test.ok((select source_record->'details'->'gallery_images'->>0 from marketing_offers where ref='TEST-1')='https://approved.example/photo.jpg','Listing gallery is saved');
 select test.ok((select published_snapshot->'details'->>'floor_plan' from marketing_offers where ref='TEST-1')='https://approved.example/plan.jpg','Published floor plan follows saved listing');

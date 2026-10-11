@@ -35,7 +35,7 @@ end if;
 if p_data ? 'highlights' then
  if jsonb_typeof(p_data->'highlights')<>'array' or jsonb_array_length(p_data->'highlights')>30 then raise exception 'Use up to 30 property highlights';end if;
  if exists(select 1 from jsonb_array_elements(p_data->'highlights') value where jsonb_typeof(value)<>'string' or length(value#>>'{}')>300) then raise exception 'Use text highlights under 300 characters';end if;
- r.source_record=jsonb_set(coalesce(r.source_record,'{}'),'{details}',coalesce(r.source_record->'details','{}')||jsonb_build_object('highlights',(select coalesce(jsonb_agg(trim(value)),'[]') from jsonb_array_elements_text(p_data->'highlights') value where trim(value)<>''));
+ r.source_record=jsonb_set(coalesce(r.source_record,'{}'),'{details}',coalesce(r.source_record->'details','{}')||jsonb_build_object('highlights',(select coalesce(jsonb_agg(trim(value)),'[]') from jsonb_array_elements_text(p_data->'highlights') value where trim(value)<>'')));
 end if;
 if wanted='Published' then
 if nullif(trim(r.district),'') is null then raise exception 'Confirm the location before publishing';end if;
