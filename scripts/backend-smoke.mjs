@@ -12,7 +12,7 @@ const jwt=role=>{const head=Buffer.from(JSON.stringify({alg:"HS256",typ:"JWT"}))
 const actor=role=>({id:uuid(ids[role]),email:role+"@example.test",aud:"authenticated",role:"authenticated",app_metadata:{provider:"email"},user_metadata:{},created_at:"2026-10-10T00:00:00Z"});
 const adminToken=jwt("admin");
 async function rest(path,method="GET",data,token=adminToken){const response=await fetch(api+path,{method,headers:{Authorization:"Bearer "+token,"Content-Type":"application/json",Prefer:"return=representation"},...(data?{body:JSON.stringify(data)}:{})});const text=await response.text();if(!response.ok)throw new Error(response.status+" "+text);return text?JSON.parse(text):null;}
-const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdio:["ignore","pipe","pipe"],env:{...process.env,VITE_ENABLE_ADMIN_DEMO:"false"}});
+const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdio:["ignore","pipe","pipe"],env:{...process.env,VITE_ENABLE_ADMIN_DEMO:"false",VITE_SUPABASE_URL:"http://127.0.0.1:8082"}});
 let serverOutput="";for(const stream of [child.stdout,child.stderr])stream.on("data",c=>serverOutput=(serverOutput+c).slice(-4000));
 let browser,page;const pageErrors=[];const results=[];
 async function clickText(text, root = "body") {
@@ -56,16 +56,16 @@ async function selectLabel(labelText, value) {
   throw new Error("Select label not found: " + labelText);
 }
 async function visit(path, heading) {
+  await page.bringToFront();
   await page.goto(origin + path, { waitUntil: "domcontentloaded" });
   await page.waitForFunction((text) => [...document.querySelectorAll("h1")].some((element) => element.textContent.trim() === text), {}, heading);
 }
-async function attachProxy(target){
- await target.setRequestInterception(true);
- target.on("request",async request=>{
-  const url=new URL(request.url());
-  if(!url.hostname.endsWith(".supabase.co"))return request.continue();
+// Both SSR loaders and browser reads use this isolated Auth/PostgREST adapter.
+const apiProxy=Bun.serve({hostname:"127.0.0.1",port:8082,async fetch(req){
+ const url=new URL(req.url),body=await req.text();
+ const request={method:()=>req.method,headers:()=>Object.fromEntries(req.headers),postData:()=>body};
   try{
-   if(request.method()==="OPTIONS")return request.respond({status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"*","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS"}});
+   if(request.method()==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"*","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS"}});
    let status=200,body,headers={"content-type":"application/json","access-control-allow-origin":"*"};
    if(url.pathname.startsWith("/auth/v1/token")){
     const input=JSON.parse(request.postData()||"{}");const role=String(input.email||"").split("@")[0];
@@ -80,22 +80,35 @@ async function attachProxy(target){
     const response=await fetch(api+url.pathname.replace("/rest/v1","")+url.search,{method:request.method(),headers:{"Content-Type":"application/json",Accept:request.headers().accept||"application/json",...(token?{Authorization:token}:{}),...(request.headers().prefer?{Prefer:request.headers().prefer}:{}),...(request.headers().range?{Range:request.headers().range}:{})},...(request.postData()?{body:request.postData()}:{})});
     status=response.status;body=await response.text();headers={...headers,...Object.fromEntries([...response.headers].filter(([name])=>["content-range","content-type","preference-applied"].includes(name)))};
    }else{status=404;body={error:"Unsupported test endpoint"};}
-   await request.respond({status,headers,body:body===null?"":typeof body==="string"?body:JSON.stringify(body)});
-  }catch(error){await request.respond({status:500,contentType:"application/json",body:JSON.stringify({error:error.message})});}
- });
-}
+   return new Response(status===204?null:body===null?"":typeof body==="string"?body:JSON.stringify(body),{status,headers});
+  }catch(error){return Response.json({error:error.message},{status:500,headers:{"access-control-allow-origin":"*"}});}
+
+}});
+async function attachProxy(target){target.on("pageerror",error=>pageErrors.push(error.message));}
 async function login(role){await page.goto(origin+"/admin/login",{waitUntil:"domcontentloaded"});await page.waitForSelector('form[data-ready="true"]');await fill('input[type="email"]',role+"@example.test");await fill('input[type="password"]',"IsolatedTestPassword!26");await clickText("Sign in");await page.waitForSelector('a[href="/admin/manage"]');}
 async function waitRow(table,field,value){for(let i=0;i<50;i++){const rows=await rest("/"+table+"?"+field+"=eq."+encodeURIComponent(value));if(rows?.length)return rows[0];await new Promise(r=>setTimeout(r,100));}throw new Error("Record not saved: "+table+" "+value);}
 try{
  for(let i=0;i<60;i++){try{if((await fetch(origin+"/admin/login")).ok)break;}catch{}if(i===59)throw new Error("Server did not start: "+serverOutput);await new Promise(r=>setTimeout(r,1000));}
- browser=await puppeteer.launch({executablePath:process.env.CHROME_PATH||"/usr/bin/google-chrome",headless:true,args:["--no-sandbox","--disable-dev-shm-usage"]});page=await browser.newPage();await page.setViewport({width:1440,height:1000});page.setDefaultTimeout(20000);page.on("pageerror",e=>pageErrors.push(e.message));page.on("dialog",d=>d.accept());await attachProxy(page);
+ browser=await puppeteer.launch({executablePath:process.env.CHROME_PATH||"/usr/bin/google-chrome",headless:true,args:["--no-sandbox","--disable-dev-shm-usage"]});page=await browser.newPage();await page.setViewport({width:1440,height:1000});page.setDefaultTimeout(20000);page.on("dialog",d=>d.accept());await attachProxy(page);
  await login("admin");assert.equal(await page.evaluate(()=>localStorage.getItem("avrasya-admin-db-v4")),null);results.push("Production authentication mode has no demo workspace");
  await visit("/admin/contacts","Contacts");await clickText("Add contact");await fillLabel("Name","Persistent buyer");await fillLabel("Email","persistent@example.test");await clickText("Save contact");await waitRow("contacts","name","Persistent buyer");await page.reload({waitUntil:"domcontentloaded"});await page.waitForFunction(()=>document.body.textContent.includes("Persistent buyer"));results.push("Contact CRUD persists in PostgreSQL after reload");
- await visit("/admin/properties","Properties");await clickText("New property");await page.waitForSelector('input[placeholder="Unknown"]');await fillLabel("Title","Persistent property");await fillLabel("District","Test district");await selectLabel("Availability","Available");await clickText("Save changes");let property=await waitRow("marketing_offers","marketing_title","Persistent property");
+ await visit("/admin/properties","Properties");await clickText("New property");await page.waitForSelector('input[placeholder="Unknown"]');await fillLabel("Title","Persistent property");await fillLabel("District","Test district");await selectLabel("Availability","Available");await selectLabel("Development name","Test development");await fillLabel("Bathrooms","2");await fillLabel("Description","Approved persistent description");await clickText("Save changes");let property=await waitRow("marketing_offers","marketing_title","Persistent property");
+ await page.waitForFunction(()=>[...document.querySelectorAll("label")].some(label=>label.textContent.startsWith("Development name")&&label.querySelector("select")?.value==="Test development"));
  await rest("/rpc/link_physical_unit","POST",{p_offer:property.id,p_unit:uuid(2001),p_version:property.version});await page.reload({waitUntil:"domcontentloaded"});await page.waitForSelector('input[placeholder="Unknown"]');await clickText("Pricing");await fillLabel("Amount","420000");await selectLabel("Price type","fixed");await clickText("Save changes");await page.waitForFunction(()=>[...document.querySelectorAll("[data-sonner-toast]")].some(x=>x.textContent.includes("Saved")));
- await clickText("Media");await fillLabel("Image URL","/images/properties/hero-main.jpg");await clickText("Save changes");await waitRow("marketing_offers","cover_image_path","/images/properties/hero-main.jpg");await clickText("Publish");await waitRow("marketing_offers","publication","Published");const catalogue=await rest("/rpc/published_catalogue","POST",{},jwt("admin"));assert.equal(catalogue.length,1);results.push("Property edit, unit linking and atomic publication");
+ await clickText("Media");await fillLabel("Image URL","/images/properties/hero-main.jpg");await clickText("Save changes");await waitRow("marketing_offers","cover_image_path","/images/properties/hero-main.jpg");
+ await clickText("Website Preview");await page.waitForSelector("[data-property-detail]");await page.waitForFunction(()=>document.querySelector("[data-property-detail]")?.textContent.includes("Approved persistent description"));
+ assert.equal(await page.$eval("[data-property-detail]",e=>e.textContent.includes("Miele / Gaggenau")),false);
+ assert.equal(await page.$eval("[data-property-detail] form fieldset",e=>e.disabled),true);
+ results.push("Admin preview uses the public layout, edited details and disabled enquiry submission");
+ await clickText("Publish");await waitRow("marketing_offers","publication","Published");const catalogue=await rest("/rpc/published_catalogue","POST",{},jwt("admin"));assert.equal(catalogue.length,1);results.push("Property edit, unit linking and atomic publication");
  await visit("/admin/settings","Website settings");await fillLabel("Brand Name","Persistent brand");await clickText("Save website settings");await waitRow("site_settings","company_name","Persistent brand");
- const publicPage=await browser.newPage();await attachProxy(publicPage);await publicPage.goto(origin+"/properties",{waitUntil:"domcontentloaded"});await publicPage.waitForFunction(()=>document.body.textContent.includes("Persistent property"));await publicPage.waitForFunction(()=>document.body.textContent.includes("Persistent brand"));await publicPage.close();results.push("Anonymous catalogue and website settings use shared database records");
+ const publicPage=await browser.newPage();await attachProxy(publicPage);await publicPage.goto(origin+"/properties",{waitUntil:"domcontentloaded"});await publicPage.waitForFunction(()=>document.body.textContent.includes("Persistent property"));await publicPage.waitForFunction(()=>document.body.textContent.includes("Persistent brand"));await publicPage.goto(origin+"/properties/"+property.slug,{waitUntil:"domcontentloaded"});await publicPage.waitForSelector("[data-property-detail]");
+ assert.equal(await publicPage.$eval("[data-property-detail]",e=>e.textContent.includes("Approved persistent description")),true);
+ assert.equal(await publicPage.$eval("[data-property-detail]",e=>e.textContent.includes("Citizenship eligibility verified")),false);
+ await visit("/admin/properties/"+property.id,"Persistent property");await fillLabel("Description","Changed while the website stays open");await clickText("Save changes");await waitRow("marketing_offers","description","Changed while the website stays open");
+ await publicPage.waitForFunction(()=>document.querySelector("[data-property-detail]")?.textContent.includes("Changed while the website stays open"),{timeout:10000,polling:"mutation"});
+ results.push("Open public property details refresh after an admin save without reloading");
+ await visit("/admin/settings","Website settings");await clickText("Homepage");await fill("#cms-heroHeadline","Managed homepage headline");await clickText("Save website settings");await waitRow("site_settings","hero_headline","Managed homepage headline");await publicPage.bringToFront();await publicPage.goto(origin+"/",{waitUntil:"domcontentloaded"});await publicPage.waitForFunction(()=>document.querySelector("h1")?.textContent.includes("Managed homepage headline"));assert.equal(await publicPage.evaluate(()=>document.body.textContent.includes("Browse all 1 offers")),true);assert.equal(await publicPage.evaluate(()=>/3409821|849201|Alexander & Elena Becker|Coordinated Volume/.test(document.body.textContent)),false);await publicPage.close();results.push("Homepage heading and shared website settings follow saved admin fields");
  await visit("/admin/inquiries","Enquiries");await clickText("Add enquiry");await page.waitForSelector("form textarea");const inputs=await page.$$("form input");await inputs[0].type("Persistent enquiry");await inputs[1].type("enquiry@example.test");await page.type("form textarea","Please advise on this unit.");await clickText("Save to Inbox");await waitRow("enquiries","name","Persistent enquiry");
  for(const row of await page.$$("tbody tr"))if(await row.evaluate(node=>node.textContent.includes("Persistent enquiry"))){await row.click();break;}
  await clickText("Create buyer enquiry");await page.waitForFunction(()=>location.pathname.startsWith("/admin/leads/"));await clickText("Convert to deal");await page.waitForFunction(()=>location.pathname==="/admin/deals");let deals=await rest("/deals");assert.equal(deals.length,1);assert.equal((await rest("/deal_selected_units")).length,0);results.push("Enquiry to lead to opportunity persists without inventing selected units");
@@ -105,8 +118,13 @@ try{
  await clickText("Website pages");await clickText("Add website pages");await selectLabel("Page address","about");await fillLabel("Page title","Managed about page");await selectLabel("Website status","Published");await clickText("Save");const authored=await waitRow("content_pages","slug","about");
  await clickText("Page sections");await clickText("Add page sections");await selectLabel("Content page",authored.id);await fillLabel("Section name","intro");await page.type("form textarea","Managed first paragraph.\n\nManaged second paragraph.");await clickText("Save");await waitRow("content_sections","section_key","intro");
  const contentPage=await browser.newPage();await attachProxy(contentPage);await contentPage.goto(origin+"/about",{waitUntil:"domcontentloaded"});await contentPage.waitForFunction(()=>document.body.textContent.includes("Managed second paragraph."));await contentPage.close();results.push("Plain-text page editing is published to the website");
+ await visit("/admin/properties/"+property.id,"Persistent property");await clickText("Unpublish");await waitRow("marketing_offers","publication","Draft");
+ const hiddenPage=await browser.newPage();await attachProxy(hiddenPage);await hiddenPage.goto(origin+"/properties",{waitUntil:"domcontentloaded"});await hiddenPage.waitForFunction(()=>!document.querySelector('[role="status"]')?.textContent.includes("Loading current offers"));assert.equal(await hiddenPage.evaluate(()=>[...document.querySelectorAll("main h2")].some(h=>h.textContent.includes("Persistent property"))),false);await hiddenPage.close();results.push("Unpublishing removes the listing from public browsing");
+ 
 
  await page.click('[aria-label="Log out"]');await page.waitForSelector('input[type="email"]');await login("viewer");await visit("/admin/settings","Website settings");assert.equal(await page.$eval("#cms-fields",e=>e.disabled),true);results.push("Viewer has read-only management controls");
  assert.deepEqual(pageErrors,[]);console.log(JSON.stringify({persistentBrowserChecks:results},null,2));
-}catch(error){await mkdir("test-results",{recursive:true});await page?.screenshot({path:"test-results/backend-smoke-failure.png",fullPage:true}).catch(()=>{});console.error("Persistent browser failure:",error.message);console.error("Passed:",JSON.stringify(results));console.error("Page errors:",pageErrors);if(page)console.error(await page.evaluate(()=>document.body.innerText.slice(0,3500)).catch(()=>""));console.error(serverOutput);process.exitCode=1;}
-finally{await browser?.close();child.kill("SIGTERM");}
+}catch(error){await mkdir("test-results",{recursive:true});await page?.screenshot({path:"test-results/backend-smoke-failure.png",fullPage:true}).catch(()=>{});console.error("Persistent browser failure:",error.stack);console.error("Passed:",JSON.stringify(results));console.error("Page errors:",pageErrors);if(page)console.error(await page.evaluate(()=>document.body.innerText.slice(0,3500)).catch(()=>""));console.error("Database listing:",await rest("/marketing_offers?select=id,marketing_title,description,version,project_id,publication").catch(e=>e.message));
+ for(const tab of await browser?.pages()||[]){console.error("Tab:",tab.url(),await tab.evaluate(()=>({body:document.body.innerText.slice(-2500),toasts:[...document.querySelectorAll("[data-sonner-toast]")].map(t=>t.textContent),description:[...document.querySelectorAll("textarea")].map(t=>t.value)})).catch(()=>null));}
+ console.error(serverOutput);process.exitCode=1;}
+finally{await browser?.close();child.kill("SIGTERM");apiProxy.stop(true);}

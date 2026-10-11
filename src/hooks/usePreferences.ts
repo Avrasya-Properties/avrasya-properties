@@ -26,6 +26,8 @@ export function useLiveRates(){
 export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => void] {
   useLiveRates();
   const [currency, setCurrencyState] = useState<SupportedCurrency>("USD");
+  const [,refreshRates]=useState(0);
+  useEffect(()=>{const update=()=>refreshRates(v=>v+1);window.addEventListener("rates-updated",update);return()=>window.removeEventListener("rates-updated",update);},[]);
 
   useEffect(() => {
     try {
@@ -39,7 +41,7 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
 
     const onStorage = () => {
       const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
-      if (current) setCurrencyState(current);
+      if (["USD","EUR","TRY","GBP"].includes(current)) setCurrencyState(current);
     };
     window.addEventListener("currency-change", onStorage);
     return () => window.removeEventListener("currency-change", onStorage);

@@ -12,13 +12,15 @@ The `staff-accounts` function creates Auth users and membership only for an acti
 
 The `submit-enquiry` Edge Function is deployed as version 1 with custom publishable-key authentication. It deliberately accepts anonymous enquiries and verifies the project key, origin, consent and payload; JWT verification is disabled for this function. Internal service credentials stay in the Edge Function runtime.
 
-All 22 imported offers remain Draft. The requested administrator is created and password sign-in plus protected staff access were verified. There are no fictional live client records. The confirmed placeholder licence number was cleared. Gallery and floor-plan management is applied as `20261011154114_manage_listing_photos`; temporary account-setup transport was removed as `20261011154031_remove_completed_admin_transport`. Anonymous hosted reads, membership enforcement and advisor checks are recorded in the audit. Website/admin code remains on the review branch; main is unchanged.
+All 22 imported offers remain Draft. The requested administrator is created and password sign-in plus protected staff access were verified. There are no fictional live client records. The confirmed placeholder licence number was cleared. Gallery and floor-plan management is applied as `20261011154114_manage_listing_photos`; temporary account-setup transport was removed as `20261011154031_remove_completed_admin_transport`. Anonymous hosted reads, membership enforcement and advisor checks are recorded in the audit. The backend integration is in main. The follow-up admin/website sync repair is tracked in PR #2; deployment of the hosted website must still be verified.
+
+The sync repair adds `20261011162300_listing_website_sync` to preserve approved property highlights and include reference, bathrooms, title deed status and source notes in the public snapshot. Admin preview and public detail use the same layout. Successful saves refresh open website tabs; other devices recheck periodically. All 22 supplied offers remain Draft until explicitly published.
 
 ## Remaining activation
 1. Set Edge Function secret `WEBSITE_ALLOWED_ORIGINS` to the exact approved website origins, comma-separated. The function fails closed without it. The connected MCP does not expose secret management; configure it in [Edge Function secrets](https://supabase.com/dashboard/project/ufcpvjhzitmxgitoaolx/functions/secrets). Do not guess the production or preview domain.
 2. Configure Auth Site URL and redirect URLs, including `https://YOUR_DOMAIN/admin/recover`; configure the intended SMTP provider and disable public staff registration. Membership independently protects access.
 3. Sign in with the created administrator and add only the staff who need access. Enable compromised-password protection in Auth settings; the current advisor reports it disabled. See [Supabase password security](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
-4. Keep `VITE_ENABLE_ADMIN_DEMO=false`. Merge/deploy the reviewed application branch when ready for hosted acceptance tests.
+4. Keep `VITE_ENABLE_ADMIN_DEMO=false`. Deploy the current main branch after the reviewed fixes are merged, then run the hosted acceptance tests.
 5. Complete the post-deployment tests below: actual sign-in/recovery email, Storage transfers, website management changes and one consented test enquiry. No real account or client-data mutation is created by the read-only hosted check script.
 
 Supabase supplies the function's internal URL/service-role environment variables. Never copy service-role keys into GitHub frontend files or Vite variables. Do not run CI bootstrap/baseline/fixtures against the live project.
@@ -40,7 +42,7 @@ Authored pages use their route slug (about, services, citizenship, why-turkiye, 
 ```json
 {"paragraphs":["First paragraph.","Second paragraph."],"enquiry":true}
 ```
-Sections render in sort order. Draft/archived authored pages display an unavailable state. Built-in source pages are the default until an authored record/sections exist. No raw HTML or client JavaScript is rendered from content JSON.
+Sections render in sort order. Draft/archived authored pages display an unavailable state. Built-in source pages are the default until an authored page record exists. A published authored page displays its managed title even when no sections have been added. No raw HTML or client JavaScript is rendered from content JSON.
 
 ## Reservation expiry
 Website and team > Reservations > Release expired reservations performs the guarded release. A server scheduler can call `expire_reservations` using service-role credentials every five minutes. No external scheduler is configured or represented as active by this change. Deploy and verify a scheduled job before relying on unattended expiry.

@@ -1,8 +1,10 @@
+import {listingPreview} from "@/admin/listing-preview";
+import {PropertyDetails} from "@/components/site/PropertyDetails";
 import { managedRows,linkUnit } from "@/admin/management";
 import { rawRecord } from "@/admin/remote";
 import {decode,type Row} from "@/admin/mappers";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect,useRef, useState } from "react";
 import { toast } from "sonner";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { AVAIL, DEMO_ENABLED, uploadImage, USERS, can, fmtMoney, publishIssues, upsert, useDB, useSession, type Property } from "@/admin/store";
@@ -16,7 +18,8 @@ function Editor() {
   const [units,setUnits]=useState<Row[]>([]);const [projects,setProjects]=useState<Row[]>([]);const [unitId,setUnitId]=useState("");
   useEffect(()=>{if(DEMO_ENABLED)return;void Promise.all([managedRows("physical_units"),managedRows("projects")]).then(([units,projects])=>{setUnits(units);setProjects(projects);}).catch(error=>toast.error(error.message));},[]);
   const [d, setD] = useState<Property | undefined>(saved); const [tab, setTab] = useState<(typeof TABS)[number]>("Property details");
-  useEffect(() => { setD(saved); }, [id]);
+  const previousSaved=useRef(saved);
+  useEffect(() => {const before=previousSaved.current;setD(previous=>!previous||previous.id!==id||JSON.stringify(previous)===JSON.stringify(before)?saved:previous);previousSaved.current=saved;}, [id,saved]);
   if (!saved || !d) return <p>Property not found. <Link to="/admin/properties" className="text-brass-text">Back to listings</Link></p>;
   const ro = !can(user, "edit-inventory");
   const f = <K extends keyof Property>(k: K, v: Property[K]) => setD({ ...d, [k]: v });
@@ -34,11 +37,13 @@ function Editor() {
         {can(user, "publish") && d.publication === "Published" && <button className={btnGhost} onClick={() => save({ publication: "Draft" })}>Unpublish</button>}
       </div>} />
       <div className="mb-4 flex gap-1 overflow-x-auto border-b">{TABS.map((t) => <button key={t} onClick={() => setTab(t)} className={`whitespace-nowrap px-3 py-2 text-sm ${tab === t ? "border-b-2 border-brass font-medium" : "text-muted-foreground"}`}>{t}</button>)}</div>
-      <div className="max-w-3xl rounded-md border bg-card p-4">
+      <div className={tab==="Website Preview"?"w-full overflow-hidden rounded-md border bg-background":"max-w-3xl rounded-md border bg-card p-4"}>
         {tab === "Property details" && <div className="grid gap-3 sm:grid-cols-2">
           {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}{inp("District", "district")}{inp("City", "city")}{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
           <label className="text-sm">Development name<select disabled={ro} className={field} value={d.project} onChange={e=>f("project",e.target.value)}><option value="">Not assigned</option>{projects.map(project=><option key={String(project["id"])} value={String(project["name"])}>{String(project["name"])}</option>)}</select></label>
           {!DEMO_ENABLED&&<div className="sm:col-span-2 rounded border p-3"><label className="block text-sm">Registered apartment<select disabled={ro} className={field} value={unitId||String(rawRecord("properties",id)?.["physical_unit_id"]||"")} onChange={e=>setUnitId(e.target.value)}><option value="">No identified unit</option>{units.map(unit=><option key={String(unit["id"])} value={String(unit["id"])}>{String(unit["unit_number"])} · {String(unit["layout_label"]||"")}</option>)}</select></label><button disabled={ro||!unitId} className={btnGhost+" mt-2"} onClick={async()=>{try{if(JSON.stringify(d)!==JSON.stringify(saved))throw new Error("Save your listing changes before linking an apartment.");await linkUnit(id,unitId,Number(rawRecord("properties",id)?.["version"]));const row=rawRecord("properties",id);if(row)setD(decode("properties",{...row,project_name:d.project}));toast.success("Apartment linked");}catch(error){toast.error((error as Error).message);}}}>Link apartment</button><p className="mt-2 text-xs text-muted-foreground">Add the apartment number under Registered apartments before reserving this listing. Packages and unit types cannot be reserved as individual units.</p></div>}
+          <label className="text-sm">Istanbul side<select disabled={ro} className={field} value={d.side||"unknown"} onChange={e=>f("side",e.target.value as Property["side"])}><option value="unknown">To confirm</option><option value="Europe">European side</option><option value="Asia">Asian side</option></select></label>{inp("Title deed status","tapuStatus")}
+          <label className="text-sm sm:col-span-2">Property highlights<textarea disabled={ro} className={field+" h-24"} value={(d.highlights||[]).join("\n")} onChange={e=>f("highlights",e.target.value.split("\n"))}/><span className="text-xs text-muted-foreground">One confirmed feature per line. Empty lines are ignored when saved.</span></label>
           {inp("Gross area m²", "grossM2", "number")}{inp("Net area m²", "netM2", "number")}{inp("Area m² (basis unspecified)", "areaM2", "number")}
           <label className="text-sm">Listing type<select disabled={ro} className={field} value={d.type} onChange={(e) => f("type", e.target.value)}><option value="unit offer">Individual unit offer</option><option value="package">Packaged offer</option><option value="unit type">Unit type / not an identified unit</option><option value="ambiguous offer">Offer to confirm</option><option value="project">Development / project</option></select></label>
           <label className="text-sm">Availability<select disabled={ro} className={field} value={d.availability} onChange={(e) => f("availability", e.target.value as Property["availability"])}>{AVAIL.map((a) => <option key={a}>{a}</option>)}</select></label>
@@ -117,13 +122,8 @@ function Editor() {
           {issues.length === 0 ? <p className="text-primary">Ready to publish.</p> : <ul className="list-disc pl-5 text-destructive">{issues.map((i) => <li key={i}>{i}</li>)}</ul>}
           {!ro && d.publication === "Draft" && <button className={btnGhost} onClick={() => save({ publication: "In Review" })}>Send to review</button>}
         </div>}
-        {tab === "Website Preview" && <article className="mx-auto max-w-md">
-          <p className="mb-2 text-[11px] uppercase text-brass-text">Local preview · not public</p>
-          {d.cover ? <img src={d.cover} alt="" className="aspect-[4/3] w-full rounded-sm object-cover" /> : <div className="aspect-[4/3] rounded-sm bg-muted" />}
-          <h2 className="mt-3 font-display text-2xl">{d.title || "Untitled"}</h2><p className="text-sm text-muted-foreground">{d.district}, {d.city} · {d.layout ?? "Layout to confirm"}</p>
-          <p className="mt-2 text-lg tabular-nums">{d.priceType === "on-request" ? "Price on request" : `${d.priceType === "from" ? "From " : ""}${fmtMoney(d.amount, d.currency)}`}</p>
-          <p className="mt-2 text-sm">{d.description}</p>
-        </article>}
+        {tab==="Website Preview"&&<><div role="status" className="border-b bg-muted/40 p-4 text-sm"><strong>Website preview</strong><p>This uses the same property layout as the public website, including your unsaved edits. Contact submission is disabled here.</p><p className="mt-1">{d.publication==="Published"?"Save changes to update the public listing.":"This listing is not public. Use Publish after checking the details."}</p>{saved.publication==="Published"&&<a className="mt-2 inline-block underline" href={"/properties/"+saved.slug} target="_blank" rel="noreferrer">Open published listing</a>}</div><PropertyDetails r={listingPreview(d,rawRecord("properties",id))} preview/></>}
+
       </div>
     </>
   );

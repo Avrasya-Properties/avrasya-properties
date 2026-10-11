@@ -42,16 +42,16 @@ export const Route = createFileRoute("/")({
   head: () =>
     meta(
       "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory",
-      "Premier Istanbul property advisory for international buyers. Explore 18 curated source-verified residential developments with comprehensive legal pre-audits and Turkish Citizenship (CBI) support."
+      "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services."
     ),
   component: Home,
 });
 
 
 function Home() {
- const catalogue=useCatalogue();
+ const catalogue=useCatalogue();const settings=useSiteSettings();
  if(catalogue.isPending)return <div className="container-site py-24" role="status">Loading the property collection…</div>;
- if(!catalogue.properties.length)return <><section className="container-site py-20"><p className="eyebrow">Avrasya Properties</p><h1 className="headline mt-4 text-4xl">Your next investment starts with a conversation.</h1><p className="mt-5 max-w-xl text-muted-foreground">{catalogue.isError ? "Our online catalogue is temporarily unavailable. Our advisory team can help you with current options." : "Our team is preparing the next collection. Contact us for current opportunities."}</p><Link to="/contact" className="btn btn-primary mt-6">Speak with an advisor</Link></section><section className="container-site max-w-xl py-12"><Enquiry compact /></section></>;
+ if(!catalogue.properties.length)return <><section className="container-site py-20"><p className="eyebrow">Avrasya Properties</p><h1 className="headline mt-4 text-4xl">{settings.heroHeadline||"Your next investment starts with a conversation."}</h1><p className="mt-4 max-w-xl text-muted-foreground">{settings.heroSubtitle}</p><p className="mt-5 max-w-xl text-muted-foreground">{catalogue.isError ? "Our online catalogue is temporarily unavailable. Our advisory team can help you with current options." : "Our team is preparing the next collection. Contact us for current opportunities."}</p><Link to="/contact" className="btn btn-primary mt-6">Speak with an advisor</Link></section><section className="container-site max-w-xl py-12"><Enquiry compact /></section></>;
  return <HomeCollection properties={catalogue.properties}/>;
 }
 function HomeCollection({properties}:{properties:PropertyRecord[]}) {
@@ -62,7 +62,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
 
   const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
-  const f = FEATURED[sel]!;
+  const f = FEATURED[Math.min(sel,FEATURED.length-1)]!;
   const media = getPropertyMedia(f);
   const fp = priceDisplay(f.price);
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(f.slug);
   const fUsd = comparableUsd(f.price);
-  const fDisplayPrice = currency === "USD" ? fp.main : convertUsdPrice(fUsd, currency);
+  const fDisplayPrice = currency === "USD"||fUsd===null ? fp.main : convertUsdPrice(fUsd, currency);
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
   return (
@@ -100,16 +100,8 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                   {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
                 </span>
               </div>
-              <h1 className="display-hero">
-                <span className="split-line">
-                  <span style={{ ["--d" as string]: "150ms" }}>An Istanbul address.</span>
-                </span>
-                <span className="split-line">
-                  <em style={{ ["--d" as string]: "280ms" }} className="text-brass italic">
-                    A considered acquisition.
-                  </em>
-                </span>
-              </h1>
+              <h1 className="display-hero"><span className="split-line"><span style={{["--d" as string]:"150ms"}}>{settings.heroHeadline}</span></span></h1>
+
               <p
                 data-reveal
                 style={{ ["--d" as string]: "350ms" }}
@@ -125,22 +117,22 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                 className="mt-8 grid grid-cols-2 gap-4 border-t border-border/80 pt-6 sm:grid-cols-4"
               >
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">$120M+</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Coordinated Volume</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{properties.length}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Published offers</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">18</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Source Portfolios</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{LOCATIONS.length}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Listed districts</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">100%</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Title Deed Pre-Audit</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">Review</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Independent title checks</p>
                 </div>
                 <div>
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
                     ${settings.cbiThresholdUsd ? `${Math.round(settings.cbiThresholdUsd / 1000)}K` : "400K"}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">CBI Program Ready</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Citizenship reference amount</p>
                 </div>
               </div>
             </div>
@@ -148,7 +140,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
             {/* Direct Quick Action CTAs */}
             <div data-reveal style={{ ["--d" as string]: "400ms" }} className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
               <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
-                <span>Browse All 18 Offers</span> <ArrowRight className="h-4 w-4" />
+                <span>Browse all {properties.length} offers</span> <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/contact" className="btn btn-outline gap-1.5">
                 <span>Book Consultation</span>
@@ -176,9 +168,9 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                     <span className="rounded-xs bg-primary/90 backdrop-blur-xs px-2.5 py-1 text-xs font-semibold tracking-wider text-primary-foreground shadow-xs">
                       Spotlight · {f.location_label}
                     </span>
-                    {(fUsd ?? 0) >= 400000 && (
+                    {f.details["cbi_verified"]===true && (
                       <span className="flex items-center gap-1 rounded-xs bg-brass px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary shadow-xs">
-                        CBI Eligible ($400k+)
+                        Citizenship eligibility verified
                       </span>
                     )}
                   </div>
@@ -393,7 +385,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
           "Maslak Skyscraper District",
           "Beşiktaş Bosphorus Panorama",
           "Ataşehir Financial Center",
-          "Turkish Citizenship $400k CBI",
+          "Citizenship investment advice",
           "Topkapı Family Residences",
           "Bomontiada Cultural Axis",
           "Ataköy Marina Coastline",
@@ -410,7 +402,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
             <h2 className="headline mt-2 text-3xl md:text-4xl">Editorial portfolio selection</h2>
           </div>
           <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-            Source-advertised offers from prime European and Asian-side Istanbul corridors. Specifications, pricing, and citizenship eligibility are cross-verified before commitment.
+            Source-advertised offers from prime European and Asian-side Istanbul corridors. Confirm specifications, pricing, availability and any citizenship claims with an advisor before commitment.
           </p>
         </div>
 
@@ -426,7 +418,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
             <ArrowRight className="h-4 w-4 arrow text-brass" />
           </Link>
           <span className="text-xs text-muted-foreground">
-            Includes 1+1, 2+1, Duplex Penthouses, and Multi-unit investment packages.
+            Availability and specifications are shown for each published offer.
           </span>
         </div>
       </section>
@@ -448,13 +440,13 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
               A sovereign gateway to Türkiye: <em className="italic text-brass font-normal">Clarity before capital.</em>
             </h2>
             <p className="mt-5 text-sm md:text-base text-on-dark-muted leading-relaxed">
-              Under current Turkish regulations, foreign real estate acquisitions totaling $400,000 USD or more may qualify the investor and their immediate family for Turkish citizenship, subject to official land registry annotations and independent valuation reports.
+              The configured investment reference is {settings.cbiThresholdUsd.toLocaleString("en-US")} USD. A purchase price alone does not confirm eligibility. Confirm the applicable rules, title conditions, valuation and family requirements with an independent legal advisor before committing.
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3">
               <div>
-                <p className="eyebrow !text-brass">Legal Threshold</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">$400,000 USD</p>
+                <p className="eyebrow !text-brass">Investment reference</p>
+                <p className="font-display text-2xl font-semibold text-on-dark mt-1">${settings.cbiThresholdUsd.toLocaleString("en-US")} USD</p>
                 <p className="text-[0.7rem] text-on-dark-muted">Or TRY equivalent at transfer</p>
               </div>
               <div>
@@ -515,7 +507,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
               to="/services"
               className="group hidden text-xs font-semibold uppercase tracking-wider md:flex items-center gap-1 hover:text-brass transition-colors"
             >
-              <span>View all 10 services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
+              <span>View advisory services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
             </Link>
           </div>
 
@@ -581,104 +573,6 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
               <Link to="/services" className="font-semibold text-foreground underline hover:text-brass">
                 Explore comprehensive service catalog →
               </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Verified Private Client Track Record & Testimonials */}
-      <section className="bg-ink text-on-dark py-24 border-t border-white/10 relative overflow-hidden">
-        {/* Ambient subtle glow */}
-        <div className="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-brass/10 blur-[120px] pointer-events-none" />
-
-        <div className="container-site relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-            <div>
-              <p className="eyebrow !text-brass">Client Verification & Track Record</p>
-              <h2 className="font-display text-3xl md:text-4xl text-on-dark font-medium mt-2">
-                Trusted by international private clients and family offices.
-              </h2>
-            </div>
-            <p className="text-sm text-on-dark-muted max-w-md leading-relaxed">
-              Real cross-border transactions executed under strict fiduciary duty, verified title deeds, and documented SPK valuations.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                client: "Alexander & Elena Becker",
-                city: "Zurich, Switzerland",
-                project: "Horizon Maslak Duplex & CBI ($400k+)",
-                quote: "Navigating Turkish property from Zurich seemed fraught with conflicting developer promises. Avrasya provided an independent SPK valuation that saved us over $60k on our initial shortlist and found us an unadvertised top-floor Maslak duplex. Both passports were granted in 4 months without a single hitch.",
-                metric: "$1,250,000 USD Acquisition",
-                badge: "Citizenship Granted",
-              },
-              {
-                client: "Tariq & Fatima Al-Mansoor",
-                city: "Dubai, United Arab Emirates",
-                project: "Ataşehir Financial Center (IFC) Suite",
-                quote: "Their team coordinated the Central Bank DAB currency conversion and Land Registry title deed transfer seamlessly via power of attorney while we were in Dubai. Clean, calm, institutional service that feels like a private bank rather than a standard brokerage.",
-                metric: "Dual Portfolio Allocation",
-                badge: "Corporate Tenancy Placed",
-              },
-              {
-                client: "Oliver Sterling, CFA",
-                city: "London, United Kingdom",
-                project: "Bomonti Loft Buy-to-Let",
-                quote: "The 5-year capital gains tax exemption and rental yields in Bomonti made this an exceptional asset. Avrasya handled key holding, turnkey furnishing, and tenanted the unit to a German diplomat within three weeks of delivery.",
-                metric: "8.2% Net Yield Achieved",
-                badge: "Turnkey Management",
-              },
-            ].map((t) => (
-              <div
-                key={t.client}
-                data-reveal
-                className="rounded-xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-md flex flex-col justify-between transition-all duration-300 hover:border-brass/40 hover:bg-white/[0.07]"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4">
-                    <span className="rounded bg-brass/20 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-brass">
-                      {t.badge}
-                    </span>
-                    <span className="text-[11px] font-mono text-on-dark-muted">{t.metric}</span>
-                  </div>
-
-                  <p className="mt-5 text-sm text-on-dark leading-relaxed italic">
-                    "{t.quote}"
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-white/10">
-                  <p className="font-display text-base font-semibold text-on-dark">{t.client}</p>
-                  <p className="text-xs text-brass font-medium mt-0.5">{t.city}</p>
-                  <p className="text-[11px] text-on-dark-muted mt-1">{t.project}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Institutional Statutory Badges Strip */}
-          <div className="mt-14 rounded-xl border border-white/10 bg-white/[0.02] p-6 grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Ministry of Trade</p>
-              <p className="text-sm font-semibold text-on-dark mt-1">Taşınmaz Ticareti No. 3409821</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Licensed Real Estate Enterprise</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Chamber of Commerce</p>
-              <p className="text-sm font-semibold text-on-dark mt-1">İTO Sicil No. 849201</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Registered Istanbul Entity</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Statutory Valuation</p>
-              <p className="text-sm font-semibold text-on-dark mt-1">100% SPK Accredited</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Mandatory Valuation Audits</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Bar Association</p>
-              <p className="text-sm font-semibold text-on-dark mt-1">Independent Legal Panel</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Zero In-House Conflicts</p>
             </div>
           </div>
         </div>

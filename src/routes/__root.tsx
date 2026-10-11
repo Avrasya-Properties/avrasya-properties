@@ -12,6 +12,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { watchWebsiteChanges,PUBLIC_QUERY_KEYS } from "@/lib/website-sync";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { MotionRoot } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
@@ -93,6 +94,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router=useRouter();
+  useEffect(()=>watchWebsiteChanges(()=>{void queryClient.invalidateQueries({predicate:q=>PUBLIC_QUERY_KEYS.has(String(q.queryKey[0]))});void router.invalidate();}),[queryClient,router]);
   const isAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
   if (isAdmin) return <QueryClientProvider client={queryClient}><Outlet /></QueryClientProvider>;
   return (
