@@ -66,6 +66,8 @@ select transition_deal((select id from deals),'Offer Prepared',(select version f
 select transition_deal((select id from deals),'Offer Accepted',(select version from deals));
 select transition_deal((select id from deals),'Reserved',(select version from deals));
 select test.ok((select status from physical_units where unit_number='A-21')='Reserved','Selected unit is reserved');
+select save_offer(jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'floor_plan',null),(select version from marketing_offers where ref='TEST-1'));
+select test.ok((select published_snapshot->'details'->>'floor_plan' is null from marketing_offers where ref='TEST-1'),'Reserved listing media edits preserve availability');
 select test.ok((select status from physical_units where unit_number='A-22')='Available','Unselected unit stays available');
 select test.denied('update physical_units set status=''Available'' where unit_number=''A-21''','Direct API cannot release reserved unit');
 select transition_deal((select id from deals),'Due Diligence',(select version from deals));

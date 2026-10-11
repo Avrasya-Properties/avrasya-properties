@@ -44,7 +44,6 @@ jobs:
             if [[ "$migration" == *enable_auth_admin_transport.sql ]]; then continue; fi
             psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$migration"
           done
-          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/changes/manage_listing_photos.sql
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/backend.sql
           bun scripts/backend-concurrency.mjs
       - run: bun scripts/enquiry-endpoint-check.mjs
