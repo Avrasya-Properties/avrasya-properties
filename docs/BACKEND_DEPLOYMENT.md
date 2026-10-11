@@ -2,18 +2,24 @@
 Target: [Avrasya Supabase project](https://supabase.com/dashboard/project/ufcpvjhzitmxgitoaolx).
 
 ## Current status
-The repository implementation is reviewable. The live database still has its original eight migrations, 22 draft marketing offers, seven projects and no staff/Auth accounts at inspection. Automatic approval review rejected applying the broad permission migration because changing live policies/grants could cause lockout or disruption. No live database changes or Edge Function deployment were performed. No imported offer was published.
+On 2026-10-11, the owner explicitly approved the reviewed migration. Supabase recorded:
+- `20261011001126_admin_connection`: private authorization, scoped policies/grants, integrity checks, audit triggers and guarded RPCs.
+- `20261011001320_admin_connection_index_cleanup`: removes seven redundant non-constraint indexes while retaining equivalent original indexes and the rate-limit uniqueness constraint.
 
-Review [the SQL change](../supabase/changes/admin_connection.sql). It preserves the existing tables and inventory, adds private authorization helpers, removes bypassable legacy RPC execution, replaces permissive staff policies with scoped access, adds constraints/audit triggers and guarded RPCs. The existing source record JSON is added as provenance on matching imported offers; current imported prices and statuses are preserved.
+Both exact recorded migrations are committed under `supabase/migrations/`. The original eight remote migrations predate this integration and are not reconstructed here. The reviewed SQL remains at `supabase/changes/admin_connection.sql` for reference; do not reapply it.
 
-## Apply after approval
-1. Confirm the target project and export a database backup/snapshot. Run the preflight queries below.
-2. Generate the migration with `supabase migration new admin_connection` (inspect `supabase migration --help` for the installed CLI). Copy the reviewed SQL into that CLI-created file. Existing remote migration identifiers start with `20261011`; ensure the new generated version sorts after the existing remote history. If applying through MCP, use `apply_migration` and then retrieve/commit its recorded version, rather than inventing a migration filename.
-3. Apply the reviewed SQL as one transaction. Do not apply the CI bootstrap/baseline/fixtures. Check the migration record, security/performance advisors and authorization tests afterward.
-4. Deploy `supabase/functions/submit-enquiry/index.ts` with its deno.json. It uses custom publishable-key authentication and deliberately permits anonymous enquiries; JWT verification is disabled for this function. All database writes use a server-only service key plus a service-only validated RPC.
-5. Set the Edge Function secret `WEBSITE_ALLOWED_ORIGINS` to a comma-separated list of exact website origins, including preview origins only when needed. The function fails closed without this setting. Supabase supplies its internal URL/service-role environment variables. Never copy a service-role key to GitHub frontend files or Vite variables.
-6. Configure Auth Site URL and allowed redirect URLs, including `https://YOUR_DOMAIN/admin/recover`. Configure the intended email/SMTP provider and disable public staff registration in Auth settings. Staff membership is independently required even when Auth signup is enabled.
-7. Keep `VITE_ENABLE_ADMIN_DEMO=false`. The project URL and publishable key already identify this project; environment variables may override these public values. Build and deploy the reviewed branch only after the migration succeeds.
+The `submit-enquiry` Edge Function is deployed as version 1 with custom publishable-key authentication. It deliberately accepts anonymous enquiries and verifies the project key, origin, consent and payload; JWT verification is disabled for this function. Internal service credentials stay in the Edge Function runtime.
+
+All 22 imported offers remain Draft. There are still no Auth users/staff; first admin setup is deferred at the owner's request. Anonymous hosted reads, membership enforcement and advisor checks are recorded in the audit. Website/admin code remains on the review branch; main is unchanged.
+
+## Remaining activation
+1. Set Edge Function secret `WEBSITE_ALLOWED_ORIGINS` to the exact approved website origins, comma-separated. The function fails closed without it. The connected MCP does not expose secret management; configure it in [Edge Function secrets](https://supabase.com/dashboard/project/ufcpvjhzitmxgitoaolx/functions/secrets). Do not guess the production or preview domain.
+2. Configure Auth Site URL and redirect URLs, including `https://YOUR_DOMAIN/admin/recover`; configure the intended SMTP provider and disable public staff registration. Membership independently protects access.
+3. Create the owner's Auth account and staff membership using the procedure below.
+4. Keep `VITE_ENABLE_ADMIN_DEMO=false`. Merge/deploy the reviewed application branch when ready for hosted acceptance tests.
+5. Complete the post-deployment tests below: actual sign-in/recovery email, Storage transfers, website management changes and one consented test enquiry. No real account or client-data mutation is created by the read-only hosted check script.
+
+Supabase supplies the function's internal URL/service-role environment variables. Never copy service-role keys into GitHub frontend files or Vite variables. Do not run CI bootstrap/baseline/fixtures against the live project.
 
 ## First administrator (owner chose setup later)
 Create/invite the owner's real Auth account through Supabase Auth. Copy its UUID. In the SQL editor as the project owner, run:

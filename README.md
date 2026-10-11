@@ -1,7 +1,7 @@
 # Avrasya Properties
 React / TanStack Start website and staff workspace backed by Supabase project `ufcpvjhzitmxgitoaolx`.
 
-The backend integration is on the review branch. **The permission migration and enquiry Edge Function have not been applied to the live project.** Apply the reviewed database change before merging/deploying this branch. See [deployment instructions](docs/BACKEND_DEPLOYMENT.md).
+The database integration is applied to Supabase and the enquiry Edge Function is deployed. Website/admin code remains on the review branch. First administrator setup, exact allowed website origins and hosted acceptance checks are required before full activation. See [deployment instructions](docs/BACKEND_DEPLOYMENT.md).
 
 ## Development
 ```sh
