@@ -222,7 +222,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       highlights: [
         "Direct connection to tram, Metrobus, and E-5 transport spine",
         "Comprehensive landscaped gardens, indoor pools, and fitness club",
-        "Full title deed clearance and citizenship compliance ready",
+        "Title deed and citizenship status require independent review",
         "Underground assigned parking with 24/7 guarded security"
       ]
     };
@@ -281,9 +281,9 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/gunesli-floorplan.jpg"
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "CBI Qualified Package", "Capital Growth"],
+      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "Investment Package", "Capital Growth"],
       highlights: [
-        "Pre-audited Turkish Citizenship by Investment eligibility threshold",
+        "Citizenship suitability requires independent legal review",
         "Prime location adjacent to Metro station entrance",
         "Modern architectural compound with commercial shopping arcade",
         "High occupancy rate driven by multinational corporate tenants"
@@ -390,7 +390,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       highlights: [
         "Two independent residential units bundled under unified purchase",
         "Dual rental income stream from medical and university precinct",
-        "Meets cumulative $400,000 threshold for Turkish Citizenship",
+        "Package price does not establish citizenship eligibility",
         "Managed handover and tenant placement services provided"
       ]
     };
@@ -534,8 +534,7 @@ export function filterProperties(f: Filters, catalogue: PropertyRecord[] = prope
     if (f.layout && !matchesLayout(r, f.layout)) return false;
     if (f.type && r.record_type !== f.type) return false;
     if (f.cbiOnly) {
-      const v = comparableUsd(r.price);
-      if (v == null || v < 400000) return false;
+      if (r.details["cbi_verified"] !== true) return false;
     }
     if (b) {
       const v = comparableUsd(r.price);

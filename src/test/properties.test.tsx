@@ -14,6 +14,12 @@ describe("property rules", () => {
       expect(comparableUsd(getProperty(s)!.price)).toBeNull();
     expect(filterProperties({ budget: "300-450" }).some((r) => r.slug === "gunesli-400-offer")).toBe(false);
   });
+  it("requires recorded verification for the citizenship filter regardless of price", () => {
+    const expensive = getProperty("topkapi-two-apartment-package-480")!;
+    expect(filterProperties({ cbiOnly: true }, [expensive])).toHaveLength(0);
+    const verified = { ...expensive, details: { ...expensive.details, cbi_verified: true } };
+    expect(filterProperties({ cbiOnly: true }, [verified])).toEqual([verified]);
+  });
   it("puts unpriced records last when sorting by price", () => {
     const l = filterProperties({ sort: "price-asc" });
     expect(l[0]!.price.amount).toBe(182000);
