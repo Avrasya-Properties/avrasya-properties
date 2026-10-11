@@ -72,7 +72,7 @@ export function AdminAnalyticsPage() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Portfolio Analytics & Intelligence"
+        title="Reports & Intelligence"
         crumbs="Operations / Analytics"
         action={
           <div className="flex items-center gap-2">

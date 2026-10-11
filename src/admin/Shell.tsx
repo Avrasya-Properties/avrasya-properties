@@ -11,32 +11,32 @@ const NAV = [
     group: "Operations",
     items: [
       { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/admin/inquiries", label: "Inquiries & Inbox", icon: Inbox, badge: "inquiries" },
-      { to: "/admin/analytics", label: "Portfolio Analytics", icon: BarChart3 },
+      { to: "/admin/inquiries", label: "Enquiries", icon: Inbox, badge: "inquiries" },
+      { to: "/admin/analytics", label: "Reports", icon: BarChart3 },
     ],
   },
   {
-    group: "Property Inventory",
+    group: "Property listings",
     items: [
       { to: "/admin/properties", label: "Properties", icon: Building2 },
       { to: "/admin/projects", label: "Developments", icon: Layers },
     ],
   },
   {
-    group: "Client CRM & Pipeline",
+    group: "Clients",
     items: [
-      { to: "/admin/leads", label: "Leads Pipeline", icon: Users },
-      { to: "/admin/contacts", label: "Contacts Directory", icon: Contact2 },
-      { to: "/admin/deals", label: "Deals & Transactions", icon: Handshake },
-      { to: "/admin/calendar", label: "Viewing Calendar", icon: CalendarDays },
-      { to: "/admin/tasks", label: "Advisory Tasks", icon: CheckSquare },
+      { to: "/admin/leads", label: "Buyer enquiries", icon: Users },
+      { to: "/admin/contacts", label: "Contacts", icon: Contact2 },
+      { to: "/admin/deals", label: "Deals", icon: Handshake },
+      { to: "/admin/calendar", label: "Viewings", icon: CalendarDays },
+      { to: "/admin/tasks", label: "Tasks", icon: CheckSquare },
     ],
   },
   {
-    group: "Platform & CMS",
+    group: "Website and team",
     items: [
-      { to: "/admin/manage", label: "Management & Control", icon: Layers },
-      { to: "/admin/settings", label: "Website Content & CMS", icon: Settings2 },
+      { to: "/admin/manage", label: "Website and team", icon: Layers },
+      { to: "/admin/settings", label: "Website settings", icon: Settings2 },
     ],
   },
 ] as const;
@@ -129,7 +129,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div className="flex h-full flex-col bg-ink text-on-dark border-r border-white/10">
       <div className="flex h-[68px] items-center gap-2.5 px-4 border-b border-white/10">
         <img src="/images/avrasya-logo-white.svg" alt="Avrasya Properties" className="h-7 w-auto object-contain" />
-        <span className="rounded bg-brass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-brass">CMS</span>
+        <span className="rounded bg-brass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-brass">ADMIN</span>
       </div>
       <Nav onNav={() => setOpen(false)} />
       <div className="mt-auto p-4 border-t border-white/10 text-[11px] text-on-dark-muted/80">
@@ -137,7 +137,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <ShieldCheck className="h-3.5 w-3.5 text-brass" />
           <span>Avrasya Internal Workspace</span>
         </div>
-        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Supabase · Shared team workspace"}</p>
+        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Shared team workspace"}</p>
       </div>
     </div>
   );
@@ -185,7 +185,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <button onClick={async () => { try { await logout(); } catch(error) { toast.error((error as Error).message); } nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving to Supabase…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
       </div>
     </div>
   );

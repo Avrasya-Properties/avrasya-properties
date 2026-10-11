@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+let handler, role="admin", active=true, valid=true, profileOk=true, calls=[];
+const source=await readFile("supabase/functions/staff-accounts/index.ts","utf8");
+const mockFetch=async(url,options={})=>{calls.push({url,options});if(url.endsWith("/auth/v1/user"))return Response.json(valid?{id:"caller"}:{},{status:valid?200:401});
+if(url.includes("staff_profiles?"))return Response.json(active?[{role,is_active:true}]:[]);
+if(url.endsWith("/auth/v1/admin/users"))return Response.json({id:"created"},{status:201});
+if(url.endsWith("/rest/v1/staff_profiles"))return new Response(null,{status:profileOk?201:500});
+if(url.endsWith("/auth/v1/admin/users/created"))return new Response(null,{status:204});
+throw Error("Unexpected request: "+url);};
+new Function("Deno","fetch",new Bun.Transpiler({loader:"ts"}).transformSync(source))({env:{get:n=>({SUPABASE_URL:"https://isolated.example",SUPABASE_SERVICE_ROLE_KEY:"server-only"})[n]},serve:fn=>handler=fn},mockFetch);
+const input={email:"agent@example.test",name:"Test Agent",role:"agent",password:"isolated-fixture-only"};
+const request=(body=input,auth=true)=>new Request("https://isolated.example/functions/v1/staff-accounts",{method:"POST",headers:{"Content-Type":"application/json",...(auth?{Authorization:"Bearer caller-jwt"}:{})},body:JSON.stringify(body)});
+assert.equal((await handler(request(input,false))).status,401);assert.equal(calls.length,0);
+for(const r of ["manager","agent","viewer"]){role=r;calls=[];assert.equal((await handler(request())).status,403);assert.equal(calls.length,2);}
+role="admin";active=false;assert.equal((await handler(request())).status,403);active=true;valid=false;assert.equal((await handler(request())).status,401);valid=true;
+for(const bad of [{role:"owner"},{email:"invalid"},{password:"short"},{name:""}])assert.equal((await handler(request({...input,...bad}))).status,400);
+calls=[];const response=await handler(request());assert.equal(response.status,201);const result=await response.json();assert.equal(result.role,"agent");assert.equal("password" in result,false);
+assert.equal(calls[1].options.headers.Authorization,"Bearer caller-jwt");
+assert.equal(calls[2].options.headers.Authorization,"Bearer server-only");
+profileOk=false;calls=[];assert.equal((await handler(request())).status,500);assert.equal(calls.at(-1).options.method,"DELETE");
+console.log("PASS: team-account authorization, validation, secret separation and failed-profile cleanup");

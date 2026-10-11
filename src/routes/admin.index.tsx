@@ -58,8 +58,8 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Command Center"
-        crumbs="Operations & Pipeline"
+        title="Overview"
+        crumbs="Daily work"
         action={
           <div className="flex items-center gap-2">
             <select
@@ -86,7 +86,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Active Pipeline</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Deals in progress</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <DollarSign className="h-4 w-4" />
             </span>
@@ -188,7 +188,7 @@ export function Dashboard() {
         <section className="rounded-xl border bg-card p-5 lg:col-span-2">
           <div className="flex items-center justify-between border-b pb-3">
             <div>
-              <h2 className="text-sm font-semibold tracking-tight text-foreground">Buyer Acquisition Pipeline</h2>
+              <h2 className="text-sm font-semibold tracking-tight text-foreground">Client progress</h2>
               <p className="text-xs text-muted-foreground">Stage conversion across international purchaser leads</p>
             </div>
             <Link to="/admin/leads" className="text-xs font-medium text-brass hover:underline flex items-center">
@@ -213,7 +213,7 @@ export function Dashboard() {
           {/* Quick Listing Inventory Preview */}
           <div className="mt-6 border-t pt-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Prime Inventory Spotlight</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Featured listings</h3>
               <Link to="/admin/properties" className="text-xs text-brass hover:underline">
                 All {db.properties.length} listings →
               </Link>
@@ -335,7 +335,7 @@ export function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between border-b pb-3">
-            <h2 className="text-sm font-semibold text-foreground">Listings Awaiting Editorial Review</h2>
+            <h2 className="text-sm font-semibold text-foreground">Listings to review</h2>
             <Link to="/admin/properties" className="text-xs text-brass hover:underline">
               Inventory →
             </Link>

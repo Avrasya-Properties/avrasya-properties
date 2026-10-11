@@ -16,7 +16,7 @@ function Login(){
  async function forgot(){if(DEMO_ENABLED){setNotice("Demo password: "+DEMO_PASSWORD);return;}setBusy(true);setErr("");try{await resetPassword(email);setNotice("If this email is registered, a password reset link will arrive.");}catch(error){setErr((error as Error).message);}finally{setBusy(false);}}
  return <div className="flex min-h-screen items-center justify-center bg-background p-4 font-sans"><div className="w-full max-w-md rounded-md border bg-card p-6">
  <img src="/images/avrasya-logo.svg" alt="Avrasya Properties" className="mb-5 h-10 w-auto object-contain"/><h1 className="text-lg font-semibold">Sign in to the workspace</h1>
- <p className="mb-4 text-xs text-muted-foreground">{DEMO_ENABLED?"Use fictional information only. Demo accounts, not secure authentication.":"Use your registered staff account. Access is checked by Supabase."}</p>
+ <p className="mb-4 text-xs text-muted-foreground">{DEMO_ENABLED?"Use fictional information only. Demo accounts, not secure authentication.":"Use your team email and password."}</p>
  <form data-ready={ready} onSubmit={submit}><fieldset disabled={!ready||busy} className="space-y-3">
  <label className="block text-sm">Email<input className={field} type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/></label>
  <label className="block text-sm">Password<div className="flex gap-2"><input className={field} type={show?"text":"password"} autoComplete="current-password" required value={pw} onChange={e=>setPw(e.target.value)}/><button type="button" className="text-xs text-brass-text" onClick={()=>setShow(!show)}>{show?"Hide":"Show"}</button></div></label>

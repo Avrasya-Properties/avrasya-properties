@@ -1,6 +1,6 @@
 import { managedRows,linkUnit } from "@/admin/management";
 import { rawRecord } from "@/admin/remote";
-import type { Row } from "@/admin/mappers";
+import {decode,type Row} from "@/admin/mappers";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -8,14 +8,14 @@ import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { AVAIL, DEMO_ENABLED, uploadImage, USERS, can, fmtMoney, publishIssues, upsert, useDB, useSession, type Property } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/properties/$id")({ component: Editor });
-const TABS = ["Essentials", "Pricing", "Media", "Source & Review", "Website Preview"] as const;
+const TABS = ["Property details", "Pricing", "Media", "Checks and notes", "Website Preview"] as const;
 
 function Editor() {
   const { id } = Route.useParams(); const db = useDB(); const user = useSession();
   const saved = db.properties.find((p) => p.id === id);
-  const [units,setUnits]=useState<Row[]>([]);const [unitId,setUnitId]=useState("");
-  useEffect(()=>{if(DEMO_ENABLED)return;void managedRows("physical_units").then(setUnits).catch(error=>toast.error(error.message));},[]);
-  const [d, setD] = useState<Property | undefined>(saved); const [tab, setTab] = useState<(typeof TABS)[number]>("Essentials");
+  const [units,setUnits]=useState<Row[]>([]);const [projects,setProjects]=useState<Row[]>([]);const [unitId,setUnitId]=useState("");
+  useEffect(()=>{if(DEMO_ENABLED)return;void Promise.all([managedRows("physical_units"),managedRows("projects")]).then(([units,projects])=>{setUnits(units);setProjects(projects);}).catch(error=>toast.error(error.message));},[]);
+  const [d, setD] = useState<Property | undefined>(saved); const [tab, setTab] = useState<(typeof TABS)[number]>("Property details");
   useEffect(() => { setD(saved); }, [id]);
   if (!saved || !d) return <p>Property not found. <Link to="/admin/properties" className="text-brass-text">Back to inventory</Link></p>;
   const ro = !can(user, "edit-inventory");
@@ -24,23 +24,23 @@ function Editor() {
   const save = async (patch: Partial<Property> = {}) => { try { const n = await upsert<Property>("properties", { ...d, ...patch }); setD(n); toast.success("Saved"); } catch (e) { toast.error((e as Error).message); } };
   const issues = publishIssues(d, db.properties);
   const inp = (label: string, k: keyof Property, type = "text") => (
-    <label className="text-sm">{label}<input disabled={ro} type={type} className={field} value={(d[k] as string | number | null) ?? ""} onChange={(e) => f(k, (type === "number" ? num(e.target.value) : e.target.value) as never)} placeholder={type === "number" ? "Unknown" : ""} /></label>
+    <label className="text-sm">{label}<input disabled={ro} type={type} step={type==="number"?"any":undefined} className={field} value={(d[k] as string | number | null) ?? ""} onChange={(e) => f(k, (type === "number" ? num(e.target.value) : e.target.value) as never)} placeholder={type === "number" ? "Unknown" : ""} /></label>
   );
   return (
     <>
       <PageHead title={d.title || "Untitled property"} crumbs={`Inventory / Properties / ${d.ref}`} action={!ro && <div className="flex gap-2">
         <button className={btnGhost} onClick={() => save()}>Save changes</button>
-        {can(user, "publish") && d.publication !== "Published" && <button className={btnPrimary} onClick={() => issues.length ? (setTab("Source & Review"), toast.error("Publishing blocked — see fix list")) : save({ publication: "Published" })}>Publish</button>}
+        {can(user, "publish") && d.publication !== "Published" && <button className={btnPrimary} onClick={() => issues.length ? (setTab("Checks and notes"), toast.error("Publishing blocked — see fix list")) : save({ publication: "Published" })}>Publish</button>}
         {can(user, "publish") && d.publication === "Published" && <button className={btnGhost} onClick={() => save({ publication: "Draft" })}>Unpublish</button>}
       </div>} />
       <div className="mb-4 flex gap-1 overflow-x-auto border-b">{TABS.map((t) => <button key={t} onClick={() => setTab(t)} className={`whitespace-nowrap px-3 py-2 text-sm ${tab === t ? "border-b-2 border-brass font-medium" : "text-muted-foreground"}`}>{t}</button>)}</div>
       <div className="max-w-3xl rounded-md border bg-card p-4">
-        {tab === "Essentials" && <div className="grid gap-3 sm:grid-cols-2">
-          {inp("Title", "title")}{inp("Slug", "slug")}{inp("Reference", "ref")}{inp("District", "district")}{inp("City", "city")}{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
-          <label className="text-sm">Development name<input disabled={ro} className={field} value={d.project} onChange={e=>f("project",e.target.value)} placeholder="Use a registered development name"/></label>
-          {!DEMO_ENABLED&&<div className="sm:col-span-2 rounded border p-3"><label className="block text-sm">Verified physical unit<select disabled={ro} className={field} value={unitId||String(rawRecord("properties",id)?.["physical_unit_id"]||"")} onChange={e=>setUnitId(e.target.value)}><option value="">No identified unit</option>{units.map(unit=><option key={String(unit["id"])} value={String(unit["id"])}>{String(unit["unit_number"])} · {String(unit["layout_label"]||"")}</option>)}</select></label><button disabled={ro||!unitId} className={btnGhost+" mt-2"} onClick={async()=>{try{await linkUnit(id,unitId,Number(rawRecord("properties",id)?.["version"]));toast.success("Physical unit linked");}catch(error){toast.error((error as Error).message);}}}>Link verified unit</button><p className="mt-2 text-xs text-muted-foreground">Create the actual unit number in Management before reserving this offer. Packages and unit types cannot be reserved as individual units.</p></div>}
+        {tab === "Property details" && <div className="grid gap-3 sm:grid-cols-2">
+          {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}{inp("District", "district")}{inp("City", "city")}{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
+          <label className="text-sm">Development name<select disabled={ro} className={field} value={d.project} onChange={e=>f("project",e.target.value)}><option value="">Not assigned</option>{projects.map(project=><option key={String(project["id"])} value={String(project["name"])}>{String(project["name"])}</option>)}</select></label>
+          {!DEMO_ENABLED&&<div className="sm:col-span-2 rounded border p-3"><label className="block text-sm">Registered apartment<select disabled={ro} className={field} value={unitId||String(rawRecord("properties",id)?.["physical_unit_id"]||"")} onChange={e=>setUnitId(e.target.value)}><option value="">No identified unit</option>{units.map(unit=><option key={String(unit["id"])} value={String(unit["id"])}>{String(unit["unit_number"])} · {String(unit["layout_label"]||"")}</option>)}</select></label><button disabled={ro||!unitId} className={btnGhost+" mt-2"} onClick={async()=>{try{if(JSON.stringify(d)!==JSON.stringify(saved))throw new Error("Save your listing changes before linking an apartment.");await linkUnit(id,unitId,Number(rawRecord("properties",id)?.["version"]));const row=rawRecord("properties",id);if(row)setD(decode("properties",{...row,project_name:d.project}));toast.success("Apartment linked");}catch(error){toast.error((error as Error).message);}}}>Link apartment</button><p className="mt-2 text-xs text-muted-foreground">Add the apartment number under Registered apartments before reserving this listing. Packages and unit types cannot be reserved as individual units.</p></div>}
           {inp("Gross area m²", "grossM2", "number")}{inp("Net area m²", "netM2", "number")}{inp("Area m² (basis unspecified)", "areaM2", "number")}
-          <label className="text-sm">Record type<select disabled={ro} className={field} value={d.type} onChange={(e) => f("type", e.target.value)}><option value="unit offer">Individual unit offer</option><option value="package">Packaged offer</option><option value="unit type">Unit type / not an identified unit</option><option value="ambiguous offer">Offer to confirm</option><option value="project">Development / project</option></select></label>
+          <label className="text-sm">Listing type<select disabled={ro} className={field} value={d.type} onChange={(e) => f("type", e.target.value)}><option value="unit offer">Individual unit offer</option><option value="package">Packaged offer</option><option value="unit type">Unit type / not an identified unit</option><option value="ambiguous offer">Offer to confirm</option><option value="project">Development / project</option></select></label>
           <label className="text-sm">Availability<select disabled={ro} className={field} value={d.availability} onChange={(e) => f("availability", e.target.value as Property["availability"])}>{AVAIL.map((a) => <option key={a}>{a}</option>)}</select></label>
           <label className="text-sm">Agent<select disabled={ro} className={field} value={d.agentId} onChange={(e) => f("agentId", e.target.value)}>{USERS.filter((u) => u.role !== "viewer").map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}</select></label>
           <label className="text-sm sm:col-span-2">Description<textarea disabled={ro} className={`${field} h-28 py-2`} value={d.description} onChange={(e) => f("description", e.target.value)} /></label>
@@ -54,11 +54,11 @@ function Editor() {
           <p className="text-xs text-muted-foreground sm:col-span-2">No automatic currency conversion is performed.</p>
         </div>}
         {tab === "Media" && <div>
-          <p className="mb-2 text-xs text-muted-foreground">Select a high-resolution project visual preset or upload a cover (JPEG, PNG or WebP, up to {DEMO_ENABLED ? "1 MB" : "5 MB"}). {DEMO_ENABLED ? "Demo uploads remain in this browser." : "Uploads are stored in Supabase Storage."}</p>
+          <p className="mb-2 text-xs text-muted-foreground">Upload a property cover photo (JPEG, PNG or WebP, up to {DEMO_ENABLED ? "1 MB" : "5 MB"}). {DEMO_ENABLED ? "Demo uploads remain in this browser." : "Uploads are stored in Supabase Storage."}</p>
           {!ro && (
             <div className="space-y-4">
-              <div>
-                <p className="mb-2 text-xs font-semibold text-foreground uppercase tracking-wider">Stock Architectural Library</p>
+              {DEMO_ENABLED&&<div>
+                <p className="mb-2 text-xs font-semibold text-foreground uppercase tracking-wider">Example images</p>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                   {[
                     { label: "Bosphorus Hero", url: "/images/properties/hero-main.jpg" },
@@ -85,13 +85,21 @@ function Editor() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div>}
+              <label className="block text-sm">Image URL<input className={field} value={d.cover||""} onChange={e=>f("cover",e.target.value||null)} placeholder="Paste an uploaded image link"/><span className="text-xs text-muted-foreground">Use a property photo or upload one below.</span></label>
               <div className="pt-2 border-t">
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Custom Upload</p>
                 <input type="file" accept="image/jpeg,image/png,image/webp" onChange={async (e) => { const file=e.target.files?.[0];if(!file)return;try{if(DEMO_ENABLED){if(file.size>1e6)throw new Error("Demo cover exceeds 1 MB.");const reader=new FileReader();reader.onerror=()=>toast.error("The image could not be read");reader.onload=()=>f("cover",reader.result as string);reader.readAsDataURL(file);}else{f("cover",await uploadImage(file));toast.success("Image uploaded. Save the listing to apply it.");}}catch(error){toast.error((error as Error).message);}}} />
               </div>
             </div>
           )}
+          {!ro&&<div className="mt-5 space-y-3 border-t pt-4">
+            <h3 className="font-medium">Photo gallery</h3><p className="text-xs text-muted-foreground">Upload the listing's photos. Save changes when finished.</p>
+            <input aria-label="Upload gallery photos" type="file" multiple accept="image/jpeg,image/png,image/webp" disabled={DEMO_ENABLED} onChange={async e=>{const files=Array.from(e.target.files||[]);if((d.galleryImages?.length||0)+files.length>20){toast.error("Use up to 20 gallery photos.");return;}for(const file of files){try{const url=await uploadImage(file);setD(old=>old?{...old,galleryImages:[...(old.galleryImages||[]),url]}:old);}catch(error){toast.error((error as Error).message);break;}}}}/>
+            <div className="grid grid-cols-3 gap-2">{(d.galleryImages||[]).map((url,index)=><div key={url+index}><img src={url} alt={"Property photo "+(index+1)} className="aspect-[4/3] w-full rounded object-cover"/><button className="text-xs text-destructive" onClick={()=>f("galleryImages",d.galleryImages?.filter((_,i)=>i!==index))}>Remove photo {index+1}</button></div>)}</div>
+            <label className="block text-sm">Floor plan image link<input className={field} value={d.floorPlan||""} onChange={e=>f("floorPlan",e.target.value||null)}/></label>
+            <label className="block text-sm">Upload a floor plan<input type="file" accept="image/jpeg,image/png,image/webp" disabled={DEMO_ENABLED} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;try{f("floorPlan",await uploadImage(file));}catch(error){toast.error((error as Error).message);}}}/></label>
+          </div>}
           {d.cover && (
             <div className="mt-4 pt-4 border-t">
               <p className="text-xs font-medium text-muted-foreground mb-1">Active Cover Image:</p>
@@ -100,7 +108,7 @@ function Editor() {
             </div>
           )}
         </div>}
-        {tab === "Source & Review" && <div className="space-y-3 text-sm">
+        {tab === "Checks and notes" && <div className="space-y-3 text-sm">
           <p>Publication: <Status v={d.publication} /> · Availability: <Status v={d.availability} /> <span className="text-xs text-muted-foreground">(independent)</span></p>
           {d.sourceNote && <p className="rounded-sm border border-brass bg-warn-bg p-2 text-xs">Source claims requiring confirmation: {d.sourceNote}</p>}
           <label className="block text-sm">Source claims requiring confirmation<textarea disabled={ro} className={`${field} mt-1 h-24 py-2`} value={d.sourceNote ?? ""} onChange={(e) => f("sourceNote", e.target.value)} /></label>

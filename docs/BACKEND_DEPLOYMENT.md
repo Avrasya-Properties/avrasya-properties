@@ -21,16 +21,10 @@ All 22 imported offers remain Draft. There are still no Auth users/staff; first 
 
 Supabase supplies the function's internal URL/service-role environment variables. Never copy service-role keys into GitHub frontend files or Vite variables. Do not run CI bootstrap/baseline/fixtures against the live project.
 
-## First administrator (owner chose setup later)
-Create/invite the owner's real Auth account through Supabase Auth. Copy its UUID. In the SQL editor as the project owner, run:
-```sql
-insert into public.staff_profiles(id,email,name,role,is_active)
-select id,email,'OWNER NAME','admin',true
-from auth.users
-where id='REPLACE_WITH_AUTH_USER_UUID'::uuid
-on conflict(id) do nothing;
-```
-Check that exactly one intended user was added. No shared/demo production password is created. The owner can then add staff profiles for existing Auth users in Management > Staff access. Roles are protected database membership, never user-editable Auth metadata. The last active administrator cannot be disabled/demoted.
+## Administrator and team accounts
+The requested administrator was created in Supabase Auth and verified through password sign-in and protected staff reads: admin@avrasyaproperties.com. The password supplied by the owner is not stored in this repository. The one-time setup endpoint is disabled.
+
+Administrators create real accounts under Website and team > Team accounts. Enter the person's name, email, role and a private temporary password of at least 12 characters. Email confirmation is completed during this administrator-only setup. Share credentials privately. Existing accounts can be disabled or their role changed; email changes require updating Auth and the profile together through an owner-reviewed process. The last active administrator cannot be disabled or demoted.
 
 ## Publishing inventory
 Imported offers remain drafts. Review title, price basis, currency, location, source uncertainties and media before publication. Marketing packages, unit types and ambiguous offers are not physical units. Create the actual building/unit identity in Management and link an individual offer before reserving it. Marking a deal won changes only selected units to Sold/Rented according to the listing mode; it does not record payment receipt.
@@ -40,14 +34,14 @@ Staff accounts are checked against an active membership, existing Auth user and 
 ## Website content
 Company profile/contact/hero/rates/announcement fields are shared settings. Services and FAQs publish from their own tables. Catalogue download paths must point to a public-marketing object or an existing site `/downloads/` path.
 
-Authored pages use their route slug (about, services, citizenship, why-turkiye, investment-in-turkiye, investment-catalog). Create content sections for the page. Supported `content_json`:
+Authored pages use their route slug (about, services, citizenship, why-turkiye, investment-in-turkiye, investment-catalog). Create content sections for the page. The page editor handles paragraphs and the contact-form switch without requiring JSON. Stored format:
 ```json
 {"paragraphs":["First paragraph.","Second paragraph."],"enquiry":true}
 ```
 Sections render in sort order. Draft/archived authored pages display an unavailable state. Built-in source pages are the default until an authored record/sections exist. No raw HTML or client JavaScript is rendered from content JSON.
 
 ## Reservation expiry
-Management > Reservations > Release expired reservations performs the guarded release. A server scheduler can call `expire_reservations` using service-role credentials every five minutes. No external scheduler is configured or represented as active by this change. Deploy and verify a scheduled job before relying on unattended expiry.
+Website and team > Reservations > Release expired reservations performs the guarded release. A server scheduler can call `expire_reservations` using service-role credentials every five minutes. No external scheduler is configured or represented as active by this change. Deploy and verify a scheduled job before relying on unattended expiry.
 
 ## Optional CAPTCHA
 The endpoint supports `TURNSTILE_SECRET_KEY` and a `captchaToken` payload. The current public form does not render a challenge widget; do not enable that secret until the widget/site key is connected. Baseline controls are validation, consent, honeypot, hashed-IP rate limiting, origin checks and idempotent receipts.

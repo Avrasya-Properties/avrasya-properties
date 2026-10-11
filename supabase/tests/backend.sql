@@ -47,6 +47,11 @@ select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-
 set local role authenticated;
 select save_offer('{"ref":"TEST-1","cover_image_path":"/images/test.jpg","slug":"verified-unit","marketing_title":"Verified unit","district":"Istanbul","city":"Istanbul","record_type":"unit_offer","mode":"sale","price_type":"fixed","amount":420000,"currency":"USD","availability":"Available","publication":"Published"}',null);
 select test.ok((select count(*) from published_catalogue())=1,'Manager publication creates one public snapshot');
+select save_offer(jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'gallery_images',jsonb_build_array('https://approved.example/photo.jpg'),'floor_plan','https://approved.example/plan.jpg'),(select version from marketing_offers where ref='TEST-1'));
+select test.ok((select source_record->'details'->'gallery_images'->>0 from marketing_offers where ref='TEST-1')='https://approved.example/photo.jpg','Listing gallery is saved');
+select test.ok((select published_snapshot->'details'->>'floor_plan' from marketing_offers where ref='TEST-1')='https://approved.example/plan.jpg','Published floor plan follows saved listing');
+select test.denied(format('select save_offer(%L::jsonb,%s)',jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'gallery_images',jsonb_build_array('javascript:alert(1)')),(select version from marketing_offers where ref='TEST-1')),'Unsafe gallery links rejected');
+
 select test.denied(format('select save_offer(%L::jsonb,0)',jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'marketing_title','Stale edit')),'Stale offer edits are rejected');
 select link_physical_unit((select id from marketing_offers where ref='TEST-1'),'00000000-0000-4000-8000-000000002001',(select version from marketing_offers where ref='TEST-1'));
 insert into leads(id,contact_id,assigned_agent_id,stage,shortlist) values('00000000-0000-4000-8000-000000003001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000003','Qualified',array[(select id from marketing_offers where ref='TEST-1')]);

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { 
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company Profile", "Homepage & CMS", "Currency & Rates", "Backup & Restore"] as const;
+const TABS = ["Company Profile", "Homepage", "Exchange rates", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
@@ -103,26 +103,29 @@ export function AdminSettingsPage() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Website Content & CMS"
+        title="Website settings"
         crumbs="Platform / Settings"
         action={
           <div className="flex items-center gap-2">
             <button
-              disabled={!editable}
+              disabled={!editable || !dirty}
               onClick={handleSave}
               className={btnPrimary}
             >
               <Save className="h-3.5 w-3.5" />
-              <span>Save CMS Changes</span>
+              <span>Save website settings</span>
             </button>
           </div>
         }
       />
 
       <p role="status" className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
-        {DEMO_ENABLED ? "Browser demo. Use fictional data only." : "Changes are saved to Supabase and shared with the public website."}
+        {DEMO_ENABLED ? "Browser demo. Use fictional data only." : "Saved changes appear on the website."}
         {!editable && " Your role has read-only access."}
       </p>
+      <div className="flex flex-wrap gap-2">
+        {([["content_pages","Website pages"],["content_sections","Page sections"],["services","Services"],["faqs","Questions and answers"],["catalog_documents","Brochures"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section}} className={btnGhost}>{label}</Link>)}
+      </div>
       {/* Tabs */}
       <div className="flex gap-1 overflow-x-auto border-b">
         {TABS.map((t) => (
@@ -147,7 +150,7 @@ export function AdminSettingsPage() {
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
               <Building2 className="h-4 w-4 text-brass" />
-              <span>Corporate & Headquarters Identity</span>
+              <span>Company details</span>
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -226,7 +229,7 @@ export function AdminSettingsPage() {
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
               <Globe2 className="h-4 w-4 text-brass" />
-              <span>Direct Client Communication Channels</span>
+              <span>Contact details</span>
             </h2>
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
@@ -264,8 +267,8 @@ export function AdminSettingsPage() {
         </div>
       )}
 
-      {/* TAB 2: Homepage & CMS */}
-      {tab === "Homepage & CMS" && (
+      {/* TAB 2: Homepage */}
+      {tab === "Homepage" && (
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
@@ -365,8 +368,8 @@ export function AdminSettingsPage() {
         </div>
       )}
 
-      {/* TAB 3: Currency & Rates */}
-      {tab === "Currency & Rates" && (
+      {/* TAB 3: Exchange rates */}
+      {tab === "Exchange rates" && (
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
@@ -434,8 +437,8 @@ export function AdminSettingsPage() {
       )}
 
       </fieldset>
-      {/* TAB 4: Backup & Restore */}
-      {tab === "Backup & Restore" && (
+      {/* TAB 4: Export data */}
+      {tab === "Export data" && (
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
@@ -447,11 +450,11 @@ export function AdminSettingsPage() {
             <div className="flex flex-wrap gap-3">
               <button disabled={!isAdmin} onClick={handleDownloadBackup} className={btnPrimary}>
                 <Download className="h-4 w-4" />
-                <span>Export JSON Backup</span>
+                <span>Download records</span>
               </button>
               <button disabled={!isAdmin || !DEMO_ENABLED} onClick={() => setIsImportOpen(!isImportOpen)} className={btnGhost}>
                 <Upload className="h-4 w-4" />
-                <span>Restore from JSON</span>
+                <span>Restore demo records</span>
               </button>
             </div>
 
@@ -487,7 +490,7 @@ export function AdminSettingsPage() {
               className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-destructive/40 bg-destructive/10 px-3 text-sm font-medium text-destructive hover:bg-destructive/20"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              <span>Reset to Seed State</span>
+              <span>Reset demo data</span>
             </button>
           </div>
         </div>

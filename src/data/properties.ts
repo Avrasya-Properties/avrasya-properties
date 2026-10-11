@@ -561,4 +561,11 @@ export const humanKey = (k: string) =>
 export const getProperty = (slug: string) => properties.find((r) => r.slug === slug);
 
 
-export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {const media=originalPropertyMedia(r);return r.cover?{...media,cover:r.cover,gallery:[r.cover,...media.gallery.filter(x=>x!==r.cover)]}:media;}
+export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {
+ const media=originalPropertyMedia(r);
+ const custom=r.details["gallery_images"];
+ const gallery=Array.isArray(custom)?custom.filter((x):x is string=>typeof x==="string"):media.gallery;
+ const result={...media,cover:r.cover||media.cover,gallery:r.cover?[r.cover,...gallery.filter(x=>x!==r.cover)]:gallery};
+ if(r.details["floor_plan"]===null)delete result.floorPlan;else if(typeof r.details["floor_plan"]==="string")result.floorPlan=r.details["floor_plan"];
+ return result;
+}

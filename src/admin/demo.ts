@@ -22,6 +22,7 @@ export const SOURCES = ["Website", "WhatsApp", "Phone", "Referral", "Walk-in", "
 export type Currency = "USD" | "TRY" | "EUR" | "GBP";
 
 export type Property = {
+  galleryImages?: string[]; floorPlan?: string | null;
   id: string; ref: string; slug: string; title: string; district: string; city: string; type: string;
   layout: string | null; bathrooms: number | null; grossM2: number | null; netM2: number | null; areaM2: number | null;
   amount: number | null; currency: Currency | null; mode: "sale" | "rent"; priceType: "fixed" | "from" | "on-request"; priceBasis?: string;
@@ -81,7 +82,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   companyName: "Avrasya Properties Group",
   registeredEntity: "Avrasya Properties Group",
   taxOffice: "Üsküdar / İstanbul",
-  licenseNo: "İTO-34-78921",
+  licenseNo: "",
   tagline: "Your Future Starts with the Right Investment.",
   email: "info@avrasyaproperties.com",
   phone: "+90 545 924 80 42",

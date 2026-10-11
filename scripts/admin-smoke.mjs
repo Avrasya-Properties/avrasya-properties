@@ -118,8 +118,8 @@ try {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")).properties.some((property) => property.title === "Smoke Test Unit" && property.cover && property.amount === 420000));
   results.push("Property details, price and cover editing");
 
-  await visit("/admin/inquiries", "Consultations & Inquiries");
-  await clickText("Log Client Inquiry");
+  await visit("/admin/inquiries", "Enquiries");
+  await clickText("Add enquiry");
   await page.waitForSelector("form textarea");
   const inputs = await page.$$("form input");
   await inputs[0].type("Smoke Test Buyer");
@@ -131,7 +131,7 @@ try {
   for (const element of row) {
     if (await element.evaluate((node) => node.textContent.includes("Smoke Test Buyer"))) { await element.click(); break; }
   }
-  await clickText("Convert to CRM Lead");
+  await clickText("Create buyer enquiry");
   await page.waitForFunction(() => location.pathname.startsWith("/admin/leads/"));
   await clickText("Convert to deal");
   await page.waitForFunction(() => location.pathname === "/admin/deals");
@@ -191,26 +191,26 @@ try {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")).tasks.some((task) => task.title === "Smoke Test Task" && task.done));
   results.push("Task creation and completion");
 
-  for (const [path, heading] of [["/admin/projects", "Projects"], ["/admin/analytics", "Portfolio Analytics & Intelligence"]]) {
+  for (const [path, heading] of [["/admin/projects", "Projects"], ["/admin/analytics", "Reports & Intelligence"]]) {
     await visit(path, heading);
   }
   results.push("Projects and analytics load");
 
-  await visit("/admin/settings", "Website Content & CMS");
+  await visit("/admin/settings", "Website settings");
   await fillLabel("Brand Name", "Smoke Test Brand");
-  await clickText("Save CMS Changes");
+  await clickText("Save website settings");
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("avrasya-admin-db-v4")).siteSettings.companyName === "Smoke Test Brand");
   results.push("CMS setting persistence");
 
   await page.click('[aria-label="Log out"]');
   await page.waitForSelector('input[type="email"]');
   await login("viewer");
-  await visit("/admin/settings", "Website Content & CMS");
+  await visit("/admin/settings", "Website settings");
   assert.equal(await page.$eval("#cms-fields", (element) => element.disabled), true);
-  const saveDisabled = await page.evaluate(() => [...document.querySelectorAll("button")].find((button) => button.textContent.trim() === "Save CMS Changes")?.disabled);
+  const saveDisabled = await page.evaluate(() => [...document.querySelectorAll("button")].find((button) => button.textContent.trim() === "Save website settings")?.disabled);
   assert.equal(saveDisabled, true);
-  await clickText("Backup & Restore");
-  const backupDisabled = await page.evaluate(() => [...document.querySelectorAll("button")].find((button) => button.textContent.trim() === "Export JSON Backup")?.disabled);
+  await clickText("Export data");
+  const backupDisabled = await page.evaluate(() => [...document.querySelectorAll("button")].find((button) => button.textContent.trim() === "Download records")?.disabled);
   assert.equal(backupDisabled, true);
   results.push("Viewer cannot modify CMS or export backups");
 

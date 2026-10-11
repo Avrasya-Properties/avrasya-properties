@@ -128,7 +128,7 @@ export function AdminInquiriesPage() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Consultations & Inquiries"
+        title="Enquiries"
         crumbs="Operations / Inbox"
         action={
           <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export function AdminInquiriesPage() {
               disabled={!can(user, "edit-crm")}
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Log Client Inquiry</span>
+              <span>Add enquiry</span>
             </button>
           </div>
         }
@@ -267,7 +267,7 @@ export function AdminInquiriesPage() {
                               disabled={!can(user, "edit-crm", inq.agentId) || (user?.role === "agent" && inq.agentId !== user.id)}
                               onClick={() => handleConvertToLead(inq.id)}
                               className="rounded p-1 text-brass hover:bg-brass/10"
-                              title="Convert to CRM Lead"
+                              title="Create buyer enquiry"
                             >
                               <UserPlus className="h-4 w-4" />
                             </button>
@@ -319,12 +319,12 @@ export function AdminInquiriesPage() {
                 <p>{selectedInquiry.message || "No message body provided."}</p>
               </div>
 
-              {selectedInquiry.propertySlug && (
+              {selectedInquiry.propertyWeb address ending && (
                 <div className="rounded-lg border p-3 bg-card text-xs">
                   <p className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Attached Listing:</p>
                   <Link
                     to="/properties/$slug"
-                    params={{ slug: selectedInquiry.propertySlug }}
+                    params={{ slug: selectedInquiry.propertyWeb address ending }}
                     target="_blank"
                     className="flex items-center gap-1.5 text-brass hover:underline font-medium"
                   >
@@ -361,7 +361,7 @@ export function AdminInquiriesPage() {
                     className={`${btnPrimary} w-full justify-center`}
                   >
                     <UserPlus className="h-4 w-4" />
-                    <span>Convert to CRM Lead</span>
+                    <span>Create buyer enquiry</span>
                   </button>
                 )}
                 <div className="flex gap-2">
