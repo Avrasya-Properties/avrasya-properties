@@ -18,11 +18,13 @@
 ## 2. Relational Database Schema
 
 ### Core & Staff Auth
+
 - `staff_profiles`: Authoritative staff records linked to Supabase Auth (`auth.users`).
   - Roles: `admin`, `manager`, `agent`, `viewer`.
   - Guard Trigger: `guard_last_admin` prevents removal or demotion of the final active administrator.
 
 ### Inventory Domain
+
 - `developers`: Property development companies.
 - `projects`: Master developments with location metadata.
 - `buildings`: Blocks / towers within projects.
@@ -40,6 +42,7 @@
 - `property_slug_redirects`: Tracks 301/302 redirects when URLs change.
 
 ### CRM Domain
+
 - `contacts`: Buyers, investors, tenants, landlords, vendors.
 - `buyer_requirements`: Structured search criteria (districts, budget range, bedrooms, CBI intent).
 - `contact_shortlists`: Properties favorited by buyers (separate from contracted units).
@@ -49,6 +52,7 @@
 - `tasks`, `viewings`, `activities`, `notes`: CRM interaction tracking.
 
 ### Transactions Domain
+
 - `deals`: Sales and lease transactions.
 - `deal_selected_units`: The exact physical units and offers subject to this transaction.
 - `reservations`: Time-limited property holds (with locking and auto-expiry).
@@ -56,6 +60,7 @@
 - `commission_allocations`: Agent fee distributions.
 
 ### Rental Management Domain
+
 - `leases`: Tenancy contracts with duration, rental rate, and payment due day.
   - Guard Trigger: `check_overlapping_lease` rejects overlapping tenancies on the same physical unit.
 - `rent_charges`: Monthly billing records with short-month due date clamping.
@@ -66,6 +71,7 @@
 - `maintenance_tickets`: Maintenance issues, priority, and repair costs.
 
 ### CMS & System
+
 - `site_settings`: Global brand configuration, contacts, and exchange rate cache.
 - `content_pages` & `content_sections`: Structured marketing page builder.
 - `services` & `faqs`: Catalog service phases and answers.
@@ -78,11 +84,11 @@
 
 ## 3. Storage Architecture
 
-| Bucket Name | Access Level | Allowed MIME Types | Max Size | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| `public-marketing` | Public Read | Images (JPEG, PNG, WebP) | 10 MB | Approved website photos and floorplans |
-| `private-source` | Staff Authenticated | All Media, PDF, Video | 100 MB | Raw Drive assets and unapproved drafts |
-| `private-documents` | Staff / Admin Only | PDF, Docs, Images | 25 MB | Contracts, passports, payment receipts |
+| Bucket Name         | Access Level        | Allowed MIME Types       | Max Size | Purpose                                |
+| :------------------ | :------------------ | :----------------------- | :------- | :------------------------------------- |
+| `public-marketing`  | Public Read         | Images (JPEG, PNG, WebP) | 10 MB    | Approved website photos and floorplans |
+| `private-source`    | Staff Authenticated | All Media, PDF, Video    | 100 MB   | Raw Drive assets and unapproved drafts |
+| `private-documents` | Staff / Admin Only  | PDF, Docs, Images        | 25 MB    | Contracts, passports, payment receipts |
 
 ---
 

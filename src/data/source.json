@@ -339,18 +339,14 @@
         "status": "source_stated_not_live"
       },
       "areas": [],
-      "source_ids": [
-        "1nMCCsFYht0p7z0E8cl1pfq0Fyrum5Rl5"
-      ],
+      "source_ids": ["1nMCCsFYht0p7z0E8cl1pfq0Fyrum5Rl5"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
       "details": {
         "package_composition_requires_confirmation": true,
         "delivery_source": "31 December 2026",
-        "features_source": [
-          "Fully furnished"
-        ],
+        "features_source": ["Fully furnished"],
         "claims_requiring_confirmation": [
           "5% annual USD rental guarantee",
           "Citizenship eligibility",
@@ -382,9 +378,7 @@
           "basis": "gross"
         }
       ],
-      "source_ids": [
-        "16f3WWtbiAHLg0NGeDMQEO582_8_VsPkS"
-      ],
+      "source_ids": ["16f3WWtbiAHLg0NGeDMQEO582_8_VsPkS"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -415,19 +409,14 @@
         "status": "source_stated_not_live"
       },
       "areas": [],
-      "source_ids": [
-        "1Pwr8oecAaIyJxeZvqC5ndJVnKebKMPcs"
-      ],
+      "source_ids": ["1Pwr8oecAaIyJxeZvqC5ndJVnKebKMPcs"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
       "details": {
         "status_source": "Ready to move",
         "title_deed_source": "Ready",
-        "claims_requiring_confirmation": [
-          "High ROI",
-          "Investment & Citizenship"
-        ],
+        "claims_requiring_confirmation": ["High ROI", "Investment & Citizenship"],
         "note": "Not established as independently citizenship-qualifying."
       }
     },
@@ -453,9 +442,7 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "1L2Sempbh5Dpxs05zWOlNXXO7Q11P0H3v"
-      ],
+      "source_ids": ["1L2Sempbh5Dpxs05zWOlNXXO7Q11P0H3v"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -507,9 +494,7 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "15sT4aVhH-wjWtG_ojhUsig-WWtqcJGyg"
-      ],
+      "source_ids": ["15sT4aVhH-wjWtG_ojhUsig-WWtqcJGyg"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -545,9 +530,7 @@
         "status": "source_stated_not_live"
       },
       "areas": [],
-      "source_ids": [
-        "1PgBe9AUmm5IwyM8GDyeGuDj8Bi-1o9GH"
-      ],
+      "source_ids": ["1PgBe9AUmm5IwyM8GDyeGuDj8Bi-1o9GH"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -592,10 +575,7 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "1tTzR8Jsw4VTic1NQ6l4nD-FgvrVq6_qn",
-        "1LwJ5TbfuZ6t9A6818eDKGbuyCs3SjK2G"
-      ],
+      "source_ids": ["1tTzR8Jsw4VTic1NQ6l4nD-FgvrVq6_qn", "1LwJ5TbfuZ6t9A6818eDKGbuyCs3SjK2G"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -637,25 +617,17 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "1kYBzTHpNqTtN-qcQQkQhZ5No3vFhVD0S"
-      ],
+      "source_ids": ["1kYBzTHpNqTtN-qcQQkQhZ5No3vFhVD0S"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
       "details": {
         "floor": "4",
-        "features_source": [
-          "Private terrace",
-          "24/7 security"
-        ],
+        "features_source": ["Private terrace", "24/7 security"],
         "status_source": "Ready project",
         "title_deed_source": "Ready (Mülkiyet)",
         "promotion_source": "Special offer for September; year not printed",
-        "claims_requiring_confirmation": [
-          "Osmanbey Metro 8 min walking",
-          "Taksim 20 min walking"
-        ],
+        "claims_requiring_confirmation": ["Osmanbey Metro 8 min walking", "Taksim 20 min walking"],
         "note": "Do not label the September promotion as current in October. Nearby landmarks do not establish exact district/address."
       }
     },
@@ -675,9 +647,7 @@
         "status": "not_supplied"
       },
       "areas": [],
-      "source_ids": [
-        "1p-U-XgaWFlV4LY0Fd_B62VTxn8dlWhH0"
-      ],
+      "source_ids": ["1p-U-XgaWFlV4LY0Fd_B62VTxn8dlWhH0"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -714,19 +684,13 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "15-2VUnvflnsV0oHeuqW_gTjMoZoY-PnX"
-      ],
+      "source_ids": ["15-2VUnvflnsV0oHeuqW_gTjMoZoY-PnX"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
       "details": {
         "status_source": "Ready to move in",
-        "claims_requiring_confirmation": [
-          "Direct sea view",
-          "Private shoreline",
-          "Last one"
-        ],
+        "claims_requiring_confirmation": ["Direct sea view", "Private shoreline", "Last one"],
         "note": "Do not publish live scarcity claim or guess the layout/project name."
       }
     },
@@ -746,9 +710,7 @@
         "status": "source_stated_not_live"
       },
       "areas": [],
-      "source_ids": [
-        "1eHM1CnKD068A-ohABmQVYDulkxp9xmGa"
-      ],
+      "source_ids": ["1eHM1CnKD068A-ohABmQVYDulkxp9xmGa"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -787,17 +749,13 @@
           "unit_count": 2
         }
       ],
-      "source_ids": [
-        "1f7crcms0n5tBTK0diOF8pvDNv6T7dUt5"
-      ],
+      "source_ids": ["1f7crcms0n5tBTK0diOF8pvDNv6T7dUt5"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
       "details": {
         "status_source": "Ready to move",
-        "features_source": [
-          "24/7 security"
-        ],
+        "features_source": ["24/7 security"],
         "claims_requiring_confirmation": [
           "Citizenship package",
           "Airbnb",
@@ -835,11 +793,7 @@
       "details": {
         "project": "Ataşehir 173",
         "developer_source": "DAP Yapı",
-        "project_layouts_source": [
-          "1+1",
-          "2+1",
-          "3+1"
-        ],
+        "project_layouts_source": ["1+1", "2+1", "3+1"],
         "project_features_source": [
           "Balconies",
           "USD and TRY installment alternatives",
@@ -879,9 +833,7 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "1OO60sr7XWdqldnGULjR_XyWnfk-orgCo"
-      ],
+      "source_ids": ["1OO60sr7XWdqldnGULjR_XyWnfk-orgCo"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -978,9 +930,7 @@
           "basis": "gross"
         }
       ],
-      "source_ids": [
-        "1ryaPLeqKEYWGBD-amStBEkVsDdwx4KYc"
-      ],
+      "source_ids": ["1ryaPLeqKEYWGBD-amStBEkVsDdwx4KYc"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -990,10 +940,7 @@
         "floor": "Ground floor",
         "title_deed_source": "Ready",
         "delivery_source": null,
-        "claims_requiring_confirmation": [
-          "Citizenship suitability",
-          "No appraisal required"
-        ],
+        "claims_requiring_confirmation": ["Citizenship suitability", "No appraisal required"],
         "note": "Legacy slug retained for route compatibility only. Despite its slug, this Drive flyer supplies no July 2027 delivery date. Do not show a live discount without confirmation."
       }
     },
@@ -1018,9 +965,7 @@
           "basis": "unspecified"
         }
       ],
-      "source_ids": [
-        "1NIQ-gl4CN6ZR1GY1Wsc8xX4wXeg-Ov3_"
-      ],
+      "source_ids": ["1NIQ-gl4CN6ZR1GY1Wsc8xX4wXeg-Ov3_"],
       "availability_verified": false,
       "citizenship_eligibility": "not_independently_verified",
       "price_effective_date": null,
@@ -1031,9 +976,7 @@
         "unit": "21",
         "delivery_source": "August 2027",
         "title_deed_source": "Ready",
-        "features_source": [
-          "Landscape view"
-        ],
+        "features_source": ["Landscape view"],
         "note": "Separate unit from ground-floor $488,000 offer. Area shown as 81.27 m2 without explicit gross/net label. Do not inherit ground-floor metadata. Flyer includes Is GYO branding."
       }
     },
@@ -1073,18 +1016,9 @@
         "unit_area_unconfirmed": true,
         "supporting_plan": {
           "type": "2+1 G",
-          "gross_range_m2": [
-            116.28,
-            116.53
-          ],
-          "net_range_m2": [
-            69.58,
-            70.01
-          ],
-          "net_plus_open_balcony_range_m2": [
-            74.52,
-            74.95
-          ],
+          "gross_range_m2": [116.28, 116.53],
+          "net_range_m2": [69.58, 70.01],
+          "net_plus_open_balcony_range_m2": [74.52, 74.95],
           "balcony_m2": 4.94,
           "bathrooms_drawn": 2,
           "exact_unit_match": "not_confirmed"

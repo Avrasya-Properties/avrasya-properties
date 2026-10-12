@@ -61,7 +61,8 @@ export function Preloader() {
       }`}
       style={{
         backgroundColor: "#0B2228",
-        backgroundImage: "radial-gradient(ellipse at 50% 40%, #133942 0%, #0B2228 65%, #07171B 100%)",
+        backgroundImage:
+          "radial-gradient(ellipse at 50% 40%, #133942 0%, #0B2228 65%, #07171B 100%)",
       }}
     >
       {/* Centerpiece Stage: Crisp White Logo & Refined Gold Loading */}
@@ -101,10 +102,7 @@ export function Preloader() {
       {/* Authentic Istanbul Architectural Skyline covering the bottom edge-to-edge */}
       <div className="pointer-events-none absolute bottom-0 inset-x-0 w-full overflow-hidden select-none flex flex-col items-center justify-end">
         <div className="w-full flex justify-center items-end">
-          <IstanbulSkyline
-            opacity={1}
-            className="w-full"
-          />
+          <IstanbulSkyline opacity={1} className="w-full" />
         </div>
       </div>
     </div>

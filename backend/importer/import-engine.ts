@@ -14,7 +14,10 @@ export interface ImportResult {
   sqlStatements: string[];
 }
 
-export function buildImportSql(manifest?: SourceDataManifest, isDryRun = false): { sql: string; result: ImportResult } {
+export function buildImportSql(
+  manifest?: SourceDataManifest,
+  isDryRun = false,
+): { sql: string; result: ImportResult } {
   const data = manifest || loadSourceManifest();
   const recon = generateReconciliationReport(data);
 
@@ -79,13 +82,23 @@ export function buildImportSql(manifest?: SourceDataManifest, isDryRun = false):
 
   // 3. Known Projects
   const knownProjects = [
-    { name: "RAMS Park House Maslak", slug: "rams-park-house-maslak", district: "Maslak", side: "Europe" },
+    {
+      name: "RAMS Park House Maslak",
+      slug: "rams-park-house-maslak",
+      district: "Maslak",
+      side: "Europe",
+    },
     { name: "Oryapark Istanbul", slug: "oryapark-istanbul", district: "Ümraniye", side: "Asia" },
     { name: "Güneşli Residences", slug: "gunesli-residences", district: "Güneşli", side: "Europe" },
     { name: "Beşiktaş Suites", slug: "besiktas-suites", district: "Beşiktaş", side: "Europe" },
     { name: "Topkapı Residences", slug: "topkapi-residences", district: "Topkapı", side: "Europe" },
     { name: "Şişli Central", slug: "sisli-central", district: "Şişli", side: "Europe" },
-    { name: "Türkerler Çiftçi Towers", slug: "turkerler-ciftci-towers-proj", district: "Beşiktaş", side: "Europe" },
+    {
+      name: "Türkerler Çiftçi Towers",
+      slug: "turkerler-ciftci-towers-proj",
+      district: "Beşiktaş",
+      side: "Europe",
+    },
   ];
 
   for (const p of knownProjects) {
@@ -117,10 +130,15 @@ export function buildImportSql(manifest?: SourceDataManifest, isDryRun = false):
     const amount = r.price.amount != null ? r.price.amount : "NULL";
     const currency = r.price.currency ? `'${r.price.currency}'` : "NULL";
     const priceBasis = r.price.basis.replace(/'/g, "''");
-    const priceType = r.price.amount == null ? "on-request" : r.record_type === "project" ? "from" : "fixed";
-    const claims = (r.details?.claims_requiring_confirmation || []).map((c) => `'${c.replace(/'/g, "''")}'`).join(",");
+    const priceType =
+      r.price.amount == null ? "on-request" : r.record_type === "project" ? "from" : "fixed";
+    const claims = (r.details?.claims_requiring_confirmation || [])
+      .map((c) => `'${c.replace(/'/g, "''")}'`)
+      .join(",");
     const claimsArr = claims ? `ARRAY[${claims}]` : "'{}'::text[]";
-    const delivery = r.details?.delivery_source ? `'${String(r.details.delivery_source).replace(/'/g, "''")}'` : "NULL";
+    const delivery = r.details?.delivery_source
+      ? `'${String(r.details.delivery_source).replace(/'/g, "''")}'`
+      : "NULL";
     const isCbi = (r.price.amount ?? 0) >= 400000;
 
     // Determine areas
@@ -216,7 +234,10 @@ export function buildImportSql(manifest?: SourceDataManifest, isDryRun = false):
   let sortOrder = 0;
   for (const phase of data.catalog.service_phases) {
     sortOrder++;
-    const slug = phase.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const slug = phase
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
     statements.push(`
       INSERT INTO public.services (slug, title, category, description, sort_order, is_published)
       VALUES (

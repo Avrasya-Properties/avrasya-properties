@@ -32,6 +32,7 @@ import {
   type PropertyRecord,
 } from "@/data/properties";
 import { useCatalogue } from "@/data/live";
+import { useSiteSettings } from "@/admin/store";
 import { PageIntro } from "@/components/site/Chrome";
 import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
@@ -61,9 +62,13 @@ export const Route = createFileRoute("/properties/")({
 });
 
 function Catalog() {
-  const catalogue=useCatalogue();
-  const properties=catalogue.properties;
-  const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
+  const catalogue = useCatalogue();
+  const properties = catalogue.properties;
+  const settings = useSiteSettings();
+  const derivedLocations = Array.from(new Set(properties.map((r) => r.location_label).filter((x): x is string => !!x)));
+  const LOCATIONS = settings.districts?.length ? settings.districts : derivedLocations;
+  const LAYOUT_OPTIONS = settings.layouts?.length ? settings.layouts : LAYOUTS;
+  const BUDGET_OPTIONS = settings.budgetRanges?.length ? settings.budgetRanges : BUDGETS;
   const f = Route.useSearch();
   const navigate = useNavigate({ from: "/properties/" });
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -120,10 +125,10 @@ function Catalog() {
       </PageIntro>
 
       <section className="container-site py-8">
-        {catalogue.isPending && <p role="status">Loading current offers…</p>}
-        {catalogue.isError && <p role="alert">The catalogue is temporarily unavailable. Please contact our advisory team.</p>}
+        {catalogue.isPending && !properties.length && <p role="status" className="text-muted-foreground text-sm mb-4">Loading current offers…</p>}
+        {catalogue.isError && <p role="alert" className="text-destructive text-sm mb-4">The catalogue is temporarily unavailable. Please contact our advisory team.</p>}
         {/* Search & Filter Panel */}
-        <div className="rounded-xs border border-border/80 bg-card p-5 shadow-xs">
+        <div className="card-elevate rounded-xs border border-border/80 bg-card/95 backdrop-blur-md p-5 shadow-[0_10px_30px_-10px_rgba(23,43,51,0.08)]">
           <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,5fr)]">
             <label className="block">
               <span className={lbl}>Keyword or District Search</span>
@@ -145,9 +150,9 @@ function Catalog() {
               ["Europe", "European Side"],
               ["Asia", "Asian Side"],
             ])}
-            {sel("layout", "Layout", "All Layouts", LAYOUTS.map((l) => [l, l]))}
+            {sel("layout", "Layout", "All Layouts", LAYOUT_OPTIONS.map((l) => [l, l]))}
             {sel("type", "Property type", "All types", Object.entries(TYPE_LABEL))}
-            {sel("budget", "Budget", "Any budget", BUDGETS.map((b) => [b.id, b.label]))}
+            {sel("budget", "Budget", "Any budget", BUDGET_OPTIONS.map((b) => [b.id, b.label]))}
             </div>
           </div>
 
@@ -190,7 +195,7 @@ function Catalog() {
                   >
                     <span>
                       {k === "budget"
-                        ? BUDGETS.find((b) => b.id === v)?.label
+                        ? BUDGET_OPTIONS.find((b) => b.id === v)?.label
                         : k === "type"
                         ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
                         : k==="savedOnly"?"Saved properties":k==="cbiOnly"?"Verified citizenship eligibility":k==="side"?(v==="Asia"?"Asian side":"European side"):String(v)}

@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { 
-  Building2, 
-  Calendar, 
-  Clock, 
-  Globe2, 
-  Mail, 
-  MapPin, 
-  MessageSquare, 
-  Phone, 
-  Send, 
-  ShieldCheck 
+import {
+  Building2,
+  Calendar,
+  Clock,
+  Globe2,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Phone,
+  Send,
+  ShieldCheck,
 } from "lucide-react";
 import { PageIntro } from "@/components/site/Chrome";
 import { Enquiry } from "@/components/site/Enquiry";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/contact")({
   head: () =>
     meta(
       "Contact & Private Consultation · Avrasya Properties",
-      "Schedule a private property consultation in Istanbul or via encrypted video conference. WhatsApp, phone, and office visiting directions."
+      "Schedule a private property consultation in Istanbul or via encrypted video conference. WhatsApp, phone, and office visiting directions.",
     ),
   component: ContactPage,
 });
@@ -48,7 +48,9 @@ export function ContactPage() {
         }
       >
         <p>
-          Connect directly with our senior client directors by WhatsApp, telephone, or scheduled video conference. We provide objective, unhurried guidance tailored to your family's objectives.
+          Connect directly with our senior client directors by WhatsApp, telephone, or scheduled
+          video conference. We provide objective, unhurried guidance tailored to your family's
+          objectives.
         </p>
       </PageIntro>
 
@@ -58,9 +60,12 @@ export function ContactPage() {
           <div className="rounded-2xl border bg-card p-6 lg:col-span-7 md:p-8">
             <div className="mb-6">
               <span className="eyebrow">Private Brief</span>
-              <h2 className="font-display text-2xl font-bold text-foreground">Submit Your Property Brief</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Submit Your Property Brief
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Your brief is handled with strict confidentiality. Draft an inquiry below to receive an instant WhatsApp or email introduction.
+                Your brief is handled with strict confidentiality. Draft an inquiry below to receive
+                an instant WhatsApp or email introduction.
               </p>
             </div>
 
@@ -99,11 +104,14 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Direct WhatsApp Desk</h3>
-                  <p className="text-xs text-muted-foreground">Average response time: &lt; 15 minutes</p>
+                  <p className="text-xs text-muted-foreground">
+                    Average response time: &lt; 15 minutes
+                  </p>
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                Need urgent confirmation on a specific project price, layout availability, or CBI eligibility? Our advisors are available directly on WhatsApp.
+                Need urgent confirmation on a specific project price, layout availability, or CBI
+                eligibility? Our advisors are available directly on WhatsApp.
               </p>
               <a
                 href={contact.whatsapp}
@@ -126,7 +134,9 @@ export function ContactPage() {
                   <div>
                     <span className="font-medium text-foreground block">Headquarters:</span>
                     <span className="text-muted-foreground">{contact.address}</span>
-                    <span className="text-xs text-muted-foreground block mt-0.5">Overlooking the Bosphorus · Walking distance to Marmaray</span>
+                    <span className="text-xs text-muted-foreground block mt-0.5">
+                      Overlooking the Bosphorus · Walking distance to Marmaray
+                    </span>
                   </div>
                 </div>
 
@@ -134,7 +144,10 @@ export function ContactPage() {
                   <Phone className="h-4 w-4 text-brass shrink-0" />
                   <div>
                     <span className="font-medium text-foreground block">Telephone:</span>
-                    <a href={contact.phoneHref} className="text-muted-foreground hover:text-foreground">
+                    <a
+                      href={contact.phoneHref}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
                       {contact.phone}
                     </a>
                   </div>
@@ -144,7 +157,10 @@ export function ContactPage() {
                   <Mail className="h-4 w-4 text-brass shrink-0" />
                   <div>
                     <span className="font-medium text-foreground block">Official Inquiries:</span>
-                    <a href={`mailto:${contact.email}`} className="text-muted-foreground hover:text-foreground break-all">
+                    <a
+                      href={`mailto:${contact.email}`}
+                      className="text-muted-foreground hover:text-foreground break-all"
+                    >
                       {contact.email}
                     </a>
                   </div>
@@ -167,7 +183,9 @@ export function ContactPage() {
                 <span>Licensed Operating Entity</span>
               </div>
               <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                Operating entity: <b>{contact.company}</b>. All transactional agreements are notarized under Turkish commercial law. Client funds are never deposited to unregulated personal accounts.
+                Operating entity: <b>{contact.company}</b>. All transactional agreements are
+                notarized under Turkish commercial law. Client funds are never deposited to
+                unregulated personal accounts.
               </p>
             </div>
           </div>

@@ -41,6 +41,9 @@ export function validateSettings(s) {
   requireAmount(s.preloaderOpacity, "preloaderOpacity", false);
   if (s.preloaderOpacity > 1) throw new Error("Preloader opacity must be between zero and one.");
   if (typeof s.announcementActive !== "boolean" || typeof s.enableFrankfurterSync !== "boolean") throw new Error("Invalid settings flags.");
+  if (s.districts !== undefined && (!Array.isArray(s.districts) || s.districts.some((x) => typeof x !== "string"))) throw new Error("Invalid districts list.");
+  if (s.layouts !== undefined && (!Array.isArray(s.layouts) || s.layouts.some((x) => typeof x !== "string"))) throw new Error("Invalid layouts list.");
+  if (s.budgetRanges !== undefined && (!Array.isArray(s.budgetRanges) || s.budgetRanges.some((b) => !b || typeof b !== "object" || typeof b.id !== "string" || typeof b.label !== "string"))) throw new Error("Invalid budget ranges list.");
   return s;
 }
 export function validateWorkspace(input) {

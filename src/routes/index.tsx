@@ -13,7 +13,6 @@ import {
   MapPin,
   MessageSquare,
   ShieldCheck,
-  TrendingUp,
 } from "lucide-react";
 import {
   BUDGETS,
@@ -21,17 +20,17 @@ import {
   areaText,
   comparableUsd,
   convertUsdPrice,
+  getLiveProperties,
   getPropertyMedia,
   locationText,
   priceDisplay,
   sideText,
-    type PropertyRecord,
+  type PropertyRecord,
 } from "@/data/properties";
-import { CtaBand, Logo } from "@/components/site/Chrome";
+import { Logo } from "@/components/site/Chrome";
 import { Marquee, Tilt,MotionRoot } from "@/components/site/Motion";
 import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
-import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useCatalogue } from "@/data/live";
@@ -48,247 +47,253 @@ export const Route = createFileRoute("/")({
 
 
 function Home() {
- const catalogue=useCatalogue();
- return <><HomeCollection properties={catalogue.properties} loading={catalogue.isPending} unavailable={catalogue.isError} retry={()=>void catalogue.refetch()}/><MotionRoot/></>;
+  const catalogue = useCatalogue();
+  return (
+    <>
+      <HomeCollection
+        properties={catalogue.properties}
+        loading={catalogue.isPending}
+        unavailable={catalogue.isError}
+        retry={() => void catalogue.refetch()}
+      />
+      <MotionRoot />
+    </>
+  );
 }
-function HomeCollection({properties,loading,unavailable,retry}:{properties:PropertyRecord[];loading:boolean;unavailable:boolean;retry:()=>void}) {
-  const waLink=useWhatsAppLink();
- const FEATURED=properties.slice(0,3);
- const EDITORIAL=properties.length>3?properties.slice(3,6):properties.slice(0,3);
- const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
-
+function HomeCollection({
+  properties,
+  loading,
+  unavailable,
+  retry,
+}: {
+  properties: PropertyRecord[];
+  loading: boolean;
+  unavailable: boolean;
+  retry: () => void;
+}) {
+  const waLink = useWhatsAppLink();
+  const EDITORIAL = properties.slice(0, 6);
   const settings = useSiteSettings();
-  const [sel, setSel] = useState(0);
-  const featuredIndex=Math.max(0,Math.min(sel,FEATURED.length-1));
-  const f = FEATURED[featuredIndex];
-  const media = f?getPropertyMedia(f):null;
-  const fp = f?priceDisplay(f.price):null;
+  const LOCATIONS = settings.districts?.length
+    ? settings.districts
+    : Array.from(new Set(properties.map((r) => r.location_label).filter((x): x is string => !!x)));
+  const LAYOUTS = settings.layouts?.length ? settings.layouts : ["1+1", "2+1", "3+1", "4+1", "Penthouse", "Duplex"];
+  const BUDGETS = settings.budgetRanges?.length ? settings.budgetRanges : [
+    { id: "u300", label: "Up to $300,000", min: 0, max: 300000 },
+    { id: "300-450", label: "$300,000 – $450,000", min: 300000, max: 450000 },
+    { id: "450-600", label: "$450,000 – $600,000", min: 450000, max: 600000 },
+    { id: "600-1m", label: "$600,000 – $1,000,000", min: 600000, max: 1000000 },
+    { id: "1m-plus", label: "$1,000,000+", min: 1000000, max: 99999999 },
+  ];
+
   const navigate = useNavigate();
-  const [currency] = useCurrency();
-  const { isSaved, toggle } = useShortlist();
-  const saved = f?isSaved(f.slug):false;
-  const fUsd = f?comparableUsd(f.price):null;
-  const fDisplayPrice = currency === "USD"||fUsd===null ? fp?.main||"" : convertUsdPrice(fUsd, currency);
+  const [heroView, setHeroView] = useState<"skyline" | "terrace">("skyline");
+  const heroImages = {
+    skyline: "/images/properties/hero-main.jpg",
+    terrace: "/images/properties/bosphorus-terrace.jpg",
+  };
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
   return (
     <div data-home-page>
 
       {/* Hero Section */}
-      <section data-home-hero className="home-hero relative overflow-hidden pt-10 pb-10 md:pt-14 md:pb-20 bg-primary text-on-dark">
-        {/* Ambient Brand Watermark in Hero */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-4 lg:right-10 top-8 lg:top-6 hidden select-none md:flex md:flex-col items-end text-right opacity-30 dark:opacity-20 z-0"
-        >
-          <span className="outline-word text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
-            AVRASYA
-          </span>
-          <span className="outline-word text-[2.2rem] lg:text-[3rem] tracking-[0.32em] mt-1.5 uppercase leading-none pr-1">
-            PROPERTIES
-          </span>
-        </div>
-
+      <section
+        data-home-hero
+        className="home-hero relative overflow-hidden pt-8 pb-10 md:pt-12 md:pb-16 bg-[#07191e] text-on-dark"
+        style={{
+          backgroundImage:
+            "linear-gradient(135deg, #07191e 0%, #0c272d 45%, #061519 100%), radial-gradient(circle at 18% 28%, rgba(20, 68, 76, 0.4) 0%, transparent 60%)",
+        }}
+      >
         <div className="container-site relative z-10">
-          {/* Header Typography & Intro */}
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
+          {/* 2-Column Split: Editorial Green Gradient Left / Architectural Property Cut Right */}
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-8 items-center">
+            
+            {/* Left Column (7 cols): Editorial Copy & Key Investment Metrics */}
+            <div className="lg:col-span-7 flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-3">
-                <span className="eyebrow">
+                <span className="eyebrow !text-brass-text">
                   {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
                 </span>
               </div>
-              <h1 className="display-hero"><span className="split-line"><span style={{["--d" as string]:"150ms"}}>{settings.heroHeadline}</span></span></h1>
+              <h1 className="display-hero">
+                <span className="split-line">
+                  <span style={{ ["--d" as string]: "150ms" }}>{settings.heroHeadline}</span>
+                </span>
+              </h1>
 
               <p
                 data-reveal
                 style={{ ["--d" as string]: "350ms" }}
                 className="mt-5 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed"
               >
-                {settings.heroSubtitle || "Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer."}
+                {settings.heroSubtitle ||
+                  "Discover carefully selected homes and investments across Istanbul. Every property is personally checked for clear legal ownership, fair market value, and smooth title transfer."}
               </p>
 
-              {/* Key Highlights Bar */}
+              {/* Key Highlights Bar with tactile hover micro-lift */}
               <div
                 data-reveal
                 style={{ ["--d" as string]: "450ms" }}
                 className="mt-8 grid grid-cols-2 gap-4 border-t border-border/80 pt-6 sm:grid-cols-4"
               >
-                <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{properties.length}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Published offers</p>
+                <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground group-hover:text-brass transition-colors">
+                    {properties.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Available homes</p>
                 </div>
-                <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{LOCATIONS.length}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Listed districts</p>
+                <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground group-hover:text-brass transition-colors">
+                    {LOCATIONS.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Istanbul districts</p>
                 </div>
-                <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">Review</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Independent title checks</p>
+                <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">Verified</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">100% Legal & title checked</p>
                 </div>
-                <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
+                <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground group-hover:text-brass transition-colors">
                     ${settings.cbiThresholdUsd ? `${Math.round(settings.cbiThresholdUsd / 1000)}K` : "400K"}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Citizenship reference amount</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Citizenship threshold</p>
                 </div>
               </div>
-            </div>
 
-            {/* Direct Quick Action CTAs */}
-            <div data-reveal style={{ ["--d" as string]: "400ms" }} className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
-              <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
-                <span>{properties.length?`Browse ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore properties"}</span> <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link to="/contact" className="btn btn-outline gap-1.5">
-                <span>Book Consultation</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Interactive Hero Showcase Grid */}
-          {f&&media&&fp&&<div className="mt-8 grid min-w-0 gap-6 text-foreground lg:mt-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
-            {/* Main Interactive Spotlight Card */}
-            <Tilt max={3}>
-              <div className="relative overflow-hidden rounded-xs border border-border/80 bg-card shadow-lg transition-all">
-                {/* Photo Aspect Container */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-muted group">
-                  <ImageFallback r={f}/>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 pointer-events-none" />
-
-                  {/* Top Badges */}
-                  <div className="absolute left-4 top-4 flex flex-wrap gap-2 z-10">
-                    <span className="rounded-xs bg-primary/90 backdrop-blur-xs px-2.5 py-1 text-xs font-semibold tracking-wider text-primary-foreground shadow-xs">
-                      Spotlight · {f.location_label}
-                    </span>
-                    {f.details["cbi_verified"]===true && (
-                      <span className="flex items-center gap-1 rounded-xs bg-brass px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary shadow-xs">
-                        Citizenship eligibility verified
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Top Right Save Heart */}
-                  <button
-                    onClick={() => toggle(f.slug)}
-                    aria-label="Save to shortlist"
-                    className={`absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all ${
-                      saved
-                        ? "bg-destructive text-white shadow-md scale-105"
-                        : "bg-black/50 text-white/90 hover:bg-black/70 hover:scale-110"
-                    }`}
-                  >
-                    <Heart className={`h-4.5 w-4.5 ${saved ? "fill-white" : ""}`} />
-                  </button>
-
-                </div>
-
-                <div className="border-t bg-card p-5"><p className="eyebrow">Featured property</p><h2 className="mt-2 break-words font-display text-2xl text-foreground md:text-3xl">{f.marketing_title}</h2><p className="mt-2 text-sm text-muted-foreground">{locationText(f)} · {sideText(f)}</p></div>
-
-                {/* Details Strip */}
-                <div
-                  key={f.slug + "bar"}
-                  className="grid grid-cols-2 gap-4 p-5 text-sm md:grid-cols-[2fr_1.2fr_1.4fr_1fr_auto] md:items-end border-t border-border/60 bg-card"
+              {/* Action Buttons */}
+              <div
+                data-reveal
+                style={{ ["--d" as string]: "500ms" }}
+                className="mt-8 flex flex-wrap items-center gap-3.5"
+              >
+                <Link to="/contact" className="btn btn-primary gap-1.5 shadow-sm btn-shimmer">
+                  <span>Book Consultation</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a
+                  href={waLink("Inquiry regarding prime Istanbul real estate opportunities")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn !bg-white/10 !border !border-white/20 !text-white hover:!bg-white/20 hover:!border-brass/50 text-xs gap-1.5 shadow-xs"
                 >
-                  <div>
-                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Development</p>
-                    <p className="font-medium truncate text-foreground">
-                      {f.details.project ? String(f.details.project) : f.marketing_title}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Layout · Area</p>
-                    <p className="text-foreground">{f.layout_label} · {areaText(f)}</p>
-                  </div>
-                  <div>
-                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
-                    <p className="font-display text-xl font-semibold text-foreground tracking-tight">
-                      {fDisplayPrice}
-                    </p>
-                    {currency !== "USD" && fUsd && (
-                      <p className="text-[0.65rem] text-muted-foreground">USD {fp.main}</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Status</p>
-                    <p className="text-xs font-semibold text-primary">{f.availability||"To confirm"}</p>
-                  </div>
-                  <Link
-                    to="/properties/$slug"
-                    params={{ slug: f.slug }}
-                    className="btn btn-primary col-span-2 !min-h-10 md:col-span-1 gap-1.5 shadow-xs"
-                  >
-                    <span>View Details</span> <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
+                  <MessageSquare className="h-3.5 w-3.5 text-brass" />
+                  <span>Direct Advisory Desk</span>
+                </a>
               </div>
-            </Tilt>
+            </div>
 
-            {/* Side Tabs Selector */}
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between border-b pb-2 text-[0.68rem] uppercase tracking-wider text-muted-foreground font-semibold">
-                <span>Curated Highlights ({FEATURED.length.toString().padStart(2, "0")})</span>
-                <span>Click to preview</span>
+            {/* Right Column (5 cols): Architectural Cut with Istanbul Real Estate & Ambient AVRASYA Typography */}
+            <div className="lg:col-span-5 relative mt-6 lg:mt-0">
+              {/* Avrasya Brand Typography sitting as an elegant architectural backdrop behind the card */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-8 sm:-top-10 lg:-top-12 left-0 right-0 z-0 select-none overflow-hidden"
+              >
+                <span
+                  className="font-display text-[3.8rem] sm:text-[5rem] lg:text-[6.2rem] xl:text-[7.2rem] font-bold tracking-[0.18em] leading-none text-transparent bg-clip-text bg-gradient-to-r from-brass/35 via-white/20 to-transparent block opacity-40"
+                >
+                  AVRASYA
+                </span>
+                <span className="font-sans text-[0.6rem] sm:text-xs tracking-[0.4em] uppercase text-brass/60 pl-1 block -mt-1 lg:-mt-2">
+                  PROPERTIES · LUXURY ADVISORY
+                </span>
               </div>
-              <div className="mt-3 space-y-3" role="tablist" aria-label="Featured offers">
-                {FEATURED.map((r, i) => {
-                  const m = getPropertyMedia(r);
-                  const isCur = i === featuredIndex;
-                  return (
+
+              {/* Outer Architectural Container with 3D Tilt & Glassmorphic Elevation */}
+              <Tilt max={3} className="relative z-10">
+                <div className="group relative w-full h-[400px] sm:h-[460px] lg:h-[490px] rounded-xs overflow-hidden border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] bg-[#07191e]">
+                  
+                  {/* Architectural Cut Inner Wrapper with polygon clip on desktop */}
+                  <div className="relative w-full h-full overflow-hidden [clip-path:polygon(0_0,_100%_0,_100%_100%,_0_100%)] lg:[clip-path:polygon(7%_0,_100%_0,_100%_100%,_0%_100%)]">
+                    {/* Architectural Hairline Accent Line along the Cut */}
+                    <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-gradient-to-b from-brass via-brass/40 to-transparent pointer-events-none z-30 hidden lg:block" />
+
+                    {/* Istanbul Luxury Real Estate Photograph */}
+                    <img
+                      src={heroImages[heroView]}
+                      alt="Istanbul Luxury Real Estate & Bosphorus Strait Frontline"
+                      className="h-full w-full object-cover object-center transition-all duration-1000 ease-out group-hover:scale-105"
+                    />
+
+                    {/* Multi-layered Architectural Gradient Scrims */}
+                    {/* Left Blend: softly bleeds the photo into the emerald green background */}
+                    <div
+                      className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-r from-[#07191e] via-[#07191e]/50 to-transparent"
+                      style={{ width: "65%" }}
+                    />
+                    {/* Bottom Vignette: protects text legibility for floating card */}
+                    <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                  </div>
+
+                  {/* Top Floating Glass Badges */}
+                  <div className="absolute top-4 right-4 z-30 flex items-center gap-2 rounded-xs px-3 py-1.5 backdrop-blur-md bg-black/60 border border-white/15 text-xs text-white/90 shadow-md">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-medium tracking-wide">Bosphorus Prime · Istanbul</span>
+                  </div>
+
+                  {/* Interactive View Switcher Tabs */}
+                  <div className="absolute top-4 left-4 z-30 hidden sm:flex items-center gap-1 p-0.5 rounded-xs backdrop-blur-md bg-black/65 border border-white/15 text-[0.68rem]">
                     <button
-                      key={r.slug}
-                      role="tab"
-                      aria-selected={isCur}
-                      onClick={() => setSel(i)}
-                      className={`group relative flex w-full items-center gap-3.5 overflow-hidden rounded-xs border p-3 text-left transition-all duration-300 ${
-                        isCur
-                          ? "border-brass bg-card shadow-md border-l-4 border-l-brass"
-                          : "border-border/70 bg-card/60 hover:border-brass/70 hover:bg-card"
+                      type="button"
+                      onClick={() => setHeroView("skyline")}
+                      className={`px-2.5 py-1 rounded-xs transition-all ${
+                        heroView === "skyline"
+                          ? "bg-brass text-primary font-semibold shadow-xs"
+                          : "text-white/70 hover:text-white"
                       }`}
                     >
-                      <div className="relative h-14 w-18 shrink-0 overflow-hidden rounded-xs bg-muted">
-                        <img src={m.cover} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-brass">0{i + 1}</span>
-                          <span className="text-[0.65rem] text-muted-foreground">{r.location_label}</span>
-                        </div>
-                        <p className="font-medium text-sm truncate text-foreground mt-0.5">
-                          {r.marketing_title}
-                        </p>
-                        <div className="mt-1 flex items-center justify-between text-xs">
-                          <span className="font-semibold text-foreground">
-                            {currency === "USD"||comparableUsd(r.price)===null
-                              ? priceDisplay(r.price).main
-                              : convertUsdPrice(comparableUsd(r.price), currency)}
-                          </span>
-                          <span className="text-[0.68rem] text-brass group-hover:underline">
-                            {isCur ? "Active" : "Inspect →"}
-                          </span>
-                        </div>
-                      </div>
+                      Waterfront Tower
                     </button>
-                  );
-                })}
-              </div>
+                    <button
+                      type="button"
+                      onClick={() => setHeroView("terrace")}
+                      className={`px-2.5 py-1 rounded-xs transition-all ${
+                        heroView === "terrace"
+                          ? "bg-brass text-primary font-semibold shadow-xs"
+                          : "text-white/70 hover:text-white"
+                      }`}
+                    >
+                      Penthouse Deck
+                    </button>
+                  </div>
 
-              {/* Verified Disclaimer Callout */}
-              <div className="mt-auto pt-4 border-t border-border/60">
-                <div className="rounded-xs border border-border/80 bg-secondary/50 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
-                  <ShieldCheck className="h-4 w-4 text-brass shrink-0 mt-0.5" />
-                  <p className="leading-relaxed">
-                    Source documentation on file. Live availability and private developer discounts verified prior to viewing arrangements.
-                  </p>
+                  {/* Bottom Floating Glassmorphic Details Card */}
+                  <div className="absolute bottom-4 left-4 right-4 z-20 backdrop-blur-md bg-black/55 border border-white/15 rounded-xs p-4 shadow-[0_20px_40px_rgba(0,0,0,0.55)] transition-all duration-300 hover:bg-black/70 hover:border-brass/40">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 text-[0.65rem] uppercase tracking-wider text-brass font-semibold">
+                          <span>{heroView === "skyline" ? "Straitfront Skyscraper" : "Panoramic Penthouse"}</span>
+                          <span className="text-white/40">·</span>
+                          <span className="text-white/70">41.0422° N, 29.0064° E</span>
+                        </div>
+                        <p className="font-display text-base sm:text-lg font-medium text-white truncate mt-0.5">
+                          {heroView === "skyline" ? "Bosphorus Coastline Residences" : "Bosphorus Strait Private Deck"}
+                        </p>
+                        <p className="text-xs text-white/70 truncate mt-0.5">
+                          Direct Title Clearance · Prime European & Asian Corridors
+                        </p>
+                      </div>
+                      <Link
+                        to="/contact"
+                        className="shrink-0 btn !min-h-9 !px-4 !text-xs !bg-brass !text-[#07191e] hover:!bg-white font-semibold shadow-xs transition-colors"
+                      >
+                        Inquire
+                      </Link>
+                    </div>
+                  </div>
+
                 </div>
-              </div>
+              </Tilt>
             </div>
-          </div>}
 
-          {/* Instant Search Bar */}
+          </div>
+
+          {/* Instant Search Bar as Floating Glass Capsule */}
           <form
             data-reveal
-            className="home-search mt-8 grid gap-4 rounded-xs border border-border/80 bg-card p-4 text-foreground shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end md:p-5"
+            className="home-search mt-8 grid gap-4 rounded-xs border border-border/90 bg-card/95 backdrop-blur-md p-4 text-foreground shadow-[0_12px_36px_-10px_rgba(23,43,51,0.12)] sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end md:p-5 transition-shadow duration-300 hover:shadow-[0_16px_44px_-10px_rgba(23,43,51,0.16)]"
             onSubmit={(e) => {
               e.preventDefault();
               navigate({
@@ -306,7 +311,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 District
               </span>
               <select
-                className="field"
+                className="field transition-all duration-200 focus:border-brass/80"
                 value={search.loc}
                 onChange={(e) => setSearch({ ...search, loc: e.target.value })}
               >
@@ -324,7 +329,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 Apartment layout
               </span>
               <select
-                className="field"
+                className="field transition-all duration-200 focus:border-brass/80"
                 value={search.layout}
                 onChange={(e) => setSearch({ ...search, layout: e.target.value })}
               >
@@ -342,7 +347,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 Budget (USD)
               </span>
               <select
-                className="field"
+                className="field transition-all duration-200 focus:border-brass/80"
                 value={search.budget}
                 onChange={(e) => setSearch({ ...search, budget: e.target.value })}
               >
@@ -355,9 +360,9 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
               </select>
             </label>
 
-            <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5">
+            <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5 btn-shimmer">
               <span>Find a property</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           </form>
         </div>
@@ -377,107 +382,73 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
         ]}
       />
 
-      {/* Curated Editorial Selection Section */}
-      <section data-home-collection className="container-site py-12 md:py-20">
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <div>
-            <div className="mb-1.5">
-              <p className="eyebrow eyebrow-mark">Handpicked Portfolio</p>
+      {/* Unified Handpicked Portfolio & Bosphorus Corridor Intelligence Section */}
+      <section data-home-collection className="relative border-y border-border/80 bg-background py-14 md:py-20 overflow-hidden">
+        <div className="container-site relative z-10 space-y-12">
+          {/* Combined Section Header */}
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end border-b border-border/70 pb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="pulse-live h-2 w-2 rounded-full bg-emerald-500 mr-1" />
+                <p className="eyebrow !text-brass-text">Handpicked Homes · Prime Neighborhoods</p>
+              </div>
+              <h2 className="headline text-3xl md:text-5xl text-foreground">
+                Selected properties & <em className="italic text-brass font-normal">Locations</em>
+              </h2>
             </div>
-            <h2 className="headline mt-2 text-3xl md:text-4xl">Selected properties</h2>
-          </div>
-          <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-            Source-advertised offers from prime European and Asian-side Istanbul corridors. Confirm specifications, pricing, availability and any citizenship claims with an advisor before commitment.
-          </p>
-        </div>
-
-        {loading?<p role="status" className="mt-8 rounded border bg-card p-6">Loading the property collection…</p>:unavailable?<div role="alert" className="mt-8 rounded border bg-card p-6"><p>The property collection could not be loaded.</p><button onClick={retry} className="btn btn-outline mt-4">Try again</button></div>:!properties.length?<div data-empty-collection className="mt-8 rounded border bg-card p-6 md:p-8"><h3 className="font-display text-2xl">Our next collection is being prepared.</h3><p className="mt-3 max-w-xl text-sm text-muted-foreground">Our team can help you find current opportunities while reviewed listings are being added.</p><Link to="/contact" className="btn btn-outline mt-5">Ask about available properties</Link></div>:<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {EDITORIAL.map((r) => (
-            <PropertyCard key={r.slug} r={r} />
-          ))}
-        </div>}
-
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
-          <Link to="/properties" className="group text-sm font-semibold text-foreground flex items-center gap-2">
-            <span>{properties.length?`Explore all ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore our property search"}</span>
-            <ArrowRight className="h-4 w-4 arrow text-brass" />
-          </Link>
-          <span className="text-xs text-muted-foreground">
-            Availability and specifications are shown for each published offer.
-          </span>
-        </div>
-      </section>
-
-      {/* Bosphorus Cross-Strait Geographical Corridor Navigator */}
-      <BosphorusNavigator />
-
-      {/* Turkish Citizenship Banner with Value Barometer */}
-      <section className="container-site pt-20 pb-12">
-        <div
-          data-reveal="mask"
-          className="relative overflow-hidden rounded-xs border border-brass/40 bg-primary p-8 md:p-14 text-on-dark shadow-xl"
-        >
-          <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
-              <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Turkish Citizenship by Investment (CBI)
-            </div>
-            <h2 className="headline mt-4 text-3xl md:text-5xl text-on-dark leading-tight">
-              A sovereign gateway to Türkiye: <em className="italic text-brass font-normal">Clarity before capital.</em>
-            </h2>
-            <p className="mt-5 text-sm md:text-base text-on-dark-muted leading-relaxed">
-              The configured investment reference is {settings.cbiThresholdUsd.toLocaleString("en-US")} USD. A purchase price alone does not confirm eligibility. Confirm the applicable rules, title conditions, valuation and family requirements with an independent legal advisor before committing.
+            <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
+              Explore handpicked homes across Istanbul's top European and Asian neighborhoods. Our dedicated advisors are here to answer your questions on pricing, citizenship benefits, and private viewings.
             </p>
-
-            <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3">
-              <div>
-                <p className="eyebrow !text-brass">Investment reference</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">${settings.cbiThresholdUsd.toLocaleString("en-US")} USD</p>
-                <p className="text-[0.7rem] text-on-dark-muted">Or TRY equivalent at transfer</p>
-              </div>
-              <div>
-                <p className="eyebrow !text-brass">Holding Period</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">3 Years</p>
-                <p className="text-[0.7rem] text-on-dark-muted">Tapu annotation requirement</p>
-              </div>
-              <div>
-                <p className="eyebrow !text-brass">Family Scope</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse & Kids &lt;18</p>
-                <p className="text-[0.7rem] text-on-dark-muted">Single joint application</p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#calculator" className="btn btn-light shadow-sm gap-2">
-                <Calculator className="h-4 w-4 text-brass" />
-                <span>Calculate Total All-In Closing Costs</span>
-              </a>
-              <Link to="/citizenship" className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10">
-                Official CBI Guide & Requirements
-              </Link>
-              <a
-                href={waLink("Hello Avrasya Properties, I would like to consult on Turkish Citizenship by Investment ($400,000 CBI).")}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10"
-              >
-                <MessageSquare className="h-3.5 w-3.5 text-brass" /> Consult a Citizenship Adviser
-              </a>
-            </div>
           </div>
 
-          <div
-            aria-hidden
-            data-parallax="0.2"
-            className="outline-word pointer-events-none absolute -bottom-12 right-0 select-none text-[12rem] outline-light opacity-30 hidden md:block"
-          >
-            TÜRKİYE
+          {/* Published Properties / Collection Status */}
+          {loading ? (
+            <p role="status" className="rounded-xs border border-border/70 bg-card p-6 text-sm text-muted-foreground">
+              Loading the property collection…
+            </p>
+          ) : unavailable ? (
+            <div role="alert" className="rounded-xs border border-destructive/30 bg-card p-6">
+              <p className="text-sm text-foreground">The property collection could not be loaded.</p>
+              <button onClick={retry} className="btn btn-outline mt-4 text-xs">
+                Try again
+              </button>
+            </div>
+          ) : !properties.length ? (
+            <div
+              data-empty-collection
+              className="rounded-xs border border-border/70 bg-card/60 p-5 md:p-6 backdrop-blur-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-brass" />
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-brass-text">
+                    Curated Availability
+                  </span>
+                </div>
+                <h3 className="font-display text-xl font-semibold text-foreground">
+                  Our next collection is being prepared.
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground max-w-xl leading-relaxed">
+                  Our team can help you find current opportunities while reviewed listings are being added.
+                </p>
+              </div>
+              <Link to="/contact" className="btn btn-outline text-xs shrink-0 hover:border-brass hover:text-brass">
+                Ask about available properties
+              </Link>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {EDITORIAL.map((r) => (
+                <PropertyCard key={r.slug} r={r} />
+              ))}
+            </div>
+          )}
+
+          {/* Seamlessly Integrated Corridor Navigator */}
+          <div className="border-t border-border/70 pt-8">
+            <BosphorusNavigator embedded />
           </div>
         </div>
-      </section>
-
-      {/* Interactive Title Deed (Tapu) & Acquisition Cost Ledger */}
-      <section className="container-site pb-20">
-        <AcquisitionCalculator />
       </section>
 
       {/* Advisory Directory Process Framework */}
@@ -485,47 +456,47 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
         <div className="container-site">
           <div className="flex items-end justify-between">
             <div>
-              <p className="eyebrow eyebrow-mark">Structured Methodology</p>
-              <h2 className="headline mt-2 text-3xl md:text-4xl">The 3-phase advisory journey</h2>
+              <p className="eyebrow eyebrow-mark">How We Help You</p>
+              <h2 className="headline mt-2 text-3xl md:text-4xl">Your simple 3-step buying journey</h2>
             </div>
             <Link
               to="/services"
               className="group hidden text-xs font-semibold uppercase tracking-wider md:flex items-center gap-1 hover:text-brass transition-colors"
             >
-              <span>View advisory services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
+              <span>View all services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
             </Link>
           </div>
 
-          <div data-reveal className="mt-10 divide-y border border-border/80 rounded-xs bg-background overflow-hidden">
+          <div data-reveal className="mt-10 divide-y border border-border/80 rounded-xs bg-background overflow-hidden shadow-xs">
             {[
               [
                 "01",
-                "Phase 01 · Plan",
-                "Pre-acquisition assessment, family briefing and verified shortlist",
+                "Step 01 · Explore & Plan",
+                "Understanding your lifestyle, family goals, and finding the right home",
                 [
-                  ["Investment Advisory", "Strategic investment goals, portfolio diversification, and risk analysis."],
-                  ["Property Selection", "District yield comparisons, developer delivery track record, and virtual tours."],
-                  ["Citizenship Structuring", "Legal document preparation, apostille verification, and banking prerequisites."],
+                  ["Personal Guidance", "We discuss your goals, family needs, and preferred budget."],
+                  ["Handpicked Homes", "Tour top Istanbul neighborhoods with verified, trusted properties."],
+                  ["Easy Preparation", "We guide you through Turkish tax ID setup and bank account opening."],
                 ],
               ],
               [
                 "02",
-                "Phase 02 · Acquire",
-                "Independent legal checks, currency conversion (DAB), contracting and closing",
+                "Step 02 · Secure & Purchase",
+                "Independent legal checks, fair price valuation, and official deed transfer",
                 [
-                  ["Title Deed Due Diligence", "Turkish Land Registry encumbrance, mortgage, and ownership verification."],
-                  ["Licensed Valuation", "Appraisal report preparation by SPK-licensed certified evaluators."],
-                  ["Title Deed (Tapu) Transfer", "Official registry representation and power of attorney coordination."],
+                  ["Clean Ownership Check", "We verify at the Land Registry that the property is completely debt-free."],
+                  ["Fair Market Appraisal", "Independent government-certified appraisal confirming true market value."],
+                  ["Official Deed Transfer", "We register the official title deed (Tapu) directly into your name."],
                 ],
               ],
               [
                 "03",
-                "Phase 03 · Own & Manage",
-                "Handover inspection, utility connections, tenant management and resale strategy",
+                "Step 03 · Move In & Prosper",
+                "Collecting keys, connecting utilities, and optional rental management",
                 [
-                  ["Property Management", "Key handover, luxury furnishing packages, and utility registrations."],
-                  ["Rental Yield Management", "Corporate and executive tenant placement with local partners."],
-                  ["Holding & Exit Strategy", "Capital appreciation monitoring and 3-year post-holding resale planning."],
+                  ["Key Handover & Move-In", "We inspect your home, hand over your keys, and connect all utilities."],
+                  ["Rental Management", "We place reliable tenants so your property generates steady returns."],
+                  ["Ongoing Care", "Continuous support whenever you wish to rent, sell, or upgrade in the future."],
                 ],
               ],
             ].map(([n, h, s, items]) => (
@@ -542,7 +513,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 {(items as string[][]).map(([t, d]) => (
                   <div key={t} className="space-y-1.5">
                     <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-brass" /> {t}
+                      <CheckCircle2 className="h-3.5 w-3.5 text-brass shrink-0" /> {t}
                     </p>
                     <p className="text-xs text-muted-foreground leading-relaxed">{d}</p>
                   </div>
@@ -553,17 +524,96 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
             <div className="flex flex-col sm:flex-row justify-between items-center bg-card px-6 py-4 text-xs text-muted-foreground border-t gap-2">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-brass" />
-                Continuous International Investor Representation across all phases
+                Dedicated client care, honest guidance, and legal safety at every step
               </span>
               <Link to="/services" className="font-semibold text-foreground underline hover:text-brass">
-                Explore comprehensive service catalog →
+                Explore our complete services →
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <CtaBand />
+      {/* Sovereign Gateway & Private Portfolio Consultation CTA (Combined Advisory & CBI Band) */}
+      <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-24">
+        {/* Subtle decorative radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/15 via-transparent to-transparent pointer-events-none" />
+
+        <div className="container-site relative z-10 text-center">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
+            <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Direct Istanbul Guidance · Turkish Citizenship Desk
+          </div>
+
+          <h2 className="headline mx-auto mt-4 max-w-3xl text-3xl md:text-5xl text-on-dark leading-tight">
+            Your trusted path to Istanbul real estate:{" "}
+            <em className="italic text-brass font-normal">Expert guidance at every step.</em>
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-2xl text-on-dark-muted text-sm md:text-base leading-relaxed">
+            Schedule a friendly consultation with our Istanbul advisory team. Ask us anything about top neighborhoods,
+            Turkish citizenship qualifications (${settings.cbiThresholdUsd.toLocaleString("en-US")} USD),
+            clean title deeds, or arranging private viewings.
+          </p>
+
+          {/* 3 Metric Parameter Cards */}
+          <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3 max-w-3xl mx-auto text-left">
+            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40">
+              <p className="eyebrow !text-brass">Citizenship Requirement</p>
+              <p className="font-display text-2xl font-semibold text-on-dark mt-1">
+                ${settings.cbiThresholdUsd.toLocaleString("en-US")} USD
+              </p>
+              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">Or TRY equivalent on transfer day</p>
+            </div>
+            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40">
+              <p className="eyebrow !text-brass">Holding Period</p>
+              <p className="font-display text-2xl font-semibold text-on-dark mt-1">3 Years</p>
+              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">Keep for 3 years to maintain citizenship</p>
+            </div>
+            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40 col-span-2 sm:col-span-1">
+              <p className="eyebrow !text-brass">Family Included</p>
+              <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse & Kids &lt;18</p>
+              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">All included under one single application</p>
+            </div>
+          </div>
+
+          {/* Combined Action Buttons */}
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-3">
+            <Link to="/contact" className="btn btn-primary btn-shimmer shadow-sm">
+              Request a Consultation
+            </Link>
+            <a
+              href={waLink("Hello Avrasya Properties, I would like to schedule a private portfolio consultation regarding Istanbul real estate and Turkish citizenship.")}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"
+            >
+              <MessageSquare className="h-3.5 w-3.5 text-brass" /> Chat on WhatsApp
+            </a>
+            <Link
+              to="/calculator"
+              className="btn btn-light shadow-sm gap-2"
+            >
+              <Calculator className="h-4 w-4 text-brass" />
+              <span>Calculate Total Purchase Costs</span>
+            </Link>
+            <Link
+              to="/citizenship"
+              className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 transition-colors"
+            >
+              Turkish Citizenship Guide
+            </Link>
+          </div>
+        </div>
+
+        {/* Elegant typography watermark */}
+        <div
+          aria-hidden
+          data-parallax="0.2"
+          className="outline-word pointer-events-none absolute -bottom-12 right-0 select-none text-[12rem] outline-light opacity-20 hidden md:block"
+        >
+          TÜRKİYE
+        </div>
+      </section>
     </div>
   );
 }

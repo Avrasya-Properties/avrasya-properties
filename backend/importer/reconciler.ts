@@ -71,7 +71,7 @@ export function generateReconciliationReport(manifest?: SourceDataManifest): Rec
     },
     matchStatus: {
       sourceFilesMatch: sourceFilesCount === data.scope.files,
-      hashesMatch: uniqueHashesCount === (data.scope.unique_image_hashes + 2), // 27 image + 1 pdf + 1 video = 29
+      hashesMatch: uniqueHashesCount === data.scope.unique_image_hashes + 2, // 27 image + 1 pdf + 1 video = 29
       recordsMatch: editorialRecordsCount === data.scope.editorial_offer_project_records,
     },
     notes: [

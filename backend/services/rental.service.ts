@@ -35,7 +35,9 @@ export class RentalService {
 
     if (error) {
       if (error.message.includes("overlapping lease")) {
-        throw new Error("Unit already has an active lease covering this period. Overlapping leases are rejected.");
+        throw new Error(
+          "Unit already has an active lease covering this period. Overlapping leases are rejected.",
+        );
       }
       throw new Error(`Failed to create lease: ${error.message}`);
     }
@@ -118,7 +120,9 @@ export class RentalService {
     if (chargeErr || !charge) throw new Error("Rent charge not found");
 
     if (charge.currency !== params.currency) {
-      throw new Error(`Cross-currency payment rejected: Charge is in ${charge.currency}, but payment is in ${params.currency}`);
+      throw new Error(
+        `Cross-currency payment rejected: Charge is in ${charge.currency}, but payment is in ${params.currency}`,
+      );
     }
 
     // Insert allocation record
@@ -144,7 +148,10 @@ export class RentalService {
       .update({
         paid_amount: newPaidAmount,
         status: newStatus,
-        paid_date: newPaidAmount >= Number(charge.amount_due) ? (params.paidDate || new Date().toISOString().split("T")[0]) : null,
+        paid_date:
+          newPaidAmount >= Number(charge.amount_due)
+            ? params.paidDate || new Date().toISOString().split("T")[0]
+            : null,
       })
       .eq("id", params.chargeId);
 
@@ -204,7 +211,7 @@ export class RentalService {
       costAmount?: number;
       resolutionNotes?: string;
     },
-    staffUserId: string
+    staffUserId: string,
   ) {
     const admin = getAdminClient();
 

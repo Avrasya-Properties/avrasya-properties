@@ -1,6 +1,11 @@
 import { getAdminClient } from "../config";
 import type { Database } from "../types/database.types";
-import { DealSchema, ReservationSchema, RecordedPaymentSchema, type DealInput } from "../validators";
+import {
+  DealSchema,
+  ReservationSchema,
+  RecordedPaymentSchema,
+  type DealInput,
+} from "../validators";
 import { z } from "zod";
 
 export class TransactionService {
@@ -62,7 +67,9 @@ export class TransactionService {
       .single();
 
     if (deal && deal.currency !== params.currency) {
-      throw new Error(`Currency mismatch: Deal currency is ${deal.currency}, but unit is priced in ${params.currency}. Cross-currency aggregation in a single deal is rejected.`);
+      throw new Error(
+        `Currency mismatch: Deal currency is ${deal.currency}, but unit is priced in ${params.currency}. Cross-currency aggregation in a single deal is rejected.`,
+      );
     }
 
     const { data, error } = await admin
@@ -200,7 +207,9 @@ export class TransactionService {
       .single();
 
     if (deal && deal.currency !== validated.currency) {
-      throw new Error(`Currency mismatch: Deal currency is ${deal.currency}, payment is in ${validated.currency}`);
+      throw new Error(
+        `Currency mismatch: Deal currency is ${deal.currency}, payment is in ${validated.currency}`,
+      );
     }
 
     const { data: payment, error } = await admin

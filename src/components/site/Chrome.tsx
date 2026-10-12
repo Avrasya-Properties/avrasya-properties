@@ -6,7 +6,13 @@ import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { Magnetic } from "./Motion";
 
-export function Logo({ className = "h-10", variant = "auto" }: { className?: string; variant?: "auto" | "light" | "dark" }) {
+export function Logo({
+  className = "h-10",
+  variant = "auto",
+}: {
+  className?: string;
+  variant?: "auto" | "light" | "dark";
+}) {
   const isLight = variant === "light";
   return (
     <img
@@ -19,6 +25,7 @@ export function Logo({ className = "h-10", variant = "auto" }: { className?: str
 
 const NAV = [
   { to: "/properties", label: "Properties" },
+  { to: "/calculator", label: "Calculator" },
   { to: "/why-turkiye", label: "Why Türkiye" },
   { to: "/investment-in-turkiye", label: "Investing" },
   { to: "/citizenship", label: "Citizenship" },
@@ -110,7 +117,9 @@ export function Header() {
           <div className="flex items-center gap-6">
             {/* Currency switcher in top bar */}
             <div className="flex items-center gap-2">
-              <span className="text-on-dark-muted/70 text-[0.68rem] uppercase font-semibold">Currency:</span>
+              <span className="text-on-dark-muted/70 text-[0.68rem] uppercase font-semibold">
+                Currency:
+              </span>
               <div className="flex rounded border border-on-dark/20 bg-primary/40 p-0.5">
                 {(["USD", "EUR", "TRY", "GBP"] as SupportedCurrency[]).map((c) => (
                   <button
@@ -128,7 +137,10 @@ export function Header() {
               </div>
             </div>
 
-            <a href={`mailto:${contact.email}`} className="text-on-dark-muted hover:text-on-dark transition-colors">
+            <a
+              href={`mailto:${contact.email}`}
+              className="text-on-dark-muted hover:text-on-dark transition-colors"
+            >
               {contact.email}
             </a>
           </div>
@@ -140,18 +152,26 @@ export function Header() {
         ref={headerElement}
         className={`site-header sticky top-0 z-40 h-16 border-b transition-all duration-300 md:h-[74px] ${
           scrolled
-            ? "border-border/80 bg-background/90 backdrop-blur-md shadow-xs"
-            : "border-border/40 bg-background/80 backdrop-blur-xs"
+            ? "border-border/80 bg-background/85 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+            : "border-border/40 bg-background/70 backdrop-blur-md"
         }`}
       >
         <div className="container-site flex h-full items-center justify-between gap-4">
-          <Link to="/" aria-label="Avrasya Properties home" className="transition-transform hover:scale-[1.01]">
+          <Link
+            to="/"
+            aria-label="Avrasya Properties home"
+            className="transition-transform duration-300 hover:scale-[1.01]"
+          >
             <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" />
           </Link>
 
           <nav className="hidden items-center gap-6 xl:flex" aria-label="Main">
             {NAV.map((n) => (
-              <Link key={n.to} to={n.to} className="nav-link py-1 text-sm font-medium text-foreground">
+              <Link
+                key={n.to}
+                to={n.to}
+                className="nav-link py-1 text-sm font-medium text-foreground transition-colors duration-200 hover:text-primary"
+              >
                 {n.label}
               </Link>
             ))}
@@ -161,14 +181,16 @@ export function Header() {
             {/* Shortlist Badge Button */}
             <Link
               to="/properties"
-              search={{savedOnly:true}}
-              className="relative flex h-10 items-center gap-1.5 rounded-sm border px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:border-brass hover:text-foreground transition-colors"
+              search={{ savedOnly: true }}
+              className="relative flex h-10 items-center gap-1.5 rounded-sm border border-border/80 bg-card/60 backdrop-blur-xs px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:border-brass hover:text-foreground hover:bg-card transition-all duration-300"
               title="View your saved property shortlist"
             >
-              <Heart className={`h-3.5 w-3.5 ${shortlistCount > 0 ? "fill-destructive text-destructive" : ""}`} />
+              <Heart
+                className={`h-3.5 w-3.5 transition-transform duration-300 hover:scale-110 ${shortlistCount > 0 ? "fill-destructive text-destructive" : ""}`}
+              />
               <span>Saved</span>
               {shortlistCount > 0 && (
-                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold text-primary">
+                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold text-primary animate-pulse">
                   {shortlistCount}
                 </span>
               )}
@@ -178,13 +200,13 @@ export function Header() {
               href={contact.whatsapp}
               target="_blank"
               rel="noreferrer"
-              className="btn btn-outline gap-1.5"
+              className="btn btn-outline hover:border-brass gap-1.5 transition-all duration-300"
             >
               <MessageSquare className="h-3.5 w-3.5 text-brass" /> WhatsApp
             </a>
 
             <Magnetic>
-              <Link to="/contact" className="btn btn-primary shadow-xs">
+              <Link to="/contact" className="btn btn-primary btn-shimmer shadow-xs">
                 Book Consultation
               </Link>
             </Magnetic>
@@ -256,6 +278,7 @@ export function Footer() {
       h: "Explore Portfolio",
       l: [
         ["/properties", "All Offers & Projects"],
+        ["/calculator", "Acquisition & Yield Calculator"],
         ["/citizenship", "Citizenship advice"],
         ["/services", "Advisory services"],
         ["/investment-catalog", "Investment catalogue"],
@@ -279,7 +302,8 @@ export function Footer() {
           <Logo className="h-10" variant="light" />
           <p className="text-on-dark font-medium">{contact.tagline}</p>
           <p className="text-xs leading-relaxed text-on-dark-muted/80">
-            Istanbul-headquartered private advisory firm catering exclusively to international property investors, citizenship applicants, and institutional buyers in Türkiye.
+            Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and
+            independent legal peace of mind.
           </p>
           <div className="pt-2 flex items-center gap-3">
             <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-[0.7rem] font-semibold text-brass">
@@ -328,12 +352,16 @@ export function Footer() {
 
       <div className="border-t border-on-dark/15">
         <div className="container-site py-6 text-xs leading-relaxed text-on-dark-muted/80">
-          Property valuations, price availability, unit specifications, and legal citizenship eligibility thresholds are subject to ongoing regulatory updates by Turkish authorities. Content on this website is for introductory advisory review and must be confirmed prior to binding contracts.
+          Property prices, availability, and official citizenship regulations may be updated
+          periodically by Turkish authorities. Our team will verify all latest details and legal
+          requirements with you before signing any contract.
         </div>
         <div className="container-site flex flex-col gap-3 pb-8 text-xs text-on-dark-muted md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span>© 2026 {contact.company}. All rights reserved.</span>
-            <span className="text-on-dark-muted/40" aria-hidden="true">·</span>
+            <span className="text-on-dark-muted/40" aria-hidden="true">
+              ·
+            </span>
             <span className="text-on-dark-muted/90 font-medium">Built by Zarif</span>
           </div>
           <span className="flex flex-wrap gap-5">
@@ -406,9 +434,7 @@ export function Margin({ label, children }: { label: string; children: React.Rea
       <div>
         <p className="eyebrow eyebrow-mark border-t border-ink pt-3 md:sticky md:top-24">{label}</p>
       </div>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -420,13 +446,14 @@ export function CtaBand() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/10 via-transparent to-transparent pointer-events-none" />
       <div className="container-site relative text-center">
         <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
-          Direct Istanbul Advisory
+          Direct Istanbul Guidance
         </span>
         <h2 className="headline mx-auto mt-4 max-w-2xl text-3xl md:text-4xl text-on-dark">
-          Schedule your private portfolio consultation.
+          Ready to find your dream property in Istanbul?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-on-dark-muted text-sm md:text-base leading-relaxed">
-          Speak directly with our Istanbul team about district valuations, Turkish citizenship thresholds, title verification, or private viewing shortlists.
+          Speak directly with our team in Istanbul. Whether you are exploring neighborhoods,
+          seeking Turkish citizenship, or arranging a viewing, we are here to help.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Magnetic>
@@ -447,4 +474,3 @@ export function CtaBand() {
     </section>
   );
 }
-

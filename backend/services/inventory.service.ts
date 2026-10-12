@@ -38,7 +38,10 @@ export class InventoryService {
 
     let query = client
       .from("marketing_offers")
-      .select("id, ref, slug, marketing_title, district, city, side, record_type, mode, layout_label, bathrooms, gross_m2, net_m2, area_m2, amount, currency, price_type, price_basis, expenses_amount, availability, cover_image_path, cbi_eligible, cbi_verified, published_snapshot, published_at", { count: "exact" })
+      .select(
+        "id, ref, slug, marketing_title, district, city, side, record_type, mode, layout_label, bathrooms, gross_m2, net_m2, area_m2, amount, currency, price_type, price_basis, expenses_amount, availability, cover_image_path, cbi_eligible, cbi_verified, published_snapshot, published_at",
+        { count: "exact" },
+      )
       .eq("publication_status", "Published");
 
     if (options.district) {
@@ -96,13 +99,15 @@ export class InventoryService {
     // 1. Direct match on published offer
     const { data: offer, error: offerError } = await client
       .from("marketing_offers")
-      .select(`
+      .select(
+        `
         *,
         pricing_options (*),
         offer_amenities (
           amenities (*)
         )
-      `)
+      `,
+      )
       .eq("slug", slug)
       .eq("publication_status", "Published")
       .maybeSingle();
@@ -138,7 +143,8 @@ export class InventoryService {
     const admin = getAdminClient();
     const { data, error } = await admin
       .from("marketing_offers")
-      .select(`
+      .select(
+        `
         *,
         pricing_options (*),
         package_memberships (
@@ -148,7 +154,8 @@ export class InventoryService {
           amenities (*)
         ),
         publication_history (*)
-      `)
+      `,
+      )
       .eq("id", offerId)
       .single();
 
@@ -214,7 +221,11 @@ export class InventoryService {
    * Admin / Staff: Update an existing draft marketing offer.
    * If slug is modified, records a 301 redirect from old slug to new slug.
    */
-  static async updateOffer(offerId: string, updates: Partial<z.infer<typeof MarketingOfferSchema>>, staffUserId: string) {
+  static async updateOffer(
+    offerId: string,
+    updates: Partial<z.infer<typeof MarketingOfferSchema>>,
+    staffUserId: string,
+  ) {
     const admin = getAdminClient();
 
     // Fetch existing

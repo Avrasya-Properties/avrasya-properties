@@ -1,4 +1,4 @@
-import type { DB, SiteSettings } from "./demo";
+import { DEFAULT_SITE_SETTINGS, type DB, type SiteSettings } from "./demo";
 export type Row = Record<string, unknown>;
 export const TABLES = {properties:"marketing_offers",contacts:"contacts",leads:"leads",tasks:"tasks",viewings:"viewings",deals:"deals",inquiries:"enquiries"} as const;
 export type Collection = keyof typeof TABLES;
@@ -12,7 +12,8 @@ export const FIELDS: Record<Collection, Record<string,string>> = {
  inquiries:{id:"id",name:"name",email:"email",phone:"phone",topic:"topic",budget:"budget",message:"message",source:"source",propertySlug:"property_slug",status:"status",createdAt:"created_at",notes:"notes",leadId:"lead_id",agentId:"assigned_agent_id"},
 };
 export const SETTINGS: Record<keyof SiteSettings,string> = {
-companyName:"company_name",registeredEntity:"registered_entity",taxOffice:"tax_office",licenseNo:"license_no",tagline:"tagline",email:"email",phone:"phone",whatsapp:"whatsapp",address:"address",advisoryHours:"advisory_hours",heroHeadline:"hero_headline",heroSubtitle:"hero_subtitle",eyebrowText:"eyebrow_text",cbiThresholdUsd:"cbi_threshold_usd",preloaderOpacity:"preloader_opacity",exchangeRateEur:"exchange_rate_eur",exchangeRateTry:"exchange_rate_try",exchangeRateGbp:"exchange_rate_gbp",enableFrankfurterSync:"enable_frankfurter_sync",announcementText:"announcement_text",announcementActive:"announcement_active"
+companyName:"company_name",registeredEntity:"registered_entity",taxOffice:"tax_office",licenseNo:"license_no",tagline:"tagline",email:"email",phone:"phone",whatsapp:"whatsapp",address:"address",advisoryHours:"advisory_hours",heroHeadline:"hero_headline",heroSubtitle:"hero_subtitle",eyebrowText:"eyebrow_text",cbiThresholdUsd:"cbi_threshold_usd",preloaderOpacity:"preloader_opacity",exchangeRateEur:"exchange_rate_eur",exchangeRateTry:"exchange_rate_try",exchangeRateGbp:"exchange_rate_gbp",enableFrankfurterSync:"enable_frankfurter_sync",announcementText:"announcement_text",announcementActive:"announcement_active",
+districts:"districts",layouts:"layouts",budgetRanges:"budget_ranges"
 };
 export function decode<C extends Collection>(collection:C,row:Row): DB[C][number] {
  const value:Row={revision:row["updated_at"]};
@@ -37,6 +38,16 @@ export function encode(collection:Collection,item:Row):Row {
  return row;
 }
 export function decodeSettings(row:Row):SiteSettings {
- return Object.fromEntries(Object.entries(SETTINGS).map(([key,column])=>[key,row[column]])) as SiteSettings;
+ const s = Object.fromEntries(Object.entries(SETTINGS).map(([key,column])=>[key,row[column]])) as unknown as SiteSettings;
+ if (!Array.isArray(s.districts)) {
+  s.districts = typeof s.districts === "string" ? JSON.parse(s.districts) : DEFAULT_SITE_SETTINGS.districts;
+ }
+ if (!Array.isArray(s.layouts)) {
+  s.layouts = typeof s.layouts === "string" ? JSON.parse(s.layouts) : DEFAULT_SITE_SETTINGS.layouts;
+ }
+ if (!Array.isArray(s.budgetRanges)) {
+  s.budgetRanges = typeof s.budgetRanges === "string" ? JSON.parse(s.budgetRanges) : DEFAULT_SITE_SETTINGS.budgetRanges;
+ }
+ return s;
 }
 export function encodeSettings(settings:Partial<SiteSettings>):Row {return Object.fromEntries(Object.entries(settings).map(([key,value])=>[SETTINGS[key as keyof SiteSettings],value]));}

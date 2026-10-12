@@ -14,7 +14,9 @@ export async function runReservationExpiryJob() {
       throw error;
     }
 
-    console.log(`[Job:ReservationExpiry] Successfully released ${releasedCount} expired reservations.`);
+    console.log(
+      `[Job:ReservationExpiry] Successfully released ${releasedCount} expired reservations.`,
+    );
 
     if ((releasedCount || 0) > 0) {
       await admin.from("audit_events").insert({

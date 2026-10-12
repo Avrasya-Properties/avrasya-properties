@@ -2,10 +2,15 @@ import fs from "node:fs";
 
 const manifest = JSON.parse(fs.readFileSync("src/data/source.json", "utf8"));
 
-const candidateRows = manifest.sources.map((s) => {
-  const rawPayload = JSON.stringify(s).replace(/'/g, "''");
-  const normPayload = JSON.stringify({ filename: s.filename, sha256: s.sha256, folder: s.folder }).replace(/'/g, "''");
-  return `(
+const candidateRows = manifest.sources
+  .map((s) => {
+    const rawPayload = JSON.stringify(s).replace(/'/g, "''");
+    const normPayload = JSON.stringify({
+      filename: s.filename,
+      sha256: s.sha256,
+      folder: s.folder,
+    }).replace(/'/g, "''");
+    return `(
     (SELECT id FROM public.source_files WHERE drive_id = '${s.id}' LIMIT 1),
     'file_provenance',
     '${rawPayload}'::jsonb,
@@ -15,7 +20,8 @@ const candidateRows = manifest.sources.map((s) => {
     'accepted',
     'Verified in 2026-10-10 baseline review'
   )`;
-}).join(",\n");
+  })
+  .join(",\n");
 
 const sql = `
 INSERT INTO public.extraction_candidates (

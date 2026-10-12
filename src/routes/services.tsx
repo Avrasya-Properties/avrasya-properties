@@ -24,8 +24,8 @@ import { meta } from "@/components/site/TextPage";
 export const Route = createFileRoute("/services")({
   head: () =>
     meta(
-      "Comprehensive Real Estate Advisory Services · Avrasya Properties",
-      "Ten end-to-end luxury property advisory services covering investment structuring, citizenship, legal coordination, turnkey management, and resale."
+      "Property Advisory & Buying Services · Avrasya Properties",
+      "Ten end-to-end property advisory services covering personalized search, Turkish citizenship, independent legal checks, interior setup, and ongoing management.",
     ),
   component: () => <ManagedPage slug="services"><ServicesPage /></ManagedPage>,
 });
@@ -42,82 +42,82 @@ type ServiceItem = {
 const SERVICES: ServiceItem[] = [
   {
     num: "01",
-    title: "Strategic Investment Advisory",
-    category: "Pre-Acquisition",
-    desc: "Bespoke consultation matching financial goals, risk profile, and family timelines with high-conviction Istanbul sub-markets.",
-    deliverables: ["Macro yield analysis", "District pricing forecasts", "Tax optimization strategy"],
+    title: "Personalized Property Advisory",
+    category: "Planning",
+    desc: "We sit down with you to understand your lifestyle, budget, and family goals, recommending the best Istanbul neighborhoods that match what you're looking for.",
+    deliverables: ["Neighborhood price guides", "Expected rental returns", "Clear cost breakdowns"],
     icon: LineChart,
   },
   {
     num: "02",
-    title: "Curated Property Selection & VIP Tours",
-    category: "Acquisition",
-    desc: "Unbiased selection across primary developer master-plans and private off-market resales, with private chauffeur viewings or 4K virtual tours.",
-    deliverables: ["Off-market shortlists", "Unfiltered site inspections", "Virtual video walk-throughs"],
+    title: "Handpicked Homes & Guided Tours",
+    category: "Viewing",
+    desc: "Explore handpicked homes that match your criteria. We accompany you on private, comfortable viewings across Istanbul or host live, high-definition video walkthroughs.",
+    deliverables: ["Shortlist of vetted homes", "Chauffeured private tours", "Live interactive video tours"],
     icon: Compass,
   },
   {
     num: "03",
-    title: "Citizenship by Investment Coordination",
-    category: "Legal & Residency",
-    desc: "Full guidance under Turkish Citizenship Law No. 5901, ensuring property meets $400,000 threshold and SPK appraisal compliance.",
-    deliverables: ["SPK appraisal monitoring", "Ministry conformity filings", "Family passport applications"],
+    title: "Turkish Citizenship Guidance",
+    category: "Citizenship & Residency",
+    desc: "Full, stress-free support for you and your family to secure Turkish citizenship by investing $400,000 or more in qualifying property.",
+    deliverables: ["Government valuation checks", "Official conformity approval", "Passports for the whole family"],
     icon: Landmark,
   },
   {
     num: "04",
-    title: "Legal & Administrative Representation",
-    category: "Legal & Residency",
-    desc: "Connecting you with vetted, independent Turkish bar-registered attorneys for limited Power of Attorney (POA), title searches, and contract reviews.",
-    deliverables: ["Tax ID registration", "Depository bank opening", "Encumbrance & lien checks"],
+    title: "Independent Legal & Title Checks",
+    category: "Legal Protection",
+    desc: "We connect you with independent, English-speaking Turkish bar attorneys who review contracts, perform full title deed checks, and protect your rights.",
+    deliverables: ["Tax number registration", "Turkish bank account opening", "Clean, debt-free title deed verification"],
     icon: Scale,
   },
   {
     num: "05",
-    title: "Cross-Border FX & Central Bank DAB",
-    category: "Transaction",
-    desc: "Management of foreign currency transfers and statutory Central Bank (TCMB) FX certificate conversions to eliminate exchange rate slippage.",
-    deliverables: ["Central Bank DAB certificate", "Escrow payment handling", "Multi-currency wire verification"],
+    title: "Safe Bank Transfers & Currency Exchange",
+    category: "Payment & Closing",
+    desc: "We guide your international bank transfers and handle the official Central Bank currency certificate (DAB), ensuring secure payments at fair government rates.",
+    deliverables: ["Official Central Bank DAB certificate", "Secure payment coordination", "Multi-currency wire assistance"],
     icon: FileCheck,
   },
   {
     num: "06",
-    title: "Investor Residence Permit (İkamet)",
-    category: "Legal & Residency",
-    desc: "Fast-track residence permit execution under Article 31/1(j) for investors and their dependents with zero physical stay conditions.",
-    deliverables: ["Health insurance enrollment", "Biometric appointment booking", "Permit renewal tracking"],
+    title: "Investor Residence Permits (İkamet)",
+    category: "Citizenship & Residency",
+    desc: "Fast-track residency for you and your family with no minimum stay requirements, allowing you to live, visit, or travel in Türkiye with complete freedom.",
+    deliverables: ["Health insurance guidance", "Biometrics appointment booking", "Permit delivery to your door"],
     icon: Users,
   },
   {
     num: "07",
-    title: "Turnkey Handover & Interior Fit-Out",
-    category: "Post-Acquisition",
-    desc: "Comprehensive snagging inspection upon developer completion, key holding, designer interior furnishing, and utility activations.",
-    deliverables: ["Snagging defect audit", "Interior design packages", "Water/gas/electric contracts"],
+    title: "Handover Inspection & Home Furnishing",
+    category: "Move-In & Setup",
+    desc: "Before you accept keys, we inspect every corner of the property to ensure flawless finishes. We also help set up utilities, internet, and beautiful interior furnishing.",
+    deliverables: ["Detailed room-by-room inspection", "Furnishing & interior design packages", "Water, electricity & internet setup"],
     icon: Key,
   },
   {
     num: "08",
-    title: "Strategic Rental & Asset Management",
-    category: "Post-Acquisition",
-    desc: "Tenant vetting, drafting notarized Turkish eviction agreements (tahliye taahhütnamesi), rent collection, and routine maintenance.",
-    deliverables: ["Corporate tenant vetting", "Rent escrow reporting", "Routine facility inspections"],
+    title: "Rental & Tenant Management",
+    category: "Rental Management",
+    desc: "Earn reliable rental income without the day-to-day hassle. We vet quality tenants, prepare official agreements, collect rent, and oversee maintenance.",
+    deliverables: ["Tenant screening & agreements", "Monthly rent collection", "Regular property check-ups"],
     icon: Building2,
   },
   {
     num: "09",
-    title: "Secondary Resale & Exit Execution",
-    category: "Wealth Management",
-    desc: "Capitalizing on the 5-year capital gains tax exemption window, re-appraising your asset, and marketing to our international network.",
-    deliverables: ["Market valuation review", "Global investor marketing", "Title transfer closing"],
+    title: "Future Resale & Marketing",
+    category: "Resale & Growth",
+    desc: "When you are ready to sell—especially after 5 years when profits are 100% tax-free—we appraise your home and present it to our global network of buyers.",
+    deliverables: ["Updated market appraisal", "Global buyer marketing", "Smooth title deed transfer"],
     icon: Layers,
   },
   {
     num: "10",
-    title: "Cross-Border Family Wealth Advisory",
-    category: "Wealth Management",
-    desc: "Structuring cross-border estate succession, Turkish inheritance compliance, and family relocation concierge.",
-    deliverables: ["Inheritance planning", "International school admission", "Private banking introductions"],
+    title: "Family Relocation & Settling-In Support",
+    category: "Family Support",
+    desc: "We help your family settle smoothly in Istanbul, assisting with international school enrollments, private banking introductions, and local life tips.",
+    deliverables: ["School introductions", "Private banking guidance", "Friendly local concierge"],
     icon: ShieldCheck,
   },
 ];
@@ -125,33 +125,33 @@ const SERVICES: ServiceItem[] = [
 const PHASES = [
   {
     stage: "Phase 1",
-    title: "Pre-Investment Structuring",
-    desc: "Define objectives, establish budget parameters, and review market macro trends before visiting properties.",
+    title: "Getting Started & Planning",
+    desc: "We discuss your goals, budget, and favorite areas, giving you an honest overview of the Istanbul market before you look at properties.",
   },
   {
     stage: "Phase 2",
-    title: "Selection & Verification",
-    desc: "Shortlisting prime developments, verifying developer track records, and ordering SPK valuations.",
+    title: "Curated Selection & Safety Check",
+    desc: "We handpick homes that suit you, inspect them in person, and verify the developer's track record and official valuation.",
   },
   {
     stage: "Phase 3",
-    title: "Contract & Financial Settlement",
-    desc: "Executing the preliminary sales contract, converting funds via TCMB DAB certificate, and executing Tapu transfer.",
+    title: "Clear Contracts & Title Transfer",
+    desc: "Your attorney reviews the sales contract, we guide your bank transfer safely, and you receive your official freehold title deed (Tapu).",
   },
   {
     stage: "Phase 4",
-    title: "Residency & Nationality Filing",
-    desc: "Filing conformity certificates, securing investor residency, and monitoring presidential citizenship decrees.",
+    title: "Citizenship & Residency Filing",
+    desc: "If you are applying for Turkish citizenship or residency, our legal team submits your paperwork for quick and smooth approval.",
   },
   {
     stage: "Phase 5",
-    title: "Handover & Furnishing",
-    desc: "Conducting handover snagging surveys, utility activations, and bespoke interior furnishing fit-outs.",
+    title: "Handover Inspection & Move-In",
+    desc: "We conduct a thorough final inspection, hand over the keys, activate utilities, and help furnish your home to perfection.",
   },
   {
     stage: "Phase 6",
-    title: "Operational Yield & Future Exit",
-    desc: "Managing tenant relationships, collecting net rental yields, and orchestrating future tax-exempt liquidation.",
+    title: "Rental Income & Ongoing Peace of Mind",
+    desc: "We help you welcome reputable tenants for steady rental income and provide ongoing support whenever you need it.",
   },
 ];
 
@@ -168,15 +168,15 @@ export function ServicesPage() {
   return (
     <>
       <PageIntro
-        eyebrow="End-to-End Client Care · Fiduciary Standards"
+        eyebrow="Complete Buyer Support · Every Step of the Way"
         title={
           <>
-            Comprehensive advisory across every <em>stage of ownership.</em>
+            Comprehensive guidance across every <em>stage of your purchase.</em>
           </>
         }
       >
         <p>
-          Avrasya Properties provides institutional advisory and transactional execution. We eliminate conflicts of interest by coordinating with independent, bar-registered attorneys and licensed valuation experts.
+          We make buying and owning property in Istanbul straightforward and stress-free. From selecting the right home to receiving your keys and Turkish passport, our team coordinates with independent lawyers and government-licensed experts to keep your purchase completely safe.
         </p>
       </PageIntro>
 
@@ -184,19 +184,19 @@ export function ServicesPage() {
       <section className="container-site py-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <p className="eyebrow">Service Directory</p>
-            <h2 className="font-display text-3xl font-semibold md:text-4xl">The Ten Core Advisory Pillars</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Filter by your stage of real estate acquisition or management.</p>
+            <p className="eyebrow">Our Services</p>
+            <h2 className="font-display text-3xl font-semibold md:text-4xl">The Ten Ways We Support You</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Filter by what you need—from initial planning to settling into your new home.</p>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 rounded-lg border bg-card p-1 text-xs">
+          <div className="flex flex-wrap gap-1.5 rounded-xs border border-border/80 bg-card p-1 text-xs shadow-xs">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+                className={`rounded-xs px-3 py-1.5 font-medium transition-all duration-200 ${
                   activeCategory === cat
-                    ? "bg-brass text-primary-foreground"
+                    ? "bg-primary text-on-dark shadow-xs font-semibold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -208,7 +208,7 @@ export function ServicesPage() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => (
-            <div key={s.num} className="group rounded-xl border bg-card p-6 transition-all hover:border-brass hover:shadow-md flex flex-col justify-between">
+            <div key={s.num} className="card-elevate group rounded-xs border border-border/80 bg-card p-6 shadow-xs transition-all hover:border-brass/70 hover:shadow-lg flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-semibold text-brass">{s.num}</span>
@@ -218,7 +218,7 @@ export function ServicesPage() {
                 </div>
 
                 <div className="mt-4 flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brass/10 text-brass">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xs bg-brass/10 text-brass">
                     <s.icon className="h-4 w-4" />
                   </div>
                   <h3 className="font-display text-lg font-bold text-foreground">{s.title}</h3>
@@ -245,18 +245,18 @@ export function ServicesPage() {
       <section className="border-t bg-ink text-on-dark py-20">
         <div className="container-site">
           <div className="max-w-2xl mb-12">
-            <p className="eyebrow text-brass">Strategic Sequence</p>
+            <p className="eyebrow text-brass">Simple Buying Journey</p>
             <h2 className="font-display text-3xl font-semibold md:text-4xl text-on-dark">
-              The Six-Phase Client Journey
+              Your Six-Step Buying Experience
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              Structured to guarantee total legal safety, financial efficiency, and absolute clarity at every step.
+              Designed to give you complete peace of mind, financial safety, and absolute clarity at every step.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {PHASES.map((p, i) => (
-              <div key={p.stage} className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div key={p.stage} className="card-elevate rounded-xs border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:border-brass/50 hover:bg-white/8">
                 <span className="font-mono text-xs font-bold text-brass uppercase tracking-widest">{p.stage}</span>
                 <h3 className="mt-2 font-display text-xl font-bold text-on-dark">{p.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">{p.desc}</p>
@@ -267,8 +267,8 @@ export function ServicesPage() {
       </section>
 
       <div className="container-site py-12 flex justify-center">
-        <Link to="/contact" className="btn btn-primary text-base px-8 py-3">
-          Schedule Private Service Consultation
+        <Link to="/contact" className="btn btn-primary text-base px-8 py-3 shadow-md btn-shimmer">
+          Book a Free Consultation
         </Link>
       </div>
 

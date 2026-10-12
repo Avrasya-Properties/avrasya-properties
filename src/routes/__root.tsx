@@ -24,12 +24,22 @@ function NotFoundComponent() {
     <div className="container-site py-24">
       <p className="eyebrow eyebrow-mark">404 · Page not found</p>
       <h1 className="display-hero mt-3">This address isn't on our map.</h1>
-      <p className="mt-4 max-w-xl text-muted-foreground">The page may have moved. These are good places to continue:</p>
+      <p className="mt-4 max-w-xl text-muted-foreground">
+        The page may have moved. These are good places to continue:
+      </p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/properties" className="btn btn-primary">Offers & projects</Link>
-        <Link to="/services" className="btn btn-outline">Services</Link>
-        <Link to="/contact" className="btn btn-outline">Contact</Link>
-        <Link to="/" className="btn btn-outline">Home</Link>
+        <Link to="/properties" className="btn btn-primary">
+          Offers & projects
+        </Link>
+        <Link to="/services" className="btn btn-outline">
+          Services
+        </Link>
+        <Link to="/contact" className="btn btn-outline">
+          Contact
+        </Link>
+        <Link to="/" className="btn btn-outline">
+          Home
+        </Link>
       </div>
     </div>
   );
@@ -46,8 +56,18 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
       <h1 className="headline">This page didn't load</h1>
       <p className="mt-2 text-muted-foreground">Something went wrong on our end.</p>
       <div className="mt-6 flex gap-2">
-        <button onClick={() => { router.invalidate(); reset(); }} className="btn btn-primary">Try again</button>
-        <a href="/" className="btn btn-outline">Go home</a>
+        <button
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
+          className="btn btn-primary"
+        >
+          Try again
+        </button>
+        <a href="/" className="btn btn-outline">
+          Go home
+        </a>
       </div>
     </div>
   );
@@ -59,8 +79,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Load critical public data before rendering, then hydrate the same cache.
     // A failed catalogue read is displayed inside the homepage, not as a redirect.
     await Promise.allSettled([
-      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:15000,retry:false}),
-      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:300000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:300000,retry:false}),
     ]);
   },
   head: () => ({
@@ -68,14 +88,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Avrasya Properties — Istanbul property-investment consultancy" },
-      { name: "description", content: "Istanbul-based advisory for international property buyers in Türkiye." },
+      {
+        name: "description",
+        content: "Istanbul-based advisory for international property buyers in Türkiye.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
@@ -104,14 +130,30 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router=useRouter();
-  useEffect(()=>watchWebsiteChanges(()=>{void queryClient.invalidateQueries({predicate:q=>PUBLIC_QUERY_KEYS.has(String(q.queryKey[0]))});void router.invalidate();}),[queryClient,router]);
+  const router = useRouter();
+  useEffect(
+    () =>
+      watchWebsiteChanges(() => {
+        void queryClient.invalidateQueries({
+          predicate: (q) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
+        });
+        void router.invalidate();
+      }),
+    [queryClient, router],
+  );
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const isAdmin=path.startsWith("/admin");
-  if (isAdmin) return <QueryClientProvider client={queryClient}><Outlet /></QueryClientProvider>;
+  const isAdmin = path.startsWith("/admin");
+  if (isAdmin)
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    );
   return (
     <QueryClientProvider client={queryClient}>
-      <a href="#main" className="sr-only focus:not-sr-only">Skip to content</a>
+      <a href="#main" className="sr-only focus:not-sr-only">
+        Skip to content
+      </a>
       <Preloader />
       {path!=="/"&&<MotionRoot />}
       <Header />

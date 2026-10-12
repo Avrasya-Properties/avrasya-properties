@@ -1,20 +1,20 @@
 import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { 
-  Award, 
-  Building2, 
-  Calendar, 
-  CheckCircle2, 
-  ChevronRight, 
-  Coins, 
-  DollarSign, 
-  FileCheck2, 
-  Globe2, 
-  HelpCircle, 
-  Landmark, 
-  ShieldCheck, 
-  Users 
+import {
+  Award,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  ChevronRight,
+  Coins,
+  DollarSign,
+  FileCheck2,
+  Globe2,
+  HelpCircle,
+  Landmark,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/citizenship")({
   head: () =>
     meta(
       "Turkish Citizenship by Investment ($400,000) · Avrasya Properties",
-      "Authoritative guide and interactive financial calculator for acquiring Turkish citizenship through qualifying Istanbul real estate. Legal roadmap, cost breakdowns, and SPK appraisal compliance."
+      "Clear, comprehensive guide and interactive cost calculator for obtaining Turkish citizenship through qualifying Istanbul real estate. Step-by-step roadmap and cost breakdowns.",
     ),
   component: () => <ManagedPage slug="citizenship"><CitizenshipPage /></ManagedPage>,
 });
@@ -43,49 +43,55 @@ export function CitizenshipPage() {
   const legalRepresentation = 6500; // Complete bar-certified CBI attorney representation for family
   const govtFilingPerPerson = 850;
   const totalGovtFiling = totalApplicants * govtFilingPerPerson;
-  const estimatedTotal = propertyPrice + tapuTransferFee + spkAppraisalFee + dabAndNotary + legalRepresentation + totalGovtFiling;
+  const estimatedTotal =
+    propertyPrice +
+    tapuTransferFee +
+    spkAppraisalFee +
+    dabAndNotary +
+    legalRepresentation +
+    totalGovtFiling;
 
   const steps = [
     {
       num: "01",
-      title: "Property Selection & SPK Appraisal",
+      title: "Choose Your Home & Value Check",
       duration: "Weeks 1–2",
-      desc: "Select qualifying property and commission an official Capital Markets Board (SPK) licensed appraisal confirming market valuation meets or exceeds $400,000 USD.",
+      desc: "Choose a home you love. A government-licensed appraiser then inspects the property to verify that its official market value meets or exceeds $400,000 USD.",
       icon: Building2,
     },
     {
       num: "02",
-      title: "Central Bank DAB Currency Conversion",
+      title: "Secure Bank Transfer & Currency Certificate",
       duration: "Week 3",
-      desc: "Transfer purchase funds in foreign currency to a Turkish bank, converting via the Central Bank of Türkiye (TCMB) to obtain the Döviz Alım Belgesi (DAB).",
+      desc: "Send your funds securely to a Turkish bank. The bank converts the funds through the Central Bank of Türkiye and issues the official currency certificate (DAB).",
       icon: Landmark,
     },
     {
       num: "03",
-      title: "Title Deed Transfer & 3-Year Annotation",
+      title: "Receive Your Title Deed (Tapu)",
       duration: "Week 4",
-      desc: "Execute title deed transfer at the Land Registry (Tapu) with an official statutory annotation restricting resale for a period of 3 years.",
+      desc: "You receive your official title deed at the Land Registry office with a simple 3-year holding pledge. You are free to live in or rent out your property immediately.",
       icon: FileCheck2,
     },
     {
       num: "04",
-      title: "Certificate of Conformity (Uygunluk Belgesi)",
+      title: "Citizenship Eligibility Approval",
       duration: "Weeks 5–6",
-      desc: "The Ministry of Environment, Urbanisation and Climate Change issues the official Certificate of Conformity verifying eligibility.",
+      desc: "The government reviews your title deed and valuation report, issuing your official Certificate of Eligibility for citizenship.",
       icon: ShieldCheck,
     },
     {
       num: "05",
       title: "Investor Residence Permit",
       duration: "Weeks 7–8",
-      desc: "Filing for a specialized investor residence permit under Article 31/1(j) of the Foreigners and International Protection Law. No residency requirement is imposed.",
+      desc: "We arrange fast-track investor residence cards for you and your family. There is no minimum stay required in Türkiye.",
       icon: Users,
     },
     {
       num: "06",
-      title: "Citizenship Approval & Passport Issuance",
+      title: "Receive Your Turkish Passports",
       duration: "Months 3–6",
-      desc: "Final presidential decree approval. Biometric appointment scheduled in Istanbul or at any Turkish embassy worldwide to receive biometric passports.",
+      desc: "Your citizenship is approved. Collect your new Turkish identity cards and biometric passports in Istanbul or at any Turkish embassy worldwide.",
       icon: Award,
     },
   ];
@@ -93,65 +99,68 @@ export function CitizenshipPage() {
   const benefits = [
     {
       title: "Fast Track Processing",
-      desc: "Total procedure typically concluded within 3 to 6 months from title deed registration to passport collection.",
+      desc: "Typically completed within 3 to 6 months from title deed transfer to receiving your passports.",
     },
     {
       title: "Entire Family Included",
-      desc: "The principal investor, legal spouse, and all biological or adopted dependent children under 18 receive citizenship simultaneously.",
+      desc: "You, your spouse, and all children under 18 receive Turkish passports together under a single investment.",
     },
     {
       title: "Zero Physical Stay Requirement",
-      desc: "No minimum physical residency is required before, during, or after the citizenship application is granted.",
+      desc: "You are not required to live in or visit Türkiye for any set number of days to keep your citizenship.",
     },
     {
       title: "Full Dual Nationality",
-      desc: "Turkish law explicitly permits multiple citizenships without requiring surrender of your country of origin passport.",
+      desc: "Türkiye allows dual citizenship, meaning you keep your existing nationality and passport.",
     },
     {
-      title: "Complete Capital Preservation",
-      desc: "After the 3-year statutory holding period, you are legally entitled to sell your property while retaining lifelong citizenship.",
+      title: "Keep Your Passport Forever",
+      desc: "After just 3 years, you can sell your property and recover your investment while keeping your Turkish passport for life.",
     },
     {
       title: "US E-2 Treaty Investor Eligibility",
-      desc: "Turkish citizens are eligible to apply for the United States E-2 Investor Visa for business entry into the USA.",
+      desc: "Turkish citizens can apply for the US E-2 Investor Visa, opening simplified business and residency opportunities in America.",
     },
   ];
 
   const faqs = [
     [
       "Can I purchase multiple properties to reach the $400,000 threshold?",
-      "Yes. Under Turkish law, you can combine multiple properties (such as two 1+1 apartments or a penthouse and a commercial unit) provided their total SPK appraisal and payment receipts equal or exceed $400,000 USD, and all title deeds are submitted synchronously.",
+      "Yes. Under Turkish law, you can combine multiple properties (such as two 1+1 apartments or an apartment and a retail unit) provided their total official valuation and bank payments equal or exceed $400,000 USD.",
     ],
     [
-      "What is the DAB (Döviz Alım Belgesi) and why is it critical?",
-      "Since January 2022, foreign property buyers must convert foreign currency into Turkish Liras through a Turkish depository bank to the Central Bank of Türkiye (TCMB) prior to title transfer. The issued DAB certificate is mandatory for citizenship validation.",
+      "What is the DAB (Döviz Alım Belgesi) and why is it needed?",
+      "When buying property as an international buyer, your foreign currency is converted to Turkish Liras through your bank and the Central Bank of Türkiye. The bank provides the DAB certificate as official proof for your citizenship application.",
     ],
     [
       "Do I have to live in Türkiye to maintain citizenship?",
-      "No. Türkiye does not require physical residency, language examinations, or military conscription for foreign investors obtaining nationality through the investment programme.",
+      "No. Türkiye does not require physical residency, language tests, or military service for foreign investors obtaining citizenship through property.",
     ],
     [
       "Can I rent out the property during the 3-year holding period?",
-      "Yes. You are fully permitted to generate rental income in foreign currency or Turkish Lira throughout the 3-year holding window. You only agree not to sell the title deed.",
+      "Yes. You are completely free to rent out your property and earn steady rental income in foreign currency or Turkish Lira throughout the 3-year period. You simply agree not to sell the title deed.",
     ],
     [
-      "How does the VAT (KDV) exemption work for foreigners?",
-      "Non-resident foreign nationals buying directly from primary developers can qualify for 0% VAT exemption (saving 1% to 20%), provided the purchase is funded with foreign currency wired from outside Türkiye and held for at least one year.",
+      "How does the VAT (KDV) tax exemption work?",
+      "International buyers purchasing directly from quality developers can qualify for 0% VAT (saving 1% to 20%), provided the funds are transferred from outside Türkiye and the property is kept for at least one year.",
     ],
   ];
 
   return (
     <>
       <PageIntro
-        eyebrow="Official Turkish Citizenship by Investment · Law No. 5901"
+        eyebrow="Turkish Citizenship by Investment · Simple & Clear Guide"
         title={
           <>
-            Turkish citizenship through property: <em>authoritative, transparent counsel.</em>
+            Turkish citizenship through property: <em>a smooth, secure pathway for your family.</em>
           </>
         }
       >
         <p>
-          Acquire Turkish nationality for your entire family by investing a minimum of $400,000 USD in qualifying Istanbul real estate. Avrasya Properties coordinates every milestone alongside independent bar-registered lawyers and licensed valuation experts.
+          Obtain Turkish passports for your entire family by investing $400,000 or more in qualifying
+          Istanbul real estate. We guide you through every milestone alongside trusted, independent
+          attorneys and licensed valuation experts—keeping the process simple, transparent, and
+          completely worry-free.
         </p>
       </PageIntro>
 
@@ -170,12 +179,12 @@ export function CitizenshipPage() {
           </div>
           <div className="border-l-2 border-brass pl-4">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Family Scope</p>
-            <p className="font-display text-2xl font-bold text-foreground">Investor & Family</p>
-            <p className="text-xs text-muted-foreground">Spouse + kids under 18</p>
+            <p className="font-display text-2xl font-bold text-foreground">Whole Family</p>
+            <p className="text-xs text-muted-foreground">Spouse & kids under 18</p>
           </div>
           <div className="border-l-2 border-brass pl-4">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Holding Period</p>
-            <p className="font-display text-2xl font-bold text-foreground">36 Months</p>
+            <p className="font-display text-2xl font-bold text-foreground">3 Years</p>
             <p className="text-xs text-muted-foreground">Retain passport after sale</p>
           </div>
         </div>
@@ -184,19 +193,19 @@ export function CitizenshipPage() {
       {/* Interactive Financial Calculator */}
       <section className="container-site py-16">
         <div className="mb-8">
-          <p className="eyebrow">Financial Transparency</p>
+          <p className="eyebrow">Cost Transparency</p>
           <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
-            Citizenship Acquisition Cost Calculator
+            Citizenship Cost Calculator
           </h2>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            Estimate all government fees, title deed taxes, legal retainers, and appraisal charges for your family.
+            Estimate all property costs, government fees, and legal support for your family in seconds.
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12">
           {/* Controls Panel */}
-          <div className="space-y-6 rounded-2xl border bg-card p-6 lg:col-span-6 md:p-8">
-            <h3 className="text-lg font-semibold text-foreground">Configure Your Case</h3>
+          <div className="card-elevate space-y-6 rounded-xs border border-border/80 bg-card p-6 lg:col-span-6 md:p-8 shadow-xs">
+            <h3 className="text-lg font-semibold text-foreground">Your Investment & Family</h3>
 
             {/* Slider */}
             <div>
@@ -213,7 +222,7 @@ export function CitizenshipPage() {
                 step="25000"
                 value={propertyPrice}
                 onChange={(e) => setPropertyPrice(Number(e.target.value))}
-                className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-brass"
+                className="range-luxury my-3"
               />
               <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
                 <span>$400,000 (Min Threshold)</span>
@@ -224,8 +233,10 @@ export function CitizenshipPage() {
 
             {/* Family composition */}
             <div className="space-y-4 pt-4 border-t">
-              <label className="text-sm font-medium text-foreground block">Family Members Included</label>
-              
+              <label className="text-sm font-medium text-foreground block">
+                Family Members Included
+              </label>
+
               <div className="flex items-center justify-between rounded-lg border bg-background p-3">
                 <span className="text-sm">Include Legal Spouse</span>
                 <input
@@ -246,7 +257,9 @@ export function CitizenshipPage() {
                   >
                     -
                   </button>
-                  <span className="w-5 text-center font-mono text-sm font-medium">{childrenCount}</span>
+                  <span className="w-5 text-center font-mono text-sm font-medium">
+                    {childrenCount}
+                  </span>
                   <button
                     type="button"
                     onClick={() => setChildrenCount(Math.min(6, childrenCount + 1))}
@@ -259,8 +272,12 @@ export function CitizenshipPage() {
 
               <div className="flex items-center justify-between rounded-lg border bg-background p-3">
                 <div>
-                  <span className="text-sm block">Primary Developer Stock (VAT Exemption Eligible)</span>
-                  <span className="text-[11px] text-muted-foreground">Non-residents can apply for 0% KDV status</span>
+                  <span className="text-sm block">
+                    Eligible for 0% VAT (Tax Saving)
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    Foreign buyers can save between 1% to 20% on value-added tax
+                  </span>
                 </div>
                 <input
                   type="checkbox"
@@ -273,39 +290,63 @@ export function CitizenshipPage() {
           </div>
 
           {/* Breakdown Summary Panel */}
-          <div className="rounded-2xl border bg-card p-6 lg:col-span-6 md:p-8 flex flex-col justify-between">
+          <div className="card-elevate rounded-xs border border-border/80 bg-card p-6 lg:col-span-6 md:p-8 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between border-b pb-4">
-                <h3 className="text-lg font-semibold text-foreground">Estimated Financial Outlay</h3>
-                <span className="rounded-full bg-brass/10 px-3 py-1 text-xs font-semibold text-brass">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Estimated Total Cost Breakdown
+                </h3>
+                <span className="rounded bg-brass/10 px-3 py-1 text-xs font-semibold text-brass">
                   {totalApplicants} {totalApplicants === 1 ? "Passport" : "Passports"} Included
                 </span>
               </div>
 
               <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">Property Investment Capital</dt>
-                  <dd className="font-mono font-medium text-foreground">${new Intl.NumberFormat("en-US").format(propertyPrice)}</dd>
+                  <dt className="text-muted-foreground">Property Purchase Price</dt>
+                  <dd className="font-mono font-medium text-foreground">
+                    ${new Intl.NumberFormat("en-US").format(propertyPrice)}
+                  </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">Title Deed Transfer Tax (Tapu Harcı · 4%)</dt>
-                  <dd className="font-mono font-medium text-foreground">${new Intl.NumberFormat("en-US").format(tapuTransferFee)}</dd>
+                  <dt className="text-muted-foreground">
+                    Title Deed Transfer Tax (Tapu Harcı · 4%)
+                  </dt>
+                  <dd className="font-mono font-medium text-foreground">
+                    ${new Intl.NumberFormat("en-US").format(tapuTransferFee)}
+                  </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">Official SPK Valuation & Appraisal Report</dt>
-                  <dd className="font-mono font-medium text-foreground">${new Intl.NumberFormat("en-US").format(spkAppraisalFee)}</dd>
+                  <dt className="text-muted-foreground">
+                    Independent Government Property Valuation
+                  </dt>
+                  <dd className="font-mono font-medium text-foreground">
+                    ${new Intl.NumberFormat("en-US").format(spkAppraisalFee)}
+                  </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">Central Bank DAB Currency Certificate & Sworn Notarizations</dt>
-                  <dd className="font-mono font-medium text-foreground">${new Intl.NumberFormat("en-US").format(dabAndNotary)}</dd>
+                  <dt className="text-muted-foreground">
+                    Central Bank Currency Certificate (DAB) & Notary
+                  </dt>
+                  <dd className="font-mono font-medium text-foreground">
+                    ${new Intl.NumberFormat("en-US").format(dabAndNotary)}
+                  </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">Bar-Certified Immigration Counsel Retainer (Full Family)</dt>
-                  <dd className="font-mono font-medium text-foreground">${new Intl.NumberFormat("en-US").format(legalRepresentation)}</dd>
+                  <dt className="text-muted-foreground">
+                    Independent Legal Support for the Whole Family
+                  </dt>
+                  <dd className="font-mono font-medium text-foreground">
+                    ${new Intl.NumberFormat("en-US").format(legalRepresentation)}
+                  </dd>
                 </div>
                 <div className="flex justify-between py-1 border-b pb-3">
-                  <dt className="text-muted-foreground">Government Passport Filing & Residence Duties ({totalApplicants} pax)</dt>
-                  <dd className="font-mono font-medium text-foreground">${new Intl.NumberFormat("en-US").format(totalGovtFiling)}</dd>
+                  <dt className="text-muted-foreground">
+                    Government Filing & Passport Fees ({totalApplicants} people)
+                  </dt>
+                  <dd className="font-mono font-medium text-foreground">
+                    ${new Intl.NumberFormat("en-US").format(totalGovtFiling)}
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -313,8 +354,12 @@ export function CitizenshipPage() {
             <div className="mt-6 pt-4 border-t">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Estimated Total Investment</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Includes property acquisition & complete legal execution</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Estimated Total Cost
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Includes property cost, taxes, valuation, and legal support
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="font-display text-3xl font-bold text-brass tabular-nums">
@@ -328,15 +373,12 @@ export function CitizenshipPage() {
                 <Link
                   to="/properties"
                   search={{ cbiOnly: true }}
-                  className="btn btn-primary flex-1 justify-center"
+                  className="btn btn-primary flex-1 justify-center btn-shimmer"
                 >
-                  View $400k+ Qualifying Inventory
+                  Explore Qualifying Homes ($400,000+)
                 </Link>
-                <Link
-                  to="/contact"
-                  className="btn btn-outline flex-1 justify-center"
-                >
-                  Book Private Legal Briefing
+                <Link to="/contact" className="btn btn-outline flex-1 justify-center hover:border-brass/70 hover:text-brass transition-colors">
+                  Speak with a Citizenship Advisor
                 </Link>
               </div>
             </div>
@@ -350,16 +392,20 @@ export function CitizenshipPage() {
           <div className="max-w-2xl">
             <p className="eyebrow text-brass">Process Transparency</p>
             <h2 className="font-display text-3xl font-semibold md:text-4xl text-on-dark">
-              6-Stage Path to Turkish Citizenship
+              6 Simple Steps to Turkish Citizenship
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              Every step is pre-structured with independent legal oversight to guarantee compliance with the Ministry of Environment and Directorate of Migration Management.
+              Every step is handled with independent legal oversight to make your application smooth,
+              safe, and completely predictable.
             </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {steps.map((s) => (
-              <div key={s.num} className="group relative rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:border-brass/50 hover:bg-white/[0.08]">
+              <div
+                key={s.num}
+                className="card-elevate group relative rounded-xs border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:border-brass/50 hover:bg-white/[0.08]"
+              >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-2xl font-bold text-brass">{s.num}</span>
                   <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-on-dark-muted">
@@ -382,14 +428,17 @@ export function CitizenshipPage() {
         <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="eyebrow">Global Freedom & Security</p>
           <h2 className="font-display text-3xl font-semibold md:text-4xl">
-            Strategic Advantages of Turkish Nationality
+            Advantages of Turkish Citizenship
           </h2>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {benefits.map((b) => (
-            <div key={b.title} className="rounded-xl border bg-card p-6 transition-all hover:border-brass">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brass/10 text-brass mb-4">
+            <div
+              key={b.title}
+              className="card-elevate rounded-xs border border-border/80 bg-card p-6 shadow-xs transition-all hover:border-brass/70 hover:shadow-lg hover:-translate-y-1"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xs bg-brass/10 text-brass mb-4">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">{b.title}</h3>
@@ -400,7 +449,7 @@ export function CitizenshipPage() {
       </section>
 
       {/* Questions & Legal Clarification */}
-      <Margin label="Official FAQ">
+      <Margin label="Helpful FAQs">
         <div className="space-y-6">
           {faqs.map(([q, a]) => (
             <div key={q} className="rounded-lg border bg-card p-6">
@@ -414,9 +463,15 @@ export function CitizenshipPage() {
       {/* Strict Compliance Disclaimer */}
       <Margin label="Important Notice">
         <div className="rounded-xl border-l-4 border-brass bg-card p-6 text-sm leading-relaxed text-muted-foreground">
-          <p className="font-semibold text-foreground mb-1">Regulatory & Statutory Compliance Notice</p>
+          <p className="font-semibold text-foreground mb-1">
+            Regulatory & Compliance Notice
+          </p>
           <p>
-            Avrasya Properties provides investment brokerage and transactional coordination. Final citizenship approval is the exclusive statutory prerogative of the Republic of Türkiye Ministry of Interior Directorate of Migration Management. Property listings displayed on this platform are evaluated based on developer documentation and independent SPK valuations. All legal representations are executed through licensed members of the Istanbul Bar Association.
+            Avrasya Properties provides dedicated property advisory and transaction support. Final
+            citizenship approval is granted by the Republic of Türkiye Ministry of Interior Directorate
+            of Migration Management. Every property in our collection is independently appraised by
+            licensed experts, and all legal filings are handled by certified members of the Istanbul
+            Bar Association.
           </p>
         </div>
       </Margin>

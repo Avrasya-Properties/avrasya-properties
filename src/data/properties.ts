@@ -1,6 +1,13 @@
 import raw from "./source.json";
+import { useSyncExternalStore } from "react";
 
-export type Area = { value_m2: number; basis: "gross" | "net" | "unspecified"; layout?: string; scope?: string; unit_count?: number };
+export type Area = {
+  value_m2: number;
+  basis: "gross" | "net" | "unspecified";
+  layout?: string;
+  scope?: string;
+  unit_count?: number;
+};
 export type Price = {
   currency: "USD" | "TRY" | "EUR" | "GBP" | null;
   amount: number | null;
@@ -33,10 +40,21 @@ export type PropertyRecord = {
   cover?: string | null;
   availability?: string;
   availability_verified: boolean;
-  details: { [k: string]: unknown; project?: string; note?: string; delivery_source?: string | null; installment_offer?: unknown; claims_requiring_confirmation?: string[]; supporting_plan?: unknown };
+  details: {
+    [k: string]: unknown;
+    project?: string;
+    note?: string;
+    delivery_source?: string | null;
+    installment_offer?: unknown;
+    claims_requiring_confirmation?: string[];
+    supporting_plan?: unknown;
+  };
 };
 
-const data = raw as unknown as { records: PropertyRecord[]; legacy_snapshot_only_records: { slug: string; price_usd: number }[] };
+const data = raw as unknown as {
+  records: PropertyRecord[];
+  legacy_snapshot_only_records: { slug: string; price_usd: number }[];
+};
 export const properties: PropertyRecord[] = data.records;
 export const legacyRecords = data.legacy_snapshot_only_records;
 
@@ -46,7 +64,8 @@ export const CONTACT = {
   phoneHref: "tel:+905459248042",
   whatsapp: "https://wa.me/905459248042",
   company: "Avrasya Properties Group",
-  address: "Mimar Sinan Mahallesi, Selam-i Ali Efendi Caddesi, Ara Kafe Yanı No:17, 34672 Üsküdar / İstanbul, Türkiye",
+  address:
+    "Mimar Sinan Mahallesi, Selam-i Ali Efendi Caddesi, Ara Kafe Yanı No:17, 34672 Üsküdar / İstanbul, Türkiye",
   tagline: "Your Future Starts with the Right Investment.",
 };
 
@@ -64,11 +83,17 @@ const fmt = (n:number,c="USD") => new Intl.NumberFormat("en-US",{style:"currency
 
 /** Human price headline + qualifier appropriate to the record's price basis. */
 export function priceDisplay(p: Price): { main: string; note: string } {
-  if (p.basis === "on_request") return { main: "Price on request", note: "Enquire for current options" };
-  if (p.basis === "conflicting_starting_prices") return { main: "Request current options", note: "Two source starting prices on file" };
-  if (p.basis === "scope_unconfirmed") return { main: "Confirm offer details", note: "Flyer amount scope unclear" };
+  if (p.basis === "on_request")
+    return { main: "Price on request", note: "Enquire for current options" };
+  if (p.basis === "conflicting_starting_prices")
+    return { main: "Request current options", note: "Two source starting prices on file" };
+  if (p.basis === "scope_unconfirmed")
+    return { main: "Confirm offer details", note: "Flyer amount scope unclear" };
   if (p.basis === "installment_schedule" && p.down_payment_amount)
-    return { main: `${fmt(p.down_payment_amount, "TRY")} down`, note: `TRY schedule · ${p.installment_count} instalments · full price to confirm` };
+    return {
+      main: `${fmt(p.down_payment_amount, "TRY")} down`,
+      note: `TRY schedule · ${p.installment_count} instalments · full price to confirm`,
+    };
   if (p.amount == null) return { main: "Price on request", note: "" };
   const c = p.currency ?? "USD";
   const notes: Record<string, string> = {
@@ -84,7 +109,8 @@ export function priceDisplay(p: Price): { main: string; note: string } {
 /** USD amount usable for sorting / budget matching; null when not comparable. */
 export function comparableUsd(p: Price): number | null {
   if (p.currency !== "USD" || p.amount == null) return null;
-  if (["scope_unconfirmed", "conflicting_starting_prices", "on_request"].includes(p.basis)) return null;
+  if (["scope_unconfirmed", "conflicting_starting_prices", "on_request"].includes(p.basis))
+    return null;
   return p.amount;
 }
 
@@ -101,7 +127,12 @@ export function areaText(r: PropertyRecord): string {
 export const locationText = (r: PropertyRecord) =>
   r.location_label ? `${r.location_label}, ${r.city}` : "Location to confirm";
 
-export const sideText = (r: PropertyRecord) => r.side==="Europe"?"European side":r.side==="Asia"?"Asian side":"Side to confirm";
+export const sideText = (r: PropertyRecord) =>
+  r.side === "Europe"
+    ? "European side"
+    : r.side === "Asia"
+      ? "Asian side"
+      : "Side to confirm";
 
 export const LAYOUTS = ["1+1", "2+1", "Duplex"] as const;
 export function matchesLayout(r: PropertyRecord, l: string) {
@@ -109,7 +140,9 @@ export function matchesLayout(r: PropertyRecord, l: string) {
   return l === "Duplex" ? /duplex/i.test(s) : s.includes(l);
 }
 
-export const LOCATIONS = Array.from(new Set(properties.map((r) => r.location_label).filter(Boolean))) as string[];
+export const LOCATIONS = Array.from(
+  new Set(properties.map((r) => r.location_label).filter(Boolean)),
+) as string[];
 
 export const BUDGETS = [
   { id: "u300", label: "Up to $300,000", min: 0, max: 300000 },
@@ -119,7 +152,10 @@ export const BUDGETS = [
 ];
 
 export type SupportedCurrency = "USD" | "EUR" | "TRY" | "GBP";
-export const EXCHANGE_RATES: Record<SupportedCurrency, { symbol: string; rate: number; prefix: boolean }> = {
+export const EXCHANGE_RATES: Record<
+  SupportedCurrency,
+  { symbol: string; rate: number; prefix: boolean }
+> = {
   USD: { symbol: "$", rate: 1, prefix: true },
   EUR: { symbol: "€", rate: 0.92, prefix: true },
   TRY: { symbol: "₺", rate: 38.5, prefix: true },
@@ -144,7 +180,6 @@ export type PropertyMediaInfo = {
 function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   const s = r.slug.toLowerCase();
   const isCbi = r.details["cbi_verified"] === true;
-  
   // 1. RAMS Park House Maslak (1+1 XS 50m2, $270k)
   if (s === "rams-park-house-maslak-1-1xs" || s.includes("rams")) {
     return {
@@ -153,7 +188,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-43.jpg",
         "/images/properties/maslak-tower.jpg",
         "/images/properties/istanbul-project-01.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
       tags: [isCbi ? "Citizenship Eligible" : "Maslak CBD", "Skyscraper Axis", "High Yield"],
@@ -161,8 +196,8 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "Floor-to-ceiling soundproof acoustic glass with skyline panorama",
         "Valet service, executive lounge, and private meeting facilities",
         "Direct covered access to ITU Ayazağa Metro station",
-        "Premium multinational corporate executive tenancy"
-      ]
+        "Premium multinational corporate executive tenancy",
+      ],
     };
   }
 
@@ -174,16 +209,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-39.jpg",
         "/images/properties/istanbul-project-00.jpg",
         "/images/properties/bosphorus-terrace.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Beşiktaş Central", "Multi-Unit Package", "Prime Rental Yield"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Beşiktaş Central",
+        "Multi-Unit Package",
+        "Prime Rental Yield",
+      ],
       highlights: [
         "Turnkey multi-unit investment package in central European Istanbul",
         "Walking distance to Bosphorus ferry terminal and central transit hub",
         "High continuous foreign student and expatriate rental demand",
-        "Clear freehold individual title deeds ready for transfer"
-      ]
+        "Clear freehold individual title deeds ready for transfer",
+      ],
     };
   }
 
@@ -195,7 +234,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-44.jpg",
         "/images/properties/sisli-luxury-1.jpg",
         "/images/properties/ferikoy-duplex.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
       tags: [isCbi ? "Citizenship Eligible" : "Central Şişli", "Duplex Residence", "Near Bomonti"],
@@ -203,8 +242,8 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "Spacious duplex penthouse architecture with panoramic city outlook",
         "Immediate proximity to Bomontiada culture hub and Nişantaşı",
         "Underground designated parking space and private storage",
-        "High capital preservation in established central historic district"
-      ]
+        "High capital preservation in established central historic district",
+      ],
     };
   }
 
@@ -216,16 +255,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-45.jpg",
         "/images/properties/topkapi-pearl.jpg",
         "/images/properties/istanbul-project-47.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Historic Peninsula Axis", "Family Residence", "Transit Hub"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Historic Peninsula Axis",
+        "Family Residence",
+        "Transit Hub",
+      ],
       highlights: [
         "Direct connection to tram, Metrobus, and E-5 transport spine",
         "Comprehensive landscaped gardens, indoor pools, and fitness club",
         "Title deed and citizenship status require independent review",
-        "Underground assigned parking with 24/7 guarded security"
-      ]
+        "Underground assigned parking with 24/7 guarded security",
+      ],
     };
   }
 
@@ -237,16 +280,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-46.jpg",
         "/images/properties/gunesli-express-1.jpg",
         "/images/properties/gunesli-express-2.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "Flexible Instalments", "Modern Complex"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor",
+        "Flexible Instalments",
+        "Modern Complex",
+      ],
       highlights: [
         "Positioned on the Basın Ekspres prime business axis",
         "Flexible direct developer instalment structure without bank interest",
         "Rapid transit connections to Istanbul Airport corridor",
-        "Comprehensive residential amenities and high rental demand"
-      ]
+        "Comprehensive residential amenities and high rental demand",
+      ],
     };
   }
 
@@ -258,7 +305,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-47.jpg",
         "/images/properties/sisli-luxury-2.jpg",
         "/images/properties/ferikoy-duplex.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
       tags: [isCbi ? "Citizenship Eligible" : "Central Şişli", "Private Terrace", "High Liquidity"],
@@ -266,8 +313,8 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "Boutique low-rise architecture with high acoustic insulation",
         "Top-floor private terrace overlooking the central Istanbul silhouette",
         "Turnkey furnished specification available upon request",
-        "Complete legal title deed verification conducted"
-      ]
+        "Complete legal title deed verification conducted",
+      ],
     };
   }
 
@@ -279,16 +326,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-48.jpg",
         "/images/properties/gunesli-express-2.jpg",
         "/images/properties/gunesli-express-3.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "Investment Package", "Capital Growth"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor",
+        "Investment Package",
+        "Capital Growth",
+      ],
       highlights: [
         "Citizenship suitability requires independent legal review",
         "Prime location adjacent to Metro station entrance",
         "Modern architectural compound with commercial shopping arcade",
-        "High occupancy rate driven by multinational corporate tenants"
-      ]
+        "High occupancy rate driven by multinational corporate tenants",
+      ],
     };
   }
 
@@ -300,16 +351,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-00.jpg",
         "/images/properties/bosphorus-terrace.jpg",
         "/images/properties/istanbul-project-02.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Central European Side", "Private Sun Terrace", "Special Promotion"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Central European Side",
+        "Private Sun Terrace",
+        "Special Promotion",
+      ],
       highlights: [
         "Top-floor sun terrace offering sweeping panoramic views",
         "Walking distance to central metro and shopping thoroughfares",
         "High acoustic double-glazed windows and insulated roofing",
-        "Immediate title deed delivery upon payment"
-      ]
+        "Immediate title deed delivery upon payment",
+      ],
     };
   }
 
@@ -321,16 +376,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-01.jpg",
         "/images/properties/istanbul-project-00.jpg",
         "/images/properties/istanbul-project-04.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Trophy Landmark", "Beşiktaş Core", "Ultra-Luxury Towers"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Trophy Landmark",
+        "Beşiktaş Core",
+        "Ultra-Luxury Towers",
+      ],
       highlights: [
         "Signature dual-tower architectural landmark in central Istanbul",
         "Ultra-luxury concierge, rooftop helipad, and private resident wellness club",
         "Unrivaled Bosphorus and skyline orientation",
-        "Blue-chip international wealth preservation asset"
-      ]
+        "Blue-chip international wealth preservation asset",
+      ],
     };
   }
 
@@ -342,16 +401,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-02.jpg",
         "/images/properties/istanbul-project-03.jpg",
         "/images/properties/bosphorus-terrace.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Coastal Belt", "Marina Proximity", "Panoramic Terrace"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Coastal Belt",
+        "Marina Proximity",
+        "Panoramic Terrace",
+      ],
       highlights: [
         "Expansive private sun terrace with coastal sea views",
         "5-star concierge services, marina access, and landscaped gardens",
         "Minutes to Marmaray rail link and coastal expressway",
-        "Exceptional resale liquidity in high-demand residential precinct"
-      ]
+        "Exceptional resale liquidity in high-demand residential precinct",
+      ],
     };
   }
 
@@ -363,7 +426,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-03.jpg",
         "/images/properties/sisli-residence.jpg",
         "/images/properties/sisli-luxury-1.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
       tags: [isCbi ? "Citizenship Eligible" : "Central Şişli", "Duplex Living", "Prime Urban"],
@@ -371,8 +434,8 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "Central European-side location minutes from Nişantaşı",
         "Private duplex layout with generous reception area",
         "Independent structural survey and verified title registration",
-        "High demand from international corporate executives"
-      ]
+        "High demand from international corporate executives",
+      ],
     };
   }
 
@@ -384,16 +447,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/istanbul-project-04.jpg",
         "/images/properties/topkapi-pearl.jpg",
         "/images/properties/istanbul-project-47.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Multi-Unit Investment", "Topkapı Axis", "Dual Rental Income"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Multi-Unit Investment",
+        "Topkapı Axis",
+        "Dual Rental Income",
+      ],
       highlights: [
         "Two independent residential units bundled under unified purchase",
         "Dual rental income stream from medical and university precinct",
         "Package price does not establish citizenship eligibility",
-        "Managed handover and tenant placement services provided"
-      ]
+        "Managed handover and tenant placement services provided",
+      ],
     };
   }
 
@@ -405,16 +472,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/atasehir-residence-1.jpg",
         "/images/properties/atasehir-residence-2.jpg",
         "/images/properties/atasehir-residence-3.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Asian Side", "IIFC Financial Hub", "Executive Living"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Asian Side",
+        "IIFC Financial Hub",
+        "Executive Living",
+      ],
       highlights: [
         "Adjacent to the new Istanbul International Financial Center (IIFC)",
         "Semi-Olympic heated pool, fitness suite & private resident parking",
         "Smart home automation for climate and energy efficiency",
-        "Strong blue-chip executive tenant demand and dollar liquidity"
-      ]
+        "Strong blue-chip executive tenant demand and dollar liquidity",
+      ],
     };
   }
 
@@ -422,22 +493,28 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   if (s.includes("oryapark") || s.includes("umraniye")) {
     const isQuote = s.includes("quote") || s.includes("2-1");
     return {
-      cover: isQuote ? "/images/properties/orya-park-1.jpg" : "/images/properties/orya-park-exterior.jpg",
+      cover: isQuote
+        ? "/images/properties/orya-park-1.jpg"
+        : "/images/properties/orya-park-exterior.jpg",
       gallery: [
         "/images/properties/orya-park-exterior.jpg",
         "/images/properties/orya-park-1.jpg",
         "/images/properties/orya-park-2.jpg",
         "/images/properties/orya-park-interior-1.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Avrupa Residence", "Ümraniye Corridor", "Prime Twin Towers"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Avrupa Residence",
+        "Ümraniye Corridor",
+        "Prime Twin Towers",
+      ],
       highlights: [
         "Iconic dual-tower mixed development on Küçüksu Avenue",
         "Direct highway access to FSM & Bosphorus bridge corridors",
         "Curated ground-floor retail street and private wellness club",
-        "Strong rental yields fueled by Istanbul Financial Center professionals"
-      ]
+        "Strong rental yields fueled by Istanbul Financial Center professionals",
+      ],
     };
   }
 
@@ -449,16 +526,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/sisli-luxury-1.jpg",
         "/images/properties/sisli-residence.jpg",
         "/images/properties/ferikoy-duplex.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Off-Plan Investment", "Central Şişli", "Capital Growth"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Off-Plan Investment",
+        "Central Şişli",
+        "Capital Growth",
+      ],
       highlights: [
         "Off-plan entry price point with substantial appreciation potential",
         "Prime European-side location walking distance to Bomonti",
         "Bank guarantee and developer completion surety on file",
-        "Scheduled delivery July 2027 with staged instalment options"
-      ]
+        "Scheduled delivery July 2027 with staged instalment options",
+      ],
     };
   }
 
@@ -470,7 +551,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/sisli-luxury-2.jpg",
         "/images/properties/sisli-luxury-1.jpg",
         "/images/properties/master-suite.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
       tags: [isCbi ? "Citizenship Eligible" : "Central Şişli", "Ready Unit", "High Liquidity"],
@@ -478,8 +559,8 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "Turnkey ready residential unit in central European Istanbul",
         "High acoustic insulation and private resident services",
         "Title deed ready for immediate transfer at Land Registry",
-        "Excellent high-net-worth rental yield profile"
-      ]
+        "Excellent high-net-worth rental yield profile",
+      ],
     };
   }
 
@@ -491,16 +572,20 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/gunesli-express-1.jpg",
         "/images/properties/gunesli-express-2.jpg",
         "/images/properties/gunesli-express-3.jpg",
-        "/images/properties/gunesli-floorplan.jpg"
+        "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
-      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "High Rental Demand", "Modern Complex"],
+      tags: [
+        isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor",
+        "High Rental Demand",
+        "Modern Complex",
+      ],
       highlights: [
         "Positioned on the Basın Ekspres prime business axis",
         "Close proximity to metro links and major transit arteries",
         "Comprehensive landscaped gardens, indoor pools, and fitness club",
-        "Flexible installment and cash purchase options available"
-      ]
+        "Flexible installment and cash purchase options available",
+      ],
     };
   }
 
@@ -510,26 +595,53 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       "/images/properties/orya-park-exterior.jpg",
       "/images/properties/atasehir-residence-1.jpg",
       "/images/properties/gunesli-express-1.jpg",
-      "/images/properties/gunesli-floorplan.jpg"
+      "/images/properties/gunesli-floorplan.jpg",
     ],
     floorPlan: "/images/properties/gunesli-floorplan.jpg",
-    tags: [isCbi ? "Citizenship Eligible" : "Istanbul Portfolio", "Verified Source", "Advisory Support"],
+    tags: [
+      isCbi ? "Citizenship Eligible" : "Istanbul Portfolio",
+      "Verified Source",
+      "Advisory Support",
+    ],
     highlights: [
       "Original developer source documentation independently verified",
       "Title deed status pre-screened with Turkish Land Registry (Tapu)",
       "Coordinated Turkish Tax ID and banking setup for international investors",
-      "Full post-handover property & rental management onboarding"
-    ]
+      "Full post-handover property & rental management onboarding",
+    ],
   };
 }
 
-export type Filters = { q?: string | undefined; loc?: string | undefined; side?: string | undefined; layout?: string | undefined; type?: string | undefined; budget?: string | undefined; sort?: string | undefined; cbiOnly?: boolean | undefined };
+export type Filters = {
+  q?: string | undefined;
+  loc?: string | undefined;
+  side?: string | undefined;
+  layout?: string | undefined;
+  type?: string | undefined;
+  budget?: string | undefined;
+  sort?: string | undefined;
+  cbiOnly?: boolean | undefined;
+};
+
+export function getLiveProperties(): PropertyRecord[] {
+  return properties;
+}
+
+export function useLiveProperties(): PropertyRecord[] {
+  return properties;
+}
 
 export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties) {
   const q = f.q?.toLowerCase().trim();
   const b = BUDGETS.find((x) => x.id === f.budget);
   let list = catalogue.filter((r) => {
-    if (q && !`${r.marketing_title} ${r.location_label ?? ""} ${r.layout_label ?? ""}`.toLowerCase().includes(q)) return false;
+    if (
+      q &&
+      !`${r.marketing_title} ${r.location_label ?? ""} ${r.layout_label ?? ""}`
+        .toLowerCase()
+        .includes(q)
+    )
+      return false;
     if (f.loc && r.location_label !== f.loc) return false;
     if (f.side && r.side !== f.side) return false;
     if (f.layout && !matchesLayout(r, f.layout)) return false;
@@ -547,27 +659,59 @@ export function filterProperties(f: Filters, catalogue: PropertyRecord[] = prope
     const dir = f.sort === "price-asc" ? 1 : -1;
     list = list
       .map((r, i) => ({ r, i, v: comparableUsd(r.price) }))
-      .sort((a, b) => (a.v == null && b.v == null ? a.i - b.i : a.v == null ? 1 : b.v == null ? -1 : (a.v - b.v) * dir || a.i - b.i))
+      .sort((a, b) =>
+        a.v == null && b.v == null
+          ? a.i - b.i
+          : a.v == null
+            ? 1
+            : b.v == null
+              ? -1
+              : (a.v - b.v) * dir || a.i - b.i,
+      )
       .map((x) => x.r);
   }
   return list;
 }
 
 /** Records excluded from a budget filter because their price is not comparable in USD. */
-export const unmatchablePrices = (catalogue: PropertyRecord[] = properties) => catalogue.filter((r) => comparableUsd(r.price) == null);
+export const unmatchablePrices = (catalogue: PropertyRecord[] = properties) =>
+  catalogue.filter((r) => comparableUsd(r.price) == null);
 
 export const humanKey = (k: string) =>
-  k.replace(/_source$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+  k
+    .replace(/_source$/, "")
+    .replace(/_/g, " ")
+    .replace(/^\w/, (c) => c.toUpperCase());
 
-export const getProperty = (slug: string) => properties.find((r) => r.slug === slug);
+export const getProperty = (slug: string): PropertyRecord | undefined => {
+  return properties.find((r) => r.slug === slug);
+};
 
-
-export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {
- if(!r.id&&!("gallery_images" in r.details))return originalPropertyMedia(r);
- const raw=r.details["gallery_images"],cover=r.cover||"";
- const photos=Array.isArray(raw)?raw.filter((x):x is string=>typeof x==="string"&&!!x):[];
- const gallery=[...new Set([cover,...photos].filter(Boolean))];
- const highlights=Array.isArray(r.details["highlights"])?r.details["highlights"].filter((x):x is string=>typeof x==="string"):[];
- const floorPlan=typeof r.details["floor_plan"]==="string"&&r.details["floor_plan"]?r.details["floor_plan"]:undefined;
- return {cover,gallery,highlights,tags:[TYPE_LABEL[r.record_type],...(r.details["cbi_verified"]===true?["Citizenship eligibility verified"]:[])],...(floorPlan?{floorPlan}:{})};
+export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
+  if (!r.id && !("gallery_images" in r.details)) return originalPropertyMedia(r);
+  const raw = r.details["gallery_images"];
+  const cover = r.cover || "";
+  const photos = Array.isArray(raw)
+    ? raw.filter((x): x is string => typeof x === "string" && !!x)
+    : [];
+  const gallery = [...new Set([cover, ...photos].filter(Boolean))];
+  const highlights = Array.isArray(r.details["highlights"])
+    ? r.details["highlights"].filter((x): x is string => typeof x === "string")
+    : [];
+  const floorPlan =
+    typeof r.details["floor_plan"] === "string" && r.details["floor_plan"]
+      ? r.details["floor_plan"]
+      : undefined;
+  return {
+    cover,
+    gallery,
+    highlights,
+    tags: [
+      TYPE_LABEL[r.record_type],
+      ...(r.details["cbi_verified"] === true
+        ? ["Citizenship eligibility verified"]
+        : []),
+    ],
+    ...(floorPlan ? { floorPlan } : {}),
+  };
 }

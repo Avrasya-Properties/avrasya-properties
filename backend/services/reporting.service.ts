@@ -51,8 +51,13 @@ export class ReportingService {
     }
 
     // 2. CRM stats
-    const { count: totalContacts } = await admin.from("contacts").select("*", { count: "exact", head: true });
-    const { count: pendingEnquiries } = await admin.from("enquiries").select("*", { count: "exact", head: true }).eq("status", "new");
+    const { count: totalContacts } = await admin
+      .from("contacts")
+      .select("*", { count: "exact", head: true });
+    const { count: pendingEnquiries } = await admin
+      .from("enquiries")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "new");
     const { data: leads } = await admin.from("leads").select("stage");
 
     const leadsByStage: Record<string, number> = {};
@@ -80,13 +85,20 @@ export class ReportingService {
     }
 
     // 4. Rentals stats
-    const { count: activeLeases } = await admin.from("leases").select("*", { count: "exact", head: true }).eq("status", "active");
-    const { data: pendingCharges } = await admin.from("rent_charges").select("amount_due, paid_amount, currency").neq("status", "paid");
+    const { count: activeLeases } = await admin
+      .from("leases")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+    const { data: pendingCharges } = await admin
+      .from("rent_charges")
+      .select("amount_due, paid_amount, currency")
+      .neq("status", "paid");
 
     const pendingChargesByCurrency: Record<string, number> = { USD: 0, TRY: 0, EUR: 0, GBP: 0 };
     for (const c of pendingCharges || []) {
       const remaining = Number(c.amount_due) - Number(c.paid_amount);
-      pendingChargesByCurrency[c.currency] = (pendingChargesByCurrency[c.currency] || 0) + remaining;
+      pendingChargesByCurrency[c.currency] =
+        (pendingChargesByCurrency[c.currency] || 0) + remaining;
     }
 
     return {
@@ -122,12 +134,23 @@ export class ReportingService {
     const admin = getAdminClient();
     const { data: contacts, error } = await admin
       .from("contacts")
-      .select("id, full_name, email, phone, contact_type, preferred_language, cbi_interest, created_at")
+      .select(
+        "id, full_name, email, phone, contact_type, preferred_language, cbi_interest, created_at",
+      )
       .order("created_at", { ascending: false });
 
     if (error) throw new Error(`Export failed: ${error.message}`);
 
-    const headers = ["ID", "Full Name", "Email", "Phone", "Type", "Language", "CBI Interest", "Created At"];
+    const headers = [
+      "ID",
+      "Full Name",
+      "Email",
+      "Phone",
+      "Type",
+      "Language",
+      "CBI Interest",
+      "Created At",
+    ];
     const rows = (contacts || []).map((c) => [
       c.id,
       c.full_name,
@@ -139,10 +162,7 @@ export class ReportingService {
       c.created_at,
     ]);
 
-    return [
-      formatCsvRow(headers),
-      ...rows.map((row) => formatCsvRow(row)),
-    ].join("\n");
+    return [formatCsvRow(headers), ...rows.map((row) => formatCsvRow(row))].join("\n");
   }
 
   /**
@@ -157,7 +177,15 @@ export class ReportingService {
 
     if (error) throw new Error(`Export failed: ${error.message}`);
 
-    const headers = ["Deal Number", "Title", "Type", "Stage", "Agreed Price", "Currency", "Created At"];
+    const headers = [
+      "Deal Number",
+      "Title",
+      "Type",
+      "Stage",
+      "Agreed Price",
+      "Currency",
+      "Created At",
+    ];
     const rows = (deals || []).map((d) => [
       d.deal_number,
       d.title,
@@ -168,9 +196,6 @@ export class ReportingService {
       d.created_at,
     ]);
 
-    return [
-      formatCsvRow(headers),
-      ...rows.map((row) => formatCsvRow(row)),
-    ].join("\n");
+    return [formatCsvRow(headers), ...rows.map((row) => formatCsvRow(row))].join("\n");
   }
 }
