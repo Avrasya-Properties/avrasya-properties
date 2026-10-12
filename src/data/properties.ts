@@ -101,7 +101,7 @@ export function areaText(r: PropertyRecord): string {
 export const locationText = (r: PropertyRecord) =>
   r.location_label ? `${r.location_label}, ${r.city}` : "Location to confirm";
 
-export const sideText = (r: PropertyRecord) => (r.side === "unknown" ? "Side to confirm" : `${r.side}an side`);
+export const sideText = (r: PropertyRecord) => r.side==="Europe"?"European side":r.side==="Asia"?"Asian side":"Side to confirm";
 
 export const LAYOUTS = ["1+1", "2+1", "Duplex"] as const;
 export function matchesLayout(r: PropertyRecord, l: string) {

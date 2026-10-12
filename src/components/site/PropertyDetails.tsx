@@ -1,6 +1,6 @@
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { Link } from "@tanstack/react-router";
-import { useState,useEffect } from "react";
+import { useState,useEffect,useRef } from "react";
 import { toast } from "sonner";
 import {
   ArrowRight,
@@ -45,11 +45,16 @@ import { useLiveContact } from "@/hooks/useLiveContact";
 
 function Fact({ k, v }: { k: string; v: React.ReactNode }) {
   return (
-    <div className="flex justify-between items-center gap-4 border-b border-border/70 py-3 text-sm">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start gap-4 border-b border-border/70 py-3 text-sm">
       <span className="text-muted-foreground">{k}</span>
-      <span className="text-right font-medium text-foreground">{v}</span>
+      <span className="break-words text-right font-medium text-foreground">{v}</span>
     </div>
   );
+}
+
+function GalleryImage({src,alt,className}:{src:string;alt:string;className:string}){
+  const [failed,setFailed]=useState(false);
+  return failed?<div role="img" aria-label={alt} className="flex h-full w-full items-center justify-center bg-muted p-4 text-center text-sm text-muted-foreground">This photo is temporarily unavailable.</div>:<img src={src} alt={alt} className={className} onError={()=>setFailed(true)}/>;
 }
 
 const usd = (n: number) => "$" + n.toLocaleString("en-US");
@@ -75,7 +80,7 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
   return (
     <div className="mt-6 rounded-xs border border-border/80 bg-secondary/40 p-4">
       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-        Detailed Breakdown
+        Price details
       </h3>
       {rows.map(([k, v]) => (
         <Fact key={k} k={k} v={v} />
@@ -94,6 +99,9 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
   const contact = useLiveContact();
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [ready,setReady]=useState(false);
+  useEffect(()=>setReady(true),[]);
+  const galleryDialog=useRef<HTMLDivElement>(null);
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(r.slug);
@@ -112,7 +120,26 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
   const related = properties.filter((x) => x.slug !== r.slug && x.side === r.side).slice(0, 3);
 
   const images = media.floorPlan?[...new Set([...media.gallery,media.floorPlan])]:media.gallery;
-  useEffect(()=>{setActiveImg(0);setLightbox(false);},[r.slug,media.cover,images.join("|")]);
+  const mediaKey=r.slug+"|"+media.cover+"|"+images.join("|");
+  const previousMedia=useRef(mediaKey);
+  useEffect(()=>{if(previousMedia.current!==mediaKey){previousMedia.current=mediaKey;setActiveImg(0);setLightbox(false);}},[mediaKey]);
+  useEffect(()=>{
+    if(!lightbox)return;
+    const trigger=document.activeElement as HTMLElement|null,previous=document.body.style.overflow;
+    document.body.style.overflow="hidden";galleryDialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const keys=(event:KeyboardEvent)=>{
+      if(event.key==="Escape")setLightbox(false);
+      if(event.key==="ArrowRight"&&images.length>1)setActiveImg(i=>(i+1)%images.length);
+      if(event.key==="ArrowLeft"&&images.length>1)setActiveImg(i=>(i+images.length-1)%images.length);
+      if(event.key==="Tab"){
+        const buttons=galleryDialog.current?.querySelectorAll<HTMLButtonElement>("button"),first=buttons?.[0],last=buttons?.[buttons.length-1];
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+      }
+    };
+    window.addEventListener("keydown",keys);
+    return()=>{document.body.style.overflow=previous;window.removeEventListener("keydown",keys);if(trigger?.isConnected)trigger.focus();};
+  },[lightbox,images.length]);
 
   const handleShare = () => {
     if (!preview&&typeof navigator !== "undefined" && navigator.clipboard) {
@@ -122,23 +149,23 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
   };
 
   return (
-    <div data-property-detail onClickCapture={preview?e=>{if((e.target as Element).closest("a")){e.preventDefault();e.stopPropagation();}}:undefined}>
+    <div data-property-detail data-property-ready={ready} className={preview?"property-detail-preview":"property-detail-page"} onClickCapture={preview?e=>{if((e.target as Element).closest("a")){e.preventDefault();e.stopPropagation();}}:undefined}>
       {/* Breadcrumb Nav */}
       <div className="border-b border-border/60 bg-card/60">
-        <nav className="container-site flex items-center justify-between py-3 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Link to="/" className="hover:text-foreground">Home</Link>
-            <span>/</span>
-            <Link to="/properties" className="hover:text-foreground">Properties</Link>
-            <span>/</span>
-            <span className="text-foreground font-medium truncate max-w-xs">{r.marketing_title}</span>
+        <nav aria-label="Breadcrumb" className="container-site flex flex-wrap items-center justify-between gap-2 py-3 text-xs text-muted-foreground">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <Link to="/" className="shrink-0 hover:text-foreground">Home</Link>
+            <span className="shrink-0" aria-hidden="true">/</span>
+            <Link to="/properties" className="shrink-0 hover:text-foreground">Properties</Link>
+            <span className="shrink-0" aria-hidden="true">/</span>
+            <span className="min-w-0 flex-1 truncate font-medium text-foreground">{r.marketing_title}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               disabled={preview}
               onClick={handleShare}
-              className="flex items-center gap-1 hover:text-foreground transition-colors"
+              className="flex min-h-11 min-w-11 items-center justify-center gap-1 hover:text-foreground transition-colors"
               title="Share listing link"
             >
               <Share2 className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Share</span>
@@ -146,7 +173,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <button
               disabled={preview}
               onClick={() => toggle(r.slug)}
-              className="flex items-center gap-1 hover:text-foreground transition-colors"
+              className="flex min-h-11 min-w-11 items-center justify-center gap-1 hover:text-foreground transition-colors"
               title="Save to shortlist"
             >
               <Heart className={`h-3.5 w-3.5 ${saved ? "fill-destructive text-destructive" : ""}`} />
@@ -159,7 +186,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
       {/* Header Info Banner */}
       <section className="container-site pt-8 pb-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="rounded-xs bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
                 {TYPE_LABEL[r.record_type]}
@@ -178,10 +205,10 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               )}
             </div>
 
-            <h1 className="display-hero !text-3xl md:!text-5xl font-semibold text-foreground">
+            <h1 className="display-hero break-words !text-3xl md:!text-5xl font-semibold text-foreground">
               {r.marketing_title}
             </h1>
-            <p className="mt-2 text-sm md:text-base text-muted-foreground flex items-center gap-2">
+            <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground md:text-base">
               <MapPin className="h-4 w-4 text-brass" />
               <span>{locationText(r)}</span>
               <span>·</span>
@@ -193,7 +220,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
           <div className="lg:text-right flex flex-col items-start lg:items-end">
             <p className="eyebrow !text-muted-foreground">{r.mode==="rent"?"Monthly rent":"Asking price"}</p>
-            <p className="font-display text-3xl md:text-5xl font-semibold text-foreground tracking-tight">
+            <p className="font-display break-words text-3xl md:text-5xl font-semibold text-foreground tracking-tight">
               {displayPrice}
             </p>
             {currency !== "USD" && usdVal && (
@@ -208,11 +235,12 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
         {/* Gallery Showcase */}
         <div className="mt-8 space-y-3">
           {/* Main Display Image */}
-          <div className="relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xs border border-border/80 bg-muted group">
-            {images[activeImg]||media.cover?<img
+          <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xs border border-border/80 bg-muted group">
+            {images[activeImg]||media.cover?<GalleryImage
+              key={images[activeImg]||media.cover}
               src={images[activeImg] || media.cover}
               alt={r.marketing_title}
-              className="h-full w-full object-cover transition-transform duration-500"
+              className="h-full w-full object-contain transition-transform duration-500"
             />
             :<div className="flex h-full items-center justify-center text-sm text-muted-foreground">Property photos have not been added.</div>}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -221,7 +249,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <button
               disabled={!images.length}
               onClick={() => setLightbox(true)}
-              className="absolute right-4 bottom-4 flex items-center gap-1.5 rounded-xs bg-black/60 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white hover:bg-black/80 transition-colors"
+              className="absolute right-3 bottom-3 flex min-h-11 items-center gap-1.5 rounded-xs bg-black/60 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white hover:bg-black/80 transition-colors"
             >
               <Maximize2 className="h-3.5 w-3.5" /> Fullscreen View
             </button>
@@ -231,14 +259,14 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               <>
                 <button
                   onClick={() => setActiveImg((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-colors"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-colors"
                   aria-label="Previous image"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => setActiveImg((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-colors"
                   aria-label="Next image"
                 >
                   <ChevronRight className="h-5 w-5" />
@@ -252,15 +280,17 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             {images.map((img, i) => (
               <button
                 key={i}
+                aria-label={img===media.floorPlan?"View supplied floor plan":`View photo ${i+1}`}
+                aria-pressed={activeImg===i}
                 onClick={() => setActiveImg(i)}
                 className={`relative h-20 w-32 shrink-0 overflow-hidden rounded-xs border transition-all ${
                   activeImg === i ? "border-brass ring-2 ring-brass/40 scale-102" : "border-border/70 opacity-70 hover:opacity-100"
                 }`}
               >
-                <img src={img} alt="" className="h-full w-full object-cover" />
-                {img.includes("floorplan") && (
+                <GalleryImage key={img} src={img} alt={img===media.floorPlan?"Supplied floor plan":`Property photo ${i+1}`} className="h-full w-full object-cover" />
+                {img===media.floorPlan && (
                   <span className="absolute bottom-1 left-1 rounded-xs bg-primary/90 px-1 text-[8px] font-bold text-white uppercase">
-                    CAD Plan
+                    Floor plan
                   </span>
                 )}
               </button>
@@ -270,24 +300,24 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
       </section>
 
       {/* Main Body Grid */}
-      <section className="container-site grid gap-10 py-10 lg:grid-cols-[1fr_24rem]">
-        <div className="space-y-10">
+      <section className="container-site grid min-w-0 gap-6 py-6 md:gap-10 md:py-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="min-w-0 space-y-6 md:space-y-10">
           {/* Section 01: Specifications Fact Sheet */}
-          <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
+          <div className="rounded-xs border border-border/80 bg-card p-4 sm:p-6 md:p-8 shadow-xs">
             <div className="flex items-center gap-2 mb-2">
-              <span className="eyebrow !text-brass">Portfolio Specification</span>
+              <span className="eyebrow !text-brass">Property specifications</span>
             </div>
-            <h2 className="headline text-2xl font-semibold">Development & unit specifications</h2>
+            <h2 className="headline text-2xl font-semibold">Property details</h2>
 
             <div className="mt-6 grid gap-x-12 sm:grid-cols-2">
-              <Fact k="District / Zone" v={locationText(r)} />
-              <Fact k="Continent" v={sideText(r)} />
+              <Fact k="District" v={locationText(r)} />
+              <Fact k="Istanbul side" v={sideText(r)} />
               <Fact k="Listing" v={r.mode==="rent"?"For rent":"For sale"} />
               {r.bathrooms!=null&&<Fact k="Bathrooms" v={r.bathrooms}/>}<Fact k="Availability" v={r.availability||"To confirm"} />
               {r.tapu_status&&<Fact k="Title deed status" v={r.tapu_status}/>}
-              <Fact k="Layout Configuration" v={r.layout_label ?? "To confirm"} />
-              <Fact k="Total Surface Area" v={areaText(r)} />
-              {typeof d.project === "string" && <Fact k="Project Development" v={d.project} />}
+              <Fact k="Apartment layout" v={r.layout_label ?? "To confirm"} />
+              {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?"Gross area":area.basis==="net"?"Net area":"Area (basis to confirm)"} v={`${area.value_m2.toLocaleString("en-US")} m²`}/>):<Fact k="Area" v="To confirm"/>}
+              {typeof d.project === "string"&&d.project&&<Fact k="Development" v={d.project} />}
               {["block", "floor", "unit"].map(
                 (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />
               )}
@@ -301,7 +331,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <PriceBlock r={r} />
 
             {typeof d.note === "string" && (
-              <div className="mt-6 rounded-xs border border-border/70 bg-secondary/30 p-4 text-xs text-muted-foreground leading-relaxed">
+              <div className="mt-6 whitespace-pre-line rounded-xs border border-border/70 bg-secondary/30 p-4 text-sm text-muted-foreground leading-relaxed">
                 <strong className="text-foreground block mb-1">Property description:</strong>
                 {d.note}
               </div>
@@ -345,7 +375,8 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             </div>
 
             <div className="relative aspect-[16/11] overflow-hidden rounded-xs border border-border/80 bg-white">
-              <img
+              <GalleryImage
+                key={media.floorPlan}
                 src={media.floorPlan}
                 alt="Architectural Floor Plan"
                 className="h-full w-full object-contain p-4"
@@ -361,7 +392,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           <div className="rounded-xs border border-brass/40 bg-primary p-6 md:p-8 text-on-dark shadow-md">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck className="h-4 w-4 text-brass" />
-              <p className="eyebrow !text-brass">Sovereign Rights Review</p>
+              <p className="eyebrow !text-brass">Citizenship review</p>
             </div>
             <h2 className="headline text-2xl font-semibold text-on-dark">
               Turkish citizenship eligibility assessment
@@ -388,8 +419,8 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
         </div>
 
         {/* Sticky Consultation & Enquiry Sidebar */}
-        <aside className="lg:sticky lg:top-24 lg:self-start space-y-6">
-          <div className="rounded-xs border border-border/80 bg-card p-6 shadow-md">
+        <aside id="property-enquiry" className="min-w-0 scroll-mt-24 space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <div className="rounded-xs border border-border/80 bg-card p-4 sm:p-6 shadow-md">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
               <span className="text-xs font-semibold text-muted-foreground">REF: {r.ref||r.slug}</span>
               <span className="rounded-xs bg-emerald-500/10 text-emerald-600 px-2 py-0.5 text-[0.65rem] font-bold uppercase">
@@ -440,7 +471,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <div>
               <p className="eyebrow eyebrow-mark">Comparable Portfolios</p>
               <h2 className="headline text-2xl md:text-3xl font-semibold mt-1">
-                More developments on the {r.side === "unknown" ? "market" : `${r.side}an side`}
+                {r.side==="unknown"?"More properties":"More properties on the "+(r.side==="Europe"?"European":"Asian")+" side"}
               </h2>
             </div>
             <Link to="/properties" className="text-xs font-semibold text-foreground hover:text-brass underline">
@@ -456,20 +487,22 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
       )}
 
       {/* Mobile Sticky Bar */}
-      {!preview&&<div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border/80 bg-card/95 backdrop-blur-md p-3 lg:hidden shadow-lg">
+      {!preview&&<div className="property-contact-bar fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border/80 bg-card/95 backdrop-blur-md p-3 lg:hidden shadow-lg">
+        <a href="#property-enquiry" className="btn btn-primary flex-1 !px-3">Enquire</a>
         <a
           href={`${contact.whatsapp}?text=${encodeURIComponent(`Hello, I'm interested in ${r.marketing_title} (${r.slug}).`)}`}
           target="_blank"
           rel="noreferrer"
-          className="btn btn-primary flex-1 justify-center gap-1.5"
+          className="btn btn-outline flex-1 justify-center !px-3 gap-1.5"
         >
           <MessageSquare className="h-4 w-4" /> WhatsApp
         </a>
         <a
           href={contact.phoneHref}
-          className="btn btn-outline flex-1 justify-center gap-1.5"
+          className="btn btn-outline !px-3"
+          aria-label="Call Avrasya"
         >
-          <Phone className="h-4 w-4" /> Call Office
+          <Phone className="h-4 w-4" />
         </a>
       </div>
 
@@ -479,18 +512,21 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
         <div
           role="dialog"
           aria-modal="true"
+          aria-label="Property photo gallery"
+          ref={galleryDialog}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-4"
         >
           <button
             onClick={() => setLightbox(false)}
-            className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+            className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
             aria-label="Close lightbox"
           >
             <X className="h-6 w-6" />
           </button>
 
           <div className="relative max-h-[85vh] max-w-[90vw] overflow-hidden flex items-center justify-center">
-            <img
+            <GalleryImage
+              key={images[activeImg]||media.cover}
               src={images[activeImg] || media.cover}
               alt=""
               className="max-h-[82vh] max-w-[88vw] object-contain rounded-xs"
@@ -501,7 +537,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <div className="mt-4 flex items-center gap-4">
               <button
                 onClick={() => setActiveImg((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/25 transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/25 transition-colors"
                 aria-label="Previous image"
               >
                 <ChevronLeft className="h-6 w-6" />
@@ -511,7 +547,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               </span>
               <button
                 onClick={() => setActiveImg((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/25 transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/25 transition-colors"
                 aria-label="Next image"
               >
                 <ChevronRight className="h-6 w-6" />

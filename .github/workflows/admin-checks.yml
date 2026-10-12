@@ -52,6 +52,8 @@ jobs:
       - run: bun run build
       - run: bun run typecheck
       - run: bun scripts/admin-smoke.mjs
+      - name: Mobile website and gallery workflows
+        run: bun scripts/mobile-smoke.mjs
       - name: Persistent browser workflows
         env:
           PGPASSWORD: postgres

@@ -113,11 +113,11 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
         </div>
 
         {/* Card Body */}
-        <div className="flex flex-1 flex-col p-5">
+        <div className="property-card-body flex flex-1 flex-col p-5">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
             <span className="eyebrow !text-brass-text text-[0.65rem]">{TYPE_LABEL[r.record_type]}</span>
             <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-              Ref: {r.slug.slice(0, 8).toUpperCase()}
+              Ref: {r.ref||r.slug}
             </span>
           </div>
 
@@ -145,9 +145,9 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
           </div>
 
           {/* Pricing & CTA Footer */}
-          <div className="mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
+          <div className="property-card-price mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
             <div>
-              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
+              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode==="rent"?"Monthly rent":"Price"}</p>
               <p className="text-xl font-sans font-semibold text-foreground tracking-tight tabular-nums">
                 {displayPrice}
               </p>
@@ -156,7 +156,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
               )}
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="property-card-actions flex items-center gap-1.5">
               <a
                 href={waLink(`Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`)}
                 target="_blank"

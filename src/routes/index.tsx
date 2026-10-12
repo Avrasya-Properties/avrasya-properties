@@ -28,14 +28,13 @@ import {
     type PropertyRecord,
 } from "@/data/properties";
 import { CtaBand, Logo } from "@/components/site/Chrome";
-import { Marquee, Tilt } from "@/components/site/Motion";
-import { PropertyCard } from "@/components/site/PropertyCard";
+import { Marquee, Tilt,MotionRoot } from "@/components/site/Motion";
+import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
 import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useCatalogue } from "@/data/live";
-import { Enquiry } from "@/components/site/Enquiry";
 import { useSiteSettings } from "@/admin/store";
 
 export const Route = createFileRoute("/")({
@@ -49,35 +48,34 @@ export const Route = createFileRoute("/")({
 
 
 function Home() {
- const catalogue=useCatalogue();const settings=useSiteSettings();
- if(catalogue.isPending)return <div className="container-site py-24" role="status">Loading the property collection…</div>;
- if(!catalogue.properties.length)return <><section className="container-site py-20"><p className="eyebrow">Avrasya Properties</p><h1 className="headline mt-4 text-4xl">{settings.heroHeadline||"Your next investment starts with a conversation."}</h1><p className="mt-4 max-w-xl text-muted-foreground">{settings.heroSubtitle}</p><p className="mt-5 max-w-xl text-muted-foreground">{catalogue.isError ? "Our online catalogue is temporarily unavailable. Our advisory team can help you with current options." : "Our team is preparing the next collection. Contact us for current opportunities."}</p><Link to="/contact" className="btn btn-primary mt-6">Speak with an advisor</Link></section><section className="container-site max-w-xl py-12"><Enquiry compact /></section></>;
- return <HomeCollection properties={catalogue.properties}/>;
+ const catalogue=useCatalogue();
+ return <><HomeCollection properties={catalogue.properties} loading={catalogue.isPending} unavailable={catalogue.isError} retry={()=>void catalogue.refetch()}/><MotionRoot/></>;
 }
-function HomeCollection({properties}:{properties:PropertyRecord[]}) {
+function HomeCollection({properties,loading,unavailable,retry}:{properties:PropertyRecord[];loading:boolean;unavailable:boolean;retry:()=>void}) {
   const waLink=useWhatsAppLink();
  const FEATURED=properties.slice(0,3);
- const EDITORIAL=properties.slice(3,6);
+ const EDITORIAL=properties.length>3?properties.slice(3,6):properties.slice(0,3);
  const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
 
   const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
-  const f = FEATURED[Math.min(sel,FEATURED.length-1)]!;
-  const media = getPropertyMedia(f);
-  const fp = priceDisplay(f.price);
+  const featuredIndex=Math.max(0,Math.min(sel,FEATURED.length-1));
+  const f = FEATURED[featuredIndex];
+  const media = f?getPropertyMedia(f):null;
+  const fp = f?priceDisplay(f.price):null;
   const navigate = useNavigate();
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
-  const saved = isSaved(f.slug);
-  const fUsd = comparableUsd(f.price);
-  const fDisplayPrice = currency === "USD"||fUsd===null ? fp.main : convertUsdPrice(fUsd, currency);
+  const saved = f?isSaved(f.slug):false;
+  const fUsd = f?comparableUsd(f.price):null;
+  const fDisplayPrice = currency === "USD"||fUsd===null ? fp?.main||"" : convertUsdPrice(fUsd, currency);
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
   return (
-    <>
+    <div data-home-page>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-8 pb-16 md:pt-14 md:pb-24 bg-gradient-to-b from-card/30 via-background to-background">
+      <section data-home-hero className="home-hero relative overflow-hidden pt-10 pb-10 md:pt-14 md:pb-20 bg-primary text-on-dark">
         {/* Ambient Brand Watermark in Hero */}
         <div
           aria-hidden
@@ -96,7 +94,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="eyebrow !text-brass-text">
+                <span className="eyebrow">
                   {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
                 </span>
               </div>
@@ -140,7 +138,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
             {/* Direct Quick Action CTAs */}
             <div data-reveal style={{ ["--d" as string]: "400ms" }} className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
               <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
-                <span>Browse all {properties.length} offers</span> <ArrowRight className="h-4 w-4" />
+                <span>{properties.length?`Browse ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore properties"}</span> <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/contact" className="btn btn-outline gap-1.5">
                 <span>Book Consultation</span>
@@ -149,18 +147,13 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
           </div>
 
           {/* Interactive Hero Showcase Grid */}
-          <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_22rem]">
+          {f&&media&&fp&&<div className="mt-8 grid min-w-0 gap-6 text-foreground lg:mt-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
             {/* Main Interactive Spotlight Card */}
             <Tilt max={3}>
               <div className="relative overflow-hidden rounded-xs border border-border/80 bg-card shadow-lg transition-all">
                 {/* Photo Aspect Container */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-muted group">
-                  <img
-                    key={f.slug}
-                    src={media.cover}
-                    alt={f.marketing_title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
+                  <ImageFallback r={f}/>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 pointer-events-none" />
 
                   {/* Top Badges */}
@@ -188,17 +181,9 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                     <Heart className={`h-4.5 w-4.5 ${saved ? "fill-white" : ""}`} />
                   </button>
 
-                  {/* Bottom Text Overlay */}
-                  <div className="absolute inset-x-6 bottom-6 z-10 text-white">
-                    <p className="eyebrow !text-brass text-xs">Featured Portfolio Asset</p>
-                    <h2 className="mt-1 font-display text-2xl md:text-3xl font-medium text-white drop-shadow-sm">
-                      {f.marketing_title}
-                    </h2>
-                    <p className="mt-1 text-xs md:text-sm text-white/80">
-                      {locationText(f)} · {sideText(f)}
-                    </p>
-                  </div>
                 </div>
+
+                <div className="border-t bg-card p-5"><p className="eyebrow">Featured property</p><h2 className="mt-2 break-words font-display text-2xl text-foreground md:text-3xl">{f.marketing_title}</h2><p className="mt-2 text-sm text-muted-foreground">{locationText(f)} · {sideText(f)}</p></div>
 
                 {/* Details Strip */}
                 <div
@@ -226,7 +211,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                   </div>
                   <div>
                     <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Status</p>
-                    <p className="text-xs font-semibold text-primary">Pre-Screened</p>
+                    <p className="text-xs font-semibold text-primary">{f.availability||"To confirm"}</p>
                   </div>
                   <Link
                     to="/properties/$slug"
@@ -248,7 +233,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
               <div className="mt-3 space-y-3" role="tablist" aria-label="Featured offers">
                 {FEATURED.map((r, i) => {
                   const m = getPropertyMedia(r);
-                  const isCur = i === sel;
+                  const isCur = i === featuredIndex;
                   return (
                     <button
                       key={r.slug}
@@ -274,7 +259,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                         </p>
                         <div className="mt-1 flex items-center justify-between text-xs">
                           <span className="font-semibold text-foreground">
-                            {currency === "USD"
+                            {currency === "USD"||comparableUsd(r.price)===null
                               ? priceDisplay(r.price).main
                               : convertUsdPrice(comparableUsd(r.price), currency)}
                           </span>
@@ -298,12 +283,12 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
 
           {/* Instant Search Bar */}
           <form
             data-reveal
-            className="mt-10 rounded-xs border border-border/80 bg-card p-5 shadow-sm md:grid md:grid-cols-[1.2fr_1fr_1fr_auto] md:items-end gap-4"
+            className="home-search mt-8 grid gap-4 rounded-xs border border-border/80 bg-card p-4 text-foreground shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end md:p-5"
             onSubmit={(e) => {
               e.preventDefault();
               navigate({
@@ -318,7 +303,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
           >
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                District / Investment Corridor
+                District
               </span>
               <select
                 className="field"
@@ -336,7 +321,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
 
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                Apartment Layout
+                Apartment layout
               </span>
               <select
                 className="field"
@@ -354,7 +339,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
 
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                Target Budget Range (USD)
+                Budget (USD)
               </span>
               <select
                 className="field"
@@ -371,7 +356,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
             </label>
 
             <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5">
-              <span>Filter {properties.length} Listings</span>
+              <span>Find a property</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -393,28 +378,28 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
       />
 
       {/* Curated Editorial Selection Section */}
-      <section className="container-site py-20">
+      <section data-home-collection className="container-site py-12 md:py-20">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <div className="mb-1.5">
               <p className="eyebrow eyebrow-mark">Handpicked Portfolio</p>
             </div>
-            <h2 className="headline mt-2 text-3xl md:text-4xl">Editorial portfolio selection</h2>
+            <h2 className="headline mt-2 text-3xl md:text-4xl">Selected properties</h2>
           </div>
           <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
             Source-advertised offers from prime European and Asian-side Istanbul corridors. Confirm specifications, pricing, availability and any citizenship claims with an advisor before commitment.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {loading?<p role="status" className="mt-8 rounded border bg-card p-6">Loading the property collection…</p>:unavailable?<div role="alert" className="mt-8 rounded border bg-card p-6"><p>The property collection could not be loaded.</p><button onClick={retry} className="btn btn-outline mt-4">Try again</button></div>:!properties.length?<div data-empty-collection className="mt-8 rounded border bg-card p-6 md:p-8"><h3 className="font-display text-2xl">Our next collection is being prepared.</h3><p className="mt-3 max-w-xl text-sm text-muted-foreground">Our team can help you find current opportunities while reviewed listings are being added.</p><Link to="/contact" className="btn btn-outline mt-5">Ask about available properties</Link></div>:<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {EDITORIAL.map((r) => (
             <PropertyCard key={r.slug} r={r} />
           ))}
-        </div>
+        </div>}
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
           <Link to="/properties" className="group text-sm font-semibold text-foreground flex items-center gap-2">
-            <span>Explore all {properties.length} offers and developments</span>
+            <span>{properties.length?`Explore all ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore our property search"}</span>
             <ArrowRight className="h-4 w-4 arrow text-brass" />
           </Link>
           <span className="text-xs text-muted-foreground">
@@ -546,7 +531,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
             ].map(([n, h, s, items]) => (
               <div
                 key={n as string}
-                className="group grid gap-6 p-7 transition-colors duration-300 hover:bg-secondary/40 md:grid-cols-4"
+                className="group grid gap-6 p-5 transition-colors duration-300 hover:bg-secondary/40 md:grid-cols-4 md:p-7"
               >
                 <div>
                   <p className="eyebrow !text-brass">{h as string}</p>
@@ -579,7 +564,7 @@ function HomeCollection({properties}:{properties:PropertyRecord[]}) {
       </section>
 
       <CtaBand />
-    </>
+    </div>
   );
 }
 

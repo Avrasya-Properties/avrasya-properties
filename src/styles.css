@@ -294,3 +294,46 @@ details[open] .faq-body { animation: rise 200ms ease-out; }
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+
+/* The navy/cream editorial hierarchy follows the supplied Avrasya reference. */
+.site-page-intro .text-muted-foreground { color: var(--on-dark-muted); }
+.site-page-intro .text-foreground { color: var(--on-dark); }
+.site-page-intro .eyebrow { color: #e5c378; }
+.home-hero > .container-site > div:first-child .text-foreground { color: var(--on-dark); }
+.home-hero > .container-site > div:first-child .text-muted-foreground { color: var(--on-dark-muted); }
+.home-hero > .container-site > div:first-child .eyebrow { color: #e5c378; }
+[data-page-actions] > div { display: flex; flex-wrap: wrap; gap: .5rem; }
+main, main .grid > *, main .flex > * { min-width: 0; }
+main h1, main h2, main h3, main p, footer a, footer li { overflow-wrap: break-word; }
+.property-contact-bar { padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
+.property-card-body { container-type: inline-size; }
+@container (max-width: 300px) {
+  .property-card-price { flex-direction: column; align-items: stretch; }
+  .property-card-actions { justify-content: flex-end; }
+  .property-card-actions .btn { flex: 1; }
+}
+
+@media (max-width: 767px) {
+  .display-hero { font-size: clamp(2rem, 8.5vw, 2.75rem); line-height: 1.14; }
+  .home-hero .display-hero { max-width: 17ch; }
+  [data-home-page] > section:not([data-home-hero]) { padding-block: 2.5rem; }
+  main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  main select, main textarea, .site-header select { font-size: 16px !important; min-height: 44px; }
+  main .btn, main button.btn, main a.btn { min-height: 44px !important; line-height: 1.3; padding-block: .65rem; }
+  main button { min-height: 44px; }
+  main button[aria-label], main button[title], [data-property-detail] button { min-width: 44px; min-height: 44px; }
+  [data-property-detail] .container-site { padding-inline: 1rem; }
+  .property-detail-preview .container-site { padding-inline: .75rem; }
+  [data-property-detail] .space-y-10 > div { padding: 1rem; }
+  .admin-workspace main { padding: .75rem; }
+  .admin-workspace main button { min-height: 44px; }
+}
+@media (max-width: 1023px) {
+  body:has(.property-contact-bar) footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+  .property-detail-page { padding-bottom: 1rem; }
+}
+
+/* Decorative loading must never permanently block a usable server-rendered page. */
+.avrasya-preloader { animation: preloaderSafety 3s step-end forwards; }
+@keyframes preloaderSafety { to { visibility: hidden; pointer-events: none; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .avrasya-preloader { display: none; } }
