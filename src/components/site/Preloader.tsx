@@ -7,6 +7,7 @@ export function Preloader() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){setDismissed(true);return;}
     // Only show on fresh page load or first visit of session
     try {
       if (sessionStorage.getItem("avr_preloader_seen")) {
@@ -19,6 +20,8 @@ export function Preloader() {
 
     const duration = 1400; // 1.4s smooth luxury timing
     const startTime = performance.now();
+    let animId=0;
+    const timers:ReturnType<typeof setTimeout>[]=[];
 
     const update = (now: number) => {
       const elapsed = now - startTime;
@@ -29,23 +32,23 @@ export function Preloader() {
       setPercent(val);
 
       if (progress < 1) {
-        requestAnimationFrame(update);
+        animId=requestAnimationFrame(update);
       } else {
         setPercent(100);
-        setTimeout(() => setIsDone(true), 200); // Dignified pause at 100%
-        setTimeout(() => {
+        timers.push(setTimeout(() => setIsDone(true), 200));
+        timers.push(setTimeout(() => {
           setDismissed(true);
           try {
             sessionStorage.setItem("avr_preloader_seen", "1");
           } catch {
             /* ignore */
           }
-        }, 900);
+        }, 900));
       }
     };
 
-    const animId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(animId);
+    animId = requestAnimationFrame(update);
+    return () => {cancelAnimationFrame(animId);timers.forEach(clearTimeout);};
   }, []);
 
   if (dismissed) return null;
@@ -53,7 +56,7 @@ export function Preloader() {
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B2228] transition-all duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
+      className={`avrasya-preloader fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B2228] transition-all duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
         isDone ? "-translate-y-full opacity-90 pointer-events-none" : "translate-y-0 opacity-100"
       }`}
       style={{

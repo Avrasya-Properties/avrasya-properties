@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSiteSettings } from "@/admin/store";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useSyncExternalStore } from "react";
 import type { SupportedCurrency } from "@/data/properties";
 import { EXCHANGE_RATES } from "@/data/properties";
 
@@ -19,7 +19,7 @@ export function useLiveRates(){
  }});
  const live=settings.enableFrankfurterSync&&!!query.data;
  const rates=live?query.data!.rates:manual;
- useEffect(()=>{EXCHANGE_RATES.EUR.rate=rates.EUR;EXCHANGE_RATES.TRY.rate=rates.TRY;EXCHANGE_RATES.GBP.rate=rates.GBP;window.dispatchEvent(new Event("rates-updated"));},[rates.EUR,rates.TRY,rates.GBP]);
+ useEffect(()=>{if(EXCHANGE_RATES.EUR.rate===rates.EUR&&EXCHANGE_RATES.TRY.rate===rates.TRY&&EXCHANGE_RATES.GBP.rate===rates.GBP)return;EXCHANGE_RATES.EUR.rate=rates.EUR;EXCHANGE_RATES.TRY.rate=rates.TRY;EXCHANGE_RATES.GBP.rate=rates.GBP;window.dispatchEvent(new Event("rates-updated"));},[rates.EUR,rates.TRY,rates.GBP]);
  const convert=(amount:number|null,currency:SupportedCurrency)=>amount===null?"Price on request":new Intl.NumberFormat("en-US",{style:"currency",currency,maximumFractionDigits:0}).format(Math.round(amount*rates[currency]));
  return {rates,isLive:live,date:live?query.data!.date:"",convert};
 }
@@ -40,8 +40,8 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
     }
 
     const onStorage = () => {
-      const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
-      if (["USD","EUR","TRY","GBP"].includes(current)) setCurrencyState(current);
+      try{const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
+      if (["USD","EUR","TRY","GBP"].includes(current)) setCurrencyState(current);}catch{}
     };
     window.addEventListener("currency-change", onStorage);
     return () => window.removeEventListener("currency-change", onStorage);
@@ -60,45 +60,34 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
   return [currency, setCurrency];
 }
 
+const EMPTY_SHORTLIST:string[]=[];
+let shortlistRaw:string|null=null;
+let shortlistSnapshot:string[]=EMPTY_SHORTLIST;
+function readShortlist(){
+ if(typeof window==="undefined")return EMPTY_SHORTLIST;
+ try{
+  const raw=localStorage.getItem(SHORTLIST_KEY);
+  if(raw!==shortlistRaw){shortlistRaw=raw;const value=JSON.parse(raw||"[]");shortlistSnapshot=Array.isArray(value)?[...new Set(value.filter((item):item is string=>typeof item==="string"))]:EMPTY_SHORTLIST;}
+ }catch{}
+ return shortlistSnapshot;
+}
+function subscribeShortlist(listener:()=>void){
+ const storage=(event:StorageEvent)=>{if(event.key===SHORTLIST_KEY||event.key===null)listener();};
+ window.addEventListener("shortlist-change",listener);window.addEventListener("storage",storage);
+ return()=>{window.removeEventListener("shortlist-change",listener);window.removeEventListener("storage",storage);};
+}
 export function useShortlist(): {
   shortlist: string[];
   isSaved: (slug: string) => boolean;
   toggle: (slug: string) => void;
   count: number;
 } {
-  const [shortlist, setShortlist] = useState<string[]>([]);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || "[]");
-      if (Array.isArray(saved)) setShortlist(saved);
-    } catch {
-      /* ignore */
-    }
-
-    const onStorage = () => {
-      try {
-        const saved = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || "[]");
-        if (Array.isArray(saved)) setShortlist(saved);
-      } catch {
-        /* ignore */
-      }
-    };
-    window.addEventListener("shortlist-change", onStorage);
-    return () => window.removeEventListener("shortlist-change", onStorage);
-  }, []);
-
+  const shortlist=useSyncExternalStore(subscribeShortlist,readShortlist,()=>EMPTY_SHORTLIST);
   const toggle = (slug: string) => {
-    setShortlist((prev) => {
-      const next = prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug];
-      try {
-        localStorage.setItem(SHORTLIST_KEY, JSON.stringify(next));
-        window.dispatchEvent(new Event("shortlist-change"));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    const current=readShortlist(),next=current.includes(slug)?current.filter(item=>item!==slug):[...current,slug];
+    shortlistSnapshot=next;
+    try{shortlistRaw=JSON.stringify(next);localStorage.setItem(SHORTLIST_KEY,shortlistRaw);}catch{shortlistRaw=null;}
+    window.dispatchEvent(new Event("shortlist-change"));
   };
 
   const isSaved = (slug: string) => shortlist.includes(slug);
