@@ -1,5 +1,12 @@
 import { describe, it, expect } from "bun:test";
-import { MarketingOfferSchema, ContactSchema, LeadSchema, DealSchema, MaintenanceTicketSchema, ReservationSchema } from "../validators";
+import {
+  MarketingOfferSchema,
+  ContactSchema,
+  LeadSchema,
+  DealSchema,
+  MaintenanceTicketSchema,
+  ReservationSchema,
+} from "../validators";
 
 describe("Backend Domain Contracts & Schemas Suite", () => {
   describe("Marketing Offers Schema", () => {

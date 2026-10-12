@@ -3,11 +3,14 @@
 ## 1. PostgreSQL Database Backups
 
 ### Automated Backups (Supabase Managed)
+
 - **Point-in-Time Recovery (PITR)**: Supabase provides continuous WAL archiving for Pro projects, allowing restoration to any second within the retention window (7 to 30 days).
 - **Daily Physical Backups**: Retained automatically for disaster recovery.
 
 ### Manual Export / Logical Backup (`pg_dump`)
+
 To take an offsite logical snapshot:
+
 ```bash
 # Dump complete schema and data (excluding auth secrets)
 pg_dump \
@@ -24,6 +27,7 @@ pg_dump \
 ```
 
 ### Logical Restore Procedure
+
 ```bash
 # Restore into target database
 psql \
@@ -39,12 +43,15 @@ psql \
 ## 2. Storage Buckets Backup & Retention
 
 Avrasya Properties utilizes 3 distinct buckets:
+
 - `public-marketing`
 - `private-source`
 - `private-documents`
 
 ### Bucket Mirroring
+
 Use Supabase CLI or S3-compatible tools (such as `rclone` or AWS CLI with Supabase S3 credentials):
+
 ```bash
 # Sync public marketing assets to cold backup
 rclone sync supabase:public-marketing /backups/storage/public-marketing/
@@ -54,6 +61,7 @@ rclone sync supabase:private-documents /backups/storage/private-documents/ --cry
 ```
 
 ### Retention Policy
+
 - `public-marketing`: Retain permanently while referenced by active listings. Deletion of media referenced by published content is blocked until unpublished.
 - `private-documents`: Retain minimum 7 years for financial records and contracts; archived thereafter.
 - `audit_events`: Immutable server-generated records; retained indefinitely.

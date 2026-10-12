@@ -1,14 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { 
-  Award, 
-  Building2, 
-  Compass, 
-  Globe2, 
-  HeartHandshake, 
-  MapPin, 
-  Scale, 
-  ShieldCheck, 
-  Users 
+import {
+  Award,
+  Building2,
+  Compass,
+  Globe2,
+  HeartHandshake,
+  MapPin,
+  Scale,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/about")({
   head: () =>
     meta(
       "About Avrasya Properties · Istanbul Property Investment Consultancy",
-      "Headquartered on Istanbul's historic Asian shore, Avrasya Properties provides institutional advisory and cross-border acquisition services for international private clients."
+      "Headquartered on Istanbul's historic Asian shore, Avrasya Properties provides institutional advisory and cross-border acquisition services for international private clients.",
     ),
   component: AboutPage,
 });
@@ -77,7 +77,9 @@ export function AboutPage() {
         }
       >
         <p>
-          Founded on Istanbul's Asian shoreline in Üsküdar overlooking the Bosphorus, Avrasya Properties bridges international capital with high-conviction Turkish real estate assets. We combine deep local market intelligence with institutional transparency.
+          Founded on Istanbul's Asian shoreline in Üsküdar overlooking the Bosphorus, Avrasya
+          Properties bridges international capital with high-conviction Turkish real estate assets.
+          We combine deep local market intelligence with institutional transparency.
         </p>
       </PageIntro>
 
@@ -86,19 +88,27 @@ export function AboutPage() {
         <div className="container-site grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
           <div>
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">$120M+</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">Transaction Volume Advised</p>
+            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
+              Transaction Volume Advised
+            </p>
           </div>
           <div>
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">38+</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">Nationalities Represented</p>
+            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
+              Nationalities Represented
+            </p>
           </div>
           <div>
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">100%</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">CBI Compliance Success</p>
+            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
+              CBI Compliance Success
+            </p>
           </div>
           <div>
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">14 Yrs</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">Istanbul Market Tenure</p>
+            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
+              Istanbul Market Tenure
+            </p>
           </div>
         </div>
       </section>
@@ -112,10 +122,14 @@ export function AboutPage() {
               Transforming Foreign Property Acquisition in Türkiye
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              For decades, international buyers navigating Istanbul's dynamic property landscape encountered fragmented information, undisclosed markups, and aggressive developer sales tactics.
+              For decades, international buyers navigating Istanbul's dynamic property landscape
+              encountered fragmented information, undisclosed markups, and aggressive developer
+              sales tactics.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              Avrasya Properties was established to introduce an uncompromising standard of advisory. We believe property acquisition abroad should be as structured, documented, and secure as an institutional capital allocation.
+              Avrasya Properties was established to introduce an uncompromising standard of
+              advisory. We believe property acquisition abroad should be as structured, documented,
+              and secure as an institutional capital allocation.
             </p>
             <div className="pt-2">
               <p className="text-sm font-semibold text-foreground">Registered Office & Presence:</p>
@@ -146,7 +160,10 @@ export function AboutPage() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {standards.map((s) => (
-              <div key={s.title} className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div
+                key={s.title}
+                className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+              >
                 <s.icon className="h-6 w-6 text-brass mb-3" />
                 <h3 className="font-display text-lg font-semibold text-on-dark">{s.title}</h3>
                 <p className="mt-2 text-sm text-on-dark-muted leading-relaxed">{s.desc}</p>
@@ -169,10 +186,15 @@ export function AboutPage() {
           {leadership.map((l) => (
             <div key={l.name} className="rounded-xl border bg-card p-6">
               <div className="h-12 w-12 rounded-full bg-brass/10 text-brass flex items-center justify-center font-bold text-lg font-display mb-4">
-                {l.name.split(" ").map(n => n[0]).join("")}
+                {l.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">{l.name}</h3>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brass mt-1">{l.role}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-brass mt-1">
+                {l.role}
+              </p>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{l.desc}</p>
             </div>
           ))}
@@ -187,7 +209,8 @@ export function AboutPage() {
             Institutional Verification Framework
           </h2>
           <p className="mt-3 text-muted-foreground leading-relaxed">
-            Every property recommended by Avrasya Properties undergoes strict multi-tier vetting before any client capital commitment.
+            Every property recommended by Avrasya Properties undergoes strict multi-tier vetting
+            before any client capital commitment.
           </p>
         </div>
 
@@ -196,9 +219,13 @@ export function AboutPage() {
             <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
               <Scale className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-lg font-semibold text-foreground">Independent Title Audit</h3>
+            <h3 className="font-display text-lg font-semibold text-foreground">
+              Independent Title Audit
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Direct verification at the Land Registry (Tapu Sicil) ensuring clean freehold title deed, absence of mortgages or judicial liens (haciz), and confirmed Kat Mülkiyeti status.
+              Direct verification at the Land Registry (Tapu Sicil) ensuring clean freehold title
+              deed, absence of mortgages or judicial liens (haciz), and confirmed Kat Mülkiyeti
+              status.
             </p>
           </div>
 
@@ -206,9 +233,12 @@ export function AboutPage() {
             <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
               <Building2 className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-lg font-semibold text-foreground">SPK-Accredited Valuation</h3>
+            <h3 className="font-display text-lg font-semibold text-foreground">
+              SPK-Accredited Valuation
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Mandatory appraisal reports by Capital Markets Board (SPK) certified assessors confirming real market value and Turkish Citizenship qualifying threshold eligibility.
+              Mandatory appraisal reports by Capital Markets Board (SPK) certified assessors
+              confirming real market value and Turkish Citizenship qualifying threshold eligibility.
             </p>
           </div>
 
@@ -216,9 +246,13 @@ export function AboutPage() {
             <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
               <Globe2 className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-lg font-semibold text-foreground">Central Bank DAB Execution</h3>
+            <h3 className="font-display text-lg font-semibold text-foreground">
+              Central Bank DAB Execution
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Coordinated Foreign Exchange Purchase Certificate (Döviz Alım Belgesi) processing directly through the Central Bank of Türkiye (TCMB) to secure statutory exchange rates.
+              Coordinated Foreign Exchange Purchase Certificate (Döviz Alım Belgesi) processing
+              directly through the Central Bank of Türkiye (TCMB) to secure statutory exchange
+              rates.
             </p>
           </div>
         </div>
@@ -235,17 +269,26 @@ export function AboutPage() {
               </h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Our headquarters is situated on Istanbul's historic Asian shoreline in Üsküdar overlooking the Bosphorus. We host private investors and family offices for confidential portfolio reviews, legal title examinations, and direct developer consultations.
+              Our headquarters is situated on Istanbul's historic Asian shoreline in Üsküdar
+              overlooking the Bosphorus. We host private investors and family offices for
+              confidential portfolio reviews, legal title examinations, and direct developer
+              consultations.
             </p>
 
             <div className="grid gap-4 sm:grid-cols-2 pt-2">
               <div className="rounded-lg border bg-card/60 p-4">
-                <p className="text-xs uppercase tracking-wider text-brass font-semibold">Registered Entity</p>
+                <p className="text-xs uppercase tracking-wider text-brass font-semibold">
+                  Registered Entity
+                </p>
                 <p className="mt-1 text-sm font-medium text-foreground">{contact.company}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Istanbul Chamber of Commerce (İTO)</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Istanbul Chamber of Commerce (İTO)
+                </p>
               </div>
               <div className="rounded-lg border bg-card/60 p-4">
-                <p className="text-xs uppercase tracking-wider text-brass font-semibold">Advisory Hours</p>
+                <p className="text-xs uppercase tracking-wider text-brass font-semibold">
+                  Advisory Hours
+                </p>
                 <p className="mt-1 text-sm font-medium text-foreground">{contact.advisoryHours}</p>
               </div>
             </div>
@@ -257,7 +300,9 @@ export function AboutPage() {
               </p>
               <p className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-brass shrink-0" />
-                <span>Private boardroom meetings & chauffeured property viewings arranged upon request</span>
+                <span>
+                  Private boardroom meetings & chauffeured property viewings arranged upon request
+                </span>
               </p>
             </div>
           </div>
@@ -269,7 +314,9 @@ export function AboutPage() {
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-              <p className="text-white text-sm font-medium">Avrasya Advisory · Prime Corridors Across Istanbul</p>
+              <p className="text-white text-sm font-medium">
+                Avrasya Advisory · Prime Corridors Across Istanbul
+              </p>
             </div>
           </div>
         </div>
@@ -288,40 +335,59 @@ export function AboutPage() {
           <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
               <span>How does Avrasya Properties differ from conventional real estate agents?</span>
-              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">
+                ▾
+              </span>
             </summary>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              We operate exclusively as buy-side client fiduciaries rather than sales intermediaries. We do not accept undisclosed commissions or promote speculative inventory. Every property in our portfolio has undergone pre-clearance checks on title deeds, developer balance sheets, and SPK appraisal compliance.
+              We operate exclusively as buy-side client fiduciaries rather than sales
+              intermediaries. We do not accept undisclosed commissions or promote speculative
+              inventory. Every property in our portfolio has undergone pre-clearance checks on title
+              deeds, developer balance sheets, and SPK appraisal compliance.
             </p>
           </details>
 
           <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
               <span>Are the prices shown on your website verified directly with developers?</span>
-              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">
+                ▾
+              </span>
             </summary>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Yes. All pricing is cross-referenced with developer price lists and recent transaction records. For projects offering installment schedules or cash payment discounts, our advisors negotiate directly on your behalf to obtain institutional-grade pricing.
+              Yes. All pricing is cross-referenced with developer price lists and recent transaction
+              records. For projects offering installment schedules or cash payment discounts, our
+              advisors negotiate directly on your behalf to obtain institutional-grade pricing.
             </p>
           </details>
 
           <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
               <span>How is client capital protected before the Land Registry transfer?</span>
-              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">
+                ▾
+              </span>
             </summary>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Funds are held in secure escrow accounts and converted through official Central Bank DAB foreign exchange certificates. Payments are released only upon verification that the title deed (Tapu) is clean, unencumbered, and ready for notarized registration into the buyer's name.
+              Funds are held in secure escrow accounts and converted through official Central Bank
+              DAB foreign exchange certificates. Payments are released only upon verification that
+              the title deed (Tapu) is clean, unencumbered, and ready for notarized registration
+              into the buyer's name.
             </p>
           </details>
 
           <details className="group rounded-xl border bg-card p-5 transition-colors [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex cursor-pointer items-center justify-between font-display text-base font-semibold text-foreground">
               <span>What ongoing management services are provided after the sale completes?</span>
-              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">▾</span>
+              <span className="ml-4 shrink-0 text-brass transition-transform group-open:rotate-180">
+                ▾
+              </span>
             </summary>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              We provide full turnkey post-acquisition support, including Turkish tax number issuance, bank account setup, utility connections, interior design management, corporate tenant leasing, and citizenship dossier coordination through accredited legal counsel.
+              We provide full turnkey post-acquisition support, including Turkish tax number
+              issuance, bank account setup, utility connections, interior design management,
+              corporate tenant leasing, and citizenship dossier coordination through accredited
+              legal counsel.
             </p>
           </details>
         </div>

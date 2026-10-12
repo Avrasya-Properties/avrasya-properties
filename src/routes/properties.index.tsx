@@ -27,6 +27,7 @@ import {
   locationText,
   priceDisplay,
   properties,
+  useLiveProperties,
   sideText,
   unmatchablePrices,
   waLink,
@@ -56,7 +57,7 @@ export const Route = createFileRoute("/properties/")({
   head: () =>
     meta(
       "Istanbul Real Estate Portfolio — 18 Curated Developments",
-      "Browse 18 verified Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
+      "Browse 18 verified Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence.",
     ),
   component: Catalog,
 });
@@ -68,7 +69,9 @@ function Catalog() {
   const [currency] = useCurrency();
   const { shortlist, count: savedCount, isSaved, toggle } = useShortlist();
 
-  let list = filterProperties(f);
+  const liveProperties = useLiveProperties();
+
+  let list = filterProperties(f, liveProperties);
   if (f.savedOnly) {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
@@ -86,7 +89,11 @@ function Catalog() {
   const sel = (k: keyof Filters, label: string, any: string, opts: [string, string][]) => (
     <label className="block">
       <span className={lbl}>{label}</span>
-      <select className="field text-xs md:text-sm" value={String(f[k] ?? "")} onChange={(e) => set(k, e.target.value)}>
+      <select
+        className="field text-xs md:text-sm"
+        value={String(f[k] ?? "")}
+        onChange={(e) => set(k, e.target.value)}
+      >
         <option value="">{any}</option>
         {opts.map(([v, t]) => (
           <option key={v} value={v}>
@@ -101,18 +108,26 @@ function Catalog() {
     <>
       <PageIntro
         eyebrow="Istanbul Portfolio Collection"
-        title={<>Curated Offers & Developments in <em>Istanbul.</em></>}
+        title={
+          <>
+            Curated Offers & Developments in <em>Istanbul.</em>
+          </>
+        }
         aside={
           <div className="flex flex-col gap-1 text-right">
             <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
               Prime Corridors · European & Asian Side
             </span>
-            <span className="text-xs text-foreground font-medium">18 Curated Opportunities</span>
+            <span className="text-xs text-foreground font-medium">
+              {liveProperties.length} Curated Opportunities
+            </span>
           </div>
         }
       >
         <p>
-          Source-backed investment opportunities across central and Asian-side Istanbul. Every property is subject to preliminary title deed, zoning, and legal clearance before acquisition.
+          Source-backed investment opportunities across central and Asian-side Istanbul. Every
+          property is subject to preliminary title deed, zoning, and legal clearance before
+          acquisition.
         </p>
       </PageIntro>
 
@@ -133,14 +148,29 @@ function Catalog() {
                 <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
               </div>
             </label>
-            {sel("loc", "District", "All Districts", LOCATIONS.map((l) => [l, l]))}
+            {sel(
+              "loc",
+              "District",
+              "All Districts",
+              LOCATIONS.map((l) => [l, l]),
+            )}
             {sel("side", "Continent", "Both Continents", [
               ["Europe", "European Side"],
               ["Asia", "Asian Side"],
             ])}
-            {sel("layout", "Layout", "All Layouts", LAYOUTS.map((l) => [l, l]))}
+            {sel(
+              "layout",
+              "Layout",
+              "All Layouts",
+              LAYOUTS.map((l) => [l, l]),
+            )}
             {sel("type", "Asset Type", "All Types", Object.entries(TYPE_LABEL))}
-            {sel("budget", "Target Budget", "Any Budget", BUDGETS.map((b) => [b.id, b.label]))}
+            {sel(
+              "budget",
+              "Target Budget",
+              "Any Budget",
+              BUDGETS.map((b) => [b.id, b.label]),
+            )}
           </div>
 
           {/* Quick Toggle Bars & Active Filters */}
@@ -184,8 +214,8 @@ function Catalog() {
                       {k === "budget"
                         ? BUDGETS.find((b) => b.id === v)?.label
                         : k === "type"
-                        ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
-                        : String(v)}
+                          ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
+                          : String(v)}
                     </span>
                     <X className="h-3 w-3 text-muted-foreground" />
                   </button>
@@ -195,7 +225,11 @@ function Catalog() {
               )}
 
               {active.length > 0 && (
-                <Link to="/properties" search={{}} className="text-brass font-medium underline ml-1">
+                <Link
+                  to="/properties"
+                  search={{}}
+                  className="text-brass font-medium underline ml-1"
+                >
                   Reset filters
                 </Link>
               )}
@@ -212,7 +246,9 @@ function Catalog() {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`flex h-7 w-7 items-center justify-center rounded-xs transition-colors ${
-                    viewMode === "grid" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                    viewMode === "grid"
+                      ? "bg-card text-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                   title="Grid View"
                 >
@@ -221,7 +257,9 @@ function Catalog() {
                 <button
                   onClick={() => setViewMode("list")}
                   className={`flex h-7 w-7 items-center justify-center rounded-xs transition-colors ${
-                    viewMode === "list" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                    viewMode === "list"
+                      ? "bg-card text-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                   title="List View"
                 >
@@ -302,7 +340,11 @@ function Catalog() {
                         </div>
 
                         <h3 className="font-display text-base md:text-lg font-medium text-foreground truncate mt-0.5">
-                          <Link to="/properties/$slug" params={{ slug: r.slug }} className="hover:text-brass">
+                          <Link
+                            to="/properties/$slug"
+                            params={{ slug: r.slug }}
+                            className="hover:text-brass"
+                          >
                             {r.marketing_title}
                           </Link>
                         </h3>
@@ -315,7 +357,9 @@ function Catalog() {
 
                     <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-t-0 pt-3 sm:pt-0">
                       <div className="text-left sm:text-right">
-                        <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
+                        <p className="eyebrow !text-muted-foreground !text-[0.6rem]">
+                          Indicative Valuation
+                        </p>
                         <p className="font-display text-xl font-semibold text-foreground tracking-tight">
                           {displayPrice}
                         </p>
@@ -374,11 +418,14 @@ function Catalog() {
         <div className="mt-12 rounded-xs border border-border/80 bg-card p-5 text-xs leading-relaxed text-muted-foreground flex items-start gap-3">
           <CheckCircle2 className="h-4 w-4 text-brass shrink-0 mt-0.5" />
           <p>
-            <strong className="text-foreground">Official Advisory Standard:</strong> All property specifications, valuations, area measurements (gross/net), and citizenship eligibility criteria originate from project developers and are pre-screened on file. Prior to contractual commitments, our team coordinates an independent title deed audit (Tapu kaydı) and licensed valuation report (SPK değerleme).
+            <strong className="text-foreground">Official Advisory Standard:</strong> All property
+            specifications, valuations, area measurements (gross/net), and citizenship eligibility
+            criteria originate from project developers and are pre-screened on file. Prior to
+            contractual commitments, our team coordinates an independent title deed audit (Tapu
+            kaydı) and licensed valuation report (SPK değerleme).
           </p>
         </div>
       </section>
     </>
   );
 }
-

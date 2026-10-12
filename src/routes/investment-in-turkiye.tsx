@@ -1,19 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { 
-  AlertTriangle, 
-  Banknote, 
-  Building2, 
-  Calculator, 
-  CheckCircle2, 
-  FileText, 
-  HelpCircle, 
-  KeyRound, 
-  Percent, 
-  Receipt, 
-  ShieldAlert, 
-  ShieldCheck, 
-  WalletCards 
+import {
+  AlertTriangle,
+  Banknote,
+  Building2,
+  Calculator,
+  CheckCircle2,
+  FileText,
+  HelpCircle,
+  KeyRound,
+  Percent,
+  Receipt,
+  ShieldAlert,
+  ShieldCheck,
+  WalletCards,
 } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/investment-in-turkiye")({
   head: () =>
     meta(
       "Investing in Türkiye · Master Real Estate Acquisition Playbook",
-      "Comprehensive investment methodology, legal due diligence, tax structures, and rental yield benchmarks for international purchasers in Istanbul."
+      "Comprehensive investment methodology, legal due diligence, tax structures, and rental yield benchmarks for international purchasers in Istanbul.",
     ),
   component: InvestmentPlaybook,
 });
@@ -42,7 +42,8 @@ const STRATEGIES: Strategy[] = [
     title: "Prime Residential Buy-to-Let",
     targetYield: "6.5% – 8.0%",
     horizon: "5+ Years (0% CGT after 5 yrs)",
-    profile: "Long-term corporate, expatriate, or affluent domestic tenants in Maslak, Ataşehir, and Bomonti.",
+    profile:
+      "Long-term corporate, expatriate, or affluent domestic tenants in Maslak, Ataşehir, and Bomonti.",
     points: [
       "Consistent recurring income pegged to annual CPI rental index caps",
       "Low turnover costs with 12-month advance or quarterly lease terms",
@@ -54,7 +55,8 @@ const STRATEGIES: Strategy[] = [
     title: "Branded Hospitality & Short-Stay",
     targetYield: "8.0% – 10.5%",
     horizon: "3 – 5 Years",
-    profile: "Turnkey hotel-serviced apartments in tourism and conference zones (Şişli, Taksim, Bomonti, Kadıköy).",
+    profile:
+      "Turnkey hotel-serviced apartments in tourism and conference zones (Şişli, Taksim, Bomonti, Kadıköy).",
     points: [
       "Managed by professional hotel or boutique short-stay operators",
       "Revenues generated in hard currency (EUR/USD) from international travelers",
@@ -130,7 +132,9 @@ export function InvestmentPlaybook() {
         }
       >
         <p>
-          A methodical, institutional framework for foreign individuals, family offices, and cross-border buyers. Clear risk isolation, documented costs, and transparent legal due diligence.
+          A methodical, institutional framework for foreign individuals, family offices, and
+          cross-border buyers. Clear risk isolation, documented costs, and transparent legal due
+          diligence.
         </p>
       </PageIntro>
 
@@ -142,7 +146,8 @@ export function InvestmentPlaybook() {
             Select Your Target Asset Strategy
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Compare expected yields, holding horizons, and tenant profiles across primary asset classes.
+            Compare expected yields, holding horizons, and tenant profiles across primary asset
+            classes.
           </p>
         </div>
 
@@ -161,7 +166,9 @@ export function InvestmentPlaybook() {
               >
                 <div className="flex items-center justify-between">
                   <h3 className="font-display text-lg font-bold text-foreground">{s.title}</h3>
-                  <span className="font-mono text-xs font-semibold text-brass">{s.targetYield}</span>
+                  <span className="font-mono text-xs font-semibold text-brass">
+                    {s.targetYield}
+                  </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{s.horizon}</p>
               </button>
@@ -173,24 +180,37 @@ export function InvestmentPlaybook() {
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
                 <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-brass">Strategy Profile</span>
-                  <h3 className="font-display text-2xl font-bold text-foreground">{currentStrat.title}</h3>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-brass">
+                    Strategy Profile
+                  </span>
+                  <h3 className="font-display text-2xl font-bold text-foreground">
+                    {currentStrat.title}
+                  </h3>
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-muted-foreground block">Net Yield Benchmark</span>
-                  <span className="font-mono text-2xl font-bold text-brass">{currentStrat.targetYield}</span>
+                  <span className="font-mono text-2xl font-bold text-brass">
+                    {currentStrat.targetYield}
+                  </span>
                 </div>
               </div>
 
               <div className="mt-6">
                 <p className="text-sm font-medium text-foreground">Target Profile:</p>
-                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{currentStrat.profile}</p>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                  {currentStrat.profile}
+                </p>
               </div>
 
               <div className="mt-6 space-y-3">
-                <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Key Operational Characteristics</p>
+                <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
+                  Key Operational Characteristics
+                </p>
                 {currentStrat.points.map((pt, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-lg border bg-background p-3 text-sm">
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 rounded-lg border bg-background p-3 text-sm"
+                  >
                     <CheckCircle2 className="h-5 w-5 text-brass shrink-0 mt-0.5" />
                     <span className="text-foreground leading-relaxed">{pt}</span>
                   </div>
@@ -199,7 +219,9 @@ export function InvestmentPlaybook() {
             </div>
 
             <div className="mt-8 pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-              <span className="text-xs text-muted-foreground">Recommended minimum holding period: <b>{currentStrat.horizon}</b></span>
+              <span className="text-xs text-muted-foreground">
+                Recommended minimum holding period: <b>{currentStrat.horizon}</b>
+              </span>
               <Link to="/properties" className="btn btn-primary w-full sm:w-auto">
                 Browse Matching Opportunities
               </Link>
@@ -217,13 +239,17 @@ export function InvestmentPlaybook() {
               End-to-End Acquisition Protocol
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              Every stage is coordinated with client approval, verified documentation, and independent professional sign-off.
+              Every stage is coordinated with client approval, verified documentation, and
+              independent professional sign-off.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {PHASES.map((p) => (
-              <div key={p.stage} className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div
+                key={p.stage}
+                className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+              >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-2xl font-bold text-brass">{p.stage}</span>
                   <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-on-dark-muted">
@@ -246,7 +272,8 @@ export function InvestmentPlaybook() {
             Key Tax Rules for International Buyers
           </h2>
           <p className="mt-2 text-muted-foreground text-sm">
-            Turkish property taxation is straightforward and competitive compared to Western European destinations.
+            Turkish property taxation is straightforward and competitive compared to Western
+            European destinations.
           </p>
         </div>
 
@@ -255,10 +282,13 @@ export function InvestmentPlaybook() {
             <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
               <Receipt className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-lg font-bold text-foreground">Title Transfer Tax (Tapu Harcı)</h3>
+            <h3 className="font-display text-lg font-bold text-foreground">
+              Title Transfer Tax (Tapu Harcı)
+            </h3>
             <p className="mt-1 font-mono text-xl font-bold text-brass">4.0%</p>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Assessed on declared sales value at the Land Registry. Customarily split 2% buyer and 2% seller, though contract terms dictate allocation.
+              Assessed on declared sales value at the Land Registry. Customarily split 2% buyer and
+              2% seller, though contract terms dictate allocation.
             </p>
           </div>
 
@@ -266,10 +296,13 @@ export function InvestmentPlaybook() {
             <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
               <Building2 className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-lg font-bold text-foreground">Annual Municipal Tax (Emlak Vergisi)</h3>
+            <h3 className="font-display text-lg font-bold text-foreground">
+              Annual Municipal Tax (Emlak Vergisi)
+            </h3>
             <p className="mt-1 font-mono text-xl font-bold text-brass">0.2% p.a.</p>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Paid biannually in May and November to the local municipality (Belediye). Istanbul residential rate is 0.2% of the municipal tax valuation.
+              Paid biannually in May and November to the local municipality (Belediye). Istanbul
+              residential rate is 0.2% of the municipal tax valuation.
             </p>
           </div>
 
@@ -277,10 +310,13 @@ export function InvestmentPlaybook() {
             <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
               <Banknote className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-lg font-bold text-foreground">Capital Gains Tax Exemption</h3>
+            <h3 className="font-display text-lg font-bold text-foreground">
+              Capital Gains Tax Exemption
+            </h3>
             <p className="mt-1 font-mono text-xl font-bold text-emerald-600">0% (After 5 Years)</p>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Under Turkish Income Tax Law Article 80, capital gains realized by individual natural persons after holding real estate for 5 complete calendar years are 100% tax-exempt.
+              Under Turkish Income Tax Law Article 80, capital gains realized by individual natural
+              persons after holding real estate for 5 complete calendar years are 100% tax-exempt.
             </p>
           </div>
         </div>
@@ -298,28 +334,35 @@ export function InvestmentPlaybook() {
             <div className="rounded-lg border bg-card p-4">
               <p className="font-semibold text-foreground">1. Kat İrtifakı vs Kat Mülkiyeti</p>
               <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                Always confirm whether the building has acquired its final Habitation Certificate (İskan). Kat Mülkiyeti title represents completed, legally cleared residential units.
+                Always confirm whether the building has acquired its final Habitation Certificate
+                (İskan). Kat Mülkiyeti title represents completed, legally cleared residential
+                units.
               </p>
             </div>
 
             <div className="rounded-lg border bg-card p-4">
               <p className="font-semibold text-foreground">2. Declared Value Integrity</p>
               <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                Ensure the value recorded on the Title Deed matches the actual money transferred through the Central Bank DAB document. Under-declaration jeopardizes citizenship and future resale calculations.
+                Ensure the value recorded on the Title Deed matches the actual money transferred
+                through the Central Bank DAB document. Under-declaration jeopardizes citizenship and
+                future resale calculations.
               </p>
             </div>
 
             <div className="rounded-lg border bg-card p-4">
               <p className="font-semibold text-foreground">3. Military & Restricted Zone Checks</p>
               <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                Foreign nationals cannot acquire property within sensitive security zones. We verify parcel registry numbers prior to taking any financial deposits.
+                Foreign nationals cannot acquire property within sensitive security zones. We verify
+                parcel registry numbers prior to taking any financial deposits.
               </p>
             </div>
 
             <div className="rounded-lg border bg-card p-4">
               <p className="font-semibold text-foreground">4. Developer Guaranteed Yields</p>
               <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                Promotional developer "guaranteed returns" must be reviewed by independent legal counsel to verify whether guarantees are backed by bank collateral or merely marketing subsidies.
+                Promotional developer "guaranteed returns" must be reviewed by independent legal
+                counsel to verify whether guarantees are backed by bank collateral or merely
+                marketing subsidies.
               </p>
             </div>
           </div>

@@ -1,31 +1,31 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { 
-  Building2, 
-  CheckCircle2, 
-  Clock, 
-  ExternalLink, 
-  Filter, 
-  Inbox, 
-  Mail, 
-  MessageSquare, 
-  Phone, 
-  Plus, 
-  Search, 
-  Trash2, 
-  UserPlus 
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Filter,
+  Inbox,
+  Mail,
+  MessageSquare,
+  Phone,
+  Plus,
+  Search,
+  Trash2,
+  UserPlus,
 } from "lucide-react";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
-import { 
-  convertInquiryToLead, 
-  createInquiry, 
-  fmtDate, 
-  remove, 
-  upsert, 
-  useDB, 
-  useSession, 
-  type Inquiry 
+import {
+  convertInquiryToLead,
+  createInquiry,
+  fmtDate,
+  remove,
+  upsert,
+  useDB,
+  useSession,
+  type Inquiry,
 } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/inquiries")({
@@ -130,10 +130,7 @@ export function AdminInquiriesPage() {
         crumbs="Operations / Inbox"
         action={
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsAddOpen(true)}
-              className={btnPrimary}
-            >
+            <button onClick={() => setIsAddOpen(true)} className={btnPrimary}>
               <Plus className="h-3.5 w-3.5" />
               <span>Log Client Inquiry</span>
             </button>
@@ -144,7 +141,9 @@ export function AdminInquiriesPage() {
       {/* Metrics Header */}
       <div className="grid gap-4 sm:grid-cols-4">
         <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Total Inquiries</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+            Total Inquiries
+          </p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">{inquiries.length}</p>
           <p className="mt-1 text-xs text-muted-foreground">Recorded across channels</p>
         </div>
@@ -159,7 +158,9 @@ export function AdminInquiriesPage() {
           <p className="mt-1 text-xs text-muted-foreground">In active conversation</p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs uppercase tracking-wider text-emerald-600 font-semibold">Converted Leads</p>
+          <p className="text-xs uppercase tracking-wider text-emerald-600 font-semibold">
+            Converted Leads
+          </p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-emerald-600">{qualifiedCount}</p>
           <p className="mt-1 text-xs text-muted-foreground">Advanced to CRM deals</p>
         </div>
@@ -183,7 +184,9 @@ export function AdminInquiriesPage() {
                 key={st}
                 onClick={() => setFilter(st)}
                 className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                  filter === st ? "bg-brass text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
+                  filter === st
+                    ? "bg-brass text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {st}
@@ -284,8 +287,12 @@ export function AdminInquiriesPage() {
             <div className="rounded-xl border bg-card p-5 space-y-4 sticky top-20">
               <div className="flex items-start justify-between border-b pb-3">
                 <div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{selectedInquiry.name}</h3>
-                  <p className="text-xs text-muted-foreground">Received {fmtDate(selectedInquiry.createdAt, true)}</p>
+                  <h3 className="font-display text-lg font-bold text-foreground">
+                    {selectedInquiry.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Received {fmtDate(selectedInquiry.createdAt, true)}
+                  </p>
                 </div>
                 <Status v={selectedInquiry.status} />
               </div>
@@ -293,11 +300,15 @@ export function AdminInquiriesPage() {
               <div className="space-y-2 text-xs">
                 <div className="flex items-center gap-2 text-foreground">
                   <Mail className="h-3.5 w-3.5 text-brass" />
-                  <a href={`mailto:${selectedInquiry.email}`} className="hover:underline">{selectedInquiry.email || "No email"}</a>
+                  <a href={`mailto:${selectedInquiry.email}`} className="hover:underline">
+                    {selectedInquiry.email || "No email"}
+                  </a>
                 </div>
                 <div className="flex items-center gap-2 text-foreground">
                   <Phone className="h-3.5 w-3.5 text-brass" />
-                  <a href={`tel:${selectedInquiry.phone}`} className="hover:underline">{selectedInquiry.phone || "No phone"}</a>
+                  <a href={`tel:${selectedInquiry.phone}`} className="hover:underline">
+                    {selectedInquiry.phone || "No phone"}
+                  </a>
                 </div>
                 <div className="flex items-center gap-2 text-foreground">
                   <Building2 className="h-3.5 w-3.5 text-brass" />
@@ -311,13 +322,17 @@ export function AdminInquiriesPage() {
               </div>
 
               <div className="rounded-lg bg-muted/40 p-3 text-xs leading-relaxed text-foreground">
-                <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">Client Message:</p>
+                <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">
+                  Client Message:
+                </p>
                 <p>{selectedInquiry.message || "No message body provided."}</p>
               </div>
 
               {selectedInquiry.propertySlug && (
                 <div className="rounded-lg border p-3 bg-card text-xs">
-                  <p className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Attached Listing:</p>
+                  <p className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">
+                    Attached Listing:
+                  </p>
                   <Link
                     to="/properties/$slug"
                     params={{ slug: selectedInquiry.propertySlug }}
@@ -338,7 +353,9 @@ export function AdminInquiriesPage() {
                 <select
                   className={field}
                   value={selectedInquiry.status}
-                  onChange={(e) => handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])}
+                  onChange={(e) =>
+                    handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])
+                  }
                 >
                   <option value="New">New</option>
                   <option value="Contacted">Contacted</option>
@@ -382,7 +399,8 @@ export function AdminInquiriesPage() {
             </div>
           ) : (
             <div className="rounded-xl border border-dashed p-8 text-center text-xs text-muted-foreground">
-              Select an inquiry from the list to view complete details, message history, and direct conversion actions.
+              Select an inquiry from the list to view complete details, message history, and direct
+              conversion actions.
             </div>
           )}
         </div>

@@ -50,9 +50,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
 
   return (
     <Tilt className="h-full">
-      <article
-        className="group relative flex h-full flex-col overflow-hidden rounded-xs border border-border/70 bg-card transition-all duration-300 hover:border-brass/70 hover:shadow-xl"
-      >
+      <article className="group relative flex h-full flex-col overflow-hidden rounded-xs border border-border/70 bg-card transition-all duration-300 hover:border-brass/70 hover:shadow-xl">
         {/* Card Image Banner */}
         <div className="relative aspect-[16/11] overflow-hidden bg-[#0C1E23]">
           <Link
@@ -112,7 +110,9 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
         {/* Card Body */}
         <div className="flex flex-1 flex-col p-5">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-            <span className="eyebrow !text-brass-text text-[0.65rem]">{TYPE_LABEL[r.record_type]}</span>
+            <span className="eyebrow !text-brass-text text-[0.65rem]">
+              {TYPE_LABEL[r.record_type]}
+            </span>
             <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
               Ref: {r.slug.slice(0, 8).toUpperCase()}
             </span>
@@ -153,13 +153,17 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
                 {displayPrice}
               </p>
               {currency !== "USD" && usdVal && (
-                <p className="text-[0.68rem] text-muted-foreground font-medium">USD ${usdVal.toLocaleString("en-US")}</p>
+                <p className="text-[0.68rem] text-muted-foreground font-medium">
+                  USD ${usdVal.toLocaleString("en-US")}
+                </p>
               )}
             </div>
 
             <div className="flex items-center gap-1.5">
               <a
-                href={waLink(`Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`)}
+                href={waLink(
+                  `Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`,
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xs border border-border hover:border-brass hover:text-brass transition-colors"
@@ -181,4 +185,3 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
     </Tilt>
   );
 }
-

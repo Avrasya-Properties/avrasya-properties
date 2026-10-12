@@ -15,22 +15,26 @@ Designed specifically for cross-border private clients, international family off
 ## 🏛️ Key Platform Capabilities
 
 ### 1. Real-Time Multi-Currency Engine (Frankfurter ECB Integration)
+
 - Dynamic currency conversions across **USD ($)**, **EUR (€)**, **TRY (₺)**, and **GBP (£)**.
 - Integrated directly with the European Central Bank feed via `https://api.frankfurter.dev/v1/latest?base=USD`.
 - Client-side reactive broadcast (`useLiveRates`) ensures instant updates across all property cards, financial calculators, and inventory tables with an active sync indicator badge.
 
 ### 2. Interactive Turkish Citizenship by Investment ($400k CBI) Suite
+
 - **Dynamic Cost Calculator**: Simulates property values ($400k to $2M+), family members (spouse + children under 18), and VAT (0% KDV) exemptions.
 - Automatically calculates Title Deed Transfer Taxes (4% Tapu Harcı), SPK-accredited valuation appraisal fees, Central Bank DAB foreign exchange certificates, and bar-certified legal representation retainers.
 - **6-Stage Legal Roadmap**: Interactive milestone tracker detailing statutory requirements under Turkish Law No. 5901.
 
 ### 3. Spatial 3D Motion & Architectural Parallax
+
 - **Minimalist Grand Preloader**: High-impact vector emblem, precision hairline progress beam, and cubic-bezier curtain wipe on initial page entry.
 - **Hardware-Accelerated Parallax**: Smooth Y-axis offset tracking via `[data-parallax]` in `MotionRoot`.
 - **Pointer-Driven 3D Card Tilt**: True perspective card tilt (`rotateX`, `rotateY`, `perspective(1000px)`) with dynamic cursor-following ambient specular sheen on property showcases.
 - **CAD Floor Plan Lightbox**: Architectural blueprint viewer with zoom and pan modes for off-plan and completed condominium inventory.
 
 ### 4. Enterprise Administrative Operations CMS (`/admin`)
+
 - **Executive Command Center**: Live portfolio valuation totals, active pipeline deal distributions, and scheduled viewing calendars.
 - **CRM & Deal Stages**: Full Kanban and tabular pipeline management for cross-border purchaser leads.
 - **Editorial Publication Checklist**: Strict validation rules enforcing title deed verification, price integrity, and cover photo selection before public deployment.
@@ -85,9 +89,11 @@ avrasya-properties/
 ## 🛠️ Local Development & Build Workflow
 
 ### Prerequisites
+
 - [Bun](https://bun.sh) (v1.2+) or Node.js (v20+)
 
 ### Setup
+
 ```bash
 # 1. Install dependencies
 bun install
@@ -105,8 +111,9 @@ bun run build
 ## ⚖️ Statutory & Fiduciary Compliance
 
 Avrasya Properties operates under strict buy-side fiduciary standards:
-- **Ministry of Trade Licensing**: *Taşınmaz Ticareti Yetki Belgesi No. 3409821*
-- **Istanbul Chamber of Commerce (İTO)**: *Sicil No. 849201*
+
+- **Ministry of Trade Licensing**: _Taşınmaz Ticareti Yetki Belgesi No. 3409821_
+- **Istanbul Chamber of Commerce (İTO)**: _Sicil No. 849201_
 - **Valuation Integrity**: All acquisitions are cross-referenced with independent Capital Markets Board (SPK) certified appraisal reports.
 - **Legal Counsel**: Client representation is coordinated through independent members of the Istanbul Bar Association.
 

@@ -26,6 +26,7 @@ import {
   locationText,
   priceDisplay,
   properties,
+  useLiveProperties,
   sideText,
   waLink,
   type PropertyRecord,
@@ -43,27 +44,34 @@ export const Route = createFileRoute("/")({
   head: () =>
     meta(
       "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory",
-      "Premier Istanbul property advisory for international buyers. Explore 18 curated source-verified residential developments with comprehensive legal pre-audits and Turkish Citizenship (CBI) support."
+      "Premier Istanbul property advisory for international buyers. Explore 18 curated source-verified residential developments with comprehensive legal pre-audits and Turkish Citizenship (CBI) support.",
     ),
   component: Home,
 });
 
-const FEATURED = [
+const FEATURED_SLUGS = [
   "sisli-block5-floor2-unit21-497",
   "atasehir-173-1-1-420",
   "sisli-ferikoy-duplex-490",
-].map((s) => getProperty(s)!) as PropertyRecord[];
+];
 
-const EDITORIAL = [
+const EDITORIAL_SLUGS = [
   "pearl-topkapi-2-1-410",
   "rams-park-house-maslak-1-1xs",
   "oryapark-1-1-325",
-].map((s) => getProperty(s)!) as PropertyRecord[];
+];
 
 function Home() {
+  const liveProperties = useLiveProperties();
+  const featured = FEATURED_SLUGS.map(
+    (s) => getProperty(s) || properties.find((p) => p.slug === s)!,
+  ).filter(Boolean);
+  const editorial = EDITORIAL_SLUGS.map(
+    (s) => getProperty(s) || properties.find((p) => p.slug === s)!,
+  ).filter(Boolean);
   const settings = useSiteSettings();
   const [sel, setSel] = useState(0);
-  const f = FEATURED[sel]!;
+  const f = featured[sel] || featured[0]!;
   const media = getPropertyMedia(f);
   const fp = priceDisplay(f.price);
   const navigate = useNavigate();
@@ -76,7 +84,6 @@ function Home() {
 
   return (
     <>
-
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-8 pb-16 md:pt-14 md:pb-24 bg-gradient-to-b from-card/30 via-background to-background">
         {/* Ambient Brand Watermark in Hero */}
@@ -116,7 +123,8 @@ function Home() {
                 style={{ ["--d" as string]: "350ms" }}
                 className="mt-5 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed"
               >
-                {settings.heroSubtitle || "Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer."}
+                {settings.heroSubtitle ||
+                  "Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer."}
               </p>
 
               {/* Key Highlights Bar */}
@@ -126,11 +134,15 @@ function Home() {
                 className="mt-8 grid grid-cols-2 gap-4 border-t border-border/80 pt-6 sm:grid-cols-4"
               >
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">$120M+</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
+                    $120M+
+                  </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Coordinated Volume</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">18</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
+                    18
+                  </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Source Portfolios</p>
                 </div>
                 <div>
@@ -139,7 +151,10 @@ function Home() {
                 </div>
                 <div>
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    ${settings.cbiThresholdUsd ? `${Math.round(settings.cbiThresholdUsd / 1000)}K` : "400K"}
+                    $
+                    {settings.cbiThresholdUsd
+                      ? `${Math.round(settings.cbiThresholdUsd / 1000)}K`
+                      : "400K"}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">CBI Program Ready</p>
                 </div>
@@ -147,7 +162,11 @@ function Home() {
             </div>
 
             {/* Direct Quick Action CTAs */}
-            <div data-reveal style={{ ["--d" as string]: "400ms" }} className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
+            <div
+              data-reveal
+              style={{ ["--d" as string]: "400ms" }}
+              className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end"
+            >
               <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
                 <span>Browse All 18 Offers</span> <ArrowRight className="h-4 w-4" />
               </Link>
@@ -222,10 +241,14 @@ function Home() {
                   </div>
                   <div>
                     <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Layout · Area</p>
-                    <p className="text-foreground">{f.layout_label} · {areaText(f)}</p>
+                    <p className="text-foreground">
+                      {f.layout_label} · {areaText(f)}
+                    </p>
                   </div>
                   <div>
-                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
+                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">
+                      Indicative Valuation
+                    </p>
                     <p className="font-display text-xl font-semibold text-foreground tracking-tight">
                       {fDisplayPrice}
                     </p>
@@ -251,11 +274,11 @@ function Home() {
             {/* Side Tabs Selector */}
             <div className="flex flex-col">
               <div className="flex items-center justify-between border-b pb-2 text-[0.68rem] uppercase tracking-wider text-muted-foreground font-semibold">
-                <span>Curated Highlights ({FEATURED.length.toString().padStart(2, "0")})</span>
+                <span>Curated Highlights ({featured.length.toString().padStart(2, "0")})</span>
                 <span>Click to preview</span>
               </div>
               <div className="mt-3 space-y-3" role="tablist" aria-label="Featured offers">
-                {FEATURED.map((r, i) => {
+                {featured.map((r, i) => {
                   const m = getPropertyMedia(r);
                   const isCur = i === sel;
                   return (
@@ -271,12 +294,18 @@ function Home() {
                       }`}
                     >
                       <div className="relative h-14 w-18 shrink-0 overflow-hidden rounded-xs bg-muted">
-                        <img src={m.cover} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                        <img
+                          src={m.cover}
+                          alt=""
+                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                        />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-semibold text-brass">0{i + 1}</span>
-                          <span className="text-[0.65rem] text-muted-foreground">{r.location_label}</span>
+                          <span className="text-[0.65rem] text-muted-foreground">
+                            {r.location_label}
+                          </span>
                         </div>
                         <p className="font-medium text-sm truncate text-foreground mt-0.5">
                           {r.marketing_title}
@@ -302,7 +331,8 @@ function Home() {
                 <div className="rounded-xs border border-border/80 bg-secondary/50 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
                   <ShieldCheck className="h-4 w-4 text-brass shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
-                    Source documentation on file. Live availability and private developer discounts verified prior to viewing arrangements.
+                    Source documentation on file. Live availability and private developer discounts
+                    verified prior to viewing arrangements.
                   </p>
                 </div>
               </div>
@@ -380,7 +410,7 @@ function Home() {
             </label>
 
             <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5">
-              <span>Filter {properties.length} Listings</span>
+              <span>Filter {liveProperties.length} Listings</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -411,19 +441,24 @@ function Home() {
             <h2 className="headline mt-2 text-3xl md:text-4xl">Editorial portfolio selection</h2>
           </div>
           <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-            Source-advertised offers from prime European and Asian-side Istanbul corridors. Specifications, pricing, and citizenship eligibility are cross-verified before commitment.
+            Source-advertised offers from prime European and Asian-side Istanbul corridors.
+            Specifications, pricing, and citizenship eligibility are cross-verified before
+            commitment.
           </p>
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {EDITORIAL.map((r) => (
+          {editorial.map((r) => (
             <PropertyCard key={r.slug} r={r} />
           ))}
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
-          <Link to="/properties" className="group text-sm font-semibold text-foreground flex items-center gap-2">
-            <span>Explore all {properties.length} offers and developments</span>
+          <Link
+            to="/properties"
+            className="group text-sm font-semibold text-foreground flex items-center gap-2"
+          >
+            <span>Explore all {liveProperties.length} offers and developments</span>
             <ArrowRight className="h-4 w-4 arrow text-brass" />
           </Link>
           <span className="text-xs text-muted-foreground">
@@ -443,19 +478,26 @@ function Home() {
         >
           <div className="relative z-10 max-w-3xl">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
-              <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Turkish Citizenship by Investment (CBI)
+              <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Turkish Citizenship by Investment
+              (CBI)
             </div>
             <h2 className="headline mt-4 text-3xl md:text-5xl text-on-dark leading-tight">
-              A sovereign gateway to Türkiye: <em className="italic text-brass font-normal">Clarity before capital.</em>
+              A sovereign gateway to Türkiye:{" "}
+              <em className="italic text-brass font-normal">Clarity before capital.</em>
             </h2>
             <p className="mt-5 text-sm md:text-base text-on-dark-muted leading-relaxed">
-              Under current Turkish regulations, foreign real estate acquisitions totaling $400,000 USD or more may qualify the investor and their immediate family for Turkish citizenship, subject to official land registry annotations and independent valuation reports.
+              Under current Turkish regulations, foreign real estate acquisitions totaling $400,000
+              USD or more may qualify the investor and their immediate family for Turkish
+              citizenship, subject to official land registry annotations and independent valuation
+              reports.
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3">
               <div>
                 <p className="eyebrow !text-brass">Legal Threshold</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">$400,000 USD</p>
+                <p className="font-display text-2xl font-semibold text-on-dark mt-1">
+                  $400,000 USD
+                </p>
                 <p className="text-[0.7rem] text-on-dark-muted">Or TRY equivalent at transfer</p>
               </div>
               <div>
@@ -465,7 +507,9 @@ function Home() {
               </div>
               <div>
                 <p className="eyebrow !text-brass">Family Scope</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse & Kids &lt;18</p>
+                <p className="font-display text-2xl font-semibold text-on-dark mt-1">
+                  Spouse & Kids &lt;18
+                </p>
                 <p className="text-[0.7rem] text-on-dark-muted">Single joint application</p>
               </div>
             </div>
@@ -475,11 +519,16 @@ function Home() {
                 <Calculator className="h-4 w-4 text-brass" />
                 <span>Calculate Total All-In Closing Costs</span>
               </a>
-              <Link to="/citizenship" className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10">
+              <Link
+                to="/citizenship"
+                className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10"
+              >
                 Official CBI Guide & Requirements
               </Link>
               <a
-                href={waLink("Hello Avrasya Properties, I would like to consult on Turkish Citizenship by Investment ($400,000 CBI).")}
+                href={waLink(
+                  "Hello Avrasya Properties, I would like to consult on Turkish Citizenship by Investment ($400,000 CBI).",
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10"
@@ -520,16 +569,28 @@ function Home() {
             </Link>
           </div>
 
-          <div data-reveal className="mt-10 divide-y border border-border/80 rounded-xs bg-background overflow-hidden">
+          <div
+            data-reveal
+            className="mt-10 divide-y border border-border/80 rounded-xs bg-background overflow-hidden"
+          >
             {[
               [
                 "01",
                 "Phase 01 · Plan",
                 "Pre-acquisition assessment, family briefing and verified shortlist",
                 [
-                  ["Investment Advisory", "Strategic investment goals, portfolio diversification, and risk analysis."],
-                  ["Property Selection", "District yield comparisons, developer delivery track record, and virtual tours."],
-                  ["Citizenship Structuring", "Legal document preparation, apostille verification, and banking prerequisites."],
+                  [
+                    "Investment Advisory",
+                    "Strategic investment goals, portfolio diversification, and risk analysis.",
+                  ],
+                  [
+                    "Property Selection",
+                    "District yield comparisons, developer delivery track record, and virtual tours.",
+                  ],
+                  [
+                    "Citizenship Structuring",
+                    "Legal document preparation, apostille verification, and banking prerequisites.",
+                  ],
                 ],
               ],
               [
@@ -537,9 +598,18 @@ function Home() {
                 "Phase 02 · Acquire",
                 "Independent legal checks, currency conversion (DAB), contracting and closing",
                 [
-                  ["Title Deed Due Diligence", "Turkish Land Registry encumbrance, mortgage, and ownership verification."],
-                  ["Licensed Valuation", "Appraisal report preparation by SPK-licensed certified evaluators."],
-                  ["Title Deed (Tapu) Transfer", "Official registry representation and power of attorney coordination."],
+                  [
+                    "Title Deed Due Diligence",
+                    "Turkish Land Registry encumbrance, mortgage, and ownership verification.",
+                  ],
+                  [
+                    "Licensed Valuation",
+                    "Appraisal report preparation by SPK-licensed certified evaluators.",
+                  ],
+                  [
+                    "Title Deed (Tapu) Transfer",
+                    "Official registry representation and power of attorney coordination.",
+                  ],
                 ],
               ],
               [
@@ -547,9 +617,18 @@ function Home() {
                 "Phase 03 · Own & Manage",
                 "Handover inspection, utility connections, tenant management and resale strategy",
                 [
-                  ["Property Management", "Key handover, luxury furnishing packages, and utility registrations."],
-                  ["Rental Yield Management", "Corporate and executive tenant placement with local partners."],
-                  ["Holding & Exit Strategy", "Capital appreciation monitoring and 3-year post-holding resale planning."],
+                  [
+                    "Property Management",
+                    "Key handover, luxury furnishing packages, and utility registrations.",
+                  ],
+                  [
+                    "Rental Yield Management",
+                    "Corporate and executive tenant placement with local partners.",
+                  ],
+                  [
+                    "Holding & Exit Strategy",
+                    "Capital appreciation monitoring and 3-year post-holding resale planning.",
+                  ],
                 ],
               ],
             ].map(([n, h, s, items]) => (
@@ -579,7 +658,10 @@ function Home() {
                 <ShieldCheck className="h-4 w-4 text-brass" />
                 Continuous International Investor Representation across all phases
               </span>
-              <Link to="/services" className="font-semibold text-foreground underline hover:text-brass">
+              <Link
+                to="/services"
+                className="font-semibold text-foreground underline hover:text-brass"
+              >
                 Explore comprehensive service catalog →
               </Link>
             </div>
@@ -601,7 +683,8 @@ function Home() {
               </h2>
             </div>
             <p className="text-sm text-on-dark-muted max-w-md leading-relaxed">
-              Real cross-border transactions executed under strict fiduciary duty, verified title deeds, and documented SPK valuations.
+              Real cross-border transactions executed under strict fiduciary duty, verified title
+              deeds, and documented SPK valuations.
             </p>
           </div>
 
@@ -611,7 +694,8 @@ function Home() {
                 client: "Alexander & Elena Becker",
                 city: "Zurich, Switzerland",
                 project: "Horizon Maslak Duplex & CBI ($400k+)",
-                quote: "Navigating Turkish property from Zurich seemed fraught with conflicting developer promises. Avrasya provided an independent SPK valuation that saved us over $60k on our initial shortlist and found us an unadvertised top-floor Maslak duplex. Both passports were granted in 4 months without a single hitch.",
+                quote:
+                  "Navigating Turkish property from Zurich seemed fraught with conflicting developer promises. Avrasya provided an independent SPK valuation that saved us over $60k on our initial shortlist and found us an unadvertised top-floor Maslak duplex. Both passports were granted in 4 months without a single hitch.",
                 metric: "$1,250,000 USD Acquisition",
                 badge: "Citizenship Granted",
               },
@@ -619,7 +703,8 @@ function Home() {
                 client: "Tariq & Fatima Al-Mansoor",
                 city: "Dubai, United Arab Emirates",
                 project: "Ataşehir Financial Center (IFC) Suite",
-                quote: "Their team coordinated the Central Bank DAB currency conversion and Land Registry title deed transfer seamlessly via power of attorney while we were in Dubai. Clean, calm, institutional service that feels like a private bank rather than a standard brokerage.",
+                quote:
+                  "Their team coordinated the Central Bank DAB currency conversion and Land Registry title deed transfer seamlessly via power of attorney while we were in Dubai. Clean, calm, institutional service that feels like a private bank rather than a standard brokerage.",
                 metric: "Dual Portfolio Allocation",
                 badge: "Corporate Tenancy Placed",
               },
@@ -627,7 +712,8 @@ function Home() {
                 client: "Oliver Sterling, CFA",
                 city: "London, United Kingdom",
                 project: "Bomonti Loft Buy-to-Let",
-                quote: "The 5-year capital gains tax exemption and rental yields in Bomonti made this an exceptional asset. Avrasya handled key holding, turnkey furnishing, and tenanted the unit to a German diplomat within three weeks of delivery.",
+                quote:
+                  "The 5-year capital gains tax exemption and rental yields in Bomonti made this an exceptional asset. Avrasya handled key holding, turnkey furnishing, and tenanted the unit to a German diplomat within three weeks of delivery.",
                 metric: "8.2% Net Yield Achieved",
                 badge: "Turnkey Management",
               },
@@ -645,9 +731,7 @@ function Home() {
                     <span className="text-[11px] font-mono text-on-dark-muted">{t.metric}</span>
                   </div>
 
-                  <p className="mt-5 text-sm text-on-dark leading-relaxed italic">
-                    "{t.quote}"
-                  </p>
+                  <p className="mt-5 text-sm text-on-dark leading-relaxed italic">"{t.quote}"</p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-white/10">
@@ -662,22 +746,34 @@ function Home() {
           {/* Institutional Statutory Badges Strip */}
           <div className="mt-14 rounded-xl border border-white/10 bg-white/[0.02] p-6 grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Ministry of Trade</p>
-              <p className="text-sm font-semibold text-on-dark mt-1">Taşınmaz Ticareti No. 3409821</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Licensed Real Estate Enterprise</p>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
+                Ministry of Trade
+              </p>
+              <p className="text-sm font-semibold text-on-dark mt-1">
+                Taşınmaz Ticareti No. 3409821
+              </p>
+              <p className="text-[11px] text-on-dark-muted mt-0.5">
+                Licensed Real Estate Enterprise
+              </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Chamber of Commerce</p>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
+                Chamber of Commerce
+              </p>
               <p className="text-sm font-semibold text-on-dark mt-1">İTO Sicil No. 849201</p>
               <p className="text-[11px] text-on-dark-muted mt-0.5">Registered Istanbul Entity</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Statutory Valuation</p>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
+                Statutory Valuation
+              </p>
               <p className="text-sm font-semibold text-on-dark mt-1">100% SPK Accredited</p>
               <p className="text-[11px] text-on-dark-muted mt-0.5">Mandatory Valuation Audits</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">Bar Association</p>
+              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
+                Bar Association
+              </p>
               <p className="text-sm font-semibold text-on-dark mt-1">Independent Legal Panel</p>
               <p className="text-[11px] text-on-dark-muted mt-0.5">Zero In-House Conflicts</p>
             </div>
@@ -689,4 +785,3 @@ function Home() {
     </>
   );
 }
-

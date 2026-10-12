@@ -1,5 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, FileText, CheckCircle2, ArrowRight, ShieldCheck, TrendingUp, Mail, Phone } from "lucide-react";
+import {
+  Download,
+  FileText,
+  CheckCircle2,
+  ArrowRight,
+  ShieldCheck,
+  TrendingUp,
+  Mail,
+  Phone,
+} from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
 import { waLink } from "@/data/properties";
@@ -9,7 +18,7 @@ export const Route = createFileRoute("/investment-catalog")({
   head: () =>
     meta(
       "Avrasya Investment Catalog — Comprehensive Portfolio & Citizenship Guide",
-      "Official 17-page Avrasya Properties Group Investment Catalog. Detailed six-phase acquisition pathway, verified 10-year financial projections, and Turkish Citizenship by Investment framework."
+      "Official 17-page Avrasya Properties Group Investment Catalog. Detailed six-phase acquisition pathway, verified 10-year financial projections, and Turkish Citizenship by Investment framework.",
     ),
   component: Catalog,
 });
@@ -50,12 +59,36 @@ const PHASES = [
 ];
 
 const METRICS = [
-  { label: "Minimum CBI Real Estate Threshold", val: "$400,000 USD", sub: "Qualifying government-appraised title deeds" },
-  { label: "Average Capital Appreciation", val: "12% – 18%", sub: "5-year rolling average in prime Istanbul corridors" },
-  { label: "Gross Long-Term Rental Yield", val: "5% – 8%", sub: "Annual USD/EUR equivalent returns" },
-  { label: "Peak Tourism Rental Yield", val: "10% – 15%", sub: "Short-term managed suites in central tourist hubs" },
-  { label: "Citizenship Processing Timeline", val: "3 – 6 Months", sub: "Expedited fast-track investor track" },
-  { label: "Mandatory Resale Hold Period", val: "3 Years", sub: "Free-market liquidation unlocked upon milestone" },
+  {
+    label: "Minimum CBI Real Estate Threshold",
+    val: "$400,000 USD",
+    sub: "Qualifying government-appraised title deeds",
+  },
+  {
+    label: "Average Capital Appreciation",
+    val: "12% – 18%",
+    sub: "5-year rolling average in prime Istanbul corridors",
+  },
+  {
+    label: "Gross Long-Term Rental Yield",
+    val: "5% – 8%",
+    sub: "Annual USD/EUR equivalent returns",
+  },
+  {
+    label: "Peak Tourism Rental Yield",
+    val: "10% – 15%",
+    sub: "Short-term managed suites in central tourist hubs",
+  },
+  {
+    label: "Citizenship Processing Timeline",
+    val: "3 – 6 Months",
+    sub: "Expedited fast-track investor track",
+  },
+  {
+    label: "Mandatory Resale Hold Period",
+    val: "3 Years",
+    sub: "Free-market liquidation unlocked upon milestone",
+  },
 ];
 
 function Catalog() {
@@ -71,7 +104,9 @@ function Catalog() {
         }
       >
         <p className="max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
-          Our comprehensive 17-page investor brief detailing the Turkish Citizenship by Investment framework, verified return projections, legal due diligence standards, and our complete six-phase client pathway.
+          Our comprehensive 17-page investor brief detailing the Turkish Citizenship by Investment
+          framework, verified return projections, legal due diligence standards, and our complete
+          six-phase client pathway.
         </p>
       </PageIntro>
 
@@ -87,7 +122,9 @@ function Catalog() {
                 Download the Complete Investor Guide
               </h2>
               <p className="mt-2 text-sm md:text-base text-white/80 leading-relaxed">
-                Includes full financial modeling for $400,000+ acquisitions, 10-year wealth projections, legal FAQs for emerging market investors, and district portfolio overviews.
+                Includes full financial modeling for $400,000+ acquisitions, 10-year wealth
+                projections, legal FAQs for emerging market investors, and district portfolio
+                overviews.
               </p>
             </div>
 
@@ -100,7 +137,9 @@ function Catalog() {
                 <Download className="h-4 w-4" /> Download PDF (340 KB)
               </a>
               <a
-                href={waLink("Hello, I would like to request the Avrasya Investment Catalog and book a private consultation.")}
+                href={waLink(
+                  "Hello, I would like to request the Avrasya Investment Catalog and book a private consultation.",
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline !border-white/30 !bg-white/10 !text-white hover:!bg-white/20 gap-2"
@@ -118,7 +157,9 @@ function Catalog() {
           {METRICS.map((m) => (
             <div key={m.label} className="rounded-xs border border-border/80 bg-card p-5">
               <p className="eyebrow !text-muted-foreground !text-[0.68rem]">{m.label}</p>
-              <p className="mt-2 font-display text-2xl md:text-3xl font-semibold text-primary">{m.val}</p>
+              <p className="mt-2 font-display text-2xl md:text-3xl font-semibold text-primary">
+                {m.val}
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">{m.sub}</p>
             </div>
           ))}
@@ -129,7 +170,10 @@ function Catalog() {
       <Margin label="The Six-Phase Pathway">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PHASES.map((p) => (
-            <div key={p.phase} className="rounded-xs border border-border/80 bg-card p-6 flex flex-col justify-between">
+            <div
+              key={p.phase}
+              className="rounded-xs border border-border/80 bg-card p-6 flex flex-col justify-between"
+            >
               <div>
                 <span className="eyebrow !text-brass-text">{p.phase}</span>
                 <h3 className="mt-2 font-display text-lg font-medium text-foreground">{p.title}</h3>
@@ -150,13 +194,21 @@ function Catalog() {
             Connect Directly with our Senior Istanbul Advisory Team
           </h3>
           <p className="mt-2 text-sm text-muted-foreground max-w-xl">
-            Whether you are evaluating a $400,000 citizenship qualifying purchase or building an Istanbul commercial portfolio, our consultants provide transparent guidance without sales pressure.
+            Whether you are evaluating a $400,000 citizenship qualifying purchase or building an
+            Istanbul commercial portfolio, our consultants provide transparent guidance without
+            sales pressure.
           </p>
           <div className="mt-6 flex flex-wrap gap-4 text-sm font-medium">
-            <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-primary hover:text-brass">
+            <a
+              href={`mailto:${contact.email}`}
+              className="flex items-center gap-2 text-primary hover:text-brass"
+            >
               <Mail className="h-4 w-4 text-brass" /> {contact.email}
             </a>
-            <a href={contact.phoneHref} className="flex items-center gap-2 text-primary hover:text-brass">
+            <a
+              href={contact.phoneHref}
+              className="flex items-center gap-2 text-primary hover:text-brass"
+            >
               <Phone className="h-4 w-4 text-brass" /> {contact.phone}
             </a>
           </div>

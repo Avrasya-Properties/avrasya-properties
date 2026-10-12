@@ -4,9 +4,11 @@ export async function runRentChargeGenerationJob(targetYear?: number, targetMont
   const admin = getAdminClient();
   const now = new Date();
   const year = targetYear || now.getFullYear();
-  const month = targetMonth || (now.getMonth() + 1);
+  const month = targetMonth || now.getMonth() + 1;
 
-  console.log(`[Job:RentCharge] Generating charges for ${year}-${String(month).padStart(2, "0")}...`);
+  console.log(
+    `[Job:RentCharge] Generating charges for ${year}-${String(month).padStart(2, "0")}...`,
+  );
 
   try {
     const { data: generatedCount, error } = await admin.rpc("generate_rent_charges_for_month", {
@@ -19,7 +21,9 @@ export async function runRentChargeGenerationJob(targetYear?: number, targetMont
       throw error;
     }
 
-    console.log(`[Job:RentCharge] Successfully generated ${generatedCount} charges for ${year}-${month}.`);
+    console.log(
+      `[Job:RentCharge] Successfully generated ${generatedCount} charges for ${year}-${month}.`,
+    );
 
     if ((generatedCount || 0) > 0) {
       await admin.from("audit_events").insert({

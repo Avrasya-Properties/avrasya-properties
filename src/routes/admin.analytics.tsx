@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { 
-  Building2, 
-  DollarSign, 
-  Globe2, 
-  Layers, 
-  MapPin, 
-  Percent, 
-  PieChart, 
-  TrendingUp, 
-  Users 
+import {
+  Building2,
+  DollarSign,
+  Globe2,
+  Layers,
+  MapPin,
+  Percent,
+  PieChart,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { PageHead, Status, btnGhost } from "@/admin/Shell";
 import { fmtMoney, useDB } from "@/admin/store";
@@ -23,7 +23,7 @@ export function AdminAnalyticsPage() {
 
   const metrics = useMemo(() => {
     const activeProps = db.properties.filter((p) => p.availability !== "Sold");
-    
+
     // Total gross value in USD
     const totalValueUsd = activeProps.reduce((sum, p) => {
       if (!p.amount) return sum;
@@ -34,8 +34,12 @@ export function AdminAnalyticsPage() {
     }, 0);
 
     // CBI eligible count & ratio
-    const cbiEligible = activeProps.filter((p) => (p.amount ?? 0) >= 400000 && p.currency === "USD");
-    const cbiRatio = activeProps.length ? Math.round((cbiEligible.length / activeProps.length) * 100) : 0;
+    const cbiEligible = activeProps.filter(
+      (p) => (p.amount ?? 0) >= 400000 && p.currency === "USD",
+    );
+    const cbiRatio = activeProps.length
+      ? Math.round((cbiEligible.length / activeProps.length) * 100)
+      : 0;
 
     // Side distribution
     const european = activeProps.filter((p) => p.side !== "Asia");
@@ -50,11 +54,15 @@ export function AdminAnalyticsPage() {
     const districts = Object.entries(districtCounts).sort((a, b) => b[1] - a[1]);
 
     // Average price / m2
-    const propsWithArea = activeProps.filter((p) => (p.grossM2 || p.netM2 || p.areaM2) && p.amount && p.currency === "USD");
+    const propsWithArea = activeProps.filter(
+      (p) => (p.grossM2 || p.netM2 || p.areaM2) && p.amount && p.currency === "USD",
+    );
     const avgPriceM2 = propsWithArea.length
       ? Math.round(
-          propsWithArea.reduce((sum, p) => sum + p.amount! / (p.grossM2 || p.netM2 || p.areaM2)!, 0) /
-            propsWithArea.length
+          propsWithArea.reduce(
+            (sum, p) => sum + p.amount! / (p.grossM2 || p.netM2 || p.areaM2)!,
+            0,
+          ) / propsWithArea.length,
         )
       : 0;
 
@@ -101,20 +109,29 @@ export function AdminAnalyticsPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Portfolio Gross Value</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Portfolio Gross Value
+            </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <DollarSign className="h-4 w-4" />
             </span>
           </div>
           <p className="mt-3 text-2xl font-bold tracking-tight text-foreground tabular-nums">
-            ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(metrics.totalValueUsd)}
+            $
+            {new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(
+              metrics.totalValueUsd,
+            )}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Across {metrics.activeCount} active residential assets</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Across {metrics.activeCount} active residential assets
+          </p>
         </div>
 
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">CBI Qualification Share</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              CBI Qualification Share
+            </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
               <Percent className="h-4 w-4" />
             </span>
@@ -122,33 +139,45 @@ export function AdminAnalyticsPage() {
           <p className="mt-3 text-2xl font-bold tracking-tight text-emerald-600 tabular-nums">
             {metrics.cbiRatio}%
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{metrics.cbiCount} units qualifying for $400k+ Citizenship</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {metrics.cbiCount} units qualifying for $400k+ Citizenship
+          </p>
         </div>
 
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Average Price / m²</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Average Price / m²
+            </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <Building2 className="h-4 w-4" />
             </span>
           </div>
           <p className="mt-3 text-2xl font-bold tracking-tight text-foreground tabular-nums">
-            ${metrics.avgPriceM2.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">/ m²</span>
+            ${metrics.avgPriceM2.toLocaleString()}{" "}
+            <span className="text-xs font-normal text-muted-foreground">/ m²</span>
           </p>
           <p className="mt-1 text-xs text-muted-foreground">Central corridor prime benchmarks</p>
         </div>
 
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Active Deal Pipeline</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Active Deal Pipeline
+            </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
               <TrendingUp className="h-4 w-4" />
             </span>
           </div>
           <p className="mt-3 text-2xl font-bold tracking-tight text-foreground tabular-nums">
-            ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(metrics.totalPipelineUsd)}
+            $
+            {new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(
+              metrics.totalPipelineUsd,
+            )}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{metrics.openDealsCount} live contract & diligence stages</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {metrics.openDealsCount} live contract & diligence stages
+          </p>
         </div>
       </div>
 
@@ -158,10 +187,16 @@ export function AdminAnalyticsPage() {
         <section className="rounded-xl border bg-card p-6 lg:col-span-7">
           <div className="flex items-center justify-between border-b pb-3 mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-foreground">District Concentration Breakdown</h2>
-              <p className="text-xs text-muted-foreground">Active inventory distribution across Istanbul prime zones</p>
+              <h2 className="text-sm font-semibold text-foreground">
+                District Concentration Breakdown
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Active inventory distribution across Istanbul prime zones
+              </p>
             </div>
-            <span className="text-xs text-brass font-medium">{metrics.districts.length} districts active</span>
+            <span className="text-xs text-brass font-medium">
+              {metrics.districts.length} districts active
+            </span>
           </div>
 
           <div className="space-y-3">
@@ -196,15 +231,23 @@ export function AdminAnalyticsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border p-4 bg-muted/20 text-center">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">European Side</p>
-                <p className="mt-2 text-2xl font-bold text-foreground tabular-nums">{metrics.europeanCount}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  European Side
+                </p>
+                <p className="mt-2 text-2xl font-bold text-foreground tabular-nums">
+                  {metrics.europeanCount}
+                </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {Math.round((metrics.europeanCount / metrics.activeCount) * 100)}% of portfolio
                 </p>
               </div>
               <div className="rounded-lg border p-4 bg-muted/20 text-center">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Asian Side</p>
-                <p className="mt-2 text-2xl font-bold text-foreground tabular-nums">{metrics.asianCount}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Asian Side
+                </p>
+                <p className="mt-2 text-2xl font-bold text-foreground tabular-nums">
+                  {metrics.asianCount}
+                </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {Math.round((metrics.asianCount / metrics.activeCount) * 100)}% of portfolio
                 </p>
@@ -215,7 +258,9 @@ export function AdminAnalyticsPage() {
           {/* Lead Source Acquisition */}
           <div>
             <div className="border-b pb-3 mb-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Lead Acquisition Channels</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Lead Acquisition Channels
+              </h3>
             </div>
             <div className="space-y-2">
               {Object.entries(metrics.sourceCounts).map(([src, count]) => (

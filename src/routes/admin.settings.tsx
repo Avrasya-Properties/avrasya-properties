@@ -1,29 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { 
-  Building2, 
-  Check, 
-  Download, 
-  Globe2, 
-  RefreshCw, 
-  Save, 
-  Settings2, 
-  ShieldCheck, 
-  Upload, 
-  AlertTriangle 
+import {
+  Building2,
+  Check,
+  Download,
+  Globe2,
+  RefreshCw,
+  Save,
+  Settings2,
+  ShieldCheck,
+  Upload,
+  AlertTriangle,
 } from "lucide-react";
 import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
-import { 
-  DEFAULT_SITE_SETTINGS, 
-  exportBackup, 
-  importBackup, 
-  resetData, 
-  updateSiteSettings, 
-  useDB, 
-  useSession, 
-  can, 
-  type SiteSettings 
+import {
+  DEFAULT_SITE_SETTINGS,
+  exportBackup,
+  importBackup,
+  resetData,
+  updateSiteSettings,
+  useDB,
+  useSession,
+  can,
+  type SiteSettings,
 } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/settings")({
@@ -84,7 +84,11 @@ export function AdminSettingsPage() {
   };
 
   const handleResetFactory = () => {
-    if (confirm("Reset all properties, leads, contacts and settings to default seed data? Any session changes will be reverted.")) {
+    if (
+      confirm(
+        "Reset all properties, leads, contacts and settings to default seed data? Any session changes will be reverted.",
+      )
+    ) {
       resetData();
       setForm({ ...DEFAULT_SITE_SETTINGS });
       toast.success("Database restored to default verified state");
@@ -98,10 +102,7 @@ export function AdminSettingsPage() {
         crumbs="Platform / Settings"
         action={
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleSave}
-              className={btnPrimary}
-            >
+            <button onClick={handleSave} className={btnPrimary}>
               <Save className="h-3.5 w-3.5" />
               <span>Save CMS Changes</span>
             </button>
@@ -306,13 +307,16 @@ export function AdminSettingsPage() {
                   onChange={(e) => setField("cbiThresholdUsd", Number(e.target.value) || 400000)}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Statutory minimum property valuation required for Turkish Citizenship by Investment ($400,000 statutory law).
+                  Statutory minimum property valuation required for Turkish Citizenship by
+                  Investment ($400,000 statutory law).
                 </p>
               </div>
               <div className="rounded-lg border bg-muted/40 p-4">
                 <p className="text-xs font-semibold text-foreground">Current Rule Active:</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Properties with valuation equal to or exceeding <b>${form.cbiThresholdUsd.toLocaleString()}</b> receive automatic "CBI Eligible" status across website filters.
+                  Properties with valuation equal to or exceeding{" "}
+                  <b>${form.cbiThresholdUsd.toLocaleString()}</b> receive automatic "CBI Eligible"
+                  status across website filters.
                 </p>
               </div>
             </div>
@@ -330,7 +334,9 @@ export function AdminSettingsPage() {
                   onChange={(e) => setField("announcementActive", e.target.checked)}
                   className="rounded border"
                 />
-                <span className="text-sm font-medium text-foreground">Enable site-wide top announcement bar</span>
+                <span className="text-sm font-medium text-foreground">
+                  Enable site-wide top announcement bar
+                </span>
               </label>
               {form.announcementActive && (
                 <div>
@@ -360,7 +366,9 @@ export function AdminSettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/20">
                 <div>
-                  <p className="text-sm font-medium text-foreground">Real-Time European Central Bank (Frankfurter API)</p>
+                  <p className="text-sm font-medium text-foreground">
+                    Real-Time European Central Bank (Frankfurter API)
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Automatically pulls hourly ECB spot exchange rates for USD, EUR, TRY, and GBP.
                   </p>
@@ -388,7 +396,9 @@ export function AdminSettingsPage() {
                       step="0.001"
                       className={`${field} mt-1`}
                       value={form.exchangeRateEur}
-                      onChange={(e) => setField("exchangeRateEur", parseFloat(e.target.value) || 0.892)}
+                      onChange={(e) =>
+                        setField("exchangeRateEur", parseFloat(e.target.value) || 0.892)
+                      }
                     />
                   </div>
                   <div className="rounded-lg border p-3 bg-card">
@@ -398,7 +408,9 @@ export function AdminSettingsPage() {
                       step="0.01"
                       className={`${field} mt-1`}
                       value={form.exchangeRateTry}
-                      onChange={(e) => setField("exchangeRateTry", parseFloat(e.target.value) || 49.17)}
+                      onChange={(e) =>
+                        setField("exchangeRateTry", parseFloat(e.target.value) || 49.17)
+                      }
                     />
                   </div>
                   <div className="rounded-lg border p-3 bg-card">
@@ -408,7 +420,9 @@ export function AdminSettingsPage() {
                       step="0.001"
                       className={`${field} mt-1`}
                       value={form.exchangeRateGbp}
-                      onChange={(e) => setField("exchangeRateGbp", parseFloat(e.target.value) || 0.756)}
+                      onChange={(e) =>
+                        setField("exchangeRateGbp", parseFloat(e.target.value) || 0.756)
+                      }
                     />
                   </div>
                 </div>
@@ -426,7 +440,8 @@ export function AdminSettingsPage() {
               Database Export & Snapshot
             </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Export all 18+ property records, active leads, CRM contacts, deals, scheduled calendar viewings, and website CMS configurations into a single standalone JSON file.
+              Export all 18+ property records, active leads, CRM contacts, deals, scheduled calendar
+              viewings, and website CMS configurations into a single standalone JSON file.
             </p>
             <div className="flex flex-wrap gap-3">
               <button onClick={handleDownloadBackup} className={btnPrimary}>
@@ -463,7 +478,8 @@ export function AdminSettingsPage() {
               <span>Reset Database to Initial Verified State</span>
             </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Re-initialize all database tables with the original 18 verified properties, leadership profiles, seed CRM deals, and standard settings.
+              Re-initialize all database tables with the original 18 verified properties, leadership
+              profiles, seed CRM deals, and standard settings.
             </p>
             <button
               onClick={handleResetFactory}

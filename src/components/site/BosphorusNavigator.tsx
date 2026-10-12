@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { 
-  ArrowRight, 
-  Building2, 
-  Compass, 
-  MapPin, 
-  MessageSquare, 
-  Navigation, 
-  Plane, 
-  ShieldCheck, 
-  Train, 
-  TrendingUp, 
-  Waves 
+import {
+  ArrowRight,
+  Building2,
+  Compass,
+  MapPin,
+  MessageSquare,
+  Navigation,
+  Plane,
+  ShieldCheck,
+  Train,
+  TrendingUp,
+  Waves,
 } from "lucide-react";
 import { waLink } from "@/data/properties";
 
@@ -41,7 +41,8 @@ const CORRIDORS: CorridorData[] = [
     name: "Maslak & Sariyer",
     subName: "Skyscraper Executive Axis",
     side: "European",
-    tagline: "The Manhattan of Istanbul. Headquarters of multinational banks, tech giants, and prestige corporate residential towers.",
+    tagline:
+      "The Manhattan of Istanbul. Headquarters of multinational banks, tech giants, and prestige corporate residential towers.",
     priceM2: "$4,800 – $8,500",
     yieldRate: "7.0% – 8.2%",
     appreciation: "14% – 18% p.a.",
@@ -55,15 +56,16 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Highest corporate USD rental payment track record",
       "Belgrad Forest micro-climate and immediate northern highway link",
-      "Walking distance to Vadistanbul & İstinyePark luxury shopping"
-    ]
+      "Walking distance to Vadistanbul & İstinyePark luxury shopping",
+    ],
   },
   {
     id: "sisli",
     name: "Şişli & Bomonti",
     subName: "Cosmopolitan Luxury & Arts Hub",
     side: "European",
-    tagline: "Minutes from Nişantaşı couture boutiques. Prime destination for 5-star hotel branded residences and high-liquidity luxury suites.",
+    tagline:
+      "Minutes from Nişantaşı couture boutiques. Prime destination for 5-star hotel branded residences and high-liquidity luxury suites.",
     priceM2: "$4,200 – $7,800",
     yieldRate: "6.8% – 7.8%",
     appreciation: "12% – 16% p.a.",
@@ -77,15 +79,16 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "High short-stay & executive corporate lease demand",
       "Immediate proximity to Bomontiada cultural center and five-star hotels",
-      "Rapid resale liquidity driven by international investor concentration"
-    ]
+      "Rapid resale liquidity driven by international investor concentration",
+    ],
   },
   {
     id: "besiktas",
     name: "Beşiktaş & Waterfront",
     subName: "Bosphorus Frontline & Trophy Heritage",
     side: "European",
-    tagline: "Ultra-prime waterfront territory offering scarcity value, historic embassies, and world-renowned five-star palace hotels.",
+    tagline:
+      "Ultra-prime waterfront territory offering scarcity value, historic embassies, and world-renowned five-star palace hotels.",
     priceM2: "$7,500 – $14,000",
     yieldRate: "5.5% – 6.5%",
     appreciation: "Preservation of Capital & Global Trophy Status",
@@ -99,15 +102,16 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Irreplaceable Bosphorus Strait frontline panoramas",
       "Strict zoning preventing new supply; permanent asset exclusivity",
-      "Direct water ferry transit to Asian shore in under 8 minutes"
-    ]
+      "Direct water ferry transit to Asian shore in under 8 minutes",
+    ],
   },
   {
     id: "topkapi",
     name: "Topkapı & Zeytinburnu",
     subName: "Family Living & Central Arterial Axis",
     side: "European",
-    tagline: "Modern gated residential compounds with lush gardens, minutes from historic city walls and direct E-5 transit arteries.",
+    tagline:
+      "Modern gated residential compounds with lush gardens, minutes from historic city walls and direct E-5 transit arteries.",
     priceM2: "$2,900 – $4,600",
     yieldRate: "7.2% – 8.5%",
     appreciation: "15% – 20% p.a.",
@@ -121,8 +125,8 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Extensive on-site family amenities, private schools & indoor pools",
       "Lower entry m² threshold maximizing Turkish Citizenship allocation",
-      "Direct highway arterial access to both old city and business districts"
-    ]
+      "Direct highway arterial access to both old city and business districts",
+    ],
   },
 
   // Asian Axis
@@ -131,7 +135,8 @@ const CORRIDORS: CorridorData[] = [
     name: "Ataşehir & IFC",
     subName: "Istanbul Financial Center (IFC) Axis",
     side: "Asian",
-    tagline: "Türkiye's $3B sovereign banking metropolis. Central Bank, Ziraat, Halkbank, and multinational financial institutions consolidated in one smart district.",
+    tagline:
+      "Türkiye's $3B sovereign banking metropolis. Central Bank, Ziraat, Halkbank, and multinational financial institutions consolidated in one smart district.",
     priceM2: "$3,400 – $6,500",
     yieldRate: "7.5% – 8.8%",
     appreciation: "18% – 24% p.a. (Post-IFC opening momentum)",
@@ -145,15 +150,16 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Over 50,000 corporate finance professionals entering the district",
       "Brand-new residential high-rises with international safety codes",
-      "Highest rental occupancy consistency across all Istanbul sub-markets"
-    ]
+      "Highest rental occupancy consistency across all Istanbul sub-markets",
+    ],
   },
   {
     id: "umraniye",
     name: "Ümraniye & Oryapark",
     subName: "High-Growth Commercial Axis",
     side: "Asian",
-    tagline: "Contemporary twin-tower commercial & residential developments situated directly at the junction of Istanbul's two Bosphorus bridge highways.",
+    tagline:
+      "Contemporary twin-tower commercial & residential developments situated directly at the junction of Istanbul's two Bosphorus bridge highways.",
     priceM2: "$2,800 – $5,200",
     yieldRate: "7.2% – 8.4%",
     appreciation: "15% – 18% p.a.",
@@ -167,15 +173,16 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Direct on-ramp to Fatih Sultan Mehmet (2nd Bosphorus) Bridge",
       "Integrated Crown Plaza & shopping boulevards within compound perimeter",
-      "Attractive yield-to-price ratio with zero renovation requirement"
-    ]
+      "Attractive yield-to-price ratio with zero renovation requirement",
+    ],
   },
   {
     id: "kadikoy",
     name: "Kadıköy & Bağdat Avenue",
     subName: "Coastal High-Street & High-Net-Worth Living",
     side: "Asian",
-    tagline: "The premier pedestrian luxury avenue of the Asian shore. Tree-lined boulevards, gourmet dining, private marinas, and high domestic wealth concentration.",
+    tagline:
+      "The premier pedestrian luxury avenue of the Asian shore. Tree-lined boulevards, gourmet dining, private marinas, and high domestic wealth concentration.",
     priceM2: "$4,500 – $9,200",
     yieldRate: "6.0% – 7.0%",
     appreciation: "Strongest Domestic Lira & USD Resale Liquidity",
@@ -189,15 +196,16 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Walkable coastal parks stretching 8km along the Sea of Marmara",
       "Highest local Turkish buyer demand guaranteeing instant resale liquidity",
-      "Kalamış Yacht Marina and prestigious private international academies"
-    ]
+      "Kalamış Yacht Marina and prestigious private international academies",
+    ],
   },
   {
     id: "uskudar",
     name: "Üsküdar & Çamlıca",
     subName: "Historic Panoramic Vistas & Low-Density Enclaves",
     side: "Asian",
-    tagline: "Spiritual, aristocratic heart of the Asian Bosphorus. Low-rise luxury compounds overlooking Maiden's Tower and the European historical peninsula.",
+    tagline:
+      "Spiritual, aristocratic heart of the Asian Bosphorus. Low-rise luxury compounds overlooking Maiden's Tower and the European historical peninsula.",
     priceM2: "$4,000 – $7,800",
     yieldRate: "6.2% – 7.2%",
     appreciation: "High Scarcity Long-Term Capital Preservation",
@@ -211,9 +219,9 @@ const CORRIDORS: CorridorData[] = [
     keyStrengths: [
       "Fastest intercontinental crossing: 4 minutes undersea to Europe shore",
       "Unobstructed panoramic sunset views over Topkapı & Hagia Sophia",
-      "Gated low-density private residences surrounded by protected pine groves"
-    ]
-  }
+      "Gated low-density private residences surrounded by protected pine groves",
+    ],
+  },
 ];
 
 export function BosphorusNavigator() {
@@ -232,12 +240,11 @@ export function BosphorusNavigator() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="pulse-live h-2 w-2 rounded-full bg-emerald-500 mr-1" />
-              <p className="eyebrow !text-brass-text">
-                Cross-Continental Sub-Market Intelligence
-              </p>
+              <p className="eyebrow !text-brass-text">Cross-Continental Sub-Market Intelligence</p>
             </div>
             <h2 className="headline text-3xl md:text-5xl text-foreground">
-              Bosphorus Cross-Strait <em className="italic text-brass font-normal">Corridor Navigator</em>
+              Bosphorus Cross-Strait{" "}
+              <em className="italic text-brass font-normal">Corridor Navigator</em>
             </h2>
           </div>
 
@@ -341,7 +348,9 @@ export function BosphorusNavigator() {
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-brass font-medium">
                   <MapPin className="h-3.5 w-3.5" />
-                  <span>{active.side} Istanbul · {active.locParam}</span>
+                  <span>
+                    {active.side} Istanbul · {active.locParam}
+                  </span>
                 </div>
               </div>
 
@@ -375,23 +384,35 @@ export function BosphorusNavigator() {
               {/* Financial & Statutory Key Metrics Grid */}
               <div className="mt-8 grid grid-cols-2 gap-4 border-y border-border/70 py-5 sm:grid-cols-4 bg-secondary/20 -mx-6 sm:-mx-8 px-6 sm:px-8">
                 <div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Valuation Range</p>
-                  <p className="font-display text-lg font-semibold text-foreground mt-0.5">{active.priceM2}</p>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Valuation Range
+                  </p>
+                  <p className="font-display text-lg font-semibold text-foreground mt-0.5">
+                    {active.priceM2}
+                  </p>
                   <p className="text-[10px] text-muted-foreground">per m² USD</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Projected Net Yield</p>
-                  <p className="font-display text-lg font-semibold text-brass mt-0.5">{active.yieldRate}</p>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Projected Net Yield
+                  </p>
+                  <p className="font-display text-lg font-semibold text-brass mt-0.5">
+                    {active.yieldRate}
+                  </p>
                   <p className="text-[10px] text-muted-foreground">USD indexed contracts</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Airport Transit</p>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Airport Transit
+                  </p>
                   <p className="font-sans text-xs font-semibold text-foreground mt-1 flex items-center gap-1">
                     <Plane className="h-3 w-3 text-brass" /> {active.airportTime}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Capital Growth</p>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Capital Growth
+                  </p>
                   <p className="font-sans text-xs font-semibold text-emerald-700 mt-1 flex items-center gap-1">
                     <TrendingUp className="h-3 w-3" /> {active.appreciation}
                   </p>
@@ -406,7 +427,10 @@ export function BosphorusNavigator() {
                 </p>
                 <div className="grid gap-2 sm:grid-cols-3">
                   {active.keyStrengths.map((str, idx) => (
-                    <div key={idx} className="rounded-xs border border-border/70 bg-card p-3 text-xs text-muted-foreground leading-relaxed flex flex-col justify-between">
+                    <div
+                      key={idx}
+                      className="rounded-xs border border-border/70 bg-card p-3 text-xs text-muted-foreground leading-relaxed flex flex-col justify-between"
+                    >
                       <span className="font-mono text-[9px] text-brass mb-1">0{idx + 1}</span>
                       <span>{str}</span>
                     </div>
@@ -417,11 +441,15 @@ export function BosphorusNavigator() {
               {/* Title Deed & Tenancy Footnote */}
               <div className="mt-4 rounded-xs border border-border/80 bg-secondary/40 p-3.5 text-xs text-muted-foreground space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-semibold text-primary uppercase">Deed Stage:</span>
+                  <span className="font-mono text-[10px] font-semibold text-primary uppercase">
+                    Deed Stage:
+                  </span>
                   <span className="text-foreground font-medium">{active.titleDeedStatus}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-semibold text-primary uppercase">Tenancy Pool:</span>
+                  <span className="font-mono text-[10px] font-semibold text-primary uppercase">
+                    Tenancy Pool:
+                  </span>
                   <span>{active.tenantProfile}</span>
                 </div>
               </div>
@@ -438,7 +466,9 @@ export function BosphorusNavigator() {
               </button>
 
               <a
-                href={waLink(`Hello Avrasya Properties, I am reviewing the ${active.name} investment corridor on your Bosphorus Navigator. I would like a curated availability dossier.`)}
+                href={waLink(
+                  `Hello Avrasya Properties, I am reviewing the ${active.name} investment corridor on your Bosphorus Navigator. I would like a curated availability dossier.`,
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline gap-2"

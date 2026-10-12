@@ -51,7 +51,9 @@ export const Route = createFileRoute("/properties/$slug")({
   },
   head: ({ loaderData }) => {
     const r = loaderData?.record;
-    const title = r ? `${r.marketing_title} — Avrasya Properties Istanbul` : "Availability to confirm — Avrasya Properties";
+    const title = r
+      ? `${r.marketing_title} — Avrasya Properties Istanbul`
+      : "Availability to confirm — Avrasya Properties";
     const desc = r
       ? `${r.layout_label ?? TYPE_LABEL[r.record_type]} in ${locationText(r)}. ${priceDisplay(r.price).main}. Pre-screened title deed on file.`
       : "This listing is being re-confirmed with the project.";
@@ -70,8 +72,10 @@ export const Route = createFileRoute("/properties/$slug")({
 
 function Detail() {
   const { record } = Route.useLoaderData();
-  if (!record) return <Legacy />;
-  return <RecordView r={record} />;
+  const { slug } = Route.useParams();
+  const liveRecord = getProperty(slug) ?? record;
+  if (!liveRecord) return <Legacy />;
+  return <RecordView r={liveRecord} />;
 }
 
 function Legacy() {
@@ -80,7 +84,8 @@ function Legacy() {
       <p className="eyebrow eyebrow-mark">Availability Under Review</p>
       <h1 className="headline mt-3 text-3xl">We are currently re-confirming this listing.</h1>
       <p className="mt-4 text-muted-foreground">
-        This listing is currently undergoing title deed and availability re-verification with the developer. You may browse our current source-verified offers or enquire directly.
+        This listing is currently undergoing title deed and availability re-verification with the
+        developer. You may browse our current source-verified offers or enquire directly.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link to="/properties" className="btn btn-primary">
@@ -114,18 +119,28 @@ const tryf = (n: number) => "TRY " + n.toLocaleString("en-US");
 function PriceBlock({ r }: { r: PropertyRecord }) {
   const p = r.price;
   const rows: [string, string][] = [];
-  if (p.previous_advertised_amount) rows.push(["Formerly Advertised", usd(p.previous_advertised_amount)]);
+  if (p.previous_advertised_amount)
+    rows.push(["Formerly Advertised", usd(p.previous_advertised_amount)]);
   if (p.list_price) rows.push(["Source List Price", usd(p.list_price)]);
   if (p.expenses_amount) rows.push(["Stated Transfer Expenses", usd(p.expenses_amount)]);
-  const inst = r.details.installment_offer as { total: number; down_payment_percent: number; months: number } | undefined;
-  if (inst) rows.push(["Developer Instalment Plan", `${usd(inst.total)} · ${inst.down_payment_percent}% down · ${inst.months} months`]);
+  const inst = r.details.installment_offer as
+    | { total: number; down_payment_percent: number; months: number }
+    | undefined;
+  if (inst)
+    rows.push([
+      "Developer Instalment Plan",
+      `${usd(inst.total)} · ${inst.down_payment_percent}% down · ${inst.months} months`,
+    ]);
   if (p.basis === "installment_schedule") {
     rows.push([`Down Payment (${p.down_payment_percent}%)`, tryf(p.down_payment_amount!)]);
     rows.push([`At Delivery (${p.delivery_payment_percent}%)`, tryf(p.delivery_payment_amount!)]);
     rows.push(["Instalments", `${p.installment_count} × ${tryf(p.installment_amount!)}`]);
   }
   p.source_offers?.forEach((o, i) =>
-    rows.push([`Starting Offer ${i + 1}`, `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m² gross` : ""}`])
+    rows.push([
+      `Starting Offer ${i + 1}`,
+      `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m² gross` : ""}`,
+    ]),
   );
   if (!rows.length) return null;
   return (
@@ -137,7 +152,8 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
         <Fact key={k} k={k} v={v} />
       ))}
       <p className="pt-3 text-[0.72rem] text-muted-foreground leading-relaxed">
-        Figures sourced from developer offering documents. Official binding contracts and currency conversion rates (DAB) are confirmed with legal advisers prior to deposit.
+        Figures sourced from developer offering documents. Official binding contracts and currency
+        conversion rates (DAB) are confirmed with legal advisers prior to deposit.
       </p>
     </div>
   );
@@ -158,7 +174,8 @@ function RecordView({ r }: { r: PropertyRecord }) {
 
   const d = r.details;
   const facts = Object.entries(d).filter(
-    ([k, v]) => typeof v === "string" && k !== "note" && k !== "project" && k !== "unit_area_unconfirmed"
+    ([k, v]) =>
+      typeof v === "string" && k !== "note" && k !== "project" && k !== "unit_area_unconfirmed",
   );
   const claims = (d.claims_requiring_confirmation as string[] | undefined) ?? [];
   const plan = d.supporting_plan as Record<string, unknown> | undefined;
@@ -179,11 +196,17 @@ function RecordView({ r }: { r: PropertyRecord }) {
       <div className="border-b border-border/60 bg-card/60">
         <nav className="container-site flex items-center justify-between py-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <Link to="/" className="hover:text-foreground">Home</Link>
+            <Link to="/" className="hover:text-foreground">
+              Home
+            </Link>
             <span>/</span>
-            <Link to="/properties" className="hover:text-foreground">Properties</Link>
+            <Link to="/properties" className="hover:text-foreground">
+              Properties
+            </Link>
             <span>/</span>
-            <span className="text-foreground font-medium truncate max-w-xs">{r.marketing_title}</span>
+            <span className="text-foreground font-medium truncate max-w-xs">
+              {r.marketing_title}
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -199,7 +222,9 @@ function RecordView({ r }: { r: PropertyRecord }) {
               className="flex items-center gap-1 hover:text-foreground transition-colors"
               title="Save to shortlist"
             >
-              <Heart className={`h-3.5 w-3.5 ${saved ? "fill-destructive text-destructive" : ""}`} />
+              <Heart
+                className={`h-3.5 w-3.5 ${saved ? "fill-destructive text-destructive" : ""}`}
+              />
               <span className="hidden sm:inline">{saved ? "Saved" : "Save"}</span>
             </button>
           </div>
@@ -302,7 +327,9 @@ function RecordView({ r }: { r: PropertyRecord }) {
                 key={i}
                 onClick={() => setActiveImg(i)}
                 className={`relative h-20 w-32 shrink-0 overflow-hidden rounded-xs border transition-all ${
-                  activeImg === i ? "border-brass ring-2 ring-brass/40 scale-102" : "border-border/70 opacity-70 hover:opacity-100"
+                  activeImg === i
+                    ? "border-brass ring-2 ring-brass/40 scale-102"
+                    : "border-border/70 opacity-70 hover:opacity-100"
                 }`}
               >
                 <img src={img} alt="" className="h-full w-full object-cover" />
@@ -334,7 +361,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
               <Fact k="Total Surface Area" v={areaText(r)} />
               {typeof d.project === "string" && <Fact k="Project Development" v={d.project} />}
               {["block", "floor", "unit"].map(
-                (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />
+                (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />,
               )}
               {facts
                 .filter(([k]) => !["block", "floor", "unit"].includes(k))
@@ -351,27 +378,39 @@ function RecordView({ r }: { r: PropertyRecord }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div className="rounded-xs border border-border/70 bg-background p-3">
                   <span className="font-semibold text-foreground block">Ceiling Height</span>
-                  <span className="text-muted-foreground">3.20m clear finished architectural volume</span>
+                  <span className="text-muted-foreground">
+                    3.20m clear finished architectural volume
+                  </span>
                 </div>
                 <div className="rounded-xs border border-border/70 bg-background p-3">
                   <span className="font-semibold text-foreground block">Culinary Appliances</span>
-                  <span className="text-muted-foreground">Integrated Miele / Gaggenau cooktop & oven suite</span>
+                  <span className="text-muted-foreground">
+                    Integrated Miele / Gaggenau cooktop & oven suite
+                  </span>
                 </div>
                 <div className="rounded-xs border border-border/70 bg-background p-3">
                   <span className="font-semibold text-foreground block">HVAC & Climate</span>
-                  <span className="text-muted-foreground">Daikin VRF multi-zone cooling + radiant underfloor heat</span>
+                  <span className="text-muted-foreground">
+                    Daikin VRF multi-zone cooling + radiant underfloor heat
+                  </span>
                 </div>
                 <div className="rounded-xs border border-border/70 bg-background p-3">
                   <span className="font-semibold text-foreground block">Home Automation</span>
-                  <span className="text-muted-foreground">KNX smart home lighting, climate & intercom hub</span>
+                  <span className="text-muted-foreground">
+                    KNX smart home lighting, climate & intercom hub
+                  </span>
                 </div>
                 <div className="rounded-xs border border-border/70 bg-background p-3">
                   <span className="font-semibold text-foreground block">Parking & Mobility</span>
-                  <span className="text-muted-foreground">2 dedicated indoor parking bays with 22kW EV charger</span>
+                  <span className="text-muted-foreground">
+                    2 dedicated indoor parking bays with 22kW EV charger
+                  </span>
                 </div>
                 <div className="rounded-xs border border-border/70 bg-background p-3">
                   <span className="font-semibold text-foreground block">Private Amenities</span>
-                  <span className="text-muted-foreground">Olympic indoor pool, Technogym suite & 24/7 security concierge</span>
+                  <span className="text-muted-foreground">
+                    Olympic indoor pool, Technogym suite & 24/7 security concierge
+                  </span>
                 </div>
               </div>
             </div>
@@ -393,9 +432,14 @@ function RecordView({ r }: { r: PropertyRecord }) {
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {media.highlights.map((h, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-xs border border-border/70 bg-background p-4">
+                <div
+                  key={i}
+                  className="flex items-start gap-3 rounded-xs border border-border/70 bg-background p-4"
+                >
                   <CheckCircle2 className="h-4 w-4 text-brass shrink-0 mt-0.5" />
-                  <p className="text-xs md:text-sm text-foreground leading-relaxed font-medium">{h}</p>
+                  <p className="text-xs md:text-sm text-foreground leading-relaxed font-medium">
+                    {h}
+                  </p>
                 </div>
               ))}
             </div>
@@ -406,7 +450,9 @@ function RecordView({ r }: { r: PropertyRecord }) {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="eyebrow !text-brass">Architectural Layout</p>
-                <h2 className="headline text-2xl font-semibold mt-1">Floor plan & space distribution</h2>
+                <h2 className="headline text-2xl font-semibold mt-1">
+                  Floor plan & space distribution
+                </h2>
               </div>
               <button
                 onClick={() => {
@@ -427,7 +473,9 @@ function RecordView({ r }: { r: PropertyRecord }) {
               />
             </div>
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-              Standard 2D architectural CAD layout drawing for {r.layout_label ?? "residence"} units within this development. Precise room partition measurements are confirmed upon viewing.
+              Standard 2D architectural CAD layout drawing for {r.layout_label ?? "residence"} units
+              within this development. Precise room partition measurements are confirmed upon
+              viewing.
             </p>
           </div>
 
@@ -444,11 +492,16 @@ function RecordView({ r }: { r: PropertyRecord }) {
             <div className="mt-4 text-xs md:text-sm text-on-dark-muted leading-relaxed space-y-3">
               {isCbi ? (
                 <p>
-                  This property's acquisition price meets or exceeds the official <strong className="text-on-dark">$400,000 USD</strong> threshold required under current Turkish regulations for the Turkish Citizenship by Investment (CBI) program.
+                  This property's acquisition price meets or exceeds the official{" "}
+                  <strong className="text-on-dark">$400,000 USD</strong> threshold required under
+                  current Turkish regulations for the Turkish Citizenship by Investment (CBI)
+                  program.
                 </p>
               ) : (
                 <p>
-                  This listing ({p.main}) is below the single-unit $400,000 USD minimum. However, foreign buyers are legally permitted to combine multiple property purchases across Istanbul to reach the $400,000 CBI threshold on a single joint application.
+                  This listing ({p.main}) is below the single-unit $400,000 USD minimum. However,
+                  foreign buyers are legally permitted to combine multiple property purchases across
+                  Istanbul to reach the $400,000 CBI threshold on a single joint application.
                 </p>
               )}
             </div>
@@ -456,11 +509,16 @@ function RecordView({ r }: { r: PropertyRecord }) {
             <div className="mt-6 grid grid-cols-2 gap-4 border-t border-on-dark/15 pt-5 text-xs text-on-dark-muted">
               <div>
                 <span className="block text-brass font-bold">Independent SPK Valuation:</span>
-                <span>Mandatory licensed appraisal verifies true market price prior to deed signing.</span>
+                <span>
+                  Mandatory licensed appraisal verifies true market price prior to deed signing.
+                </span>
               </div>
               <div>
                 <span className="block text-brass font-bold">Central Bank DAB Certificate:</span>
-                <span>Foreign currency is exchanged via Turkish Central Bank to issue proof of foreign inflow.</span>
+                <span>
+                  Foreign currency is exchanged via Turkish Central Bank to issue proof of foreign
+                  inflow.
+                </span>
               </div>
             </div>
 
@@ -469,7 +527,9 @@ function RecordView({ r }: { r: PropertyRecord }) {
                 View Full CBI Regulations Guide
               </Link>
               <a
-                href={waLink(`Hello Avrasya, I'd like to check citizenship eligibility for ${r.marketing_title} (${r.slug})`)}
+                href={waLink(
+                  `Hello Avrasya, I'd like to check citizenship eligibility for ${r.marketing_title} (${r.slug})`,
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline !border-on-dark/30 !text-on-dark !min-h-9 !text-xs hover:!bg-on-dark/10"
@@ -482,15 +542,32 @@ function RecordView({ r }: { r: PropertyRecord }) {
           {/* Section 05: Independent Due Diligence Standard */}
           <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
             <p className="eyebrow">Institutional Buyer Protection</p>
-            <h2 className="headline mt-2 text-2xl font-semibold">Pre-closing verification safeguards</h2>
+            <h2 className="headline mt-2 text-2xl font-semibold">
+              Pre-closing verification safeguards
+            </h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {[
-                ["Title Deed (Tapu) Audit", "Coordinated registry check ensuring zero encumbrances, liens, or undisclosed mortgages."],
-                ["Certified Valuation (SPK)", "Official appraisal performed exclusively by capital markets board (SPK) accredited valuers."],
-                ["Banking & Currency (DAB)", "Central bank currency conversion (Döviz Alım Belgesi) processed strictly under investor's name."],
-                ["Independent Lawyer Review", "Sales contracts drafted and reviewed by an independent English-speaking Turkish attorney."],
+                [
+                  "Title Deed (Tapu) Audit",
+                  "Coordinated registry check ensuring zero encumbrances, liens, or undisclosed mortgages.",
+                ],
+                [
+                  "Certified Valuation (SPK)",
+                  "Official appraisal performed exclusively by capital markets board (SPK) accredited valuers.",
+                ],
+                [
+                  "Banking & Currency (DAB)",
+                  "Central bank currency conversion (Döviz Alım Belgesi) processed strictly under investor's name.",
+                ],
+                [
+                  "Independent Lawyer Review",
+                  "Sales contracts drafted and reviewed by an independent English-speaking Turkish attorney.",
+                ],
               ].map(([t, x], i) => (
-                <div key={t} className="rounded-xs border border-border/70 bg-background p-4.5 space-y-1">
+                <div
+                  key={t}
+                  className="rounded-xs border border-border/70 bg-background p-4.5 space-y-1"
+                >
                   <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-brass" /> {t}
                   </p>
@@ -512,10 +589,13 @@ function RecordView({ r }: { r: PropertyRecord }) {
             </div>
 
             <h3 className="font-display text-xl font-semibold text-foreground">
-              {r.record_type === "project" ? "Enquire about project units" : "Schedule a private viewing"}
+              {r.record_type === "project"
+                ? "Enquire about project units"
+                : "Schedule a private viewing"}
             </h3>
             <p className="mt-1 mb-5 text-xs text-muted-foreground leading-relaxed">
-              We confirm real-time inventory, floor options, and private developer discount allocations before your visit.
+              We confirm real-time inventory, floor options, and private developer discount
+              allocations before your visit.
             </p>
 
             <Enquiry defaultTopic={r.marketing_title} compact />
@@ -557,7 +637,10 @@ function RecordView({ r }: { r: PropertyRecord }) {
                 More developments on the {r.side === "unknown" ? "market" : `${r.side}an side`}
               </h2>
             </div>
-            <Link to="/properties" className="text-xs font-semibold text-foreground hover:text-brass underline">
+            <Link
+              to="/properties"
+              className="text-xs font-semibold text-foreground hover:text-brass underline"
+            >
               View all listings →
             </Link>
           </div>
@@ -579,10 +662,7 @@ function RecordView({ r }: { r: PropertyRecord }) {
         >
           <MessageSquare className="h-4 w-4" /> WhatsApp
         </a>
-        <a
-          href={contact.phoneHref}
-          className="btn btn-outline flex-1 justify-center gap-1.5"
-        >
+        <a href={contact.phoneHref} className="btn btn-outline flex-1 justify-center gap-1.5">
           <Phone className="h-4 w-4" /> Call Office
         </a>
       </div>
@@ -636,4 +716,3 @@ function RecordView({ r }: { r: PropertyRecord }) {
     </>
   );
 }
-

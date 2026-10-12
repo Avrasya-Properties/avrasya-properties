@@ -27,7 +27,7 @@ export type Action =
 export function canPerformAction(
   profile: StaffProfile | null,
   action: Action,
-  ownerId?: string
+  ownerId?: string,
 ): boolean {
   if (!profile || !profile.is_active) return false;
   if (profile.role === "admin") return true;
@@ -108,7 +108,8 @@ export class AuthService {
     }
 
     // 2. Create Auth User
-    const password = input.password || "AvrasyaSecureAdmin!" + Math.random().toString(36).slice(2, 8);
+    const password =
+      input.password || "AvrasyaSecureAdmin!" + Math.random().toString(36).slice(2, 8);
     const { data: authUser, error: authError } = await this.client.auth.admin.createUser({
       email: input.email.trim().toLowerCase(),
       password,
@@ -150,7 +151,7 @@ export class AuthService {
       name: string;
       role: StaffRole;
       password?: string;
-    }
+    },
   ): Promise<StaffProfile> {
     const actor = await this.verifyActiveStaff(actorId);
     if (!actor || actor.role !== "admin") {
@@ -194,7 +195,7 @@ export class AuthService {
   public async updateStaffRole(
     actorId: string,
     targetStaffId: string,
-    newRole: StaffRole
+    newRole: StaffRole,
   ): Promise<StaffProfile> {
     const actor = await this.verifyActiveStaff(actorId);
     if (!actor || actor.role !== "admin") {

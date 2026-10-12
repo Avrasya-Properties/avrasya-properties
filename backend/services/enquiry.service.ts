@@ -13,7 +13,11 @@ export class EnquiryService {
    * Rate limiting helper using PostgreSQL table `rate_limit_entries`.
    * Enforces maxRequests per windowSeconds for a given identifier (IP or hash).
    */
-  private static async checkRateLimit(key: string, maxRequests = 5, windowSeconds = 300): Promise<boolean> {
+  private static async checkRateLimit(
+    key: string,
+    maxRequests = 5,
+    windowSeconds = 300,
+  ): Promise<boolean> {
     const admin = getAdminClient();
     const now = new Date();
     const expiresAt = new Date(now.getTime() + windowSeconds * 1000).toISOString();
@@ -68,7 +72,7 @@ export class EnquiryService {
    */
   static async submitPublicEnquiry(
     rawInput: unknown,
-    clientIp: string = "unknown-ip"
+    clientIp: string = "unknown-ip",
   ): Promise<SubmitEnquiryResult> {
     // 1. Validate payload
     const parseResult = EnquirySchema.safeParse(rawInput);
@@ -90,7 +94,9 @@ export class EnquiryService {
     // 3. Durable rate limiting per IP
     const rateLimitPassed = await this.checkRateLimit(`enquiry:ip:${clientIp}`, 6, 300);
     if (!rateLimitPassed) {
-      throw new Error("Too many enquiries submitted from this location. Please wait a few minutes before trying again.");
+      throw new Error(
+        "Too many enquiries submitted from this location. Please wait a few minutes before trying again.",
+      );
     }
 
     const admin = getAdminClient();
@@ -174,7 +180,8 @@ export class EnquiryService {
 
     return {
       success: true,
-      message: "Your enquiry has been received successfully. A property advisor will contact you shortly.",
+      message:
+        "Your enquiry has been received successfully. A property advisor will contact you shortly.",
       referenceId: enquiry.id,
     };
   }
@@ -204,11 +211,13 @@ export class EnquiryService {
     const admin = getAdminClient();
     let query = admin
       .from("enquiries")
-      .select(`
+      .select(
+        `
         *,
         marketing_offers (id, ref, marketing_title, slug),
         contacts (id, full_name, email, phone)
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (status) {

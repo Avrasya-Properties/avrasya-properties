@@ -48,7 +48,8 @@ export class CrmService {
 
     const { data: contact, error } = await admin
       .from("contacts")
-      .select(`
+      .select(
+        `
         *,
         buyer_requirements (*),
         contact_shortlists (
@@ -61,7 +62,8 @@ export class CrmService {
         viewings (*),
         tasks (*),
         activities (*)
-      `)
+      `,
+      )
       .eq("id", contactId)
       .single();
 
@@ -73,7 +75,12 @@ export class CrmService {
    * Add a property offer to a contact's shortlist.
    * NOTE: Shortlisted items are strictly exploratory; they do NOT reserve or alter availability of the unit.
    */
-  static async addToShortlist(contactId: string, offerId: string, staffUserId: string, notes?: string) {
+  static async addToShortlist(
+    contactId: string,
+    offerId: string,
+    staffUserId: string,
+    notes?: string,
+  ) {
     const admin = getAdminClient();
 
     const { data, error } = await admin
@@ -137,8 +144,16 @@ export class CrmService {
     }
 
     // 1. Fetch both contacts
-    const { data: primary } = await admin.from("contacts").select("*").eq("id", primaryContactId).single();
-    const { data: duplicate } = await admin.from("contacts").select("*").eq("id", duplicateContactId).single();
+    const { data: primary } = await admin
+      .from("contacts")
+      .select("*")
+      .eq("id", primaryContactId)
+      .single();
+    const { data: duplicate } = await admin
+      .from("contacts")
+      .select("*")
+      .eq("id", duplicateContactId)
+      .single();
 
     if (!primary || !duplicate) {
       throw new Error("Both primary and duplicate contact records must exist");
@@ -151,15 +166,36 @@ export class CrmService {
     };
 
     // 3. Reassign child records
-    await admin.from("enquiries").update({ contact_id: primaryContactId }).eq("contact_id", duplicateContactId);
-    await admin.from("leads").update({ contact_id: primaryContactId }).eq("contact_id", duplicateContactId);
-    await admin.from("deals").update({ contact_id: primaryContactId }).eq("contact_id", duplicateContactId);
-    await admin.from("tasks").update({ contact_id: primaryContactId }).eq("contact_id", duplicateContactId);
-    await admin.from("viewings").update({ contact_id: primaryContactId }).eq("contact_id", duplicateContactId);
-    await admin.from("activities").update({ contact_id: primaryContactId }).eq("contact_id", duplicateContactId);
+    await admin
+      .from("enquiries")
+      .update({ contact_id: primaryContactId })
+      .eq("contact_id", duplicateContactId);
+    await admin
+      .from("leads")
+      .update({ contact_id: primaryContactId })
+      .eq("contact_id", duplicateContactId);
+    await admin
+      .from("deals")
+      .update({ contact_id: primaryContactId })
+      .eq("contact_id", duplicateContactId);
+    await admin
+      .from("tasks")
+      .update({ contact_id: primaryContactId })
+      .eq("contact_id", duplicateContactId);
+    await admin
+      .from("viewings")
+      .update({ contact_id: primaryContactId })
+      .eq("contact_id", duplicateContactId);
+    await admin
+      .from("activities")
+      .update({ contact_id: primaryContactId })
+      .eq("contact_id", duplicateContactId);
 
     // Shortlists: update or delete duplicates if already in primary shortlist
-    const { data: dupShortlists } = await admin.from("contact_shortlists").select("*").eq("contact_id", duplicateContactId);
+    const { data: dupShortlists } = await admin
+      .from("contact_shortlists")
+      .select("*")
+      .eq("contact_id", duplicateContactId);
     if (dupShortlists && dupShortlists.length > 0) {
       for (const item of dupShortlists) {
         const { error: moveErr } = await admin
@@ -184,9 +220,12 @@ export class CrmService {
     });
 
     // 5. Update duplicate contact notes to reflect merge
-    await admin.from("contacts").update({
-      notes: `[MERGED into ${primaryContactId} on ${new Date().toISOString()}] ${duplicate.notes || ""}`,
-    }).eq("id", duplicateContactId);
+    await admin
+      .from("contacts")
+      .update({
+        notes: `[MERGED into ${primaryContactId} on ${new Date().toISOString()}] ${duplicate.notes || ""}`,
+      })
+      .eq("id", duplicateContactId);
 
     // 6. Audit event
     await admin.from("audit_events").insert({
@@ -208,7 +247,12 @@ export class CrmService {
   /**
    * Update Lead stage with audit logging and stage transition rules.
    */
-  static async updateLeadStage(leadId: string, newStage: Database["public"]["Enums"]["lead_stage"], staffUserId: string, lossReason?: string) {
+  static async updateLeadStage(
+    leadId: string,
+    newStage: Database["public"]["Enums"]["lead_stage"],
+    staffUserId: string,
+    lossReason?: string,
+  ) {
     const admin = getAdminClient();
 
     const { data: existing, error: fetchErr } = await admin

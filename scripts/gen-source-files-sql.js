@@ -2,13 +2,15 @@ import fs from "node:fs";
 
 const manifest = JSON.parse(fs.readFileSync("src/data/source.json", "utf8"));
 
-const sfRows = manifest.sources.map((s) => {
-  const f = s.folder.replace(/'/g, "''");
-  const fn = s.filename.replace(/'/g, "''");
-  const ap = s.asset_path.replace(/'/g, "''");
-  const du = s.drive_url.replace(/'/g, "''");
-  return `('${s.id}', '${f}', '${fn}', '${ap}', '${du}', '${s.mime_type}', ${s.bytes}, '${s.sha256}', 'imported')`;
-}).join(",\n");
+const sfRows = manifest.sources
+  .map((s) => {
+    const f = s.folder.replace(/'/g, "''");
+    const fn = s.filename.replace(/'/g, "''");
+    const ap = s.asset_path.replace(/'/g, "''");
+    const du = s.drive_url.replace(/'/g, "''");
+    return `('${s.id}', '${f}', '${fn}', '${ap}', '${du}', '${s.mime_type}', ${s.bytes}, '${s.sha256}', 'imported')`;
+  })
+  .join(",\n");
 
 const sql = `
 INSERT INTO public.import_runs (run_type, total_sources, imported_sources, status, log_messages)

@@ -31,13 +31,20 @@ export class GoogleDriveClient {
   constructor(config?: Partial<DriveConfig>) {
     this.config = {
       rootFolderId: config?.rootFolderId || "1IXZqHmdZ8mU_klyEu8vC-80sqjpqBZz_",
-      rootFolderUrl: config?.rootFolderUrl || "https://drive.google.com/drive/folders/1IXZqHmdZ8mU_klyEu8vC-80sqjpqBZz_",
+      rootFolderUrl:
+        config?.rootFolderUrl ||
+        "https://drive.google.com/drive/folders/1IXZqHmdZ8mU_klyEu8vC-80sqjpqBZz_",
       apiKey: config?.apiKey || process.env.GOOGLE_DRIVE_API_KEY,
-      serviceAccountKeyJson: config?.serviceAccountKeyJson || process.env.GOOGLE_SERVICE_ACCOUNT_KEY,
+      serviceAccountKeyJson:
+        config?.serviceAccountKeyJson || process.env.GOOGLE_SERVICE_ACCOUNT_KEY,
     };
   }
 
-  public getStatus(): { isConfigured: boolean; rootFolderId: string; missingCredentials: string[] } {
+  public getStatus(): {
+    isConfigured: boolean;
+    rootFolderId: string;
+    missingCredentials: string[];
+  } {
     const missing: string[] = [];
     if (!this.config.apiKey && !this.config.serviceAccountKeyJson) {
       missing.push("GOOGLE_DRIVE_API_KEY or GOOGLE_SERVICE_ACCOUNT_KEY");
@@ -53,7 +60,7 @@ export class GoogleDriveClient {
     const status = this.getStatus();
     if (!status.isConfigured) {
       throw new Error(
-        `Google Drive API integration is unconfigured. Missing: ${status.missingCredentials.join(", ")}. Using verified source manifest.`
+        `Google Drive API integration is unconfigured. Missing: ${status.missingCredentials.join(", ")}. Using verified source manifest.`,
       );
     }
     // Production runtime sync would call Google Drive v3 REST API:

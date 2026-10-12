@@ -33,7 +33,8 @@ async function syncFrankfurterRates() {
     const cached = localStorage.getItem(RATES_CACHE_KEY);
     if (cached) {
       const parsed = JSON.parse(cached);
-      if (parsed && parsed.rates && Date.now() - parsed.timestamp < 3600000) { // 1 hour cache
+      if (parsed && parsed.rates && Date.now() - parsed.timestamp < 3600000) {
+        // 1 hour cache
         currentLiveRates = { ...FALLBACK_RATES, ...parsed.rates };
         isLiveFromFrankfurter = true;
         lastSyncedDate = parsed.date || "";
@@ -44,7 +45,7 @@ async function syncFrankfurterRates() {
 
     // Fetch live from Frankfurter ECB API
     const res = await fetch("https://api.frankfurter.dev/v1/latest?base=USD").catch(() =>
-      fetch("https://api.frankfurter.app/latest?from=USD")
+      fetch("https://api.frankfurter.app/latest?from=USD"),
     );
     if (!res.ok) return;
     const data = await res.json();
@@ -68,7 +69,7 @@ async function syncFrankfurterRates() {
           rates: currentLiveRates,
           date: lastSyncedDate,
           timestamp: Date.now(),
-        })
+        }),
       );
 
       window.dispatchEvent(new Event("rates-updated"));

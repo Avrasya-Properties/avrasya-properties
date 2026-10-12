@@ -17,6 +17,7 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ## 2. Screen-by-Screen Integration Contracts
 
 ### 2.1 Public Property Catalog & Filtering
+
 - **Existing Frontend Screen**: `src/routes/properties/index.tsx`, `src/components/properties/PropertyList.tsx`
 - **Current Data Source**: `src/data/source.json` / static array
 - **Required Backend Call**:
@@ -25,7 +26,10 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
   // OR client-side:
   const { data, count } = await supabase
     .from("marketing_offers")
-    .select("id, ref, slug, marketing_title, district, city, side, record_type, mode, layout_label, bathrooms, gross_m2, net_m2, area_m2, amount, currency, price_type, price_basis, expenses_amount, availability, cover_image_path, cbi_eligible, cbi_verified, published_snapshot, published_at", { count: "exact" })
+    .select(
+      "id, ref, slug, marketing_title, district, city, side, record_type, mode, layout_label, bathrooms, gross_m2, net_m2, area_m2, amount, currency, price_type, price_basis, expenses_amount, availability, cover_image_path, cbi_eligible, cbi_verified, published_snapshot, published_at",
+      { count: "exact" },
+    )
     .eq("publication_status", "Published")
     .range(offset, offset + limit - 1);
   ```
@@ -54,6 +58,7 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.2 Property Details Page & Slug Redirects
+
 - **Existing Frontend Screen**: `src/routes/properties/$slug.tsx`
 - **Required Backend Call**:
   ```ts
@@ -63,7 +68,10 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
   - If `result.found === false` and `result.redirect` exists:
     ```ts
     if (result.redirect) {
-      throw redirect({ to: `/properties/${result.redirect.newSlug}`, statusCode: result.redirect.redirectType });
+      throw redirect({
+        to: `/properties/${result.redirect.newSlug}`,
+        statusCode: result.redirect.redirectType,
+      });
     }
     ```
 - **Response Shape**:
@@ -79,6 +87,7 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.3 Public Consultation & Property Enquiry Form
+
 - **Existing Frontend Screens**: `src/components/forms/EnquiryModal.tsx`, Contact section, Property modal enquiry.
 - **Required Backend Call**:
   ```ts
@@ -115,11 +124,15 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.4 Admin Inventory Management
+
 - **Existing Frontend Screen**: `src/routes/admin/properties.tsx`
 - **Backend Operations**:
   - **List Offers**:
     ```ts
-    const { data } = await supabase.from("marketing_offers").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase
+      .from("marketing_offers")
+      .select("*")
+      .order("created_at", { ascending: false });
     ```
   - **Create Draft Offer**:
     ```ts
@@ -146,6 +159,7 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.5 Admin CRM & Leads Pipeline
+
 - **Existing Frontend Screens**: `src/routes/admin/crm.tsx`, `src/routes/admin/leads.tsx`
 - **Backend Operations**:
   - **Convert Enquiry to Lead**:
@@ -178,6 +192,7 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.6 Admin Deals & Reservations
+
 - **Existing Frontend Screen**: `src/routes/admin/deals.tsx`
 - **Backend Operations**:
   - **Create Reservation**:
@@ -220,6 +235,7 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.7 Rental Property Management
+
 - **Existing Frontend Screen**: `src/routes/admin/rentals.tsx`
 - **Backend Operations**:
   - **Create Lease**:
@@ -254,11 +270,14 @@ The backend is built upon **Supabase Project `ufcpvjhzitmxgitoaolx`** (PostgreSQ
 ---
 
 ### 2.8 Operations Dashboard & Reports
+
 - **Existing Frontend Screen**: `src/routes/admin/index.tsx`
 - **Backend Operations**:
+
   ```ts
   const metrics = await ReportingService.getDashboardMetrics();
   ```
+
   - Returns separate currency totals for USD, TRY, EUR, GBP.
   - Safe CSV Exports:
     ```ts

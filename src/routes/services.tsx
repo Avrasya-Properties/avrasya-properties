@@ -1,19 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { 
-  Building2, 
-  CheckCircle2, 
-  Compass, 
-  FileCheck, 
-  HelpCircle, 
-  Key, 
-  Landmark, 
-  Layers, 
-  LineChart, 
-  PhoneCall, 
-  Scale, 
-  ShieldCheck, 
-  Users 
+import {
+  Building2,
+  CheckCircle2,
+  Compass,
+  FileCheck,
+  HelpCircle,
+  Key,
+  Landmark,
+  Layers,
+  LineChart,
+  PhoneCall,
+  Scale,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/services")({
   head: () =>
     meta(
       "Comprehensive Real Estate Advisory Services · Avrasya Properties",
-      "Ten end-to-end luxury property advisory services covering investment structuring, citizenship, legal coordination, turnkey management, and resale."
+      "Ten end-to-end luxury property advisory services covering investment structuring, citizenship, legal coordination, turnkey management, and resale.",
     ),
   component: ServicesPage,
 });
@@ -42,7 +42,11 @@ const SERVICES: ServiceItem[] = [
     title: "Strategic Investment Advisory",
     category: "Pre-Acquisition",
     desc: "Bespoke consultation matching financial goals, risk profile, and family timelines with high-conviction Istanbul sub-markets.",
-    deliverables: ["Macro yield analysis", "District pricing forecasts", "Tax optimization strategy"],
+    deliverables: [
+      "Macro yield analysis",
+      "District pricing forecasts",
+      "Tax optimization strategy",
+    ],
     icon: LineChart,
   },
   {
@@ -50,7 +54,11 @@ const SERVICES: ServiceItem[] = [
     title: "Curated Property Selection & VIP Tours",
     category: "Acquisition",
     desc: "Unbiased selection across primary developer master-plans and private off-market resales, with private chauffeur viewings or 4K virtual tours.",
-    deliverables: ["Off-market shortlists", "Unfiltered site inspections", "Virtual video walk-throughs"],
+    deliverables: [
+      "Off-market shortlists",
+      "Unfiltered site inspections",
+      "Virtual video walk-throughs",
+    ],
     icon: Compass,
   },
   {
@@ -58,7 +66,11 @@ const SERVICES: ServiceItem[] = [
     title: "Citizenship by Investment Coordination",
     category: "Legal & Residency",
     desc: "Full guidance under Turkish Citizenship Law No. 5901, ensuring property meets $400,000 threshold and SPK appraisal compliance.",
-    deliverables: ["SPK appraisal monitoring", "Ministry conformity filings", "Family passport applications"],
+    deliverables: [
+      "SPK appraisal monitoring",
+      "Ministry conformity filings",
+      "Family passport applications",
+    ],
     icon: Landmark,
   },
   {
@@ -74,7 +86,11 @@ const SERVICES: ServiceItem[] = [
     title: "Cross-Border FX & Central Bank DAB",
     category: "Transaction",
     desc: "Management of foreign currency transfers and statutory Central Bank (TCMB) FX certificate conversions to eliminate exchange rate slippage.",
-    deliverables: ["Central Bank DAB certificate", "Escrow payment handling", "Multi-currency wire verification"],
+    deliverables: [
+      "Central Bank DAB certificate",
+      "Escrow payment handling",
+      "Multi-currency wire verification",
+    ],
     icon: FileCheck,
   },
   {
@@ -82,7 +98,11 @@ const SERVICES: ServiceItem[] = [
     title: "Investor Residence Permit (İkamet)",
     category: "Legal & Residency",
     desc: "Fast-track residence permit execution under Article 31/1(j) for investors and their dependents with zero physical stay conditions.",
-    deliverables: ["Health insurance enrollment", "Biometric appointment booking", "Permit renewal tracking"],
+    deliverables: [
+      "Health insurance enrollment",
+      "Biometric appointment booking",
+      "Permit renewal tracking",
+    ],
     icon: Users,
   },
   {
@@ -90,7 +110,11 @@ const SERVICES: ServiceItem[] = [
     title: "Turnkey Handover & Interior Fit-Out",
     category: "Post-Acquisition",
     desc: "Comprehensive snagging inspection upon developer completion, key holding, designer interior furnishing, and utility activations.",
-    deliverables: ["Snagging defect audit", "Interior design packages", "Water/gas/electric contracts"],
+    deliverables: [
+      "Snagging defect audit",
+      "Interior design packages",
+      "Water/gas/electric contracts",
+    ],
     icon: Key,
   },
   {
@@ -98,7 +122,11 @@ const SERVICES: ServiceItem[] = [
     title: "Strategic Rental & Asset Management",
     category: "Post-Acquisition",
     desc: "Tenant vetting, drafting notarized Turkish eviction agreements (tahliye taahhütnamesi), rent collection, and routine maintenance.",
-    deliverables: ["Corporate tenant vetting", "Rent escrow reporting", "Routine facility inspections"],
+    deliverables: [
+      "Corporate tenant vetting",
+      "Rent escrow reporting",
+      "Routine facility inspections",
+    ],
     icon: Building2,
   },
   {
@@ -106,7 +134,11 @@ const SERVICES: ServiceItem[] = [
     title: "Secondary Resale & Exit Execution",
     category: "Wealth Management",
     desc: "Capitalizing on the 5-year capital gains tax exemption window, re-appraising your asset, and marketing to our international network.",
-    deliverables: ["Market valuation review", "Global investor marketing", "Title transfer closing"],
+    deliverables: [
+      "Market valuation review",
+      "Global investor marketing",
+      "Title transfer closing",
+    ],
     icon: Layers,
   },
   {
@@ -114,7 +146,11 @@ const SERVICES: ServiceItem[] = [
     title: "Cross-Border Family Wealth Advisory",
     category: "Wealth Management",
     desc: "Structuring cross-border estate succession, Turkish inheritance compliance, and family relocation concierge.",
-    deliverables: ["Inheritance planning", "International school admission", "Private banking introductions"],
+    deliverables: [
+      "Inheritance planning",
+      "International school admission",
+      "Private banking introductions",
+    ],
     icon: ShieldCheck,
   },
 ];
@@ -155,9 +191,18 @@ const PHASES = [
 export function ServicesPage() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
-  const categories = ["All", "Pre-Acquisition", "Acquisition", "Legal & Residency", "Transaction", "Post-Acquisition", "Wealth Management"];
+  const categories = [
+    "All",
+    "Pre-Acquisition",
+    "Acquisition",
+    "Legal & Residency",
+    "Transaction",
+    "Post-Acquisition",
+    "Wealth Management",
+  ];
 
-  const filtered = activeCategory === "All" ? SERVICES : SERVICES.filter(s => s.category === activeCategory);
+  const filtered =
+    activeCategory === "All" ? SERVICES : SERVICES.filter((s) => s.category === activeCategory);
 
   return (
     <>
@@ -170,7 +215,9 @@ export function ServicesPage() {
         }
       >
         <p>
-          Avrasya Properties provides institutional advisory and transactional execution. We eliminate conflicts of interest by coordinating with independent, bar-registered attorneys and licensed valuation experts.
+          Avrasya Properties provides institutional advisory and transactional execution. We
+          eliminate conflicts of interest by coordinating with independent, bar-registered attorneys
+          and licensed valuation experts.
         </p>
       </PageIntro>
 
@@ -179,8 +226,12 @@ export function ServicesPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
             <p className="eyebrow">Service Directory</p>
-            <h2 className="font-display text-3xl font-semibold md:text-4xl">The Ten Core Advisory Pillars</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Filter by your stage of real estate acquisition or management.</p>
+            <h2 className="font-display text-3xl font-semibold md:text-4xl">
+              The Ten Core Advisory Pillars
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Filter by your stage of real estate acquisition or management.
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-1.5 rounded-lg border bg-card p-1 text-xs">
@@ -202,7 +253,10 @@ export function ServicesPage() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => (
-            <div key={s.num} className="group rounded-xl border bg-card p-6 transition-all hover:border-brass hover:shadow-md flex flex-col justify-between">
+            <div
+              key={s.num}
+              className="group rounded-xl border bg-card p-6 transition-all hover:border-brass hover:shadow-md flex flex-col justify-between"
+            >
               <div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-semibold text-brass">{s.num}</span>
@@ -222,7 +276,9 @@ export function ServicesPage() {
               </div>
 
               <div className="mt-6 border-t pt-4 space-y-1.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Core Deliverables</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Core Deliverables
+                </p>
                 {s.deliverables.map((del, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs text-foreground">
                     <CheckCircle2 className="h-3.5 w-3.5 text-brass shrink-0" />
@@ -244,14 +300,20 @@ export function ServicesPage() {
               The Six-Phase Client Journey
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              Structured to guarantee total legal safety, financial efficiency, and absolute clarity at every step.
+              Structured to guarantee total legal safety, financial efficiency, and absolute clarity
+              at every step.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {PHASES.map((p, i) => (
-              <div key={p.stage} className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                <span className="font-mono text-xs font-bold text-brass uppercase tracking-widest">{p.stage}</span>
+              <div
+                key={p.stage}
+                className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+              >
+                <span className="font-mono text-xs font-bold text-brass uppercase tracking-widest">
+                  {p.stage}
+                </span>
                 <h3 className="mt-2 font-display text-xl font-bold text-on-dark">{p.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">{p.desc}</p>
               </div>

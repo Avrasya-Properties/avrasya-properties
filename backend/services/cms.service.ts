@@ -1,6 +1,11 @@
 import { getSupabaseClient, getAdminClient } from "../config";
 import type { Database } from "../types/database.types";
-import { SiteSettingsSchema, ContentPageSchema, type SiteSettingsInput, type ContentPageInput } from "../validators";
+import {
+  SiteSettingsSchema,
+  ContentPageSchema,
+  type SiteSettingsInput,
+  type ContentPageInput,
+} from "../validators";
 
 export class CmsService {
   /**
@@ -10,7 +15,9 @@ export class CmsService {
     const client = getSupabaseClient();
     const { data, error } = await client
       .from("site_settings")
-      .select("brand_name, tagline, contact_email, contact_phone, whatsapp_number, office_address, base_currency, maintenance_mode, cbi_min_investment_usd, exchange_rates")
+      .select(
+        "brand_name, tagline, contact_email, contact_phone, whatsapp_number, office_address, base_currency, maintenance_mode, cbi_min_investment_usd, exchange_rates",
+      )
       .eq("id", "default")
       .single();
 
@@ -66,7 +73,8 @@ export class CmsService {
 
     const { data: page, error } = await client
       .from("content_pages")
-      .select(`
+      .select(
+        `
         id,
         slug,
         title,
@@ -80,7 +88,8 @@ export class CmsService {
           content_json,
           sort_order
         )
-      `)
+      `,
+      )
       .eq("slug", slug)
       .eq("is_published", true)
       .maybeSingle();
@@ -143,7 +152,11 @@ export class CmsService {
    * Admin: Generate a signed download URL for private source files or private deal documents.
    * Expires after 60 minutes by default.
    */
-  static async getSignedDocumentUrl(bucket: "private-source" | "private-documents", storagePath: string, expiresInSeconds = 3600) {
+  static async getSignedDocumentUrl(
+    bucket: "private-source" | "private-documents",
+    storagePath: string,
+    expiresInSeconds = 3600,
+  ) {
     const admin = getAdminClient();
     const { data, error } = await admin.storage
       .from(bucket)

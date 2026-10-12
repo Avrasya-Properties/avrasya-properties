@@ -8,7 +8,9 @@ interface IstanbulSkylineProps {
 /** Transparent, tightly cropped skyline: the image baseline is its bottom edge. */
 export function IstanbulSkyline({ className = "", opacity = 1 }: IstanbulSkylineProps) {
   return (
-    <div className={`relative flex items-end justify-center w-full select-none pointer-events-none ${className}`}>
+    <div
+      className={`relative flex items-end justify-center w-full select-none pointer-events-none ${className}`}
+    >
       <img
         src={skyline}
         alt="Istanbul Architectural Panorama"
@@ -22,5 +24,3 @@ export function IstanbulSkyline({ className = "", opacity = 1 }: IstanbulSkyline
     </div>
   );
 }
-
-

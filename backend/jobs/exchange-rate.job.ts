@@ -20,7 +20,7 @@ export async function runExchangeRateSyncJob() {
     });
 
     if (res.ok) {
-      const data = await res.json() as any;
+      const data = (await res.json()) as any;
       if (data && data.rates) {
         rates = {
           USD: 1.0,
@@ -29,14 +29,21 @@ export async function runExchangeRateSyncJob() {
           GBP: data.rates.GBP || rates.GBP,
         };
         rateDate = data.date || rateDate;
-        console.log(`[Job:ExchangeRate] Successfully fetched live rates for date ${rateDate}:`, rates);
+        console.log(
+          `[Job:ExchangeRate] Successfully fetched live rates for date ${rateDate}:`,
+          rates,
+        );
       }
     } else {
-      console.warn(`[Job:ExchangeRate] Remote provider returned status ${res.status}. Using cached/fallback rates.`);
+      console.warn(
+        `[Job:ExchangeRate] Remote provider returned status ${res.status}. Using cached/fallback rates.`,
+      );
       provider = "Fallback System Reference";
     }
   } catch (err: any) {
-    console.warn(`[Job:ExchangeRate] Could not reach remote exchange rate API (${err.message}). Using fallback baseline.`);
+    console.warn(
+      `[Job:ExchangeRate] Could not reach remote exchange rate API (${err.message}). Using fallback baseline.`,
+    );
     provider = "Fallback System Reference";
   }
 
