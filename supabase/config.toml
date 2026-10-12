@@ -1,0 +1,6 @@
+project_id = "avrasya-properties"
+[functions.submit-enquiry]
+verify_jwt = false
+
+[functions.staff-accounts]
+verify_jwt = false

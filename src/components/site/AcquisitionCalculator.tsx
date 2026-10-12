@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
 import { 
   Building, 
@@ -14,24 +15,18 @@ import {
   ShieldCheck, 
   TrendingUp 
 } from "lucide-react";
-import { waLink } from "@/data/properties";
-import { useCurrency } from "@/hooks/usePreferences";
+import {useSiteSettings} from "@/admin/store";
+import { useCurrency,useLiveRates } from "@/hooks/usePreferences";
 
 export function AcquisitionCalculator() {
+  const waLink=useWhatsAppLink();
   const [priceUsd, setPriceUsd] = useState<number>(450000);
   const [tapuSplit, setTapuSplit] = useState<"full" | "split">("full");
   const [vatExempt, setVatExempt] = useState<boolean>(true); // Law 3065 foreigner exemption
   const [copied, setCopied] = useState<boolean>(false);
   const [currency] = useCurrency();
 
-  // Exchange approximate rates for reference
-  const rates: Record<string, number> = {
-    USD: 1,
-    EUR: 0.92,
-    TRY: 34.2,
-    GBP: 0.79,
-  };
-
+  const {rates}=useLiveRates();const settings=useSiteSettings();
   const currentRate = rates[currency] || 1;
   const currencySymbol = currency === "USD" ? "$" : currency === "EUR" ? "€" : currency === "TRY" ? "₺" : "£";
 
@@ -54,7 +49,7 @@ export function AcquisitionCalculator() {
   const closingPercentage = ((totalClosingCostsUsd / priceUsd) * 100).toFixed(1);
 
   // CBI Status
-  const cbiThreshold = 400000;
+  const cbiThreshold = settings.cbiThresholdUsd;
   const isCbiQualified = priceUsd >= cbiThreshold;
   const cbiDeficitUsd = Math.max(0, cbiThreshold - priceUsd);
   const cbiProgressPercent = Math.min(100, Math.round((priceUsd / cbiThreshold) * 100));
@@ -73,7 +68,7 @@ SPK Valuation & Appraisal: $${spkValuationUsd.toLocaleString()} USD
 Notary & DAB Certificate: $${notaryDabUsd.toLocaleString()} USD
 Independent Legal Due Diligence: $${legalFeeUsd.toLocaleString()} USD
 TOTAL ALL-IN CAPITAL: $${allInAcquisitionUsd.toLocaleString()} USD
-Turkish Citizenship ($400k CBI): ${isCbiQualified ? "QUALIFIED (100%)" : "Deficit: $" + cbiDeficitUsd.toLocaleString() + " USD"}
+Citizenship advisory target: ${isCbiQualified ? "Target reached; eligibility unverified" : "Deficit: $" + cbiDeficitUsd.toLocaleString() + " USD"}
 Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${monthlyRentalUsd.toLocaleString()}/mo)`;
 
     navigator.clipboard.writeText(text);
@@ -91,7 +86,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="rounded bg-brass/10 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-brass-text">
-                Statutory Financial Transparency
+                Estimated purchase costs
               </span>
               <span className="font-mono text-[10px] text-muted-foreground">
                 Turkish Land Registry Law No. 4721
@@ -266,7 +261,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="mt-3 text-xs leading-relaxed">
                 {isCbiQualified ? (
                   <p className="text-emerald-900 font-medium">
-                    ✓ <strong>Fully Qualified for Sovereign CBI:</strong> Covers primary investor, spouse, and all children under 18 with no residency or military service obligations. Freehold title deed held for 3 years.
+                    <strong>Advisory investment target reached.</strong> Eligibility requires independent confirmation. Price alone does not establish eligibility.
                   </p>
                 ) : (
                   <p className="text-muted-foreground">
@@ -282,7 +277,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
             <div>
               <div className="flex items-center justify-between border-b border-border/70 pb-3 font-mono text-[11px] text-muted-foreground uppercase tracking-widest">
                 <span>Fee Classification</span>
-                <span>Statutory Amount (USD)</span>
+                <span>Estimated amount (USD)</span>
               </div>
 
               <div className="mt-4 divide-y divide-border/60 text-sm">
@@ -345,7 +340,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               {/* Total Summary Box */}
               <div className="mt-6 rounded-xs border border-brass/50 bg-secondary/40 p-4.5 space-y-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Total Statutory Closing Friction</span>
+                  <span>Total estimated purchase costs</span>
                   <span className="font-mono font-bold text-brass">{closingPercentage}% (+${totalClosingCostsUsd.toLocaleString("en-US")})</span>
                 </div>
 

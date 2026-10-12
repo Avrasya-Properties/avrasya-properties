@@ -17,7 +17,6 @@ import {
 import {
   BUDGETS,
   LAYOUTS,
-  LOCATIONS,
   TYPE_LABEL,
   areaText,
   comparableUsd,
@@ -26,15 +25,15 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
-  properties,
   sideText,
   unmatchablePrices,
   waLink,
   type Filters,
   type PropertyRecord,
 } from "@/data/properties";
+import { useCatalogue } from "@/data/live";
 import { PageIntro } from "@/components/site/Chrome";
-import { PropertyCard } from "@/components/site/PropertyCard";
+import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 
@@ -55,20 +54,24 @@ export const Route = createFileRoute("/properties/")({
   }),
   head: () =>
     meta(
-      "Istanbul Real Estate Portfolio — 18 Curated Developments",
-      "Browse 18 verified Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
+      "Istanbul Property Listings — Avrasya Properties",
+      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
     ),
   component: Catalog,
 });
 
 function Catalog() {
+  const catalogue=useCatalogue();
+  const properties=catalogue.properties;
+  const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
   const f = Route.useSearch();
   const navigate = useNavigate({ from: "/properties/" });
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [filtersOpen,setFiltersOpen]=useState(false);
   const [currency] = useCurrency();
   const { shortlist, count: savedCount, isSaved, toggle } = useShortlist();
 
-  let list = filterProperties(f);
+  let list = filterProperties(f, properties);
   if (f.savedOnly) {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
@@ -107,7 +110,7 @@ function Catalog() {
             <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
               Prime Corridors · European & Asian Side
             </span>
-            <span className="text-xs text-foreground font-medium">18 Curated Opportunities</span>
+            <span className="text-xs text-foreground font-medium">{properties.length} Published Opportunities</span>
           </div>
         }
       >
@@ -117,9 +120,11 @@ function Catalog() {
       </PageIntro>
 
       <section className="container-site py-8">
+        {catalogue.isPending && <p role="status">Loading current offers…</p>}
+        {catalogue.isError && <p role="alert">The catalogue is temporarily unavailable. Please contact our advisory team.</p>}
         {/* Search & Filter Panel */}
         <div className="rounded-xs border border-border/80 bg-card p-5 shadow-xs">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1.5fr_repeat(5,1fr)]">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,5fr)]">
             <label className="block">
               <span className={lbl}>Keyword or District Search</span>
               <div className="relative">
@@ -127,20 +132,23 @@ function Catalog() {
                   className="field pl-8"
                   type="search"
                   placeholder="e.g. Şişli, Maslak, Duplex, Terrace"
-                  defaultValue={f.q ?? ""}
+                  value={f.q ?? ""}
                   onChange={(e) => set("q", e.target.value)}
                 />
                 <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
               </div>
             </label>
-            {sel("loc", "District", "All Districts", LOCATIONS.map((l) => [l, l]))}
-            {sel("side", "Continent", "Both Continents", [
+            <button className="btn btn-outline md:hidden" aria-expanded={filtersOpen} aria-controls="catalogue-filters" onClick={()=>setFiltersOpen(x=>!x)}><SlidersHorizontal className="h-4 w-4"/>{filtersOpen?"Hide filters":"Show filters"}</button>
+            <div id="catalogue-filters" className={`${filtersOpen?"grid":"hidden"} min-w-0 gap-4 sm:grid-cols-2 md:grid lg:grid-cols-5`}>
+            {sel("loc", "District", "All districts", LOCATIONS.map((l) => [l, l]))}
+            {sel("side", "Istanbul side", "Both sides", [
               ["Europe", "European Side"],
               ["Asia", "Asian Side"],
             ])}
             {sel("layout", "Layout", "All Layouts", LAYOUTS.map((l) => [l, l]))}
-            {sel("type", "Asset Type", "All Types", Object.entries(TYPE_LABEL))}
-            {sel("budget", "Target Budget", "Any Budget", BUDGETS.map((b) => [b.id, b.label]))}
+            {sel("type", "Property type", "All types", Object.entries(TYPE_LABEL))}
+            {sel("budget", "Budget", "Any budget", BUDGETS.map((b) => [b.id, b.label]))}
+            </div>
           </div>
 
           {/* Quick Toggle Bars & Active Filters */}
@@ -155,7 +163,7 @@ function Catalog() {
                     : "border-border bg-secondary hover:border-brass/70 text-foreground"
                 }`}
               >
-                <span>CBI Eligible ($400k+)</span>
+                <span>Verified citizenship eligibility</span>
               </button>
 
               {/* Saved Shortlist Filter */}
@@ -185,13 +193,13 @@ function Catalog() {
                         ? BUDGETS.find((b) => b.id === v)?.label
                         : k === "type"
                         ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
-                        : String(v)}
+                        : k==="savedOnly"?"Saved properties":k==="cbiOnly"?"Verified citizenship eligibility":k==="side"?(v==="Asia"?"Asian side":"European side"):String(v)}
                     </span>
                     <X className="h-3 w-3 text-muted-foreground" />
                   </button>
                 ))
               ) : (
-                <span className="text-muted-foreground">All active</span>
+                <span className="text-muted-foreground">None selected</span>
               )}
 
               {active.length > 0 && (
@@ -260,8 +268,8 @@ function Catalog() {
                 const media = getPropertyMedia(r);
                 const p = priceDisplay(r.price);
                 const usd = comparableUsd(r.price);
-                const displayPrice = currency === "USD" ? p.main : convertUsdPrice(usd, currency);
-                const isCbi = (usd ?? 0) >= 400000;
+                const displayPrice = currency === "USD"||comparableUsd(r.price)===null ? p.main : convertUsdPrice(usd, currency);
+                const isCbi = r.details["cbi_verified"]===true;
                 const saved = isSaved(r.slug);
 
                 return (
@@ -275,14 +283,7 @@ function Catalog() {
                         params={{ slug: r.slug }}
                         className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xs bg-[#0C1E23]"
                       >
-                        <img
-                          src={media.cover}
-                          alt=""
-                          onError={(e) => {
-                            e.currentTarget.src = "/images/properties/hero-main.jpg";
-                          }}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                        />
+                        <ImageFallback r={r}/>
                         {isCbi && (
                           <span className="absolute bottom-1 left-1 rounded-xs bg-brass px-1 py-0.5 text-[9px] font-bold text-primary">
                             CBI
@@ -291,7 +292,7 @@ function Catalog() {
                       </Link>
 
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                           <span className="font-semibold text-brass-text uppercase text-[0.65rem]">
                             {TYPE_LABEL[r.record_type]}
                           </span>
@@ -301,7 +302,7 @@ function Catalog() {
                           <span>{sideText(r)}</span>
                         </div>
 
-                        <h3 className="font-display text-base md:text-lg font-medium text-foreground truncate mt-0.5">
+                        <h3 className="mt-1 break-words font-display text-base font-medium text-foreground md:text-lg">
                           <Link to="/properties/$slug" params={{ slug: r.slug }} className="hover:text-brass">
                             {r.marketing_title}
                           </Link>
@@ -315,7 +316,7 @@ function Catalog() {
 
                     <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-t-0 pt-3 sm:pt-0">
                       <div className="text-left sm:text-right">
-                        <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
+                        <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode==="rent"?"Monthly rent":"Price"}</p>
                         <p className="font-display text-xl font-semibold text-foreground tracking-tight">
                           {displayPrice}
                         </p>
@@ -352,14 +353,14 @@ function Catalog() {
           )
         ) : (
           /* Empty State */
-          <div className="mt-10 rounded-xs border border-border/80 bg-card p-12 text-center">
-            <h2 className="headline text-2xl">No listings match the selected criteria.</h2>
+          <div className="mt-10 rounded-xs border border-border/80 bg-card p-6 md:p-12 text-center">
+            <h2 className="headline text-2xl">{!properties.length&&!active.length?"Our next collection is being prepared.":"No listings match your filters."}</h2>
             <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
               {f.savedOnly
                 ? "You haven't saved any listings to your private shortlist yet. Click the heart icon on any card to save it."
                 : "Try widening your district or layout filters, or request a bespoke off-market portfolio search directly from our Istanbul team."}
             </p>
-            <div className="mt-6 flex justify-center gap-3">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link to="/properties" search={{}} className="btn btn-outline">
                 Clear All Filters
               </Link>

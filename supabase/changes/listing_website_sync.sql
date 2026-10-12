@@ -1,0 +1,1 @@
+-- Applied migration: ../migrations/20261011162300_listing_website_sync.sql

@@ -29,6 +29,8 @@ import { Route as AdminContactsRouteImport } from './routes/admin.contacts'
 import { Route as AdminDealsRouteImport } from './routes/admin.deals'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminManageRouteImport } from './routes/admin.manage'
+import { Route as AdminRecoverRouteImport } from './routes/admin.recover'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
@@ -140,6 +142,16 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminManageRoute = AdminManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRecoverRoute = AdminRecoverRouteImport.update({
+  id: '/recover',
+  path: '/recover',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -211,6 +223,8 @@ export interface FileRoutesByFullPath {
   '/admin/deals': typeof AdminDealsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/manage': typeof AdminManageRoute
+  '/admin/recover': typeof AdminRecoverRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
@@ -242,6 +256,8 @@ export interface FileRoutesByTo {
   '/admin/deals': typeof AdminDealsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/manage': typeof AdminManageRoute
+  '/admin/recover': typeof AdminRecoverRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
@@ -275,6 +291,8 @@ export interface FileRoutesById {
   '/admin/deals': typeof AdminDealsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/manage': typeof AdminManageRoute
+  '/admin/recover': typeof AdminRecoverRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
@@ -309,6 +327,8 @@ export interface FileRouteTypes {
     | '/admin/deals'
     | '/admin/inquiries'
     | '/admin/login'
+    | '/admin/manage'
+    | '/admin/recover'
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
@@ -340,6 +360,8 @@ export interface FileRouteTypes {
     | '/admin/deals'
     | '/admin/inquiries'
     | '/admin/login'
+    | '/admin/manage'
+    | '/admin/recover'
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
@@ -372,6 +394,8 @@ export interface FileRouteTypes {
     | '/admin/deals'
     | '/admin/inquiries'
     | '/admin/login'
+    | '/admin/manage'
+    | '/admin/recover'
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
@@ -545,6 +569,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/manage': {
+      id: '/admin/manage'
+      path: '/manage'
+      fullPath: '/admin/manage'
+      preLoaderRoute: typeof AdminManageRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/recover': {
+      id: '/admin/recover'
+      path: '/recover'
+      fullPath: '/admin/recover'
+      preLoaderRoute: typeof AdminRecoverRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -625,6 +663,8 @@ interface AdminRouteChildren {
   AdminDealsRoute: typeof AdminDealsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminManageRoute: typeof AdminManageRoute
+  AdminRecoverRoute: typeof AdminRecoverRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTasksRoute: typeof AdminTasksRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -643,6 +683,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDealsRoute: AdminDealsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminManageRoute: AdminManageRoute,
+  AdminRecoverRoute: AdminRecoverRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTasksRoute: AdminTasksRoute,
   AdminIndexRoute: AdminIndexRoute,

@@ -1,37 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { currencyTotals } from "@/admin/domain.js";
 import { useState } from "react";
 import { Building2, CalendarCheck, CheckCircle2, ChevronRight, Clock, DollarSign, Eye, Flame, Layers, Plus, TrendingUp, Users } from "lucide-react";
 import { PageHead, Status, btnPrimary } from "@/admin/Shell";
 import { Thumb } from "@/routes/admin.properties.index";
-import { fmtDate, fmtMoney, useDB, userName, upsert, type Task, type Viewing } from "@/admin/store";
+import { can, fmtDate, fmtMoney, useSession, useDB, userName, upsert, type Task, type Viewing } from "@/admin/store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/")({ component: Dashboard });
 
 export function Dashboard() {
-  const db = useDB();
+  const db = useDB(); const user = useSession();
   const [range, setRange] = useState(7);
   const now = Date.now();
   const ms = range * 864e5;
 
   const upcoming = db.viewings.filter((v) => {
     const t = new Date(v.start).getTime();
-    return t >= now - 36e5 && t < now + ms && v.status !== "Cancelled";
+    return t >= now - 36e5 && t < now + ms && ["Scheduled", "Confirmed"].includes(v.status);
   });
 
   const openDeals = db.deals.filter((d) => d.stage !== "Won" && d.stage !== "Lost");
-  const totalDealUsd = openDeals.reduce((sum, d) => {
-    if (!d.amount) return sum;
-    if (d.currency === "USD") return sum + d.amount;
-    if (d.currency === "EUR") return sum + d.amount * 1.08;
-    if (d.currency === "TRY") return sum + d.amount / 36.5;
-    return sum;
-  }, 0);
+  const pipelineTotals = currencyTotals(openDeals);
 
   const overdue = db.tasks.filter((t) => !t.done && new Date(t.due).getTime() < now);
-  const today = db.viewings.filter((v) => new Date(v.start).toDateString() === new Date().toDateString());
+  const dateKey = (value: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(value);
+  const today = db.viewings.filter((v) => ["Scheduled", "Confirmed"].includes(v.status) && dateKey(new Date(v.start)) === dateKey(new Date()));
   const awaitingReview = db.properties.filter((p) => p.publication === "In Review");
-  const activeListings = db.properties.filter((p) => p.publication === "Published" && p.availability !== "Sold");
+  const activeListings = db.properties.filter((p) => p.publication === "Published" && !["Sold", "Rented", "Off Market"].includes(p.availability));
 
   // Lead stages distribution
   const leadStages = ["New", "Contacted", "Qualified", "Viewing", "Negotiation", "Converted"] as const;
@@ -41,19 +37,19 @@ export function Dashboard() {
   }));
   const maxLeadCount = Math.max(...leadCounts.map((s) => s.count), 1);
 
-  const toggleTask = (t: Task) => {
+  const toggleTask = async (t: Task) => {
     try {
-      upsert<Task>("tasks", { id: t.id, done: !t.done });
+      await upsert<Task>("tasks", { id: t.id, done: !t.done });
       toast.success(t.done ? "Task reopened" : "Task completed");
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const confirmViewing = (v: Viewing) => {
+  const confirmViewing = async (v: Viewing) => {
     try {
-      upsert<Viewing>("viewings", { id: v.id, status: "Confirmed" });
-      toast.success("Viewing confirmed with client");
+      await upsert<Viewing>("viewings", { id: v.id, status: "Confirmed" });
+      toast.success("Viewing marked confirmed; no message was sent");
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -62,8 +58,8 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Command Center"
-        crumbs="Operations & Pipeline"
+        title="Overview"
+        crumbs="Daily work"
         action={
           <div className="flex items-center gap-2">
             <select
@@ -90,18 +86,19 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Active Pipeline</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Deals in progress</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <DollarSign className="h-4 w-4" />
             </span>
           </div>
           <p className="mt-3 text-2xl font-bold tracking-tight text-foreground tabular-nums">
-            ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(totalDealUsd)}
+            {Object.entries(pipelineTotals).map(([currency, amount]) => <span key={currency} className="block">{fmtMoney(amount, currency)}</span>)}
+            {Object.keys(pipelineTotals).length === 0 && "No agreed amounts"}
           </p>
           <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
             <span>{openDeals.length} active negotiations</span>
             <span className="flex items-center text-emerald-600 font-medium">
-              <TrendingUp className="mr-0.5 h-3 w-3" /> Live
+              <TrendingUp className="mr-0.5 h-3 w-3" /> Demo
             </span>
           </div>
         </Link>
@@ -136,7 +133,7 @@ export function Dashboard() {
             </span>
           </div>
           <p className="mt-3 text-2xl font-bold tracking-tight text-foreground tabular-nums">
-            {db.leads.length}
+            {db.leads.filter((lead) => !["Lost", "Converted"].includes(lead.stage)).length}
           </p>
           <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
             <span>{db.leads.filter(l => l.stage === "New").length} new enquiries</span>
@@ -151,7 +148,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Web Inquiries</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Recorded Inquiries</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <Flame className="h-4 w-4" />
             </span>
@@ -191,7 +188,7 @@ export function Dashboard() {
         <section className="rounded-xl border bg-card p-5 lg:col-span-2">
           <div className="flex items-center justify-between border-b pb-3">
             <div>
-              <h2 className="text-sm font-semibold tracking-tight text-foreground">Buyer Acquisition Pipeline</h2>
+              <h2 className="text-sm font-semibold tracking-tight text-foreground">Client progress</h2>
               <p className="text-xs text-muted-foreground">Stage conversion across international purchaser leads</p>
             </div>
             <Link to="/admin/leads" className="text-xs font-medium text-brass hover:underline flex items-center">
@@ -206,7 +203,7 @@ export function Dashboard() {
                 <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <div
                     className="h-full rounded-full bg-brass transition-all duration-500"
-                    style={{ width: `${Math.max(15, (count / maxLeadCount) * 100)}%` }}
+                    style={{ width: `${(count / maxLeadCount) * 100}%` }}
                   />
                 </div>
               </div>
@@ -216,7 +213,7 @@ export function Dashboard() {
           {/* Quick Listing Inventory Preview */}
           <div className="mt-6 border-t pt-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Prime Inventory Spotlight</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Featured listings</h3>
               <Link to="/admin/properties" className="text-xs text-brass hover:underline">
                 All {db.properties.length} listings →
               </Link>
@@ -278,6 +275,7 @@ export function Dashboard() {
                       </div>
                       {v.status !== "Confirmed" ? (
                         <button
+                          disabled={!can(user, "edit-crm", v.agentId)}
                           onClick={() => confirmViewing(v)}
                           className="shrink-0 rounded bg-brass/10 px-2 py-1 text-[11px] font-medium text-brass hover:bg-brass hover:text-primary-foreground transition-colors"
                         >
@@ -298,7 +296,7 @@ export function Dashboard() {
           {/* Overdue Tasks */}
           <div className="rounded-xl border bg-card p-5">
             <div className="flex items-center justify-between border-b pb-3">
-              <h2 className="text-sm font-semibold text-foreground">Action Tasks</h2>
+              <h2 className="text-sm font-semibold text-foreground">Tasks</h2>
               <span className="text-xs text-destructive font-medium">{overdue.length} overdue</span>
             </div>
             <div className="mt-3 divide-y">
@@ -309,6 +307,8 @@ export function Dashboard() {
                   <div key={t.id} className="py-2.5 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <button
+                        disabled={!can(user, "edit-crm", t.assigneeId)}
+                        aria-label={t.done ? "Reopen task" : "Complete task"}
                         onClick={() => toggleTask(t)}
                         className={`h-4 w-4 rounded border flex items-center justify-center transition-colors ${
                           t.done ? "bg-brass text-primary-foreground border-brass" : "hover:border-brass"
@@ -335,7 +335,7 @@ export function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between border-b pb-3">
-            <h2 className="text-sm font-semibold text-foreground">Listings Awaiting Editorial Review</h2>
+            <h2 className="text-sm font-semibold text-foreground">Listings to review</h2>
             <Link to="/admin/properties" className="text-xs text-brass hover:underline">
               Inventory →
             </Link>
@@ -368,8 +368,8 @@ export function Dashboard() {
 
         <section className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between border-b pb-3">
-            <h2 className="text-sm font-semibold text-foreground">Audit Log & Agent Activity</h2>
-            <span className="text-[11px] text-muted-foreground">Persistent ledger</span>
+            <h2 className="text-sm font-semibold text-foreground">Recent changes</h2>
+            <span className="text-[11px] text-muted-foreground">Browser demo history</span>
           </div>
           <div className="mt-3 divide-y">
             {db.activity.slice(0, 6).map((a) => (

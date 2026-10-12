@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
+import { useState,useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Heart, MapPin, MessageSquare, ArrowRight, ShieldCheck } from "lucide-react";
+import { Heart, MapPin, MessageSquare, ArrowRight } from "lucide-react";
 import { Tilt } from "./Motion";
 import {
   areaText,
@@ -10,8 +11,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-  waLink,
-  TYPE_LABEL,
+    TYPE_LABEL,
   type PropertyRecord,
 } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
@@ -20,33 +20,36 @@ export function ImageFallback({ r, className = "" }: { r: PropertyRecord; classN
   const media = getPropertyMedia(r);
   const [imgSrc, setImgSrc] = useState(media.cover);
   const [loaded, setLoaded] = useState(false);
+  useEffect(()=>{setImgSrc(media.cover);setLoaded(false);},[media.cover]);
 
   return (
     <div className={`relative h-full w-full overflow-hidden bg-[#0C1E23] ${className}`}>
-      <img
+      {imgSrc?<img
         src={imgSrc}
         alt={r.marketing_title}
         loading="lazy"
         onLoad={() => setLoaded(true)}
-        onError={() => setImgSrc("/images/properties/hero-main.jpg")}
+        onError={() => setImgSrc("")}
         className={`h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
           loaded ? "opacity-100" : "opacity-90"
         }`}
       />
+      :<span className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-white/70">Property photo not supplied</span>}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
     </div>
   );
 }
 
 export function PropertyCard({ r }: { r: PropertyRecord }) {
+  const waLink=useWhatsAppLink();
   const p = priceDisplay(r.price);
   const media = getPropertyMedia(r);
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(r.slug);
   const usdVal = comparableUsd(r.price);
-  const displayPrice = currency === "USD" ? p.main : convertUsdPrice(usdVal, currency);
-  const isCbiEligible = (usdVal ?? 0) >= 400000;
+  const displayPrice = currency === "USD"||usdVal===null ? p.main : convertUsdPrice(usdVal, currency);
+  const isCbiEligible = r.details["cbi_verified"] === true;
 
   return (
     <Tilt className="h-full">
@@ -74,7 +77,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
             )}
             {isCbiEligible && (
               <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-wider text-primary shadow-xs">
-                CBI $400k
+                CBI verified
               </span>
             )}
           </div>
@@ -110,11 +113,11 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
         </div>
 
         {/* Card Body */}
-        <div className="flex flex-1 flex-col p-5">
+        <div className="property-card-body flex flex-1 flex-col p-5">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
             <span className="eyebrow !text-brass-text text-[0.65rem]">{TYPE_LABEL[r.record_type]}</span>
             <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-              Ref: {r.slug.slice(0, 8).toUpperCase()}
+              Ref: {r.ref||r.slug}
             </span>
           </div>
 
@@ -126,10 +129,6 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
 
           {/* Property Tag Pills & Verification Stamp */}
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-xs bg-primary/8 px-1.5 py-0.5 text-[0.62rem] font-medium text-foreground/80">
-              <ShieldCheck className="h-3 w-3 text-brass" />
-              <span>Verified Title</span>
-            </span>
             {r.areas.length > 0 && (
               <span className="rounded-xs border border-border/70 bg-card px-1.5 py-0.5 text-[0.65rem] font-medium text-foreground">
                 {areaText(r)}
@@ -146,9 +145,9 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
           </div>
 
           {/* Pricing & CTA Footer */}
-          <div className="mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
+          <div className="property-card-price mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
             <div>
-              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
+              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode==="rent"?"Monthly rent":"Price"}</p>
               <p className="text-xl font-sans font-semibold text-foreground tracking-tight tabular-nums">
                 {displayPrice}
               </p>
@@ -157,7 +156,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
               )}
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="property-card-actions flex items-center gap-1.5">
               <a
                 href={waLink(`Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`)}
                 target="_blank"

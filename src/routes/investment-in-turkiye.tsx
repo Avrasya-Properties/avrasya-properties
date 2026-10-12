@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { 
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/investment-in-turkiye")({
       "Investing in Türkiye · Master Real Estate Acquisition Playbook",
       "Comprehensive investment methodology, legal due diligence, tax structures, and rental yield benchmarks for international purchasers in Istanbul."
     ),
-  component: InvestmentPlaybook,
+  component: () => <ManagedPage slug="investment-in-turkiye"><InvestmentPlaybook /></ManagedPage>,
 });
 
 type Strategy = {

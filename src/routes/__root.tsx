@@ -12,10 +12,12 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { watchWebsiteChanges,PUBLIC_QUERY_KEYS } from "@/lib/website-sync";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { MotionRoot } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
+import {loadCatalogue,loadPublicSettings} from "@/data/live";
 
 function NotFoundComponent() {
   return (
@@ -52,6 +54,15 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad:async({context,location})=>{
+    if(location.pathname.startsWith("/admin"))return;
+    // Load critical public data before rendering, then hydrate the same cache.
+    // A failed catalogue read is displayed inside the homepage, not as a redirect.
+    await Promise.allSettled([
+      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:15000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
+    ]);
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -93,13 +104,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const isAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
+  const router=useRouter();
+  useEffect(()=>watchWebsiteChanges(()=>{void queryClient.invalidateQueries({predicate:q=>PUBLIC_QUERY_KEYS.has(String(q.queryKey[0]))});void router.invalidate();}),[queryClient,router]);
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin=path.startsWith("/admin");
   if (isAdmin) return <QueryClientProvider client={queryClient}><Outlet /></QueryClientProvider>;
   return (
     <QueryClientProvider client={queryClient}>
       <a href="#main" className="sr-only focus:not-sr-only">Skip to content</a>
       <Preloader />
-      <MotionRoot />
+      {path!=="/"&&<MotionRoot />}
       <Header />
       <main id="main">
         <Outlet />

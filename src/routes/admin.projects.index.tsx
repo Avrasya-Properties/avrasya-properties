@@ -11,7 +11,7 @@ function Projects() {
   const groups = Object.entries(db.properties.reduce<Record<string, typeof db.properties>>((a, p) => ((a[p.project || "Unassigned"] ??= []).push(p), a), {}));
   return (
     <>
-      <PageHead title="Projects" crumbs="Inventory" />
+      <PageHead title="Developments" crumbs="Inventory" />
       <div className="overflow-x-auto rounded-md border bg-card"><table className="w-full text-sm">
         <thead className="border-b text-left text-xs text-muted-foreground"><tr><th className="p-2">Project</th><th>District</th><th className="text-right">Linked records</th><th className="text-right">Available</th><th className="text-right">Unknown</th><th className="px-2 text-right">Sold</th></tr></thead>
         <tbody>{groups.map(([name, ps]) => (

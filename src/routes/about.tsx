@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { 
   Award, 
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/about")({
       "About Avrasya Properties · Istanbul Property Investment Consultancy",
       "Headquartered on Istanbul's historic Asian shore, Avrasya Properties provides institutional advisory and cross-border acquisition services for international private clients."
     ),
-  component: AboutPage,
+  component: () => <ManagedPage slug="about"><AboutPage /></ManagedPage>,
 });
 
 export function AboutPage() {
