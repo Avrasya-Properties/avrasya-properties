@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -13,7 +14,6 @@ import {
   TrendingUp,
   Waves,
 } from "lucide-react";
-import { waLink } from "@/data/properties";
 
 type CorridorData = {
   id: string;
@@ -225,6 +225,7 @@ const CORRIDORS: CorridorData[] = [
 ];
 
 export function BosphorusNavigator() {
+  const waLink=useWhatsAppLink();
   const [side, setSide] = useState<"European" | "Asian">("European");
   const filteredCorridors = CORRIDORS.filter((c) => c.side === side);
   const [selectedId, setSelectedId] = useState<string>(filteredCorridors[0]!.id);
@@ -458,7 +459,7 @@ export function BosphorusNavigator() {
             {/* Direct Action CTAs */}
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-5">
               <button
-                onClick={() => navigate({ to: "/properties", search: { loc: active.locParam } })}
+                onClick={() => navigate({ to: "/properties", search: { q: active.locParam } })}
                 className="btn btn-primary shadow-xs gap-2"
               >
                 <span>View All Properties in {active.name}</span>

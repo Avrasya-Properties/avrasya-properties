@@ -1,52 +1,18 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { toast } from "sonner";
-import {
-  ArrowRight,
-  Building,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  FileCheck2,
-  Heart,
-  Layers,
-  MapPin,
-  Maximize2,
-  MessageSquare,
-  Phone,
-  Scale,
-  Share2,
-  ShieldCheck,
-  X,
-} from "lucide-react";
-import {
-  CONTACT,
-  TYPE_LABEL,
-  areaText,
-  comparableUsd,
-  convertUsdPrice,
-  getProperty,
-  getPropertyMedia,
-  humanKey,
-  legacyRecords,
-  locationText,
-  priceDisplay,
-  properties,
-  sideText,
-  waLink,
-  type PropertyRecord,
-} from "@/data/properties";
-import { PropertyCard } from "@/components/site/PropertyCard";
-import { Enquiry } from "@/components/site/Enquiry";
-import { useCurrency, useShortlist } from "@/hooks/usePreferences";
-import { useLiveContact } from "@/hooks/useLiveContact";
-
+import {createFileRoute,Link,notFound,redirect} from "@tanstack/react-router";
+import {useCatalogue,loadCatalogue,resolveRedirect} from "@/data/live";
+import {legacyRecords,TYPE_LABEL,locationText,priceDisplay} from "@/data/properties";
+import {DEMO_MODE} from "@/lib/supabase";
+import {useWhatsAppLink} from "@/hooks/useLiveContact";
+import {MessageSquare} from "lucide-react";
+import {PropertyDetails} from "@/components/site/PropertyDetails";
 export const Route = createFileRoute("/properties/$slug")({
-  loader: ({ params }) => {
-    const r = getProperty(params.slug);
+  loader: async ({ params,context }) => {
+    const records=await loadCatalogue();
+    context.queryClient.setQueryData(["published-catalogue"],records);
+    const r = records.find(x=>x.slug===params.slug);
     if (r) return { record: r, legacy: false };
     if (legacyRecords.some((l) => l.slug === params.slug)) return { record: null, legacy: true };
+    if(!DEMO_MODE){const target=await resolveRedirect(params.slug);if(target)throw redirect({to:"/properties/$slug",params:{slug:target}});}
     throw notFound();
   },
   head: ({ loaderData }) => {
@@ -55,7 +21,7 @@ export const Route = createFileRoute("/properties/$slug")({
       ? `${r.marketing_title} — Avrasya Properties Istanbul`
       : "Availability to confirm — Avrasya Properties";
     const desc = r
-      ? `${r.layout_label ?? TYPE_LABEL[r.record_type]} in ${locationText(r)}. ${priceDisplay(r.price).main}. Pre-screened title deed on file.`
+      ? `${r.layout_label ?? TYPE_LABEL[r.record_type]} in ${locationText(r)}. ${priceDisplay(r.price).main}.`
       : "This listing is being re-confirmed with the project.";
     return {
       meta: [
@@ -70,15 +36,24 @@ export const Route = createFileRoute("/properties/$slug")({
   component: Detail,
 });
 
+<<<<<<< HEAD
 function Detail() {
   const { record } = Route.useLoaderData();
   const { slug } = Route.useParams();
   const liveRecord = getProperty(slug) ?? record;
   if (!liveRecord) return <Legacy />;
   return <RecordView r={liveRecord} />;
+=======
+function Detail(){
+ const loaded=Route.useLoaderData();const catalogue=useCatalogue();
+ if(!loaded.record)return <Legacy/>;
+ const record=catalogue.data?catalogue.properties.find(r=>r.slug===loaded.record!.slug):loaded.record;
+ if(!record)return <section className="container-site py-20"><h1 className="headline text-3xl">This listing is no longer published.</h1><Link to="/properties" className="btn btn-primary mt-5">Browse current properties</Link></section>;
+ return <PropertyDetails r={record}/>;
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 }
-
 function Legacy() {
+  const waLink=useWhatsAppLink();
   return (
     <div className="container-site max-w-2xl py-24 text-center">
       <p className="eyebrow eyebrow-mark">Availability Under Review</p>
@@ -104,6 +79,7 @@ function Legacy() {
   );
 }
 
+<<<<<<< HEAD
 function Fact({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex justify-between items-center gap-4 border-b border-border/70 py-3 text-sm">
@@ -716,3 +692,5 @@ function RecordView({ r }: { r: PropertyRecord }) {
     </>
   );
 }
+=======
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f

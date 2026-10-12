@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSiteSettings } from "@/admin/store";
+import { useState, useEffect,useSyncExternalStore } from "react";
 import type { SupportedCurrency } from "@/data/properties";
 import { EXCHANGE_RATES } from "@/data/properties";
 
@@ -6,6 +8,7 @@ const CURRENCY_KEY = "avrasya_preferred_currency";
 const SHORTLIST_KEY = "avrasya_saved_shortlist";
 const RATES_CACHE_KEY = "avrasya_frankfurter_rates_v1";
 
+<<<<<<< HEAD
 export type LiveRates = {
   USD: number;
   EUR: number;
@@ -77,48 +80,28 @@ async function syncFrankfurterRates() {
   } catch {
     // Keep fallback rates if offline
   }
+=======
+export type LiveRates={USD:number;EUR:number;TRY:number;GBP:number};
+export function useLiveRates(){
+ const settings=useSiteSettings();
+ const manual:LiveRates={USD:1,EUR:settings.exchangeRateEur,TRY:settings.exchangeRateTry,GBP:settings.exchangeRateGbp};
+ const query=useQuery({queryKey:["indicative-fx"],enabled:settings.enableFrankfurterSync,staleTime:3600000,refetchInterval:3600000,queryFn:async()=>{
+  const res=await fetch("https://api.frankfurter.dev/v1/latest?base=USD");if(!res.ok)throw new Error("Rate provider unavailable");const data=await res.json();
+  if(!["EUR","TRY","GBP"].every(key=>typeof data.rates?.[key]==="number"&&Number.isFinite(data.rates[key])&&data.rates[key]>0))throw new Error("Invalid provider rates");
+  return {rates:{USD:1,EUR:data.rates.EUR,TRY:data.rates.TRY,GBP:data.rates.GBP} as LiveRates,date:String(data.date||"")};
+ }});
+ const live=settings.enableFrankfurterSync&&!!query.data;
+ const rates=live?query.data!.rates:manual;
+ useEffect(()=>{if(EXCHANGE_RATES.EUR.rate===rates.EUR&&EXCHANGE_RATES.TRY.rate===rates.TRY&&EXCHANGE_RATES.GBP.rate===rates.GBP)return;EXCHANGE_RATES.EUR.rate=rates.EUR;EXCHANGE_RATES.TRY.rate=rates.TRY;EXCHANGE_RATES.GBP.rate=rates.GBP;window.dispatchEvent(new Event("rates-updated"));},[rates.EUR,rates.TRY,rates.GBP]);
+ const convert=(amount:number|null,currency:SupportedCurrency)=>amount===null?"Price on request":new Intl.NumberFormat("en-US",{style:"currency",currency,maximumFractionDigits:0}).format(Math.round(amount*rates[currency]));
+ return {rates,isLive:live,date:live?query.data!.date:"",convert};
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 }
-
-function updatePropertiesExchangeRates(rates: LiveRates) {
-  if (EXCHANGE_RATES.EUR) EXCHANGE_RATES.EUR.rate = rates.EUR;
-  if (EXCHANGE_RATES.TRY) EXCHANGE_RATES.TRY.rate = rates.TRY;
-  if (EXCHANGE_RATES.GBP) EXCHANGE_RATES.GBP.rate = rates.GBP;
-}
-
-// Kick off fetch on client load
-if (typeof window !== "undefined") {
-  syncFrankfurterRates();
-}
-
-export function useLiveRates() {
-  const [rates, setRates] = useState<LiveRates>(currentLiveRates);
-  const [isLive, setIsLive] = useState(isLiveFromFrankfurter);
-  const [date, setDate] = useState(lastSyncedDate);
-
-  useEffect(() => {
-    const handler = () => {
-      setRates({ ...currentLiveRates });
-      setIsLive(isLiveFromFrankfurter);
-      setDate(lastSyncedDate);
-    };
-    window.addEventListener("rates-updated", handler);
-    syncFrankfurterRates();
-    return () => window.removeEventListener("rates-updated", handler);
-  }, []);
-
-  const convert = (usdAmount: number | null, targetCurrency: SupportedCurrency): string => {
-    if (usdAmount == null) return "Price on request";
-    const symbols: Record<SupportedCurrency, string> = { USD: "$", EUR: "€", TRY: "₺", GBP: "£" };
-    const rate = rates[targetCurrency] || 1;
-    const converted = Math.round(usdAmount * rate);
-    return `${symbols[targetCurrency]}${converted.toLocaleString("en-US")}`;
-  };
-
-  return { rates, isLive, date, convert };
-}
-
 export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => void] {
+  useLiveRates();
   const [currency, setCurrencyState] = useState<SupportedCurrency>("USD");
+  const [,refreshRates]=useState(0);
+  useEffect(()=>{const update=()=>refreshRates(v=>v+1);window.addEventListener("rates-updated",update);return()=>window.removeEventListener("rates-updated",update);},[]);
 
   useEffect(() => {
     try {
@@ -131,8 +114,8 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
     }
 
     const onStorage = () => {
-      const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
-      if (current) setCurrencyState(current);
+      try{const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
+      if (["USD","EUR","TRY","GBP"].includes(current)) setCurrencyState(current);}catch{}
     };
     window.addEventListener("currency-change", onStorage);
     return () => window.removeEventListener("currency-change", onStorage);
@@ -151,45 +134,34 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
   return [currency, setCurrency];
 }
 
+const EMPTY_SHORTLIST:string[]=[];
+let shortlistRaw:string|null=null;
+let shortlistSnapshot:string[]=EMPTY_SHORTLIST;
+function readShortlist(){
+ if(typeof window==="undefined")return EMPTY_SHORTLIST;
+ try{
+  const raw=localStorage.getItem(SHORTLIST_KEY);
+  if(raw!==shortlistRaw){shortlistRaw=raw;const value=JSON.parse(raw||"[]");shortlistSnapshot=Array.isArray(value)?[...new Set(value.filter((item):item is string=>typeof item==="string"))]:EMPTY_SHORTLIST;}
+ }catch{}
+ return shortlistSnapshot;
+}
+function subscribeShortlist(listener:()=>void){
+ const storage=(event:StorageEvent)=>{if(event.key===SHORTLIST_KEY||event.key===null)listener();};
+ window.addEventListener("shortlist-change",listener);window.addEventListener("storage",storage);
+ return()=>{window.removeEventListener("shortlist-change",listener);window.removeEventListener("storage",storage);};
+}
 export function useShortlist(): {
   shortlist: string[];
   isSaved: (slug: string) => boolean;
   toggle: (slug: string) => void;
   count: number;
 } {
-  const [shortlist, setShortlist] = useState<string[]>([]);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || "[]");
-      if (Array.isArray(saved)) setShortlist(saved);
-    } catch {
-      /* ignore */
-    }
-
-    const onStorage = () => {
-      try {
-        const saved = JSON.parse(localStorage.getItem(SHORTLIST_KEY) || "[]");
-        if (Array.isArray(saved)) setShortlist(saved);
-      } catch {
-        /* ignore */
-      }
-    };
-    window.addEventListener("shortlist-change", onStorage);
-    return () => window.removeEventListener("shortlist-change", onStorage);
-  }, []);
-
+  const shortlist=useSyncExternalStore(subscribeShortlist,readShortlist,()=>EMPTY_SHORTLIST);
   const toggle = (slug: string) => {
-    setShortlist((prev) => {
-      const next = prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug];
-      try {
-        localStorage.setItem(SHORTLIST_KEY, JSON.stringify(next));
-        window.dispatchEvent(new Event("shortlist-change"));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    const current=readShortlist(),next=current.includes(slug)?current.filter(item=>item!==slug):[...current,slug];
+    shortlistSnapshot=next;
+    try{shortlistRaw=JSON.stringify(next);localStorage.setItem(SHORTLIST_KEY,shortlistRaw);}catch{shortlistRaw=null;}
+    window.dispatchEvent(new Event("shortlist-change"));
   };
 
   const isSaved = (slug: string) => shortlist.includes(slug);

@@ -1,5 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+<<<<<<< HEAD
 import {
   Bell,
   Building2,
@@ -21,6 +22,11 @@ import {
   Settings2,
 } from "lucide-react";
 import { fmtDate, logout, markRead, useDB, useSession } from "./store";
+=======
+import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2 } from "lucide-react";
+import { DEMO_ENABLED, fmtDate, logout, markRead, useDB, useSession, useBackendStatus } from "./store";
+import { toast } from "sonner";
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -29,41 +35,50 @@ const NAV = [
     group: "Operations",
     items: [
       { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/admin/inquiries", label: "Inquiries & Inbox", icon: Inbox, badge: "inquiries" },
-      { to: "/admin/analytics", label: "Portfolio Analytics", icon: BarChart3 },
+      { to: "/admin/inquiries", label: "Enquiries", icon: Inbox, badge: "inquiries" },
+      { to: "/admin/analytics", label: "Reports", icon: BarChart3 },
     ],
   },
   {
-    group: "Property Inventory",
+    group: "Property listings",
     items: [
       { to: "/admin/properties", label: "Properties", icon: Building2 },
       { to: "/admin/projects", label: "Developments", icon: Layers },
     ],
   },
   {
-    group: "Client CRM & Pipeline",
+    group: "Clients",
     items: [
-      { to: "/admin/leads", label: "Leads Pipeline", icon: Users },
-      { to: "/admin/contacts", label: "Contacts Directory", icon: Contact2 },
-      { to: "/admin/deals", label: "Deals & Transactions", icon: Handshake },
-      { to: "/admin/calendar", label: "Viewing Calendar", icon: CalendarDays },
-      { to: "/admin/tasks", label: "Advisory Tasks", icon: CheckSquare },
+      { to: "/admin/leads", label: "Buyer enquiries", icon: Users },
+      { to: "/admin/contacts", label: "Contacts", icon: Contact2 },
+      { to: "/admin/deals", label: "Deals", icon: Handshake },
+      { to: "/admin/calendar", label: "Viewings", icon: CalendarDays },
+      { to: "/admin/tasks", label: "Tasks", icon: CheckSquare },
     ],
   },
   {
+<<<<<<< HEAD
     group: "Platform & CMS",
     items: [{ to: "/admin/settings", label: "Website Content & CMS", icon: Settings2 }],
+=======
+    group: "Website and team",
+    items: [
+      { to: "/admin/manage", label: "Website and team", icon: Layers },
+      { to: "/admin/settings", label: "Website settings", icon: Settings2 },
+    ],
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   },
 ] as const;
 
 function Nav({ onNav }: { onNav?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const db = useDB();
+  const user = useSession();
   const newInquiriesCount = db.inquiries?.filter((i) => i.status === "New").length ?? 0;
 
   return (
     <nav className="flex flex-col gap-5 px-3 py-4">
-      {NAV.map((g) => (
+      {NAV.filter(g=>g.group!=="Website and team"||user?.role==="admin"||user?.role==="manager"||user?.role==="viewer").map((g) => (
         <div key={g.group}>
           <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-on-dark-muted/70">
             {g.group}
@@ -98,6 +113,7 @@ function Nav({ onNav }: { onNav?: () => void }) {
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const user = useSession();
+  const backend = useBackendStatus();
   const db = useDB();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
@@ -186,6 +202,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const sidebar = (
     <div className="flex h-full flex-col bg-ink text-on-dark border-r border-white/10">
       <div className="flex h-[68px] items-center gap-2.5 px-4 border-b border-white/10">
+<<<<<<< HEAD
         <img
           src="/images/avrasya-logo-white.svg"
           alt="Avrasya Properties"
@@ -194,6 +211,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <span className="rounded bg-brass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-brass">
           CMS
         </span>
+=======
+        <img src="/images/avrasya-logo-white.svg" alt="Avrasya Properties" className="h-7 w-auto object-contain" />
+        <span className="rounded bg-brass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-brass">ADMIN</span>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       </div>
       <Nav onNav={() => setOpen(false)} />
       <div className="mt-auto p-4 border-t border-white/10 text-[11px] text-on-dark-muted/80">
@@ -201,13 +222,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <ShieldCheck className="h-3.5 w-3.5 text-brass" />
           <span>Avrasya Internal Workspace</span>
         </div>
-        <p className="mt-1">Demo sandbox · Session changes persisted locally</p>
+        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Shared team workspace"}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen bg-background font-sans text-foreground">
+    <div className="admin-workspace flex min-h-screen bg-background font-sans text-foreground">
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 md:block">{sidebar}</aside>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-64 p-0">
@@ -215,11 +236,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </SheetContent>
       </Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
+<<<<<<< HEAD
         <header className="sticky top-0 z-20 flex h-[60px] items-center gap-3 border-b bg-card px-4">
           <button className="md:hidden" onClick={() => setOpen(true)} aria-label="Open navigation">
             <Menu className="h-5 w-5" />
           </button>
           <div className="relative max-w-md flex-1">
+=======
+        <header className="sticky top-0 z-20 flex h-[60px] items-center gap-1.5 border-b bg-card px-2 sm:gap-3 sm:px-4">
+          <button className="flex h-11 w-11 shrink-0 items-center justify-center md:hidden" onClick={() => setOpen(true)} aria-label="Open navigation"><Menu className="h-5 w-5" /></button>
+          <div className="relative min-w-0 max-w-md flex-1">
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -245,22 +272,27 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </div>
             )}
           </div>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-3">
             {time && (
               <div className="hidden items-center gap-1.5 rounded-full border bg-muted/50 px-2.5 py-1 text-xs text-muted-foreground lg:flex">
                 <Clock className="h-3 w-3 text-brass" />
                 <span>Istanbul {time} TRT</span>
               </div>
             )}
+<<<<<<< HEAD
             <a
               href="/"
               target="_blank"
               className="flex items-center gap-1 rounded-sm border px-2.5 py-1 text-xs text-muted-foreground hover:border-brass hover:text-foreground"
             >
+=======
+            <a href="/" target="_blank" rel="noreferrer" aria-label="Open website" className="flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-sm border px-2.5 py-1 text-xs text-muted-foreground hover:border-brass hover:text-foreground">
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
               <ExternalLink className="h-3.5 w-3.5 text-brass" />
-              <span>Public Portal</span>
+              <span className="hidden sm:inline">Website</span>
             </a>
             <Popover>
+<<<<<<< HEAD
               <PopoverTrigger className="relative" aria-label="Notifications">
                 <Bell className="h-5 w-5" />
                 {unread.length > 0 && (
@@ -324,9 +356,24 @@ export function AdminShell({ children }: { children: ReactNode }) {
             >
               <LogOut className="h-4 w-4" />
             </button>
+=======
+              <PopoverTrigger className="relative flex h-11 w-11 items-center justify-center" aria-label="Notifications"><Bell className="h-5 w-5" />{unread.length > 0 && <span className="absolute right-0 top-0 rounded-full bg-brass px-1 text-[10px] text-primary-foreground">{unread.length}</span>}</PopoverTrigger>
+              <PopoverContent align="end" className="max-w-[calc(100vw-2rem)] w-80 p-0">
+                <div className="flex justify-between border-b px-3 py-2 text-sm"><b>Notifications</b><button className="text-brass-text" onClick={async () => { try { await markRead(notes.map((n) => n.id), true); } catch(error) { toast.error((error as Error).message); } }}>Mark all read</button></div>
+                {notes.length === 0 && <p className="p-3 text-sm text-muted-foreground">Nothing needs attention.</p>}
+                {notes.map((n) => { const r = db.readNotes.includes(n.id); return (
+                  <div key={n.id} className="flex items-center gap-2 border-b px-3 py-2 text-sm last:border-0">
+                    <Link to={n.to} className={`flex-1 ${r ? "text-muted-foreground" : "font-medium"}`}>{n.text}</Link>
+                    <button className="text-xs text-muted-foreground" onClick={async () => { try { await markRead([n.id], !r); } catch(error) { toast.error((error as Error).message); } }}>{r ? "Unread" : "Read"}</button>
+                  </div>); })}
+              </PopoverContent>
+            </Popover>
+            <div className="hidden text-right text-xs leading-tight sm:block"><div className="font-medium">{user?.name}</div><div className="capitalize text-muted-foreground">{user?.role}{DEMO_ENABLED ? " (demo)" : ""}</div></div>
+            <button className="flex h-11 w-11 items-center justify-center" onClick={async () => { try { await logout(); } catch(error) { toast.error((error as Error).message); } nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
       </div>
     </div>
   );
@@ -343,11 +390,16 @@ export function PageHead({
 }) {
   return (
     <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+<<<<<<< HEAD
       <div>
         <p className="text-xs text-muted-foreground">Admin{crumbs ? ` / ${crumbs}` : ""}</p>
         <h1 className="text-xl font-semibold">{title}</h1>
       </div>
       {action}
+=======
+      <div className="min-w-0"><p className="break-words text-xs text-muted-foreground">Admin{crumbs ? ` / ${crumbs}` : ""}</p><h1 className="break-words text-xl font-semibold">{title}</h1></div>
+      {action&&<div data-page-actions className="max-w-full">{action}</div>}
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     </div>
   );
 }
@@ -367,8 +419,12 @@ export function Status({ v }: { v: string }) {
     </span>
   );
 }
+<<<<<<< HEAD
 export const btn =
   "inline-flex h-9 items-center gap-1.5 rounded-sm px-3 text-sm font-medium disabled:opacity-40";
+=======
+export const btn = "inline-flex min-h-11 items-center gap-1.5 rounded-sm px-3 py-2 text-sm font-medium disabled:opacity-40";
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 export const btnPrimary = `${btn} bg-brass text-primary-foreground hover:opacity-90`;
 export const btnGhost = `${btn} border bg-card hover:bg-muted`;
 export const field =

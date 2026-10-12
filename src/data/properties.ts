@@ -9,7 +9,7 @@ export type Area = {
   unit_count?: number;
 };
 export type Price = {
-  currency: "USD" | "TRY" | null;
+  currency: "USD" | "TRY" | "EUR" | "GBP" | null;
   amount: number | null;
   basis: string;
   status: string;
@@ -26,6 +26,7 @@ export type Price = {
 };
 export type RecordType = "unit_offer" | "unit_type" | "package" | "project" | "ambiguous_offer";
 export type PropertyRecord = {
+  id?:string; ref?:string; mode?:"sale"|"rent"; bathrooms?:number|null; tapu_status?:string|null; source_note?:string|null;
   slug: string;
   marketing_title: string;
   city: string;
@@ -36,6 +37,8 @@ export type PropertyRecord = {
   price: Price;
   areas: Area[];
   source_ids: string[];
+  cover?: string | null;
+  availability?: string;
   availability_verified: boolean;
   details: {
     [k: string]: unknown;
@@ -76,7 +79,7 @@ export const TYPE_LABEL: Record<RecordType, string> = {
   ambiguous_offer: "Offer to confirm",
 };
 
-const fmt = (n: number, c = "USD") => (c === "USD" ? "$" : "TRY ") + n.toLocaleString("en-US");
+const fmt = (n:number,c="USD") => new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:0}).format(n);
 
 /** Human price headline + qualifier appropriate to the record's price basis. */
 export function priceDisplay(p: Price): { main: string; note: string } {
@@ -100,7 +103,7 @@ export function priceDisplay(p: Price): { main: string; note: string } {
     special_offer: "Special offer · source-advertised",
   };
   const extra = p.expenses_amount ? ` + ${fmt(p.expenses_amount)} stated expenses` : "";
-  return { main: fmt(p.amount, c), note: (notes[p.basis] ?? "Source-advertised") + extra };
+  return { main: (p.basis==="from"?"From ":"")+fmt(p.amount, c), note: (notes[p.basis] ?? "Source-advertised") + extra };
 }
 
 /** USD amount usable for sorting / budget matching; null when not comparable. */
@@ -124,8 +127,12 @@ export function areaText(r: PropertyRecord): string {
 export const locationText = (r: PropertyRecord) =>
   r.location_label ? `${r.location_label}, ${r.city}` : "Location to confirm";
 
+<<<<<<< HEAD
 export const sideText = (r: PropertyRecord) =>
   r.side === "unknown" ? "Side to confirm" : `${r.side}an side`;
+=======
+export const sideText = (r: PropertyRecord) => r.side==="Europe"?"European side":r.side==="Asia"?"Asian side":"Side to confirm";
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 
 export const LAYOUTS = ["1+1", "2+1", "Duplex"] as const;
 export function matchesLayout(r: PropertyRecord, l: string) {
@@ -165,15 +172,22 @@ export function convertUsdPrice(usdAmount: number | null, curr: SupportedCurrenc
 export type PropertyMediaInfo = {
   cover: string;
   gallery: string[];
-  floorPlan: string;
+  floorPlan?: string;
   tags: string[];
   highlights: string[];
 };
 
+<<<<<<< HEAD
 function getBasePropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   const s = r.slug.toLowerCase();
   const isCbi = (comparableUsd(r.price) ?? 0) >= 400000;
 
+=======
+function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
+  const s = r.slug.toLowerCase();
+  const isCbi = r.details["cbi_verified"] === true;
+  
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   // 1. RAMS Park House Maslak (1+1 XS 50m2, $270k)
   if (s === "rams-park-house-maslak-1-1xs" || s.includes("rams")) {
     return {
@@ -260,9 +274,15 @@ function getBasePropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       highlights: [
         "Direct connection to tram, Metrobus, and E-5 transport spine",
         "Comprehensive landscaped gardens, indoor pools, and fitness club",
+<<<<<<< HEAD
         "Full title deed clearance and citizenship compliance ready",
         "Underground assigned parking with 24/7 guarded security",
       ],
+=======
+        "Title deed and citizenship status require independent review",
+        "Underground assigned parking with 24/7 guarded security"
+      ]
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     };
   }
 
@@ -323,13 +343,17 @@ function getBasePropertyMedia(r: PropertyRecord): PropertyMediaInfo {
         "/images/properties/gunesli-floorplan.jpg",
       ],
       floorPlan: "/images/properties/gunesli-floorplan.jpg",
+<<<<<<< HEAD
       tags: [
         isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor",
         "CBI Qualified Package",
         "Capital Growth",
       ],
+=======
+      tags: [isCbi ? "Citizenship Eligible" : "Basın Ekspres Corridor", "Investment Package", "Capital Growth"],
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       highlights: [
-        "Pre-audited Turkish Citizenship by Investment eligibility threshold",
+        "Citizenship suitability requires independent legal review",
         "Prime location adjacent to Metro station entrance",
         "Modern architectural compound with commercial shopping arcade",
         "High occupancy rate driven by multinational corporate tenants",
@@ -452,9 +476,15 @@ function getBasePropertyMedia(r: PropertyRecord): PropertyMediaInfo {
       highlights: [
         "Two independent residential units bundled under unified purchase",
         "Dual rental income stream from medical and university precinct",
+<<<<<<< HEAD
         "Meets cumulative $400,000 threshold for Turkish Citizenship",
         "Managed handover and tenant placement services provided",
       ],
+=======
+        "Package price does not establish citizenship eligibility",
+        "Managed handover and tenant placement services provided"
+      ]
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     };
   }
 
@@ -619,6 +649,7 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
   return base;
 }
 
+<<<<<<< HEAD
 export type Filters = {
   q?: string | undefined;
   loc?: string | undefined;
@@ -741,13 +772,19 @@ export function filterProperties(f: Filters, sourceList: PropertyRecord[] = getL
         .includes(q)
     )
       return false;
+=======
+export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties) {
+  const q = f.q?.toLowerCase().trim();
+  const b = BUDGETS.find((x) => x.id === f.budget);
+  let list = catalogue.filter((r) => {
+    if (q && !`${r.marketing_title} ${r.location_label ?? ""} ${r.layout_label ?? ""}`.toLowerCase().includes(q)) return false;
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     if (f.loc && r.location_label !== f.loc) return false;
     if (f.side && r.side !== f.side) return false;
     if (f.layout && !matchesLayout(r, f.layout)) return false;
     if (f.type && r.record_type !== f.type) return false;
     if (f.cbiOnly) {
-      const v = comparableUsd(r.price);
-      if (v == null || v < 400000) return false;
+      if (r.details["cbi_verified"] !== true) return false;
     }
     if (b) {
       const v = comparableUsd(r.price);
@@ -774,8 +811,12 @@ export function filterProperties(f: Filters, sourceList: PropertyRecord[] = getL
 }
 
 /** Records excluded from a budget filter because their price is not comparable in USD. */
+<<<<<<< HEAD
 export const unmatchablePrices = (sourceList: PropertyRecord[] = getLiveProperties()) =>
   sourceList.filter((r) => comparableUsd(r.price) == null);
+=======
+export const unmatchablePrices = (catalogue: PropertyRecord[] = properties) => catalogue.filter((r) => comparableUsd(r.price) == null);
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 
 export const humanKey = (k: string) =>
   k
@@ -783,6 +824,7 @@ export const humanKey = (k: string) =>
     .replace(/_/g, " ")
     .replace(/^\w/, (c) => c.toUpperCase());
 
+<<<<<<< HEAD
 export const getProperty = (slug: string): PropertyRecord | undefined => {
   if (typeof window !== "undefined") {
     try {
@@ -795,3 +837,15 @@ export const getProperty = (slug: string): PropertyRecord | undefined => {
   }
   return properties.find((r) => r.slug === slug);
 };
+=======
+
+export function getPropertyMedia(r:PropertyRecord):PropertyMediaInfo {
+ if(!r.id&&!("gallery_images" in r.details))return originalPropertyMedia(r);
+ const raw=r.details["gallery_images"],cover=r.cover||"";
+ const photos=Array.isArray(raw)?raw.filter((x):x is string=>typeof x==="string"&&!!x):[];
+ const gallery=[...new Set([cover,...photos].filter(Boolean))];
+ const highlights=Array.isArray(r.details["highlights"])?r.details["highlights"].filter((x):x is string=>typeof x==="string"):[];
+ const floorPlan=typeof r.details["floor_plan"]==="string"&&r.details["floor_plan"]?r.details["floor_plan"]:undefined;
+ return {cover,gallery,highlights,tags:[TYPE_LABEL[r.record_type],...(r.details["cbi_verified"]===true?["Citizenship eligibility verified"]:[])],...(floorPlan?{floorPlan}:{})};
+}
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f

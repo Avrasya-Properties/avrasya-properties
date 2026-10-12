@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Heart, Globe, MessageSquare, Phone, ShieldCheck } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { Heart, Globe, Menu, X, MessageSquare, Phone, ShieldCheck } from "lucide-react";
 import { CONTACT, type SupportedCurrency } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLiveContact } from "@/hooks/useLiveContact";
@@ -33,12 +33,38 @@ const NAV = [
 ] as const;
 
 export function Header() {
+  const path = useRouterState({select:s=>s.location.pathname});
+  const menuButton=useRef<HTMLButtonElement>(null);
+  const menu=useRef<HTMLElement>(null);
+  const headerElement=useRef<HTMLElement>(null);
+  const [menuHeight,setMenuHeight]=useState<number|null>(null);
+  const sizeMenu=()=>setMenuHeight(Math.max(0,(window.visualViewport?.height||window.innerHeight)-(headerElement.current?.getBoundingClientRect().bottom||64)));
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [currency, setCurrency] = useCurrency();
   const { count: shortlistCount } = useShortlist();
   const contact = useLiveContact();
   const [time, setTime] = useState("");
+
+  useEffect(()=>setOpen(false),[path]);
+  useEffect(()=>{
+    if(!open)return;
+    const previous=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    menu.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const close=(event:KeyboardEvent)=>{
+      if(event.key==="Escape"){setOpen(false);menuButton.current?.focus();}
+      if(event.key==="Tab"){
+        const controls=[menuButton.current,...Array.from(menu.current?.querySelectorAll<HTMLElement>("a,button,select")||[])].filter((element):element is HTMLElement=>!!element);
+        const first=controls[0],last=controls[controls.length-1];
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+      }
+    };
+    const resized=()=>{if(window.innerWidth>=1280)setOpen(false);else sizeMenu();};
+    window.addEventListener("keydown",close);window.addEventListener("resize",resized);
+    return()=>{document.body.style.overflow=previous;window.removeEventListener("keydown",close);window.removeEventListener("resize",resized);};
+  },[open]);
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 8);
@@ -122,22 +148,28 @@ export function Header() {
 
       {/* Main Glassmorphic Navbar */}
       <header
-        className={`sticky top-0 z-40 h-[74px] border-b transition-all duration-300 ${
+        ref={headerElement}
+        className={`site-header sticky top-0 z-40 h-16 border-b transition-all duration-300 md:h-[74px] ${
           scrolled
             ? "border-border/80 bg-background/90 backdrop-blur-md shadow-xs"
             : "border-border/40 bg-background/80 backdrop-blur-xs"
         }`}
       >
         <div className="container-site flex h-full items-center justify-between gap-4">
+<<<<<<< HEAD
           <Link
             to="/"
             aria-label="Avrasya Properties home"
             className="transition-transform hover:scale-[1.01]"
           >
             <Logo className="h-10 md:h-11" />
+=======
+          <Link to="/" aria-label="Avrasya Properties home" className="transition-transform hover:scale-[1.01]">
+            <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" />
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
           </Link>
 
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Main">
+          <nav className="hidden items-center gap-6 xl:flex" aria-label="Main">
             {NAV.map((n) => (
               <Link
                 key={n.to}
@@ -149,11 +181,11 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-3 xl:flex">
             {/* Shortlist Badge Button */}
             <Link
               to="/properties"
-              search={{}}
+              search={{savedOnly:true}}
               className="relative flex h-10 items-center gap-1.5 rounded-sm border px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:border-brass hover:text-foreground transition-colors"
               title="View your saved property shortlist"
             >
@@ -184,40 +216,30 @@ export function Header() {
             </Magnetic>
           </div>
 
-          <div className="flex items-center gap-2 lg:hidden">
-            {/* Mobile Currency toggle */}
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-              className="h-8 rounded border bg-card px-2 text-xs font-semibold"
-            >
-              <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="TRY">TRY (₺)</option>
-              <option value="GBP">GBP (£)</option>
-            </select>
-
+          <div className="flex shrink-0 items-center gap-1 xl:hidden">
+            <Link to="/properties" search={{savedOnly:true}} aria-label={`Saved properties (${shortlistCount})`} className="relative flex h-11 w-11 items-center justify-center rounded border border-border"><Heart className="h-4 w-4"/>{shortlistCount>0&&<span className="absolute right-0 top-0 rounded bg-brass px-1 text-[10px]">{shortlistCount}</span>}</Link>
             <button
-              className="btn btn-outline !min-h-9 !px-3"
+              ref={menuButton}
+              className="flex h-11 w-11 items-center justify-center rounded border border-border bg-card"
               aria-expanded={open}
               aria-controls="mobile-nav"
-              onClick={() => setOpen((o) => !o)}
+              aria-label={open?"Close menu":"Open menu"}
+              onClick={() => {if(!open)sizeMenu();setOpen((o) => !o);}}
             >
-              {open ? "Close" : "Menu"}
+              {open ? <X className="h-5 w-5"/> : <Menu className="h-5 w-5"/>}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
-        <div
+        {open&&<div
           id="mobile-nav"
-          className={`grid overflow-hidden border-b bg-card transition-[grid-template-rows] duration-200 lg:hidden ${
-            open ? "grid-rows-[1fr]" : "grid-rows-[0fr] border-transparent"
-          }`}
+          style={{maxHeight:menuHeight??"calc(100dvh - 4rem)"}}
+          className="absolute inset-x-0 top-full overflow-y-auto border-b bg-card shadow-lg xl:hidden"
         >
-          <nav className="min-h-0" aria-label="Mobile">
+          <nav ref={menu} className="min-h-0" aria-label="Mobile">
             <div className="container-site flex flex-col py-3 space-y-1">
-              {[...NAV, { to: "/contact", label: "Contact" } as const].map((n) => (
+              {[{to:"/",label:"Home"} as const,...NAV, { to: "/contact", label: "Contact" } as const].map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
@@ -227,6 +249,7 @@ export function Header() {
                   {n.label}
                 </Link>
               ))}
+              <label className="block pt-4 pb-2 text-sm">Display currency<select aria-label="Display currency" value={currency} onChange={e=>setCurrency(e.target.value as SupportedCurrency)} className="field mt-2"><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="TRY">TRY (₺)</option><option value="GBP">GBP (£)</option></select></label>
               <div className="pt-3 flex gap-2">
                 <a
                   href={contact.whatsapp}
@@ -246,7 +269,7 @@ export function Header() {
               </div>
             </div>
           </nav>
-        </div>
+        </div>}
       </header>
     </>
   );
@@ -259,9 +282,9 @@ export function Footer() {
       h: "Explore Portfolio",
       l: [
         ["/properties", "All Offers & Projects"],
-        ["/citizenship", "Citizenship Program ($400k)"],
-        ["/services", "Advisory Framework (10 Services)"],
-        ["/investment-catalog", "Investment Catalog (17 Pages)"],
+        ["/citizenship", "Citizenship advice"],
+        ["/services", "Advisory services"],
+        ["/investment-catalog", "Investment catalogue"],
       ],
     },
     {
@@ -287,7 +310,7 @@ export function Footer() {
           </p>
           <div className="pt-2 flex items-center gap-3">
             <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-[0.7rem] font-semibold text-brass">
-              Licensed Istanbul Real Estate Advisory
+              Istanbul Real Estate Advisory
             </span>
           </div>
         </div>
@@ -377,19 +400,19 @@ export function PageIntro({
   aside?: React.ReactNode;
 }) {
   return (
-    <section className="relative overflow-hidden border-b bg-gradient-to-b from-card/60 to-background">
+    <section className="site-page-intro relative overflow-hidden border-b bg-primary text-on-dark">
       <div
         aria-hidden
         className="pointer-events-none absolute right-4 lg:right-10 top-8 hidden select-none md:flex md:flex-col items-end text-right opacity-30 z-0"
       >
-        <span className="outline-word text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
+        <span className="outline-word outline-light text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
           AVRASYA
         </span>
-        <span className="outline-word text-[2.4rem] lg:text-[3.2rem] tracking-[0.32em] mt-1 uppercase leading-none pr-1">
+        <span className="outline-word outline-light text-[2.4rem] lg:text-[3.2rem] tracking-[0.32em] mt-1 uppercase leading-none pr-1">
           PROPERTIES
         </span>
       </div>
-      <div className="container-site relative flex flex-col gap-6 py-12 md:flex-row md:items-end md:justify-between md:py-16">
+      <div className="container-site relative flex flex-col gap-5 py-9 md:flex-row md:items-end md:justify-between md:py-16">
         <div className="max-w-3xl">
           <p className="eyebrow eyebrow-mark">{eyebrow}</p>
           <h1 className="display-hero mt-3">
@@ -421,6 +444,7 @@ export function Margin({ label, children }: { label: string; children: React.Rea
 }
 
 export function CtaBand() {
+  const contact=useLiveContact();
   return (
     <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-20">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/10 via-transparent to-transparent pointer-events-none" />
@@ -442,7 +466,7 @@ export function CtaBand() {
             </Link>
           </Magnetic>
           <a
-            href={CONTACT.whatsapp}
+            href={contact.whatsapp}
             target="_blank"
             rel="noreferrer"
             className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"

@@ -1,0 +1,1 @@
+-- Applied migration: ../migrations/20261011154114_manage_listing_photos.sql

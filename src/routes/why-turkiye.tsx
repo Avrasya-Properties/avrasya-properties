@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/why-turkiye")({
       "Why Türkiye & Istanbul Real Estate · Avrasya Properties",
       "Macro analysis, district investment dynamics, and freehold property rights in Istanbul for international purchasers and family offices.",
     ),
-  component: WhyTurkiye,
+  component: () => <ManagedPage slug="why-turkiye"><WhyTurkiye /></ManagedPage>,
 });
 
 type DistrictProfile = {

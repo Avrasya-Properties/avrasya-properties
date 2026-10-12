@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/citizenship")({
       "Turkish Citizenship by Investment ($400,000) · Avrasya Properties",
       "Authoritative guide and interactive financial calculator for acquiring Turkish citizenship through qualifying Istanbul real estate. Legal roadmap, cost breakdowns, and SPK appraisal compliance.",
     ),
-  component: CitizenshipPage,
+  component: () => <ManagedPage slug="citizenship"><CitizenshipPage /></ManagedPage>,
 });
 
 export function CitizenshipPage() {

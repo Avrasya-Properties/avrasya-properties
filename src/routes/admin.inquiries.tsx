@@ -17,6 +17,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
+<<<<<<< HEAD
 import {
   convertInquiryToLead,
   createInquiry,
@@ -26,6 +27,18 @@ import {
   useDB,
   useSession,
   type Inquiry,
+=======
+import { 
+  can,
+  convertInquiryToLead, 
+  createInquiry, 
+  fmtDate, 
+  remove, 
+  upsert, 
+  useDB, 
+  useSession, 
+  type Inquiry 
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/inquiries")({
@@ -38,7 +51,8 @@ export function AdminInquiriesPage() {
   const nav = useNavigate();
   const [filter, setFilter] = useState<string>("All");
   const [search, setSearch] = useState("");
-  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selectedInquiry = db.inquiries.find((q) => q.id === selectedId) ?? null;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newForm, setNewForm] = useState({
     name: "",
@@ -69,20 +83,20 @@ export function AdminInquiriesPage() {
 
   const newCount = inquiries.filter((i) => i.status === "New").length;
   const contactedCount = inquiries.filter((i) => i.status === "Contacted").length;
-  const qualifiedCount = inquiries.filter((i) => i.status === "Qualified").length;
+  const qualifiedCount = inquiries.filter((i) => Boolean(i.leadId)).length;
 
-  const handleStatusChange = (id: string, newStatus: Inquiry["status"]) => {
+  const handleStatusChange = async (id: string, newStatus: Inquiry["status"]) => {
     try {
-      upsert<Inquiry>("inquiries", { id, status: newStatus });
+      await upsert<Inquiry>("inquiries", { id, status: newStatus });
       toast.success(`Inquiry marked as ${newStatus}`);
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const handleConvertToLead = (id: string) => {
+  const handleConvertToLead = async (id: string) => {
     try {
-      const lead = convertInquiryToLead(id);
+      const lead = await convertInquiryToLead(id);
       toast.success("Converted inquiry to active CRM Lead!");
       nav({ to: "/admin/leads/$id", params: { id: lead.id } });
     } catch (e) {
@@ -90,23 +104,23 @@ export function AdminInquiriesPage() {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Remove this inquiry record?")) {
+  const handleDelete = async (id: string) => {
+    if (confirm("Archive this inquiry? It will remain available in the Archived filter.")) {
       try {
-        remove("inquiries", id);
-        toast.success("Inquiry removed");
-        if (selectedInquiry?.id === id) setSelectedInquiry(null);
+        await remove("inquiries", id);
+        toast.success("Inquiry archived");
+        if (selectedInquiry?.id === id) setSelectedId(null);
       } catch (e) {
         toast.error((e as Error).message);
       }
     }
   };
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newForm.name.trim()) return toast.error("Client name is required");
+    if (!newForm.name.trim()) { toast.error("Client name is required"); return; }
     try {
-      createInquiry(newForm);
+      await createInquiry(newForm);
       toast.success("Inquiry registered in inbox");
       setIsAddOpen(false);
       setNewForm({
@@ -126,13 +140,21 @@ export function AdminInquiriesPage() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Consultations & Inquiries"
+        title="Enquiries"
         crumbs="Operations / Inbox"
         action={
           <div className="flex items-center gap-2">
+<<<<<<< HEAD
             <button onClick={() => setIsAddOpen(true)} className={btnPrimary}>
+=======
+            <button
+              onClick={() => setIsAddOpen(true)}
+              className={btnPrimary}
+              disabled={!can(user, "edit-crm")}
+            >
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
               <Plus className="h-3.5 w-3.5" />
-              <span>Log Client Inquiry</span>
+              <span>Add enquiry</span>
             </button>
           </div>
         }
@@ -162,7 +184,7 @@ export function AdminInquiriesPage() {
             Converted Leads
           </p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-emerald-600">{qualifiedCount}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Advanced to CRM deals</p>
+          <p className="mt-1 text-xs text-muted-foreground">Linked to CRM leads</p>
         </div>
       </div>
 
@@ -223,7 +245,7 @@ export function AdminInquiriesPage() {
                   filtered.map((inq) => (
                     <tr
                       key={inq.id}
-                      onClick={() => setSelectedInquiry(inq)}
+                      onClick={() => setSelectedId(inq.id)}
                       className={`cursor-pointer transition-colors hover:bg-muted/50 ${
                         selectedInquiry?.id === inq.id ? "bg-muted/70" : ""
                       }`}
@@ -262,11 +284,12 @@ export function AdminInquiriesPage() {
                               <MessageSquare className="h-4 w-4" />
                             </a>
                           )}
-                          {inq.status !== "Qualified" && (
+                          {!inq.leadId && inq.status !== "Archived" && (
                             <button
+                              disabled={!can(user, "edit-crm", inq.agentId) || (user?.role === "agent" && inq.agentId !== user.id)}
                               onClick={() => handleConvertToLead(inq.id)}
                               className="rounded p-1 text-brass hover:bg-brass/10"
-                              title="Convert to CRM Lead"
+                              title="Create buyer enquiry"
                             >
                               <UserPlus className="h-4 w-4" />
                             </button>
@@ -352,6 +375,7 @@ export function AdminInquiriesPage() {
                 </label>
                 <select
                   className={field}
+                  disabled={!can(user, "edit-crm", selectedInquiry.agentId) || (user?.role === "agent" && selectedInquiry.agentId !== user.id)}
                   value={selectedInquiry.status}
                   onChange={(e) =>
                     handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])
@@ -366,13 +390,14 @@ export function AdminInquiriesPage() {
 
               {/* Action Buttons */}
               <div className="space-y-2 pt-2 border-t">
-                {selectedInquiry.status !== "Qualified" && (
+                {!selectedInquiry.leadId && selectedInquiry.status !== "Archived" && (
                   <button
+                    disabled={!can(user, "edit-crm", selectedInquiry.agentId) || (user?.role === "agent" && selectedInquiry.agentId !== user.id)}
                     onClick={() => handleConvertToLead(selectedInquiry.id)}
                     className={`${btnPrimary} w-full justify-center`}
                   >
                     <UserPlus className="h-4 w-4" />
-                    <span>Convert to CRM Lead</span>
+                    <span>Create buyer enquiry</span>
                   </button>
                 )}
                 <div className="flex gap-2">
@@ -411,14 +436,14 @@ export function AdminInquiriesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div className="w-full max-w-lg rounded-xl border bg-card p-6 shadow-xl">
             <h3 className="font-display text-lg font-bold text-foreground mb-4">
-              Log Direct Client Inquiry
+              Add an enquiry
             </h3>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="inquiry-name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Full Name *
                 </label>
-                <input
+                <input id="inquiry-name"
                   required
                   className={field}
                   value={newForm.name}
@@ -428,10 +453,10 @@ export function AdminInquiriesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="inquiry-email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Email
                   </label>
-                  <input
+                <input id="inquiry-email"
                     type="email"
                     className={field}
                     value={newForm.email}
@@ -440,10 +465,10 @@ export function AdminInquiriesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="inquiry-phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Phone / WhatsApp
                   </label>
-                  <input
+                <input id="inquiry-phone"
                     className={field}
                     value={newForm.phone}
                     onChange={(e) => setNewForm({ ...newForm, phone: e.target.value })}
@@ -469,10 +494,10 @@ export function AdminInquiriesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label htmlFor="inquiry-budget" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                     Stated Budget
                   </label>
-                  <input
+                <input id="inquiry-budget"
                     className={field}
                     value={newForm.budget}
                     onChange={(e) => setNewForm({ ...newForm, budget: e.target.value })}
@@ -481,10 +506,10 @@ export function AdminInquiriesPage() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label htmlFor="inquiry-message" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Inquiry Details / Message
                 </label>
-                <textarea
+                <textarea id="inquiry-message"
                   className={`${field} h-24 py-2`}
                   value={newForm.message}
                   onChange={(e) => setNewForm({ ...newForm, message: e.target.value })}

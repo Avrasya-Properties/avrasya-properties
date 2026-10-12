@@ -1,3 +1,4 @@
+import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
@@ -17,38 +18,44 @@ import {
 import {
   BUDGETS,
   LAYOUTS,
-  LOCATIONS,
   areaText,
   comparableUsd,
   convertUsdPrice,
-  getProperty,
   getPropertyMedia,
   locationText,
   priceDisplay,
+<<<<<<< HEAD
   properties,
   useLiveProperties,
+=======
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   sideText,
-  waLink,
-  type PropertyRecord,
+    type PropertyRecord,
 } from "@/data/properties";
 import { CtaBand, Logo } from "@/components/site/Chrome";
-import { Marquee, Tilt } from "@/components/site/Motion";
-import { PropertyCard } from "@/components/site/PropertyCard";
+import { Marquee, Tilt,MotionRoot } from "@/components/site/Motion";
+import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
 import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useCatalogue } from "@/data/live";
 import { useSiteSettings } from "@/admin/store";
 
 export const Route = createFileRoute("/")({
   head: () =>
     meta(
       "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory",
+<<<<<<< HEAD
       "Premier Istanbul property advisory for international buyers. Explore 18 curated source-verified residential developments with comprehensive legal pre-audits and Turkish Citizenship (CBI) support.",
+=======
+      "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services."
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     ),
   component: Home,
 });
 
+<<<<<<< HEAD
 const FEATURED_SLUGS = [
   "sisli-block5-floor2-unit21-497",
   "atasehir-173-1-1-420",
@@ -74,18 +81,42 @@ function Home() {
   const f = featured[sel] || featured[0]!;
   const media = getPropertyMedia(f);
   const fp = priceDisplay(f.price);
+=======
+
+function Home() {
+ const catalogue=useCatalogue();
+ return <><HomeCollection properties={catalogue.properties} loading={catalogue.isPending} unavailable={catalogue.isError} retry={()=>void catalogue.refetch()}/><MotionRoot/></>;
+}
+function HomeCollection({properties,loading,unavailable,retry}:{properties:PropertyRecord[];loading:boolean;unavailable:boolean;retry:()=>void}) {
+  const waLink=useWhatsAppLink();
+ const FEATURED=properties.slice(0,3);
+ const EDITORIAL=properties.length>3?properties.slice(3,6):properties.slice(0,3);
+ const LOCATIONS=Array.from(new Set(properties.map(r=>r.location_label).filter((x):x is string=>!!x)));
+
+  const settings = useSiteSettings();
+  const [sel, setSel] = useState(0);
+  const featuredIndex=Math.max(0,Math.min(sel,FEATURED.length-1));
+  const f = FEATURED[featuredIndex];
+  const media = f?getPropertyMedia(f):null;
+  const fp = f?priceDisplay(f.price):null;
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   const navigate = useNavigate();
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
-  const saved = isSaved(f.slug);
-  const fUsd = comparableUsd(f.price);
-  const fDisplayPrice = currency === "USD" ? fp.main : convertUsdPrice(fUsd, currency);
+  const saved = f?isSaved(f.slug):false;
+  const fUsd = f?comparableUsd(f.price):null;
+  const fDisplayPrice = currency === "USD"||fUsd===null ? fp?.main||"" : convertUsdPrice(fUsd, currency);
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
   return (
+<<<<<<< HEAD
     <>
+=======
+    <div data-home-page>
+
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-8 pb-16 md:pt-14 md:pb-24 bg-gradient-to-b from-card/30 via-background to-background">
+      <section data-home-hero className="home-hero relative overflow-hidden pt-10 pb-10 md:pt-14 md:pb-20 bg-primary text-on-dark">
         {/* Ambient Brand Watermark in Hero */}
         <div
           aria-hidden
@@ -104,20 +135,12 @@ function Home() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="eyebrow !text-brass-text">
+                <span className="eyebrow">
                   {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
                 </span>
               </div>
-              <h1 className="display-hero">
-                <span className="split-line">
-                  <span style={{ ["--d" as string]: "150ms" }}>An Istanbul address.</span>
-                </span>
-                <span className="split-line">
-                  <em style={{ ["--d" as string]: "280ms" }} className="text-brass italic">
-                    A considered acquisition.
-                  </em>
-                </span>
-              </h1>
+              <h1 className="display-hero"><span className="split-line"><span style={{["--d" as string]:"150ms"}}>{settings.heroHeadline}</span></span></h1>
+
               <p
                 data-reveal
                 style={{ ["--d" as string]: "350ms" }}
@@ -134,6 +157,7 @@ function Home() {
                 className="mt-8 grid grid-cols-2 gap-4 border-t border-border/80 pt-6 sm:grid-cols-4"
               >
                 <div>
+<<<<<<< HEAD
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
                     $120M+
                   </p>
@@ -144,10 +168,18 @@ function Home() {
                     18
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Source Portfolios</p>
+=======
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{properties.length}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Published offers</p>
                 </div>
                 <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">100%</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Title Deed Pre-Audit</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{LOCATIONS.length}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Listed districts</p>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
+                </div>
+                <div>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">Review</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Independent title checks</p>
                 </div>
                 <div>
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
@@ -156,7 +188,7 @@ function Home() {
                       ? `${Math.round(settings.cbiThresholdUsd / 1000)}K`
                       : "400K"}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">CBI Program Ready</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Citizenship reference amount</p>
                 </div>
               </div>
             </div>
@@ -168,7 +200,7 @@ function Home() {
               className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end"
             >
               <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
-                <span>Browse All 18 Offers</span> <ArrowRight className="h-4 w-4" />
+                <span>{properties.length?`Browse ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore properties"}</span> <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/contact" className="btn btn-outline gap-1.5">
                 <span>Book Consultation</span>
@@ -177,18 +209,13 @@ function Home() {
           </div>
 
           {/* Interactive Hero Showcase Grid */}
-          <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_22rem]">
+          {f&&media&&fp&&<div className="mt-8 grid min-w-0 gap-6 text-foreground lg:mt-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
             {/* Main Interactive Spotlight Card */}
             <Tilt max={3}>
               <div className="relative overflow-hidden rounded-xs border border-border/80 bg-card shadow-lg transition-all">
                 {/* Photo Aspect Container */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-muted group">
-                  <img
-                    key={f.slug}
-                    src={media.cover}
-                    alt={f.marketing_title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
+                  <ImageFallback r={f}/>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 pointer-events-none" />
 
                   {/* Top Badges */}
@@ -196,9 +223,9 @@ function Home() {
                     <span className="rounded-xs bg-primary/90 backdrop-blur-xs px-2.5 py-1 text-xs font-semibold tracking-wider text-primary-foreground shadow-xs">
                       Spotlight · {f.location_label}
                     </span>
-                    {(fUsd ?? 0) >= 400000 && (
+                    {f.details["cbi_verified"]===true && (
                       <span className="flex items-center gap-1 rounded-xs bg-brass px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary shadow-xs">
-                        CBI Eligible ($400k+)
+                        Citizenship eligibility verified
                       </span>
                     )}
                   </div>
@@ -216,17 +243,9 @@ function Home() {
                     <Heart className={`h-4.5 w-4.5 ${saved ? "fill-white" : ""}`} />
                   </button>
 
-                  {/* Bottom Text Overlay */}
-                  <div className="absolute inset-x-6 bottom-6 z-10 text-white">
-                    <p className="eyebrow !text-brass text-xs">Featured Portfolio Asset</p>
-                    <h2 className="mt-1 font-display text-2xl md:text-3xl font-medium text-white drop-shadow-sm">
-                      {f.marketing_title}
-                    </h2>
-                    <p className="mt-1 text-xs md:text-sm text-white/80">
-                      {locationText(f)} · {sideText(f)}
-                    </p>
-                  </div>
                 </div>
+
+                <div className="border-t bg-card p-5"><p className="eyebrow">Featured property</p><h2 className="mt-2 break-words font-display text-2xl text-foreground md:text-3xl">{f.marketing_title}</h2><p className="mt-2 text-sm text-muted-foreground">{locationText(f)} · {sideText(f)}</p></div>
 
                 {/* Details Strip */}
                 <div
@@ -258,7 +277,7 @@ function Home() {
                   </div>
                   <div>
                     <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Status</p>
-                    <p className="text-xs font-semibold text-primary">Pre-Screened</p>
+                    <p className="text-xs font-semibold text-primary">{f.availability||"To confirm"}</p>
                   </div>
                   <Link
                     to="/properties/$slug"
@@ -280,7 +299,7 @@ function Home() {
               <div className="mt-3 space-y-3" role="tablist" aria-label="Featured offers">
                 {featured.map((r, i) => {
                   const m = getPropertyMedia(r);
-                  const isCur = i === sel;
+                  const isCur = i === featuredIndex;
                   return (
                     <button
                       key={r.slug}
@@ -312,7 +331,7 @@ function Home() {
                         </p>
                         <div className="mt-1 flex items-center justify-between text-xs">
                           <span className="font-semibold text-foreground">
-                            {currency === "USD"
+                            {currency === "USD"||comparableUsd(r.price)===null
                               ? priceDisplay(r.price).main
                               : convertUsdPrice(comparableUsd(r.price), currency)}
                           </span>
@@ -337,12 +356,12 @@ function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
 
           {/* Instant Search Bar */}
           <form
             data-reveal
-            className="mt-10 rounded-xs border border-border/80 bg-card p-5 shadow-sm md:grid md:grid-cols-[1.2fr_1fr_1fr_auto] md:items-end gap-4"
+            className="home-search mt-8 grid gap-4 rounded-xs border border-border/80 bg-card p-4 text-foreground shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end md:p-5"
             onSubmit={(e) => {
               e.preventDefault();
               navigate({
@@ -357,7 +376,7 @@ function Home() {
           >
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                District / Investment Corridor
+                District
               </span>
               <select
                 className="field"
@@ -375,7 +394,7 @@ function Home() {
 
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                Apartment Layout
+                Apartment layout
               </span>
               <select
                 className="field"
@@ -393,7 +412,7 @@ function Home() {
 
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                Target Budget Range (USD)
+                Budget (USD)
               </span>
               <select
                 className="field"
@@ -410,7 +429,11 @@ function Home() {
             </label>
 
             <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5">
+<<<<<<< HEAD
               <span>Filter {liveProperties.length} Listings</span>
+=======
+              <span>Find a property</span>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -424,7 +447,7 @@ function Home() {
           "Maslak Skyscraper District",
           "Beşiktaş Bosphorus Panorama",
           "Ataşehir Financial Center",
-          "Turkish Citizenship $400k CBI",
+          "Citizenship investment advice",
           "Topkapı Family Residences",
           "Bomontiada Cultural Axis",
           "Ataköy Marina Coastline",
@@ -432,15 +455,16 @@ function Home() {
       />
 
       {/* Curated Editorial Selection Section */}
-      <section className="container-site py-20">
+      <section data-home-collection className="container-site py-12 md:py-20">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <div className="mb-1.5">
               <p className="eyebrow eyebrow-mark">Handpicked Portfolio</p>
             </div>
-            <h2 className="headline mt-2 text-3xl md:text-4xl">Editorial portfolio selection</h2>
+            <h2 className="headline mt-2 text-3xl md:text-4xl">Selected properties</h2>
           </div>
           <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
+<<<<<<< HEAD
             Source-advertised offers from prime European and Asian-side Istanbul corridors.
             Specifications, pricing, and citizenship eligibility are cross-verified before
             commitment.
@@ -449,20 +473,33 @@ function Home() {
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {editorial.map((r) => (
-            <PropertyCard key={r.slug} r={r} />
-          ))}
+=======
+            Source-advertised offers from prime European and Asian-side Istanbul corridors. Confirm specifications, pricing, availability and any citizenship claims with an advisor before commitment.
+          </p>
         </div>
 
+        {loading?<p role="status" className="mt-8 rounded border bg-card p-6">Loading the property collection…</p>:unavailable?<div role="alert" className="mt-8 rounded border bg-card p-6"><p>The property collection could not be loaded.</p><button onClick={retry} className="btn btn-outline mt-4">Try again</button></div>:!properties.length?<div data-empty-collection className="mt-8 rounded border bg-card p-6 md:p-8"><h3 className="font-display text-2xl">Our next collection is being prepared.</h3><p className="mt-3 max-w-xl text-sm text-muted-foreground">Our team can help you find current opportunities while reviewed listings are being added.</p><Link to="/contact" className="btn btn-outline mt-5">Ask about available properties</Link></div>:<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {EDITORIAL.map((r) => (
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
+            <PropertyCard key={r.slug} r={r} />
+          ))}
+        </div>}
+
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
+<<<<<<< HEAD
           <Link
             to="/properties"
             className="group text-sm font-semibold text-foreground flex items-center gap-2"
           >
             <span>Explore all {liveProperties.length} offers and developments</span>
+=======
+          <Link to="/properties" className="group text-sm font-semibold text-foreground flex items-center gap-2">
+            <span>{properties.length?`Explore all ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore our property search"}</span>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <ArrowRight className="h-4 w-4 arrow text-brass" />
           </Link>
           <span className="text-xs text-muted-foreground">
-            Includes 1+1, 2+1, Duplex Penthouses, and Multi-unit investment packages.
+            Availability and specifications are shown for each published offer.
           </span>
         </div>
       </section>
@@ -486,18 +523,27 @@ function Home() {
               <em className="italic text-brass font-normal">Clarity before capital.</em>
             </h2>
             <p className="mt-5 text-sm md:text-base text-on-dark-muted leading-relaxed">
+<<<<<<< HEAD
               Under current Turkish regulations, foreign real estate acquisitions totaling $400,000
               USD or more may qualify the investor and their immediate family for Turkish
               citizenship, subject to official land registry annotations and independent valuation
               reports.
+=======
+              The configured investment reference is {settings.cbiThresholdUsd.toLocaleString("en-US")} USD. A purchase price alone does not confirm eligibility. Confirm the applicable rules, title conditions, valuation and family requirements with an independent legal advisor before committing.
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3">
               <div>
+<<<<<<< HEAD
                 <p className="eyebrow !text-brass">Legal Threshold</p>
                 <p className="font-display text-2xl font-semibold text-on-dark mt-1">
                   $400,000 USD
                 </p>
+=======
+                <p className="eyebrow !text-brass">Investment reference</p>
+                <p className="font-display text-2xl font-semibold text-on-dark mt-1">${settings.cbiThresholdUsd.toLocaleString("en-US")} USD</p>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                 <p className="text-[0.7rem] text-on-dark-muted">Or TRY equivalent at transfer</p>
               </div>
               <div>
@@ -565,7 +611,7 @@ function Home() {
               to="/services"
               className="group hidden text-xs font-semibold uppercase tracking-wider md:flex items-center gap-1 hover:text-brass transition-colors"
             >
-              <span>View all 10 services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
+              <span>View advisory services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
             </Link>
           </div>
 
@@ -634,7 +680,7 @@ function Home() {
             ].map(([n, h, s, items]) => (
               <div
                 key={n as string}
-                className="group grid gap-6 p-7 transition-colors duration-300 hover:bg-secondary/40 md:grid-cols-4"
+                className="group grid gap-6 p-5 transition-colors duration-300 hover:bg-secondary/40 md:grid-cols-4 md:p-7"
               >
                 <div>
                   <p className="eyebrow !text-brass">{h as string}</p>
@@ -669,6 +715,7 @@ function Home() {
         </div>
       </section>
 
+<<<<<<< HEAD
       {/* Verified Private Client Track Record & Testimonials */}
       <section className="bg-ink text-on-dark py-24 border-t border-white/10 relative overflow-hidden">
         {/* Ambient subtle glow */}
@@ -781,7 +828,9 @@ function Home() {
         </div>
       </section>
 
+=======
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       <CtaBand />
-    </>
+    </div>
   );
 }

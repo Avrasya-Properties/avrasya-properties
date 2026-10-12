@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
+<<<<<<< HEAD
 import {
   AVAIL,
   PUBL,
@@ -14,6 +15,9 @@ import {
   userName,
   type Property,
 } from "@/admin/store";
+=======
+import { AVAIL, PUBL, bulkPublication, can, fmtDate, fmtMoney, upsert, useDB, useSession, userName, type Property } from "@/admin/store";
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 
 type S = {
   q?: string | undefined;
@@ -24,6 +28,7 @@ type S = {
   view?: string | undefined;
 };
 export const Route = createFileRoute("/admin/properties/")({
+<<<<<<< HEAD
   validateSearch: (s: Record<string, unknown>): S => ({
     q: s["q"] as string,
     avail: s["avail"] as string,
@@ -32,6 +37,9 @@ export const Route = createFileRoute("/admin/properties/")({
     page: Number(s["page"]) || 1,
     view: s["view"] as string,
   }),
+=======
+  validateSearch: (s: Record<string, unknown>): S => ({ q: s["q"] as string, avail: s["avail"] as string, pub: s["pub"] as string, sort: s["sort"] as string, page: Math.max(1, Math.floor(Number(s["page"]) || 1)), view: s["view"] as string }),
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   component: Inventory,
 });
 const PER = 15;
@@ -61,9 +69,11 @@ function Inventory() {
     else r = [...r].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     return r;
   }, [db.properties, s]);
-  const page = rows.slice(((s.page ?? 1) - 1) * PER, (s.page ?? 1) * PER);
   const pages = Math.max(1, Math.ceil(rows.length / PER));
+  const currentPage = Math.min(s.page ?? 1, pages);
+  const page = rows.slice((currentPage - 1) * PER, currentPage * PER);
   const panel = db.properties.find((p) => p.id === open);
+<<<<<<< HEAD
   const bulk = (patch: Partial<Property>) => {
     try {
       sel.forEach((id) => upsert<Property>("properties", { id, ...patch }));
@@ -73,10 +83,14 @@ function Inventory() {
       toast.error((e as Error).message);
     }
   };
+=======
+  const bulk = async (patch: Partial<Property>) => { try { if (!patch.publication) throw new Error("Choose a publication action."); await bulkPublication(sel, patch.publication); toast.success(`Updated ${sel.length} listing(s)`); setSel([]); } catch (e) { toast.error((e as Error).message); } };
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   const editInv = can(user, "edit-inventory");
 
   return (
     <>
+<<<<<<< HEAD
       <PageHead
         title="Properties"
         crumbs="Inventory"
@@ -117,6 +131,9 @@ function Inventory() {
           )
         }
       />
+=======
+      <PageHead title="Properties" crumbs="Inventory" action={editInv && <button className={btnPrimary} onClick={async () => { try { const p = await upsert<Property>("properties", { ref: `AVR-${Math.max(1000, ...db.properties.map((p) => Number(p.ref.replace(/^AVR-/, ""))).filter(Number.isFinite)) + 1}`, slug: `new-listing-${crypto.randomUUID()}`, title: "Untitled property", district: "", city: "Istanbul", type: "unit offer", layout: null, bathrooms: null, grossM2: null, netM2: null, areaM2: null, amount: null, currency: "USD", mode: "sale", priceType: "on-request", availability: "Unknown", publication: "Draft", agentId: user!.id, cover: null, project: "", description: "", updatedAt: new Date().toISOString() }); nav({ to: "/admin/properties/$id", params: { id: p.id } }); } catch (error) { toast.error((error as Error).message); } }}>New property</button>} />
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       <div className="mb-3 flex flex-wrap gap-2">
         <input
           className={`${field} max-w-xs`}
@@ -279,6 +296,7 @@ function Inventory() {
               </table>
             </div>
           )}
+<<<<<<< HEAD
           <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
             {rows.length} records
             <div className="flex gap-2">
@@ -301,6 +319,10 @@ function Inventory() {
               </button>
             </div>
           </div>
+=======
+          <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">{rows.length} records
+            <div className="flex gap-2"><button className={btnGhost} disabled={currentPage <= 1} onClick={() => set({ page: currentPage - 1 })}>Prev</button><span className="self-center">{currentPage} / {pages}</span><button className={btnGhost} disabled={currentPage >= pages} onClick={() => set({ page: currentPage + 1 })}>Next</button></div></div>
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
         </div>
         {panel && (
           <aside className="fixed inset-0 z-30 overflow-y-auto bg-card p-4 lg:sticky lg:top-20 lg:z-0 lg:h-fit lg:w-80 lg:rounded-md lg:border">

@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import { useSiteSettings } from "@/admin/store";
 import { CONTACT } from "@/data/properties";
-import { DEFAULT_SITE_SETTINGS, type SiteSettings } from "@/admin/store";
+import { DEFAULT_SITE_SETTINGS } from "@/admin/demo";
+export type LiveContact={company:string;email:string;phone:string;phoneHref:string;whatsapp:string;address:string;tagline:string;advisoryHours:string;announcementActive?:boolean;announcementText?:string};
+export function getLiveContact():LiveContact{return {...CONTACT,advisoryHours:DEFAULT_SITE_SETTINGS.advisoryHours};}
+export function useLiveContact():LiveContact{const s=useSiteSettings();return {company:s.companyName,email:s.email,phone:s.phone,phoneHref:"tel:"+s.phone.replace(/\s/g,""),whatsapp:s.whatsapp,address:s.address,tagline:s.tagline,advisoryHours:s.advisoryHours,announcementActive:s.announcementActive,announcementText:s.announcementText};}
 
+<<<<<<< HEAD
 const SKEY = "avrasya-admin-db-v4";
 
 export type LiveContact = {
@@ -94,3 +98,6 @@ export function useLiveContact(): LiveContact {
 
   return contact;
 }
+=======
+export function useWhatsAppLink(){const contact=useLiveContact();return (text:string)=>contact.whatsapp+"?text="+encodeURIComponent(text);}
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f

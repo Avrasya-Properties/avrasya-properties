@@ -1,11 +1,9 @@
-# Avrasya Properties — Private Client Real Estate & Advisory Portal
+# Avrasya Properties
+React / TanStack Start website and staff workspace backed by Supabase project `ufcpvjhzitmxgitoaolx`.
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-emerald.svg)](https://avrasyaproperties.com)
-[![Framework](https://img.shields.io/badge/Stack-TanStack%20Start%20%2F%20React%2019-17384A.svg)](https://tanstack.com/start)
-[![Styling](https://img.shields.io/badge/CSS-Tailwind%20v4%20%2B%20Spatial%203D-B78C4D.svg)](https://tailwindcss.com)
-[![Currency Engine](https://img.shields.io/badge/FX-Frankfurter%20ECB%20Real--Time-172B33.svg)](https://frankfurter.dev)
-[![Licence](https://img.shields.io/badge/Licence-Taşınmaz%20Ticareti%20No.%203409821-D4AF37.svg)](https://ticaret.gov.tr)
+The database integration is applied to Supabase and the enquiry Edge Function is deployed. Website/admin code remains on the review branch. First administrator setup, exact allowed website origins and hosted acceptance checks are required before full activation. See [deployment instructions](docs/BACKEND_DEPLOYMENT.md).
 
+<<<<<<< HEAD
 An institutional-grade luxury real estate acquisition portal and internal operations CMS for **Avrasya Properties**, headquartered on Istanbul’s Asian shoreline in Üsküdar overlooking the Bosphorus strait.
 
 Designed specifically for cross-border private clients, international family offices, and foreign investors navigating the Turkish property market and the official **Turkish Citizenship by Investment ($400,000 CBI)** programme.
@@ -99,29 +97,41 @@ avrasya-properties/
 bun install
 
 # 2. Launch development server with hot-module reload
+=======
+## Development
+```sh
+bun install --frozen-lockfile
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 bun run dev
-# Server accessible at http://localhost:8080/
-
-# 3. Production build validation (SSR + Client Bundles + Nitro Worker)
+bun run test
 bun run build
+bun run typecheck
 ```
 
----
+Production uses Supabase Auth, RLS-scoped data and server-authorized RPCs. The frontend contains only a publishable project key. Never add service-role keys or database credentials to Vite variables.
 
-## ⚖️ Statutory & Fiduciary Compliance
+To use the fictional browser demo explicitly, set `VITE_ENABLE_ADMIN_DEMO=true`. Demo account details appear on the login screen only in that build mode. Demo records never seed or sync to production.
 
+<<<<<<< HEAD
 Avrasya Properties operates under strict buy-side fiduciary standards:
 
 - **Ministry of Trade Licensing**: _Taşınmaz Ticareti Yetki Belgesi No. 3409821_
 - **Istanbul Chamber of Commerce (İTO)**: _Sicil No. 849201_
 - **Valuation Integrity**: All acquisitions are cross-referenced with independent Capital Markets Board (SPK) certified appraisal reports.
 - **Legal Counsel**: Client representation is coordinated through independent members of the Istanbul Bar Association.
+=======
+## Management
+- Inventory edits, publication, physical unit registration/linking and cover uploads.
+- Contacts, enquiries, leads, advisory tasks, viewing appointments and atomic deal transitions.
+- Shared company/contact/hero settings, indicative FX settings and announcements.
+- Development/building registry, staff permissions, services, FAQs, authored content pages/sections, catalogue metadata, leases, vendors, maintenance, source review, audit records.
+- Reservations and recorded payments are read-only in the generic editor. Reserved or closed inventory requires a transaction transition.
+- Administrator JSON export includes application tables and file metadata. It does not include Auth credentials or Storage file bytes. Production restore/reset is unavailable in the browser.
+>>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 
----
+Public offers are returned only from published snapshots. Imported draft inventory stays private until staff publish it. Optional authored CMS sections replace built-in source pages; no raw HTML is accepted. Published services, FAQs and catalogue documents use shared database records.
 
-## 📞 International Advisory Desk
+## Validation
+GitHub Actions runs unit tests, strict TypeScript, production build, fictional-demo browser journeys, isolated PostgreSQL migration/RLS tests, enquiry endpoint tests and persistent browser journeys through PostgREST. Browser Auth endpoints use test fixtures; no production user is created or real email sent. Hosted Auth/SMTP, storage transfers and the deployed enquiry endpoint require the post-deployment checks in the deployment guide.
 
-- **Headquarters**: Paşalimanı Caddesi No: 42, 34674 Üsküdar / Istanbul, Türkiye
-- **Telephone**: +90 545 924 8042
-- **Direct WhatsApp Desk**: [Chat on WhatsApp](https://wa.me/905459248042)
-- **Official Inquiries**: info@avrasyaproperties.com
+`supabase/tests/bootstrap.sql`, `baseline.sql` and `browser-fixtures.sql` are **disposable CI fixtures**. Never run them against the live project.
