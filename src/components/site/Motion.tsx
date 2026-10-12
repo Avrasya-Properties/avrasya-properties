@@ -9,11 +9,11 @@ export function MotionRoot() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     document.documentElement.classList.add("js-motion");
-<<<<<<< HEAD
-    const els = document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)");
+    const revealAll = () =>
+      document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((e) => e.classList.add("is-in"));
     if (reduced() || !("IntersectionObserver" in window)) {
-      els.forEach((e) => e.classList.add("is-in"));
-      return;
+      revealAll();
+      return () => document.documentElement.classList.remove("js-motion");
     }
     const io = new IntersectionObserver(
       (entries) =>
@@ -25,19 +25,11 @@ export function MotionRoot() {
         }),
       { rootMargin: "0px 0px -8% 0px" },
     );
-    els.forEach((e) => io.observe(e));
-=======
-    const revealAll=()=>document.querySelectorAll<HTMLElement>("[data-reveal]").forEach(e=>e.classList.add("is-in"));
-    if (reduced() || !("IntersectionObserver" in window)) { revealAll();return()=>document.documentElement.classList.remove("js-motion"); }
-    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
-      if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
-    }), { rootMargin: "0px 0px -8% 0px" });
-    const observe=()=>document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)").forEach(e=>io.observe(e));
+    const observe = () =>
+      document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)").forEach((e) => io.observe(e));
     observe();
-    // Query responses and CMS updates can mount sections after route navigation.
-    const mutation=new MutationObserver(observe);
-    mutation.observe(document.getElementById("main")||document.body,{childList:true,subtree:true});
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
+    const mutation = new MutationObserver(observe);
+    mutation.observe(document.getElementById("main") || document.body, { childList: true, subtree: true });
     // Parallax layers
     const layers = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
     let raf = 0;
@@ -62,16 +54,14 @@ export function MotionRoot() {
     tick();
     window.addEventListener("scroll", on, { passive: true });
     window.addEventListener("resize", on);
-<<<<<<< HEAD
     return () => {
       io.disconnect();
+      mutation.disconnect();
+      document.documentElement.classList.remove("js-motion");
       window.removeEventListener("scroll", on);
       window.removeEventListener("resize", on);
       cancelAnimationFrame(raf);
     };
-=======
-    return () => { io.disconnect(); mutation.disconnect();document.documentElement.classList.remove("js-motion");window.removeEventListener("scroll", on); window.removeEventListener("resize", on); cancelAnimationFrame(raf); };
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   }, [path]);
   return (
     <div

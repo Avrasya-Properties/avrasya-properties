@@ -54,6 +54,13 @@ export type Inquiry = {
   agentId?: string;
 };
 
+export type BudgetRange = {
+  id: string;
+  label: string;
+  min: number;
+  max: number;
+};
+
 export type SiteSettings = {
   companyName: string;
   registeredEntity: string;
@@ -76,6 +83,9 @@ export type SiteSettings = {
   enableFrankfurterSync: boolean;
   announcementText: string;
   announcementActive: boolean;
+  districts: string[];
+  layouts: string[];
+  budgetRanges: BudgetRange[];
 };
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
@@ -100,6 +110,39 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   enableFrankfurterSync: true,
   announcementText: "",
   announcementActive: false,
+  districts: [
+    "Maslak",
+    "Şişli",
+    "Beşiktaş",
+    "Kadıköy",
+    "Sarıyer",
+    "Üsküdar",
+    "Beyoğlu",
+    "Bakırköy",
+    "Ataşehir",
+    "Göktürk",
+    "Bomonti",
+    "Zekeriyaköy",
+  ],
+  layouts: [
+    "Studio",
+    "1+1",
+    "2+1",
+    "3+1",
+    "4+1",
+    "5+1",
+    "Duplex",
+    "Penthouse",
+    "Waterfront Villa",
+    "Commercial",
+  ],
+  budgetRanges: [
+    { id: "u300", label: "Up to $300,000", min: 0, max: 300000 },
+    { id: "300-450", label: "$300,000 – $450,000", min: 300000, max: 450000 },
+    { id: "450-600", label: "$450,000 – $600,000", min: 450000, max: 600000 },
+    { id: "600-1m", label: "$600,000 – $1,000,000", min: 600000, max: 1000000 },
+    { id: "1m-plus", label: "$1,000,000+", min: 1000000, max: 99999999 },
+  ],
 };
 
 export type DB = {
@@ -461,6 +504,94 @@ export function createInquiry(item: Omit<Inquiry, "id" | "createdAt" | "status">
   d.inquiries.unshift(created);
   log("inquiry", `Recorded inquiry from ${created.name}`, { kind: "inquiries", id: created.id }); save();
   return copy(created);
+}
+
+export type PublicEnquiryInput = {
+  name: string;
+  email: string;
+  phone: string;
+  topic: string;
+  budget?: string;
+  message: string;
+  source?: Inquiry["source"];
+  propertySlug?: string;
+};
+
+export function recordPublicEnquiry(input: PublicEnquiryInput): {
+  inquiry: Inquiry;
+  lead?: Lead;
+  receipt: string;
+} {
+  const name = (input.name || "Website Client").trim().slice(0, 200);
+  const email = (input.email || "").trim().slice(0, 200);
+  const phone = (input.phone || "").trim().slice(0, 100);
+  const topic = (input.topic || "General Consultation").trim().slice(0, 200);
+  const budget = (input.budget || "").trim().slice(0, 100);
+  const message = (input.message || "Consultation request").trim().slice(0, 4000);
+  const source = (input.source || "Website Consultation") as Inquiry["source"];
+  
+  const inqId = "inq-" + uid();
+  const contactId = "c" + uid();
+  const leadId = "lead-" + uid();
+
+  const d = edit();
+
+  let contact = d.contacts.find((c) => (email && c.email.toLowerCase() === email.toLowerCase()) || (phone && c.phone === phone));
+  if (!contact) {
+    contact = {
+      id: contactId,
+      name,
+      email,
+      phone,
+      kind: "person",
+      roles: ["buyer"],
+      language: "en",
+      agentId: "usr-admin-1",
+      notes: `Captured via ${source}. Topic: ${topic}. Original budget: ${budget || "Not stated"}`,
+    };
+    d.contacts.unshift(contact);
+  }
+
+  const lead: Lead = {
+    id: leadId,
+    contactId: contact.id,
+    source,
+    agentId: contact.agentId || "usr-admin-1",
+    districts: "",
+    layout: "",
+    budgetMin: null,
+    budgetMax: null,
+    currency: "USD",
+    stage: "New",
+    shortlist: input.propertySlug ? [input.propertySlug] : [],
+    nextFollowUp: new Date(Date.now() + 86400000).toISOString(),
+    dealId: null,
+  };
+  d.leads.unshift(lead);
+
+  const created: Inquiry = {
+    id: inqId,
+    name,
+    email,
+    phone,
+    topic,
+    budget,
+    message,
+    source,
+    propertySlug: input.propertySlug,
+    status: "New",
+    createdAt: new Date().toISOString(),
+    leadId: lead.id,
+    agentId: contact.agentId || "usr-admin-1",
+    notes: `Public website brief submitted directly to Advisory Desk.`,
+  };
+  d.inquiries.unshift(created);
+
+  log("inquiry", `Recorded website inquiry from ${created.name}`, { kind: "inquiries", id: created.id });
+  save();
+
+  const receipt = `AVR-${Math.floor(100000 + Math.random() * 900000)}`;
+  return { inquiry: copy(created), lead: copy(lead), receipt };
 }
 export function convertInquiryToLead(inquiryId: string): Lead {
   const current = load().inquiries.find((x) => x.id === inquiryId);

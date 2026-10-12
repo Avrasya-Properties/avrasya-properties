@@ -31,66 +31,66 @@ export const Route = createFileRoute("/investment-catalog")({
 const PHASES = [
   {
     phase: "Phase 1",
-    title: "Pre-Investment Advisory",
-    desc: "Discovery sessions, capital deployment modeling, cross-district market intelligence across Istanbul, Antalya, and Ankara.",
+    title: "Understanding Your Goals",
+    desc: "Understanding your lifestyle and financial goals, with honest neighborhood insights across Istanbul, Antalya, and Ankara.",
   },
   {
     phase: "Phase 2",
-    title: "Legal & Administrative Foundation",
-    desc: "Turkish Tax Number, foreign currency & TRY bank accounts, notarized Power of Attorney, and title deed encumbrance checks.",
+    title: "Legal & Banking Setup",
+    desc: "Obtaining your Turkish Tax Number, setting up secure bank accounts, and running thorough title deed and debt checks.",
   },
   {
     phase: "Phase 3",
     title: "Property Acquisition",
-    desc: "Purchase agreements drafted by Bar-registered attorneys, Tapu registry transfer, licensed appraisal reports, and DASK insurance.",
+    desc: "Purchase agreements drafted by independent attorneys, Land Registry transfer, licensed appraisal reports, and DASK insurance.",
   },
   {
     phase: "Phase 4",
-    title: "Residence & Citizenship Processing",
-    desc: "Short-term investor residency, dossier compilation for Population Directorate, background clearance, and biometric coordination.",
+    title: "Residence & Citizenship Support",
+    desc: "Fast-track investor residency, smooth paperwork submission, and easy biometric appointments for the entire family.",
   },
   {
     phase: "Phase 5",
-    title: "Post-Acquisition & Wealth Management",
-    desc: "Tenant sourcing, long-term and short-term hospitality optimization, rent repatriation in USD/EUR, and routine maintenance.",
+    title: "Move-In & Rental Management",
+    desc: "Quality tenant selection, reliable rental income collection in your preferred currency, and regular maintenance.",
   },
   {
     phase: "Phase 6",
-    title: "Long-Term Family Security",
-    desc: "Concierge support, school enrollment, healthcare orientation, 3-year hold exit strategy, and second-generation estate planning.",
+    title: "Long-Term Family Support",
+    desc: "Dedicated family support, top school introductions, healthcare orientation, and flexible resale options after 3 years.",
   },
 ];
 
 const METRICS = [
   {
-    label: "Minimum CBI Real Estate Threshold",
+    label: "Minimum Citizenship Investment",
     val: "$400,000 USD",
     sub: "Qualifying government-appraised title deeds",
   },
   {
     label: "Average Capital Appreciation",
     val: "12% – 18%",
-    sub: "5-year rolling average in prime Istanbul corridors",
+    sub: "5-year rolling average in prime Istanbul areas",
   },
   {
-    label: "Gross Long-Term Rental Yield",
+    label: "Expected Long-Term Rental Return",
     val: "5% – 8%",
-    sub: "Annual USD/EUR equivalent returns",
+    sub: "Annual rental returns in prime residential areas",
   },
   {
-    label: "Peak Tourism Rental Yield",
+    label: "Peak Tourism Rental Return",
     val: "10% – 15%",
-    sub: "Short-term managed suites in central tourist hubs",
+    sub: "Short-term managed suites in central cultural hubs",
   },
   {
     label: "Citizenship Processing Timeline",
     val: "3 – 6 Months",
-    sub: "Expedited fast-track investor track",
+    sub: "From title deed transfer to passport issuance",
   },
   {
-    label: "Mandatory Resale Hold Period",
+    label: "Required Holding Period",
     val: "3 Years",
-    sub: "Free-market liquidation unlocked upon milestone",
+    sub: "Freedom to sell after 3 years while keeping passports",
   },
 ];
 

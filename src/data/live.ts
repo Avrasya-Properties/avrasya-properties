@@ -11,14 +11,14 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
  if(error)throw new Error("The property catalogue is unavailable. Please contact our advisory team.");
  return z.array(record).parse(data) as PropertyRecord[];
 }
-export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:0,refetchOnMount:"always",refetchOnWindowFocus:"always",refetchInterval:15000});return {...q,properties:q.data||[]};}
+export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:60000,refetchOnMount:false,refetchOnWindowFocus:false,refetchInterval:60000});return {...q,properties:q.data||[]};}
 export async function loadPublicSettings(){
  if(DEMO_MODE)return DEFAULT_SITE_SETTINGS;
  const {data,error}=await publicSupabase.from("site_settings").select("*").eq("singleton_key","default").single();
  if(error)throw error;return decodeSettings(data as Row);
 }
 export function usePublicSettings(){
- const q=useQuery({queryKey:["site-settings"],queryFn:loadPublicSettings,enabled:!DEMO_MODE,staleTime:15000,refetchInterval:30000});
+ const q=useQuery({queryKey:["site-settings"],queryFn:loadPublicSettings,enabled:!DEMO_MODE,staleTime:60000,refetchInterval:60000});
  return {...q,settings:q.data||DEFAULT_SITE_SETTINGS};
 }
 export async function resolveRedirect(slug:string):Promise<string|null>{const {data,error}=await publicSupabase.rpc("published_redirect",{p_slug:slug});if(error)throw error;return data as string|null;}

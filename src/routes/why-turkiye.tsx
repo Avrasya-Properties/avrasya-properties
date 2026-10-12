@@ -20,8 +20,8 @@ import { meta } from "@/components/site/TextPage";
 export const Route = createFileRoute("/why-turkiye")({
   head: () =>
     meta(
-      "Why Türkiye & Istanbul Real Estate · Avrasya Properties",
-      "Macro analysis, district investment dynamics, and freehold property rights in Istanbul for international purchasers and family offices.",
+      "Why Istanbul Real Estate · Avrasya Properties",
+      "Neighborhood guides, lifestyle insights, and freehold property rights in Istanbul for international home buyers and families.",
     ),
   component: () => <ManagedPage slug="why-turkiye"><WhyTurkiye /></ManagedPage>,
 });
@@ -41,7 +41,7 @@ const DISTRICTS: DistrictProfile[] = [
   {
     name: "Maslak & Sariyer",
     side: "European",
-    category: "Financial & Corporate Center",
+    category: "Corporate & Financial Hub",
     pricePerM2: "$4,500 – $9,000",
     yieldRange: "6.5% – 8.0%",
     tagline:
@@ -52,7 +52,7 @@ const DISTRICTS: DistrictProfile[] = [
   {
     name: "Ataşehir & IFC",
     side: "Asian",
-    category: "Financial District",
+    category: "New Financial Center",
     pricePerM2: "$3,200 – $6,500",
     yieldRange: "7.0% – 8.5%",
     tagline:
@@ -67,7 +67,7 @@ const DISTRICTS: DistrictProfile[] = [
   {
     name: "Şişli & Bomonti",
     side: "European",
-    category: "Urban Luxury & Culture",
+    category: "Boutique Luxury & Culture",
     pricePerM2: "$4,200 – $8,500",
     yieldRange: "6.0% – 7.5%",
     tagline:
@@ -82,7 +82,7 @@ const DISTRICTS: DistrictProfile[] = [
   {
     name: "Avrupa Residence Oryapark & Ümraniye",
     side: "Asian",
-    category: "Master-Planned Twin Towers",
+    category: "Modern Residential Towers",
     pricePerM2: "$3,800 – $7,200",
     yieldRange: "6.8% – 8.2%",
     tagline:
@@ -97,7 +97,7 @@ const DISTRICTS: DistrictProfile[] = [
   {
     name: "Topkapı & Historic Peninsula Corridor",
     side: "European",
-    category: "Central Urban Renewal",
+    category: "Historic City Center",
     pricePerM2: "$2,800 – $4,800",
     yieldRange: "7.0% – 8.2%",
     tagline:
@@ -119,18 +119,17 @@ export function WhyTurkiye() {
   return (
     <>
       <PageIntro
-        eyebrow="Market Intelligence · Geographic & Economic Analysis"
+        eyebrow="Why Istanbul · Prime Location & Lifestyle"
         title={
           <>
-            Istanbul: where continents meet, <em>capital accelerates.</em>
+            Istanbul: where continents meet, <em>your investment thrives.</em>
           </>
         }
       >
         <p>
-          More than an iconic skyline, Istanbul is a megacity of 16 million residents driving
-          continuous organic domestic demand. With 100% unconditional freehold ownership and
-          strategic transcontinental logistics, Türkiye represents one of the most compelling real
-          estate markets worldwide.
+          Home to 16 million residents, Istanbul is one of the world's most vibrant and dynamic
+          cities. Offering 100% permanent freehold ownership, strong rental demand, and a unique
+          bridge between East and West, Türkiye is a welcoming and rewarding place to own property.
         </p>
       </PageIntro>
 
@@ -138,63 +137,63 @@ export function WhyTurkiye() {
       <section className="border-b bg-card py-16">
         <div className="container-site">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="eyebrow">Macro Fundamentals</p>
+            <p className="eyebrow">Key Advantages</p>
             <h2 className="font-display text-3xl font-semibold">
-              The Four Pillars of Istanbul Real Estate
+              Four Reasons to Choose Istanbul
             </h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border bg-background p-6">
-              <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
+              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
                 <Scale className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Freehold Ownership
+                Permanent Freehold
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Foreign purchasers hold identical statutory rights to Turkish nationals: 100%
-                unconditional freehold title (Mülkiyet) in perpetuity, never 99-year leasehold.
+                Foreign buyers enjoy the exact same rights as Turkish citizens: 100% permanent
+                freehold ownership (Tapu) that belongs to you and your family forever—never a
+                temporary leasehold.
               </p>
             </div>
 
-            <div className="rounded-xl border bg-background p-6">
-              <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
+              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
                 <Plane className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Aviation & Logistics Hub
+                Global Connectivity
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Istanbul Airport (IST) connects to 300+ international destinations within a 4-hour
-                flight radius of Europe, Central Asia, and the Gulf.
+                Istanbul Airport connects directly to over 300 international destinations, putting
+                Europe, the Middle East, and Central Asia just a short, convenient flight away.
               </p>
             </div>
 
-            <div className="rounded-xl border bg-background p-6">
-              <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
+              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Organic Rental Liquidity
+                Steady Rental Demand
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                A youthful median population (33 years old) creating tens of thousands of new
-                domestic households annually, insulating rental occupancy from purely tourism
-                cycles.
+                With a young, dynamic population and growing workforce, quality homes enjoy
+                year-round rental demand from local professionals and international families.
               </p>
             </div>
 
-            <div className="rounded-xl border bg-background p-6">
-              <div className="h-10 w-10 rounded-lg bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
+              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Statutory Safeguards
+                Secure Legal Protections
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Compulsory central bank foreign exchange valuation (DAB), SPK-regulated appraisals,
-                and licensed title deed escrow procedures protect foreign buyers.
+                Government-licensed property appraisals, official Central Bank exchange certificates,
+                and protected bank transfer procedures ensure your purchase is completely safe.
               </p>
             </div>
           </div>
@@ -205,25 +204,25 @@ export function WhyTurkiye() {
       <section className="container-site py-20">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end mb-10">
           <div>
-            <p className="eyebrow">District Comparative Analysis</p>
+            <p className="eyebrow">Neighborhood Guides</p>
             <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
-              Micro-Market Pricing & Rental Yields
+              Explore Istanbul's Top Neighborhoods
             </h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              Different districts serve fundamentally different investor briefs—from corporate
-              executive rental yield to generational Bosphorus capital preservation.
+              Every Istanbul neighborhood offers something unique—from high-energy financial hubs and
+              cultural centers to tranquil waterfront living. Here is what to expect in prime areas.
             </p>
           </div>
 
           {/* Filter Pills */}
-          <div className="inline-flex rounded-lg border bg-card p-1 text-xs">
+          <div className="inline-flex rounded-xs border border-border/80 bg-card p-1 text-xs shadow-xs">
             {(["All", "European", "Asian"] as const).map((side) => (
               <button
                 key={side}
                 onClick={() => setActiveSide(side)}
-                className={`rounded-md px-4 py-2 font-medium transition-colors ${
+                className={`rounded-xs px-4 py-2 font-medium transition-all duration-200 ${
                   activeSide === side
-                    ? "bg-brass text-primary-foreground"
+                    ? "bg-primary text-on-dark shadow-xs font-semibold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -237,15 +236,15 @@ export function WhyTurkiye() {
           {filteredDistricts.map((d) => (
             <div
               key={d.name}
-              className="group overflow-hidden rounded-xl border bg-card transition-all hover:border-brass hover:shadow-lg"
+              className="card-elevate group overflow-hidden rounded-xs border border-border/80 bg-card transition-all hover:border-brass/70 hover:shadow-lg"
             >
-              <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+              <div className="img-zoom-container relative aspect-[16/10] overflow-hidden bg-muted">
                 <img
                   src={d.image}
                   alt={d.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-650 group-hover:scale-105"
                 />
-                <div className="absolute top-3 left-3 rounded-md bg-ink/80 px-2.5 py-1 text-[11px] font-medium text-on-dark backdrop-blur-sm">
+                <div className="glass-pill-dark absolute top-3 left-3 rounded-xs px-2.5 py-1 text-[11px] font-medium text-on-dark shadow-xs">
                   {d.side} Side · {d.category}
                 </div>
               </div>
@@ -254,7 +253,7 @@ export function WhyTurkiye() {
                 <h3 className="font-display text-xl font-bold text-foreground">{d.name}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.tagline}</p>
 
-                <div className="mt-5 grid grid-cols-2 gap-3 rounded-lg border bg-background p-3 text-xs">
+                <div className="mt-5 grid grid-cols-2 gap-3 rounded-xs border border-border/60 bg-secondary/30 p-3 text-xs">
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase tracking-wider">
                       Avg Price / m²
@@ -263,7 +262,7 @@ export function WhyTurkiye() {
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase tracking-wider">
-                      Gross Rental Yield
+                      Expected Rental Return
                     </span>
                     <span className="font-mono font-bold text-brass">{d.yieldRange}</span>
                   </div>
@@ -287,13 +286,13 @@ export function WhyTurkiye() {
       <section className="border-t bg-ink text-on-dark py-20">
         <div className="container-site">
           <div className="max-w-2xl mb-12">
-            <p className="eyebrow text-brass">Global Family Quality of Life</p>
+            <p className="eyebrow text-brass">Life in Istanbul</p>
             <h2 className="font-display text-3xl font-semibold md:text-4xl text-on-dark">
-              World-Class Infrastructure for Expatriate Families
+              A Wonderful Place to Live & Raise a Family
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              Istanbul provides premier healthcare, international accreditation, and seamless
-              intercontinental transport networks.
+              From renowned English-language schools and top-tier hospitals to seamless metro
+              lines, Istanbul offers an exceptional quality of life for international families.
             </p>
           </div>
 
@@ -312,18 +311,18 @@ export function WhyTurkiye() {
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <HeartHandshake className="h-6 w-6 text-brass mb-3" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
-                JCI-Accredited Healthcare
+                World-Class Healthcare
               </h3>
               <p className="mt-2 text-sm text-on-dark-muted leading-relaxed">
                 Hospital groups such as Acıbadem, Memorial, and Koç University Hospital are renowned
-                globally for surgical excellence and multilingual patient care.
+                globally for medical excellence and multilingual patient care.
               </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <Train className="h-6 w-6 text-brass mb-3" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
-                Unified Transit Grid
+                Seamless Modern Transit
               </h3>
               <p className="mt-2 text-sm text-on-dark-muted leading-relaxed">
                 Marmaray connects Europe and Asia under the Bosphorus in 4 minutes; the M11 metro
@@ -336,7 +335,7 @@ export function WhyTurkiye() {
 
       <div className="container-site py-12 flex justify-center">
         <Link to="/properties" className="btn btn-primary text-base px-8 py-3">
-          Explore Istanbul Investment Offers
+          Explore Available Homes
         </Link>
       </div>
 

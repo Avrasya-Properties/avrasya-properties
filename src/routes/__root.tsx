@@ -79,8 +79,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Load critical public data before rendering, then hydrate the same cache.
     // A failed catalogue read is displayed inside the homepage, not as a redirect.
     await Promise.allSettled([
-      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:15000,retry:false}),
-      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:300000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:300000,retry:false}),
     ]);
   },
   head: () => ({
@@ -130,21 +130,25 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-<<<<<<< HEAD
-  const isAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
+  const router = useRouter();
+  useEffect(
+    () =>
+      watchWebsiteChanges(() => {
+        void queryClient.invalidateQueries({
+          predicate: (q) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
+        });
+        void router.invalidate();
+      }),
+    [queryClient, router],
+  );
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = path.startsWith("/admin");
   if (isAdmin)
     return (
       <QueryClientProvider client={queryClient}>
         <Outlet />
       </QueryClientProvider>
     );
-=======
-  const router=useRouter();
-  useEffect(()=>watchWebsiteChanges(()=>{void queryClient.invalidateQueries({predicate:q=>PUBLIC_QUERY_KEYS.has(String(q.queryKey[0]))});void router.invalidate();}),[queryClient,router]);
-  const path = useRouterState({ select: (s) => s.location.pathname });
-  const isAdmin=path.startsWith("/admin");
-  if (isAdmin) return <QueryClientProvider client={queryClient}><Outlet /></QueryClientProvider>;
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   return (
     <QueryClientProvider client={queryClient}>
       <a href="#main" className="sr-only focus:not-sr-only">

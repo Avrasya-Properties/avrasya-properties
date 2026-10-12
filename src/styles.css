@@ -570,17 +570,97 @@ details[open] .faq-body {
 
 /* Spatial glassmorphism and weightless motion utilities */
 .glass-panel {
-  background: color-mix(in oklab, var(--card) 85%, transparent);
+  background: color-mix(in oklab, var(--card) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
 }
 
 .glass-panel-dark {
-  background: rgba(10, 11, 14, 0.85);
+  background: rgba(14, 25, 34, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 4px 14px -3px rgba(23, 43, 51, 0.08);
+}
+
+.glass-pill-dark {
+  background: rgba(17, 36, 48, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.25);
+}
+
+.card-elevate {
+  transition:
+    transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 400ms ease;
+  will-change: transform;
+}
+.card-elevate:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 40px -15px rgba(23, 43, 51, 0.09),
+    0 0 0 1px rgba(183, 140, 77, 0.25);
+}
+
+.img-zoom-container {
+  overflow: hidden;
+}
+.img-zoom-container img {
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.group:hover .img-zoom-container img,
+.card-elevate:hover .img-zoom-container img {
+  transform: scale(1.035);
+}
+
+.ambient-glow {
+  position: relative;
+}
+.ambient-glow::after {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  background: radial-gradient(circle at 50% 50%, rgba(183, 140, 77, 0.14), transparent 70%);
+  filter: blur(20px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.ambient-glow:hover::after {
+  opacity: 1;
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+}
+.btn-shimmer:hover::before {
+  left: 150%;
+  transition: left 750ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .float-gentle {
@@ -605,6 +685,54 @@ details[open] .faq-body {
 .hover-glow:hover {
   box-shadow: 0 16px 36px -12px rgba(183, 140, 77, 0.18);
   border-color: rgba(183, 140, 77, 0.55);
+}
+
+/* Custom Luxury Range Slider */
+.range-luxury {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: color-mix(in oklab, var(--border) 80%, transparent);
+  border-radius: 9999px;
+  outline: none;
+  transition: background 300ms ease;
+}
+.range-luxury::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--brass);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(183, 140, 77, 0.5);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+}
+.range-luxury::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+  box-shadow: 0 6px 18px rgba(183, 140, 77, 0.65);
+}
+.range-luxury::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--brass);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(183, 140, 77, 0.5);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+}
+.range-luxury::-moz-range-thumb:hover {
+  transform: scale(1.18);
+  box-shadow: 0 6px 18px rgba(183, 140, 77, 0.65);
+}
+
+.text-gradient-brass {
+  background: linear-gradient(135deg, #d4af37 0%, #b78c4d 50%, #8e6a2b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Editorial Architectural Monograph & Ledger Styling */

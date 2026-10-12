@@ -82,7 +82,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
   return (
     <div
       id="calculator"
-      className="relative rounded-xs border border-border/80 bg-card p-6 md:p-10 shadow-lg overflow-hidden"
+      className="card-elevate relative rounded-xs border border-border/80 bg-card p-6 md:p-10 shadow-xl overflow-hidden"
     >
       <div className="relative z-10">
         {/* Header Strip */}
@@ -97,20 +97,19 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               </span>
             </div>
             <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-              Title Deed (Tapu) &{" "}
-              <em className="italic text-brass font-normal">Acquisition Cost Ledger</em>
+              Total Purchase &{" "}
+              <em className="italic text-brass font-normal">Cost Calculator</em>
             </h3>
             <p className="text-xs md:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
-              Calculate total all-in closing costs with zero hidden broker surprises. Complete
-              breakdown of Turkish government registry fees, legal due diligence, and Foreigner VAT
-              exemption rules.
+              Calculate your total purchase costs with zero hidden surprises. See an honest, clear
+              breakdown of government title fees, independent legal checks, and VAT tax savings.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={copySummary}
-              className="btn btn-outline !min-h-9 !py-1 text-xs gap-1.5"
+              className="btn btn-outline !min-h-9 !py-1 text-xs gap-1.5 hover:border-brass/70 hover:text-brass transition-colors"
               title="Copy complete breakdown to clipboard"
             >
               <Copy className="h-3.5 w-3.5 text-brass" />
@@ -130,7 +129,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                   htmlFor="price-slider"
                   className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                 >
-                  Target Purchase Valuation (USD)
+                  Property Purchase Price (USD)
                 </label>
                 <div className="flex items-center gap-1 font-mono text-xl md:text-2xl font-bold text-foreground">
                   <span>${priceUsd.toLocaleString("en-US")}</span>
@@ -151,7 +150,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 step={25000}
                 value={priceUsd}
                 onChange={(e) => setPriceUsd(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-secondary accent-brass"
+                className="range-luxury my-2"
               />
 
               {/* Presets Quick Buttons */}
@@ -163,10 +162,10 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                   <button
                     key={preset}
                     onClick={() => setPriceUsd(preset)}
-                    className={`rounded px-2.5 py-1 font-mono text-[11px] font-semibold transition-all ${
+                    className={`rounded px-2.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 ${
                       priceUsd === preset
-                        ? "bg-primary text-on-dark shadow-xs"
-                        : "bg-card border border-border/70 text-foreground hover:border-brass/70"
+                        ? "bg-primary text-on-dark shadow-xs -translate-y-0.5"
+                        : "bg-card border border-border/70 text-foreground hover:border-brass/70 hover:-translate-y-0.5"
                     }`}
                   >
                     ${preset >= 1000000 ? `${(preset / 1000000).toFixed(1)}M` : `${preset / 1000}K`}
@@ -290,13 +289,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="mt-3 text-xs leading-relaxed">
                 {isCbiQualified ? (
                   <p className="text-emerald-900 font-medium">
-<<<<<<< HEAD
-                    ✓ <strong>Fully Qualified for Sovereign CBI:</strong> Covers primary investor,
-                    spouse, and all children under 18 with no residency or military service
-                    obligations. Freehold title deed held for 3 years.
-=======
                     <strong>Advisory investment target reached.</strong> Eligibility requires independent confirmation. Price alone does not establish eligibility.
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                   </p>
                 ) : (
                   <p className="text-muted-foreground">
@@ -313,7 +306,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
           </div>
 
           {/* Right Column: Detailed Statutory Cost Ledger */}
-          <div className="rounded-xs border border-border/90 bg-card p-6 shadow-md flex flex-col justify-between">
+          <div className="card-elevate rounded-xs border border-border/90 bg-card/95 backdrop-blur-md p-6 shadow-md flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between border-b border-border/70 pb-3 font-mono text-[11px] text-muted-foreground uppercase tracking-widest">
                 <span>Fee Classification</span>
@@ -375,7 +368,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                   <div>
                     <p className="text-foreground">Notary, DAB & Sworn Translation</p>
                     <p className="text-[10px] text-muted-foreground font-mono">
-                      Central Bank DAB currency document
+                      Central Bank currency exchange certificate
                     </p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
@@ -386,9 +379,9 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 {/* 6. Legal Due Diligence */}
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
-                    <p className="text-foreground">Independent Attorney Due Diligence</p>
+                    <p className="text-foreground">Independent Legal & Title Checks</p>
                     <p className="text-[10px] text-muted-foreground font-mono">
-                      Fiduciary encumbrance & contract audit
+                      Full contract review & title deed verification
                     </p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
@@ -400,20 +393,15 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               {/* Total Summary Box */}
               <div className="mt-6 rounded-xs border border-brass/50 bg-secondary/40 p-4.5 space-y-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-<<<<<<< HEAD
-                  <span>Total Statutory Closing Friction</span>
+                  <span>Total estimated purchase costs</span>
                   <span className="font-mono font-bold text-brass">
                     {closingPercentage}% (+${totalClosingCostsUsd.toLocaleString("en-US")})
                   </span>
-=======
-                  <span>Total estimated purchase costs</span>
-                  <span className="font-mono font-bold text-brass">{closingPercentage}% (+${totalClosingCostsUsd.toLocaleString("en-US")})</span>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                 </div>
 
                 <div className="flex items-baseline justify-between border-t border-border/80 pt-2">
                   <span className="font-display text-lg font-semibold text-foreground">
-                    Total All-In Acquisition Capital
+                    Estimated Total Investment
                   </span>
                   <span className="font-display text-2xl font-bold text-foreground tracking-tight">
                     ${allInAcquisitionUsd.toLocaleString("en-US")}
@@ -456,7 +444,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 href={waLink(waMessage)}
                 target="_blank"
                 rel="noreferrer"
-                className="btn btn-primary w-full justify-center gap-2 shadow-sm !min-h-11"
+                className="btn btn-primary w-full justify-center gap-2 shadow-sm !min-h-11 btn-shimmer"
               >
                 <MessageSquare className="h-4 w-4 text-brass" />
                 <span>Consult Legal Advisor on This Calculation</span>

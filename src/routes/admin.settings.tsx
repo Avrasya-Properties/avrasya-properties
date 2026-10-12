@@ -11,7 +11,14 @@ import {
   Settings2, 
   ShieldCheck, 
   Upload, 
-  AlertTriangle 
+  AlertTriangle,
+  MapPin,
+  Layers,
+  DollarSign,
+  Plus,
+  Trash2,
+  RotateCcw,
+  X
 } from "lucide-react";
 import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { 
@@ -32,13 +39,16 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company Profile", "Homepage", "Exchange rates", "Export data"] as const;
+const TABS = ["Company Profile", "Homepage", "Taxonomy & Filters", "Exchange rates", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
   const user = useSession();
   const [tab, setTab] = useState<(typeof TABS)[number]>("Company Profile");
   const [form, setForm] = useState<SiteSettings>({ ...db.siteSettings });
+  const [newDistrict, setNewDistrict] = useState("");
+  const [newLayout, setNewLayout] = useState("");
+  const [newBudget, setNewBudget] = useState({ label: "", min: 0, max: 0 });
   const [importJson, setImportJson] = useState("");
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -365,6 +375,343 @@ export function AdminSettingsPage() {
                   />
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: Taxonomy & Filters (Regions, Apartment Layouts, Budgets) */}
+      {tab === "Taxonomy & Filters" && (
+        <div className="max-w-4xl space-y-6">
+          {/* Card 1: Istanbul Districts / Regions */}
+          <div className="rounded-xl border bg-card p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-brass" />
+                  <span>Istanbul Districts & Regions ({form.districts?.length || 0})</span>
+                </h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Active regions available in Homepage search, Property Catalog district filter, and Consultation brief.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setField("districts", [...DEFAULT_SITE_SETTINGS.districts]);
+                  toast.success("Restored standard Istanbul districts");
+                }}
+                className={btnGhost + " !text-xs gap-1.5"}
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset to Standard</span>
+              </button>
+            </div>
+
+            {/* List of active district tags */}
+            <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-muted/20 min-h-[56px] mb-4">
+              {(form.districts || []).map((dist, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-background border px-3 py-1 text-xs font-medium text-foreground shadow-xs group"
+                >
+                  <span>{dist}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = form.districts.filter((_, i) => i !== idx);
+                      setField("districts", next);
+                    }}
+                    className="text-muted-foreground hover:text-destructive transition-colors ml-0.5"
+                    title={`Remove ${dist}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {(!form.districts || form.districts.length === 0) && (
+                <span className="text-xs text-muted-foreground italic py-1">
+                  No districts configured. Add one below.
+                </span>
+              )}
+            </div>
+
+            {/* Add new district */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                className={field + " flex-1"}
+                placeholder="Enter new Istanbul district (e.g. Karaköy, Moda, Tarabya)"
+                value={newDistrict}
+                onChange={(e) => setNewDistrict(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (newDistrict.trim()) {
+                      const d = newDistrict.trim();
+                      if (!form.districts?.includes(d)) {
+                        setField("districts", [...(form.districts || []), d]);
+                        setNewDistrict("");
+                        toast.success(`Added ${d}`);
+                      } else {
+                        toast.error(`${d} already exists`);
+                      }
+                    }
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (newDistrict.trim()) {
+                    const d = newDistrict.trim();
+                    if (!form.districts?.includes(d)) {
+                      setField("districts", [...(form.districts || []), d]);
+                      setNewDistrict("");
+                      toast.success(`Added ${d}`);
+                    } else {
+                      toast.error(`${d} already exists`);
+                    }
+                  }
+                }}
+                className={btnPrimary + " gap-1.5 whitespace-nowrap"}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add Region</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Card 2: Apartment Layouts */}
+          <div className="rounded-xl border bg-card p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-brass" />
+                  <span>Apartment Layouts & Types ({form.layouts?.length || 0})</span>
+                </h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Layout options available in Catalog filters, Lead acquisition requirements, and property entry.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setField("layouts", [...DEFAULT_SITE_SETTINGS.layouts]);
+                  toast.success("Restored standard layouts");
+                }}
+                className={btnGhost + " !text-xs gap-1.5"}
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset to Standard</span>
+              </button>
+            </div>
+
+            {/* List of active layout tags */}
+            <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-muted/20 min-h-[56px] mb-4">
+              {(form.layouts || []).map((layout, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-background border px-3 py-1 text-xs font-medium text-foreground shadow-xs group"
+                >
+                  <span>{layout}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = form.layouts.filter((_, i) => i !== idx);
+                      setField("layouts", next);
+                    }}
+                    className="text-muted-foreground hover:text-destructive transition-colors ml-0.5"
+                    title={`Remove ${layout}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {(!form.layouts || form.layouts.length === 0) && (
+                <span className="text-xs text-muted-foreground italic py-1">
+                  No layouts configured. Add one below.
+                </span>
+              )}
+            </div>
+
+            {/* Add new layout */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                className={field + " flex-1"}
+                placeholder="Enter new layout (e.g. 5+2 Triplex, Garden Duplex, Private Villa)"
+                value={newLayout}
+                onChange={(e) => setNewLayout(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (newLayout.trim()) {
+                      const l = newLayout.trim();
+                      if (!form.layouts?.includes(l)) {
+                        setField("layouts", [...(form.layouts || []), l]);
+                        setNewLayout("");
+                        toast.success(`Added ${l}`);
+                      } else {
+                        toast.error(`${l} already exists`);
+                      }
+                    }
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (newLayout.trim()) {
+                    const l = newLayout.trim();
+                    if (!form.layouts?.includes(l)) {
+                      setField("layouts", [...(form.layouts || []), l]);
+                      setNewLayout("");
+                      toast.success(`Added ${l}`);
+                    } else {
+                      toast.error(`${l} already exists`);
+                    }
+                  }
+                }}
+                className={btnPrimary + " gap-1.5 whitespace-nowrap"}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add Layout</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Card 3: Investment Budget Ranges */}
+          <div className="rounded-xl border bg-card p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-brass" />
+                  <span>Budget Tiers & Price Presets ({form.budgetRanges?.length || 0})</span>
+                </h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Preset price brackets configured across Homepage quick search and Portfolio Catalog filters.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setField("budgetRanges", [...DEFAULT_SITE_SETTINGS.budgetRanges]);
+                  toast.success("Restored standard budget brackets");
+                }}
+                className={btnGhost + " !text-xs gap-1.5"}
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset to Standard</span>
+              </button>
+            </div>
+
+            {/* Table of active budget brackets */}
+            <div className="overflow-x-auto rounded-lg border mb-4">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-muted/50 text-muted-foreground uppercase tracking-wider font-semibold">
+                  <tr>
+                    <th className="p-3">Display Label</th>
+                    <th className="p-3">Min Amount (USD)</th>
+                    <th className="p-3">Max Amount (USD)</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {(form.budgetRanges || []).map((b, idx) => (
+                    <tr key={b.id || idx} className="hover:bg-muted/20">
+                      <td className="p-3 font-medium text-foreground">{b.label}</td>
+                      <td className="p-3 font-mono">${b.min?.toLocaleString()}</td>
+                      <td className="p-3 font-mono">
+                        {b.max >= 99999999 ? "No limit" : `$${b.max?.toLocaleString()}`}
+                      </td>
+                      <td className="p-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = form.budgetRanges.filter((_, i) => i !== idx);
+                            setField("budgetRanges", next);
+                          }}
+                          className="text-muted-foreground hover:text-destructive p-1 transition-colors"
+                          title="Delete tier"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {(!form.budgetRanges || form.budgetRanges.length === 0) && (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-muted-foreground italic">
+                        No budget tiers configured.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Add new budget tier form */}
+            <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                Add New Budget Bracket
+              </p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <label className="text-[0.65rem] uppercase tracking-wider text-muted-foreground block mb-1">
+                    Display Label
+                  </label>
+                  <input
+                    type="text"
+                    className={field}
+                    placeholder="e.g. $750,000 – $1,200,000"
+                    value={newBudget.label}
+                    onChange={(e) => setNewBudget({ ...newBudget, label: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-[0.65rem] uppercase tracking-wider text-muted-foreground block mb-1">
+                    Min USD Amount
+                  </label>
+                  <input
+                    type="number"
+                    className={field}
+                    placeholder="e.g. 750000"
+                    value={newBudget.min || ""}
+                    onChange={(e) => setNewBudget({ ...newBudget, min: Number(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <label className="text-[0.65rem] uppercase tracking-wider text-muted-foreground block mb-1">
+                    Max USD Amount (0 for unlimited)
+                  </label>
+                  <input
+                    type="number"
+                    className={field}
+                    placeholder="e.g. 1200000"
+                    value={newBudget.max || ""}
+                    onChange={(e) => setNewBudget({ ...newBudget, max: Number(e.target.value) || 0 })}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!newBudget.label.trim()) return toast.error("Please provide a display label");
+                    const maxVal = newBudget.max > 0 ? newBudget.max : 99999999;
+                    const id = `b-${Date.now().toString(36)}`;
+                    const next = [...(form.budgetRanges || []), { id, label: newBudget.label.trim(), min: newBudget.min, max: maxVal }];
+                    setField("budgetRanges", next);
+                    setNewBudget({ label: "", min: 0, max: 0 });
+                    toast.success("Added budget tier");
+                  }}
+                  className={btnPrimary + " !text-xs gap-1.5"}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add Budget Tier</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
