@@ -388,13 +388,16 @@ export function PageIntro({
   eyebrow,
   title,
   children,
+  description,
   aside,
 }: {
   eyebrow: string;
   title: React.ReactNode;
   children?: React.ReactNode;
+  description?: React.ReactNode;
   aside?: React.ReactNode;
 }) {
+  const content = children ?? (description ? <p>{description}</p> : null);
   return (
     <section className="site-page-intro relative overflow-hidden border-b bg-primary text-on-dark">
       <div
@@ -416,9 +419,9 @@ export function PageIntro({
               <span style={{ ["--d" as string]: "80ms" }}>{title}</span>
             </span>
           </h1>
-          {children && (
+          {content && (
             <div className="mt-5 max-w-2xl text-base text-muted-foreground leading-relaxed">
-              {children}
+              {content}
             </div>
           )}
         </div>

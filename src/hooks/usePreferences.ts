@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSiteSettings } from "@/admin/store";
 import { useState, useEffect,useSyncExternalStore } from "react";
 import type { SupportedCurrency } from "@/data/properties";
+export type { SupportedCurrency } from "@/data/properties";
 import { EXCHANGE_RATES } from "@/data/properties";
 
 const CURRENCY_KEY = "avrasya_preferred_currency";

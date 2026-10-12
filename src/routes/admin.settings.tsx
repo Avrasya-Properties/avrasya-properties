@@ -698,7 +698,10 @@ export function AdminSettingsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!newBudget.label.trim()) return toast.error("Please provide a display label");
+                    if (!newBudget.label.trim()) {
+                      toast.error("Please provide a display label");
+                      return;
+                    }
                     const maxVal = newBudget.max > 0 ? newBudget.max : 99999999;
                     const id = `b-${Date.now().toString(36)}`;
                     const next = [...(form.budgetRanges || []), { id, label: newBudget.label.trim(), min: newBudget.min, max: maxVal }];

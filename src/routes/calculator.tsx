@@ -123,8 +123,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
       <PageIntro
         eyebrow="Financial Transparency · Statutory Closing Ledger"
         title="Istanbul Property Acquisition & Investment Calculator"
-        description="Calculate statutory title deed (Tapu) closing taxes, Foreigner VAT exemptions under Law No. 3065, rental yields, and complete Turkish Citizenship ($400,000 CBI) outlay with zero broker surprises."
-      />
+      >
+        <p>Calculate statutory title deed (Tapu) closing taxes, Foreigner VAT exemptions under Law No. 3065, rental yields, and complete Turkish Citizenship ($400,000 CBI) outlay with zero broker surprises.</p>
+      </PageIntro>
 
       <div className="container-site pt-10">
         {/* Navigation Selector Bar */}

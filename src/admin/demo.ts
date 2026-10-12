@@ -46,7 +46,7 @@ export type Inquiry = {
   budget: string;
   message: string;
   source: "Website Consultation" | "WhatsApp Click" | "Contact Brief" | "Property Modal";
-  propertySlug?: string;
+  propertySlug?: string | undefined;
   status: "New" | "Contacted" | "Qualified" | "Archived";
   createdAt: string;
   notes?: string;
@@ -511,10 +511,10 @@ export type PublicEnquiryInput = {
   email: string;
   phone: string;
   topic: string;
-  budget?: string;
+  budget?: string | undefined;
   message: string;
-  source?: Inquiry["source"];
-  propertySlug?: string;
+  source?: Inquiry["source"] | undefined;
+  propertySlug?: string | undefined;
 };
 
 export function recordPublicEnquiry(input: PublicEnquiryInput): {
@@ -565,7 +565,6 @@ export function recordPublicEnquiry(input: PublicEnquiryInput): {
     stage: "New",
     shortlist: input.propertySlug ? [input.propertySlug] : [],
     nextFollowUp: new Date(Date.now() + 86400000).toISOString(),
-    dealId: null,
   };
   d.leads.unshift(lead);
 
@@ -578,7 +577,7 @@ export function recordPublicEnquiry(input: PublicEnquiryInput): {
     budget,
     message,
     source,
-    propertySlug: input.propertySlug,
+    ...(input.propertySlug ? { propertySlug: input.propertySlug } : {}),
     status: "New",
     createdAt: new Date().toISOString(),
     leadId: lead.id,

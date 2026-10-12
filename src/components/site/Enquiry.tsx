@@ -104,6 +104,7 @@ export function Enquiry({
     try {
       submission.current ??= crypto.randomUUID();
       const property = catalogue.properties.find((r) => r.marketing_title === v.topic);
+      const resolvedSlug = propertySlug || property?.slug;
       const res = await recordPublicEnquiry({
         name: v.name,
         email: v.email,
@@ -111,8 +112,8 @@ export function Enquiry({
         topic: v.topic,
         budget: v.budget,
         message: v.message,
-        source: (propertySlug || property) ? "Property Listing Inquiry" : "Website Consultation",
-        propertySlug: propertySlug || property?.slug,
+        source: (propertySlug || property) ? "Property Modal" : "Website Consultation",
+        ...(resolvedSlug ? { propertySlug: resolvedSlug } : {}),
       });
 
       setReceipt(res.receipt);
@@ -274,7 +275,7 @@ export function Enquiry({
                 type="button"
                 onClick={() => {
                   setReceipt("");
-                  setV({ name: "", email: "", phone: "", topic: defaultTopic || "General consultation", budget: "", message: "" });
+                  setV({ name: "", email: "", phone: "", topic: defaultTopic || "General consultation", budget: "", message: "", website: "" });
                 }}
                 className="btn btn-outline text-xs !py-1.5"
               >
