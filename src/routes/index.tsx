@@ -24,11 +24,6 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
-<<<<<<< HEAD
-  properties,
-  useLiveProperties,
-=======
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   sideText,
     type PropertyRecord,
 } from "@/data/properties";
@@ -46,42 +41,11 @@ export const Route = createFileRoute("/")({
   head: () =>
     meta(
       "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory",
-<<<<<<< HEAD
-      "Premier Istanbul property advisory for international buyers. Explore 18 curated source-verified residential developments with comprehensive legal pre-audits and Turkish Citizenship (CBI) support.",
-=======
       "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services."
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     ),
   component: Home,
 });
 
-<<<<<<< HEAD
-const FEATURED_SLUGS = [
-  "sisli-block5-floor2-unit21-497",
-  "atasehir-173-1-1-420",
-  "sisli-ferikoy-duplex-490",
-];
-
-const EDITORIAL_SLUGS = [
-  "pearl-topkapi-2-1-410",
-  "rams-park-house-maslak-1-1xs",
-  "oryapark-1-1-325",
-];
-
-function Home() {
-  const liveProperties = useLiveProperties();
-  const featured = FEATURED_SLUGS.map(
-    (s) => getProperty(s) || properties.find((p) => p.slug === s)!,
-  ).filter(Boolean);
-  const editorial = EDITORIAL_SLUGS.map(
-    (s) => getProperty(s) || properties.find((p) => p.slug === s)!,
-  ).filter(Boolean);
-  const settings = useSiteSettings();
-  const [sel, setSel] = useState(0);
-  const f = featured[sel] || featured[0]!;
-  const media = getPropertyMedia(f);
-  const fp = priceDisplay(f.price);
-=======
 
 function Home() {
  const catalogue=useCatalogue();
@@ -99,7 +63,6 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
   const f = FEATURED[featuredIndex];
   const media = f?getPropertyMedia(f):null;
   const fp = f?priceDisplay(f.price):null;
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   const navigate = useNavigate();
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
@@ -109,12 +72,8 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
   return (
-<<<<<<< HEAD
-    <>
-=======
     <div data-home-page>
 
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       {/* Hero Section */}
       <section data-home-hero className="home-hero relative overflow-hidden pt-10 pb-10 md:pt-14 md:pb-20 bg-primary text-on-dark">
         {/* Ambient Brand Watermark in Hero */}
@@ -146,8 +105,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 style={{ ["--d" as string]: "350ms" }}
                 className="mt-5 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed"
               >
-                {settings.heroSubtitle ||
-                  "Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer."}
+                {settings.heroSubtitle || "Avrasya Properties provides international private investors and families with an independent, Istanbul-based advisory partner — coordinating pre-acquisition legal due diligence, curated shortlists, and seamless title deed transfer."}
               </p>
 
               {/* Key Highlights Bar */}
@@ -157,25 +115,12 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 className="mt-8 grid grid-cols-2 gap-4 border-t border-border/80 pt-6 sm:grid-cols-4"
               >
                 <div>
-<<<<<<< HEAD
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    $120M+
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Coordinated Volume</p>
-                </div>
-                <div>
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    18
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Source Portfolios</p>
-=======
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{properties.length}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">Published offers</p>
                 </div>
                 <div>
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">{LOCATIONS.length}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">Listed districts</p>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                 </div>
                 <div>
                   <p className="font-display text-2xl md:text-3xl font-semibold text-brass">Review</p>
@@ -183,10 +128,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 </div>
                 <div>
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    $
-                    {settings.cbiThresholdUsd
-                      ? `${Math.round(settings.cbiThresholdUsd / 1000)}K`
-                      : "400K"}
+                    ${settings.cbiThresholdUsd ? `${Math.round(settings.cbiThresholdUsd / 1000)}K` : "400K"}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Citizenship reference amount</p>
                 </div>
@@ -194,11 +136,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
             </div>
 
             {/* Direct Quick Action CTAs */}
-            <div
-              data-reveal
-              style={{ ["--d" as string]: "400ms" }}
-              className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end"
-            >
+            <div data-reveal style={{ ["--d" as string]: "400ms" }} className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
               <Link to="/properties" className="btn btn-primary gap-2 shadow-sm">
                 <span>{properties.length?`Browse ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore properties"}</span> <ArrowRight className="h-4 w-4" />
               </Link>
@@ -260,14 +198,10 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                   </div>
                   <div>
                     <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Layout · Area</p>
-                    <p className="text-foreground">
-                      {f.layout_label} · {areaText(f)}
-                    </p>
+                    <p className="text-foreground">{f.layout_label} · {areaText(f)}</p>
                   </div>
                   <div>
-                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">
-                      Indicative Valuation
-                    </p>
+                    <p className="eyebrow !text-muted-foreground !text-[0.6rem]">Indicative Valuation</p>
                     <p className="font-display text-xl font-semibold text-foreground tracking-tight">
                       {fDisplayPrice}
                     </p>
@@ -293,11 +227,11 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
             {/* Side Tabs Selector */}
             <div className="flex flex-col">
               <div className="flex items-center justify-between border-b pb-2 text-[0.68rem] uppercase tracking-wider text-muted-foreground font-semibold">
-                <span>Curated Highlights ({featured.length.toString().padStart(2, "0")})</span>
+                <span>Curated Highlights ({FEATURED.length.toString().padStart(2, "0")})</span>
                 <span>Click to preview</span>
               </div>
               <div className="mt-3 space-y-3" role="tablist" aria-label="Featured offers">
-                {featured.map((r, i) => {
+                {FEATURED.map((r, i) => {
                   const m = getPropertyMedia(r);
                   const isCur = i === featuredIndex;
                   return (
@@ -313,18 +247,12 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                       }`}
                     >
                       <div className="relative h-14 w-18 shrink-0 overflow-hidden rounded-xs bg-muted">
-                        <img
-                          src={m.cover}
-                          alt=""
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                        />
+                        <img src={m.cover} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-semibold text-brass">0{i + 1}</span>
-                          <span className="text-[0.65rem] text-muted-foreground">
-                            {r.location_label}
-                          </span>
+                          <span className="text-[0.65rem] text-muted-foreground">{r.location_label}</span>
                         </div>
                         <p className="font-medium text-sm truncate text-foreground mt-0.5">
                           {r.marketing_title}
@@ -350,8 +278,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 <div className="rounded-xs border border-border/80 bg-secondary/50 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
                   <ShieldCheck className="h-4 w-4 text-brass shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
-                    Source documentation on file. Live availability and private developer discounts
-                    verified prior to viewing arrangements.
+                    Source documentation on file. Live availability and private developer discounts verified prior to viewing arrangements.
                   </p>
                 </div>
               </div>
@@ -429,11 +356,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
             </label>
 
             <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5">
-<<<<<<< HEAD
-              <span>Filter {liveProperties.length} Listings</span>
-=======
               <span>Find a property</span>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -464,38 +387,19 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
             <h2 className="headline mt-2 text-3xl md:text-4xl">Selected properties</h2>
           </div>
           <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-<<<<<<< HEAD
-            Source-advertised offers from prime European and Asian-side Istanbul corridors.
-            Specifications, pricing, and citizenship eligibility are cross-verified before
-            commitment.
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {editorial.map((r) => (
-=======
             Source-advertised offers from prime European and Asian-side Istanbul corridors. Confirm specifications, pricing, availability and any citizenship claims with an advisor before commitment.
           </p>
         </div>
 
         {loading?<p role="status" className="mt-8 rounded border bg-card p-6">Loading the property collection…</p>:unavailable?<div role="alert" className="mt-8 rounded border bg-card p-6"><p>The property collection could not be loaded.</p><button onClick={retry} className="btn btn-outline mt-4">Try again</button></div>:!properties.length?<div data-empty-collection className="mt-8 rounded border bg-card p-6 md:p-8"><h3 className="font-display text-2xl">Our next collection is being prepared.</h3><p className="mt-3 max-w-xl text-sm text-muted-foreground">Our team can help you find current opportunities while reviewed listings are being added.</p><Link to="/contact" className="btn btn-outline mt-5">Ask about available properties</Link></div>:<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {EDITORIAL.map((r) => (
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <PropertyCard key={r.slug} r={r} />
           ))}
         </div>}
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
-<<<<<<< HEAD
-          <Link
-            to="/properties"
-            className="group text-sm font-semibold text-foreground flex items-center gap-2"
-          >
-            <span>Explore all {liveProperties.length} offers and developments</span>
-=======
           <Link to="/properties" className="group text-sm font-semibold text-foreground flex items-center gap-2">
             <span>{properties.length?`Explore all ${properties.length} ${properties.length===1?"property":"properties"}`:"Explore our property search"}</span>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <ArrowRight className="h-4 w-4 arrow text-brass" />
           </Link>
           <span className="text-xs text-muted-foreground">
@@ -515,35 +419,19 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
         >
           <div className="relative z-10 max-w-3xl">
             <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
-              <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Turkish Citizenship by Investment
-              (CBI)
+              <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Turkish Citizenship by Investment (CBI)
             </div>
             <h2 className="headline mt-4 text-3xl md:text-5xl text-on-dark leading-tight">
-              A sovereign gateway to Türkiye:{" "}
-              <em className="italic text-brass font-normal">Clarity before capital.</em>
+              A sovereign gateway to Türkiye: <em className="italic text-brass font-normal">Clarity before capital.</em>
             </h2>
             <p className="mt-5 text-sm md:text-base text-on-dark-muted leading-relaxed">
-<<<<<<< HEAD
-              Under current Turkish regulations, foreign real estate acquisitions totaling $400,000
-              USD or more may qualify the investor and their immediate family for Turkish
-              citizenship, subject to official land registry annotations and independent valuation
-              reports.
-=======
               The configured investment reference is {settings.cbiThresholdUsd.toLocaleString("en-US")} USD. A purchase price alone does not confirm eligibility. Confirm the applicable rules, title conditions, valuation and family requirements with an independent legal advisor before committing.
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3">
               <div>
-<<<<<<< HEAD
-                <p className="eyebrow !text-brass">Legal Threshold</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">
-                  $400,000 USD
-                </p>
-=======
                 <p className="eyebrow !text-brass">Investment reference</p>
                 <p className="font-display text-2xl font-semibold text-on-dark mt-1">${settings.cbiThresholdUsd.toLocaleString("en-US")} USD</p>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                 <p className="text-[0.7rem] text-on-dark-muted">Or TRY equivalent at transfer</p>
               </div>
               <div>
@@ -553,9 +441,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
               </div>
               <div>
                 <p className="eyebrow !text-brass">Family Scope</p>
-                <p className="font-display text-2xl font-semibold text-on-dark mt-1">
-                  Spouse & Kids &lt;18
-                </p>
+                <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse & Kids &lt;18</p>
                 <p className="text-[0.7rem] text-on-dark-muted">Single joint application</p>
               </div>
             </div>
@@ -565,16 +451,11 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 <Calculator className="h-4 w-4 text-brass" />
                 <span>Calculate Total All-In Closing Costs</span>
               </a>
-              <Link
-                to="/citizenship"
-                className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10"
-              >
+              <Link to="/citizenship" className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10">
                 Official CBI Guide & Requirements
               </Link>
               <a
-                href={waLink(
-                  "Hello Avrasya Properties, I would like to consult on Turkish Citizenship by Investment ($400,000 CBI).",
-                )}
+                href={waLink("Hello Avrasya Properties, I would like to consult on Turkish Citizenship by Investment ($400,000 CBI).")}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline !border-on-dark/40 !text-on-dark hover:!bg-on-dark/10"
@@ -615,28 +496,16 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
             </Link>
           </div>
 
-          <div
-            data-reveal
-            className="mt-10 divide-y border border-border/80 rounded-xs bg-background overflow-hidden"
-          >
+          <div data-reveal className="mt-10 divide-y border border-border/80 rounded-xs bg-background overflow-hidden">
             {[
               [
                 "01",
                 "Phase 01 · Plan",
                 "Pre-acquisition assessment, family briefing and verified shortlist",
                 [
-                  [
-                    "Investment Advisory",
-                    "Strategic investment goals, portfolio diversification, and risk analysis.",
-                  ],
-                  [
-                    "Property Selection",
-                    "District yield comparisons, developer delivery track record, and virtual tours.",
-                  ],
-                  [
-                    "Citizenship Structuring",
-                    "Legal document preparation, apostille verification, and banking prerequisites.",
-                  ],
+                  ["Investment Advisory", "Strategic investment goals, portfolio diversification, and risk analysis."],
+                  ["Property Selection", "District yield comparisons, developer delivery track record, and virtual tours."],
+                  ["Citizenship Structuring", "Legal document preparation, apostille verification, and banking prerequisites."],
                 ],
               ],
               [
@@ -644,18 +513,9 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 "Phase 02 · Acquire",
                 "Independent legal checks, currency conversion (DAB), contracting and closing",
                 [
-                  [
-                    "Title Deed Due Diligence",
-                    "Turkish Land Registry encumbrance, mortgage, and ownership verification.",
-                  ],
-                  [
-                    "Licensed Valuation",
-                    "Appraisal report preparation by SPK-licensed certified evaluators.",
-                  ],
-                  [
-                    "Title Deed (Tapu) Transfer",
-                    "Official registry representation and power of attorney coordination.",
-                  ],
+                  ["Title Deed Due Diligence", "Turkish Land Registry encumbrance, mortgage, and ownership verification."],
+                  ["Licensed Valuation", "Appraisal report preparation by SPK-licensed certified evaluators."],
+                  ["Title Deed (Tapu) Transfer", "Official registry representation and power of attorney coordination."],
                 ],
               ],
               [
@@ -663,18 +523,9 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 "Phase 03 · Own & Manage",
                 "Handover inspection, utility connections, tenant management and resale strategy",
                 [
-                  [
-                    "Property Management",
-                    "Key handover, luxury furnishing packages, and utility registrations.",
-                  ],
-                  [
-                    "Rental Yield Management",
-                    "Corporate and executive tenant placement with local partners.",
-                  ],
-                  [
-                    "Holding & Exit Strategy",
-                    "Capital appreciation monitoring and 3-year post-holding resale planning.",
-                  ],
+                  ["Property Management", "Key handover, luxury furnishing packages, and utility registrations."],
+                  ["Rental Yield Management", "Corporate and executive tenant placement with local partners."],
+                  ["Holding & Exit Strategy", "Capital appreciation monitoring and 3-year post-holding resale planning."],
                 ],
               ],
             ].map(([n, h, s, items]) => (
@@ -704,10 +555,7 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
                 <ShieldCheck className="h-4 w-4 text-brass" />
                 Continuous International Investor Representation across all phases
               </span>
-              <Link
-                to="/services"
-                className="font-semibold text-foreground underline hover:text-brass"
-              >
+              <Link to="/services" className="font-semibold text-foreground underline hover:text-brass">
                 Explore comprehensive service catalog →
               </Link>
             </div>
@@ -715,122 +563,8 @@ function HomeCollection({properties,loading,unavailable,retry}:{properties:Prope
         </div>
       </section>
 
-<<<<<<< HEAD
-      {/* Verified Private Client Track Record & Testimonials */}
-      <section className="bg-ink text-on-dark py-24 border-t border-white/10 relative overflow-hidden">
-        {/* Ambient subtle glow */}
-        <div className="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-brass/10 blur-[120px] pointer-events-none" />
-
-        <div className="container-site relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-            <div>
-              <p className="eyebrow !text-brass">Client Verification & Track Record</p>
-              <h2 className="font-display text-3xl md:text-4xl text-on-dark font-medium mt-2">
-                Trusted by international private clients and family offices.
-              </h2>
-            </div>
-            <p className="text-sm text-on-dark-muted max-w-md leading-relaxed">
-              Real cross-border transactions executed under strict fiduciary duty, verified title
-              deeds, and documented SPK valuations.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                client: "Alexander & Elena Becker",
-                city: "Zurich, Switzerland",
-                project: "Horizon Maslak Duplex & CBI ($400k+)",
-                quote:
-                  "Navigating Turkish property from Zurich seemed fraught with conflicting developer promises. Avrasya provided an independent SPK valuation that saved us over $60k on our initial shortlist and found us an unadvertised top-floor Maslak duplex. Both passports were granted in 4 months without a single hitch.",
-                metric: "$1,250,000 USD Acquisition",
-                badge: "Citizenship Granted",
-              },
-              {
-                client: "Tariq & Fatima Al-Mansoor",
-                city: "Dubai, United Arab Emirates",
-                project: "Ataşehir Financial Center (IFC) Suite",
-                quote:
-                  "Their team coordinated the Central Bank DAB currency conversion and Land Registry title deed transfer seamlessly via power of attorney while we were in Dubai. Clean, calm, institutional service that feels like a private bank rather than a standard brokerage.",
-                metric: "Dual Portfolio Allocation",
-                badge: "Corporate Tenancy Placed",
-              },
-              {
-                client: "Oliver Sterling, CFA",
-                city: "London, United Kingdom",
-                project: "Bomonti Loft Buy-to-Let",
-                quote:
-                  "The 5-year capital gains tax exemption and rental yields in Bomonti made this an exceptional asset. Avrasya handled key holding, turnkey furnishing, and tenanted the unit to a German diplomat within three weeks of delivery.",
-                metric: "8.2% Net Yield Achieved",
-                badge: "Turnkey Management",
-              },
-            ].map((t) => (
-              <div
-                key={t.client}
-                data-reveal
-                className="rounded-xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-md flex flex-col justify-between transition-all duration-300 hover:border-brass/40 hover:bg-white/[0.07]"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4">
-                    <span className="rounded bg-brass/20 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-brass">
-                      {t.badge}
-                    </span>
-                    <span className="text-[11px] font-mono text-on-dark-muted">{t.metric}</span>
-                  </div>
-
-                  <p className="mt-5 text-sm text-on-dark leading-relaxed italic">"{t.quote}"</p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-white/10">
-                  <p className="font-display text-base font-semibold text-on-dark">{t.client}</p>
-                  <p className="text-xs text-brass font-medium mt-0.5">{t.city}</p>
-                  <p className="text-[11px] text-on-dark-muted mt-1">{t.project}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Institutional Statutory Badges Strip */}
-          <div className="mt-14 rounded-xl border border-white/10 bg-white/[0.02] p-6 grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
-                Ministry of Trade
-              </p>
-              <p className="text-sm font-semibold text-on-dark mt-1">
-                Taşınmaz Ticareti No. 3409821
-              </p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">
-                Licensed Real Estate Enterprise
-              </p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
-                Chamber of Commerce
-              </p>
-              <p className="text-sm font-semibold text-on-dark mt-1">İTO Sicil No. 849201</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Registered Istanbul Entity</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
-                Statutory Valuation
-              </p>
-              <p className="text-sm font-semibold text-on-dark mt-1">100% SPK Accredited</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Mandatory Valuation Audits</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-brass font-mono">
-                Bar Association
-              </p>
-              <p className="text-sm font-semibold text-on-dark mt-1">Independent Legal Panel</p>
-              <p className="text-[11px] text-on-dark-muted mt-0.5">Zero In-House Conflicts</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-=======
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
       <CtaBand />
     </div>
   );
 }
+

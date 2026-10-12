@@ -25,11 +25,6 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
-<<<<<<< HEAD
-  properties,
-  useLiveProperties,
-=======
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   sideText,
   unmatchablePrices,
   waLink,
@@ -59,13 +54,8 @@ export const Route = createFileRoute("/properties/")({
   }),
   head: () =>
     meta(
-<<<<<<< HEAD
-      "Istanbul Real Estate Portfolio — 18 Curated Developments",
-      "Browse 18 verified Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence.",
-=======
       "Istanbul Property Listings — Avrasya Properties",
       "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
     ),
   component: Catalog,
 });
@@ -81,13 +71,7 @@ function Catalog() {
   const [currency] = useCurrency();
   const { shortlist, count: savedCount, isSaved, toggle } = useShortlist();
 
-<<<<<<< HEAD
-  const liveProperties = useLiveProperties();
-
-  let list = filterProperties(f, liveProperties);
-=======
   let list = filterProperties(f, properties);
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
   if (f.savedOnly) {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
@@ -105,11 +89,7 @@ function Catalog() {
   const sel = (k: keyof Filters, label: string, any: string, opts: [string, string][]) => (
     <label className="block">
       <span className={lbl}>{label}</span>
-      <select
-        className="field text-xs md:text-sm"
-        value={String(f[k] ?? "")}
-        onChange={(e) => set(k, e.target.value)}
-      >
+      <select className="field text-xs md:text-sm" value={String(f[k] ?? "")} onChange={(e) => set(k, e.target.value)}>
         <option value="">{any}</option>
         {opts.map(([v, t]) => (
           <option key={v} value={v}>
@@ -124,30 +104,18 @@ function Catalog() {
     <>
       <PageIntro
         eyebrow="Istanbul Portfolio Collection"
-        title={
-          <>
-            Curated Offers & Developments in <em>Istanbul.</em>
-          </>
-        }
+        title={<>Curated Offers & Developments in <em>Istanbul.</em></>}
         aside={
           <div className="flex flex-col gap-1 text-right">
             <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
               Prime Corridors · European & Asian Side
             </span>
-<<<<<<< HEAD
-            <span className="text-xs text-foreground font-medium">
-              {liveProperties.length} Curated Opportunities
-            </span>
-=======
             <span className="text-xs text-foreground font-medium">{properties.length} Published Opportunities</span>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
           </div>
         }
       >
         <p>
-          Source-backed investment opportunities across central and Asian-side Istanbul. Every
-          property is subject to preliminary title deed, zoning, and legal clearance before
-          acquisition.
+          Source-backed investment opportunities across central and Asian-side Istanbul. Every property is subject to preliminary title deed, zoning, and legal clearance before acquisition.
         </p>
       </PageIntro>
 
@@ -170,31 +138,6 @@ function Catalog() {
                 <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
               </div>
             </label>
-<<<<<<< HEAD
-            {sel(
-              "loc",
-              "District",
-              "All Districts",
-              LOCATIONS.map((l) => [l, l]),
-            )}
-            {sel("side", "Continent", "Both Continents", [
-              ["Europe", "European Side"],
-              ["Asia", "Asian Side"],
-            ])}
-            {sel(
-              "layout",
-              "Layout",
-              "All Layouts",
-              LAYOUTS.map((l) => [l, l]),
-            )}
-            {sel("type", "Asset Type", "All Types", Object.entries(TYPE_LABEL))}
-            {sel(
-              "budget",
-              "Target Budget",
-              "Any Budget",
-              BUDGETS.map((b) => [b.id, b.label]),
-            )}
-=======
             <button className="btn btn-outline md:hidden" aria-expanded={filtersOpen} aria-controls="catalogue-filters" onClick={()=>setFiltersOpen(x=>!x)}><SlidersHorizontal className="h-4 w-4"/>{filtersOpen?"Hide filters":"Show filters"}</button>
             <div id="catalogue-filters" className={`${filtersOpen?"grid":"hidden"} min-w-0 gap-4 sm:grid-cols-2 md:grid lg:grid-cols-5`}>
             {sel("loc", "District", "All districts", LOCATIONS.map((l) => [l, l]))}
@@ -206,7 +149,6 @@ function Catalog() {
             {sel("type", "Property type", "All types", Object.entries(TYPE_LABEL))}
             {sel("budget", "Budget", "Any budget", BUDGETS.map((b) => [b.id, b.label]))}
             </div>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
           </div>
 
           {/* Quick Toggle Bars & Active Filters */}
@@ -250,13 +192,8 @@ function Catalog() {
                       {k === "budget"
                         ? BUDGETS.find((b) => b.id === v)?.label
                         : k === "type"
-<<<<<<< HEAD
-                          ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
-                          : String(v)}
-=======
                         ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
                         : k==="savedOnly"?"Saved properties":k==="cbiOnly"?"Verified citizenship eligibility":k==="side"?(v==="Asia"?"Asian side":"European side"):String(v)}
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                     </span>
                     <X className="h-3 w-3 text-muted-foreground" />
                   </button>
@@ -266,11 +203,7 @@ function Catalog() {
               )}
 
               {active.length > 0 && (
-                <Link
-                  to="/properties"
-                  search={{}}
-                  className="text-brass font-medium underline ml-1"
-                >
+                <Link to="/properties" search={{}} className="text-brass font-medium underline ml-1">
                   Reset filters
                 </Link>
               )}
@@ -287,9 +220,7 @@ function Catalog() {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`flex h-7 w-7 items-center justify-center rounded-xs transition-colors ${
-                    viewMode === "grid"
-                      ? "bg-card text-foreground shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
+                    viewMode === "grid" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                   }`}
                   title="Grid View"
                 >
@@ -298,9 +229,7 @@ function Catalog() {
                 <button
                   onClick={() => setViewMode("list")}
                   className={`flex h-7 w-7 items-center justify-center rounded-xs transition-colors ${
-                    viewMode === "list"
-                      ? "bg-card text-foreground shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
+                    viewMode === "list" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                   }`}
                   title="List View"
                 >
@@ -373,17 +302,8 @@ function Catalog() {
                           <span>{sideText(r)}</span>
                         </div>
 
-<<<<<<< HEAD
-                        <h3 className="font-display text-base md:text-lg font-medium text-foreground truncate mt-0.5">
-                          <Link
-                            to="/properties/$slug"
-                            params={{ slug: r.slug }}
-                            className="hover:text-brass"
-                          >
-=======
                         <h3 className="mt-1 break-words font-display text-base font-medium text-foreground md:text-lg">
                           <Link to="/properties/$slug" params={{ slug: r.slug }} className="hover:text-brass">
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                             {r.marketing_title}
                           </Link>
                         </h3>
@@ -396,13 +316,7 @@ function Catalog() {
 
                     <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-t-0 pt-3 sm:pt-0">
                       <div className="text-left sm:text-right">
-<<<<<<< HEAD
-                        <p className="eyebrow !text-muted-foreground !text-[0.6rem]">
-                          Indicative Valuation
-                        </p>
-=======
                         <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode==="rent"?"Monthly rent":"Price"}</p>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
                         <p className="font-display text-xl font-semibold text-foreground tracking-tight">
                           {displayPrice}
                         </p>
@@ -461,14 +375,11 @@ function Catalog() {
         <div className="mt-12 rounded-xs border border-border/80 bg-card p-5 text-xs leading-relaxed text-muted-foreground flex items-start gap-3">
           <CheckCircle2 className="h-4 w-4 text-brass shrink-0 mt-0.5" />
           <p>
-            <strong className="text-foreground">Official Advisory Standard:</strong> All property
-            specifications, valuations, area measurements (gross/net), and citizenship eligibility
-            criteria originate from project developers and are pre-screened on file. Prior to
-            contractual commitments, our team coordinates an independent title deed audit (Tapu
-            kaydı) and licensed valuation report (SPK değerleme).
+            <strong className="text-foreground">Official Advisory Standard:</strong> All property specifications, valuations, area measurements (gross/net), and citizenship eligibility criteria originate from project developers and are pre-screened on file. Prior to contractual commitments, our team coordinates an independent title deed audit (Tapu kaydı) and licensed valuation report (SPK değerleme).
           </p>
         </div>
       </section>
     </>
   );
 }
+

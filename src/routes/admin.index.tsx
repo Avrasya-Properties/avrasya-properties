@@ -1,20 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { currencyTotals } from "@/admin/domain.js";
 import { useState } from "react";
-import {
-  Building2,
-  CalendarCheck,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  DollarSign,
-  Eye,
-  Flame,
-  Layers,
-  Plus,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { Building2, CalendarCheck, CheckCircle2, ChevronRight, Clock, DollarSign, Eye, Flame, Layers, Plus, TrendingUp, Users } from "lucide-react";
 import { PageHead, Status, btnPrimary } from "@/admin/Shell";
 import { Thumb } from "@/routes/admin.properties.index";
 import { can, fmtDate, fmtMoney, useSession, useDB, userName, upsert, type Task, type Viewing } from "@/admin/store";
@@ -37,30 +24,13 @@ export function Dashboard() {
   const pipelineTotals = currencyTotals(openDeals);
 
   const overdue = db.tasks.filter((t) => !t.done && new Date(t.due).getTime() < now);
-<<<<<<< HEAD
-  const today = db.viewings.filter(
-    (v) => new Date(v.start).toDateString() === new Date().toDateString(),
-  );
-  const awaitingReview = db.properties.filter((p) => p.publication === "In Review");
-  const activeListings = db.properties.filter(
-    (p) => p.publication === "Published" && p.availability !== "Sold",
-  );
-=======
   const dateKey = (value: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(value);
   const today = db.viewings.filter((v) => ["Scheduled", "Confirmed"].includes(v.status) && dateKey(new Date(v.start)) === dateKey(new Date()));
   const awaitingReview = db.properties.filter((p) => p.publication === "In Review");
   const activeListings = db.properties.filter((p) => p.publication === "Published" && !["Sold", "Rented", "Off Market"].includes(p.availability));
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
 
   // Lead stages distribution
-  const leadStages = [
-    "New",
-    "Contacted",
-    "Qualified",
-    "Viewing",
-    "Negotiation",
-    "Converted",
-  ] as const;
+  const leadStages = ["New", "Contacted", "Qualified", "Viewing", "Negotiation", "Converted"] as const;
   const leadCounts = leadStages.map((stage) => ({
     stage,
     count: db.leads.filter((l) => l.stage === stage).length,
@@ -116,13 +86,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-<<<<<<< HEAD
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Active Pipeline
-            </span>
-=======
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Deals in progress</span>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <DollarSign className="h-4 w-4" />
             </span>
@@ -144,9 +108,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Active Listings
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Active Listings</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <Building2 className="h-4 w-4" />
             </span>
@@ -156,9 +118,7 @@ export function Dashboard() {
           </p>
           <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
             <span>{db.properties.length} total inventory items</span>
-            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">
-              {db.properties.filter((p) => p.publication === "In Review").length} review
-            </span>
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">{db.properties.filter(p => p.publication === "In Review").length} review</span>
           </div>
         </Link>
 
@@ -167,9 +127,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Active Leads
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Active Leads</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <Users className="h-4 w-4" />
             </span>
@@ -178,7 +136,7 @@ export function Dashboard() {
             {db.leads.filter((lead) => !["Lost", "Converted"].includes(lead.stage)).length}
           </p>
           <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-            <span>{db.leads.filter((l) => l.stage === "New").length} new enquiries</span>
+            <span>{db.leads.filter(l => l.stage === "New").length} new enquiries</span>
             <span className="text-brass font-medium flex items-center">
               <Flame className="mr-0.5 h-3 w-3" /> Qualified
             </span>
@@ -190,13 +148,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-<<<<<<< HEAD
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Web Inquiries
-            </span>
-=======
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Recorded Inquiries</span>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <Flame className="h-4 w-4" />
             </span>
@@ -205,9 +157,7 @@ export function Dashboard() {
             {db.inquiries?.length || 0}
           </p>
           <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-            <span className="text-brass font-medium">
-              {db.inquiries?.filter((i) => i.status === "New").length || 0} new pending
-            </span>
+            <span className="text-brass font-medium">{db.inquiries?.filter(i => i.status === "New").length || 0} new pending</span>
             <span className="rounded bg-muted px-1.5 py-0.5 text-[10px]">Inbox →</span>
           </div>
         </Link>
@@ -217,9 +167,7 @@ export function Dashboard() {
           className="group relative overflow-hidden rounded-xl border bg-card p-5 transition-all hover:border-brass hover:shadow-md"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Scheduled Viewings
-            </span>
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Scheduled Viewings</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass/10 text-brass">
               <CalendarCheck className="h-4 w-4" />
             </span>
@@ -240,31 +188,17 @@ export function Dashboard() {
         <section className="rounded-xl border bg-card p-5 lg:col-span-2">
           <div className="flex items-center justify-between border-b pb-3">
             <div>
-<<<<<<< HEAD
-              <h2 className="text-sm font-semibold tracking-tight text-foreground">
-                Buyer Acquisition Pipeline
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Stage conversion across international purchaser leads
-              </p>
-=======
               <h2 className="text-sm font-semibold tracking-tight text-foreground">Client progress</h2>
               <p className="text-xs text-muted-foreground">Stage conversion across international purchaser leads</p>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             </div>
-            <Link
-              to="/admin/leads"
-              className="text-xs font-medium text-brass hover:underline flex items-center"
-            >
+            <Link to="/admin/leads" className="text-xs font-medium text-brass hover:underline flex items-center">
               View Kanban <ChevronRight className="ml-0.5 h-3 w-3" />
             </Link>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
             {leadCounts.map(({ stage, count }) => (
               <div key={stage} className="rounded-lg border bg-muted/30 p-3 text-center">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {stage}
-                </p>
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{stage}</p>
                 <p className="mt-1.5 text-xl font-bold tabular-nums text-foreground">{count}</p>
                 <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
                   <div
@@ -279,13 +213,7 @@ export function Dashboard() {
           {/* Quick Listing Inventory Preview */}
           <div className="mt-6 border-t pt-4">
             <div className="flex items-center justify-between mb-3">
-<<<<<<< HEAD
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Prime Inventory Spotlight
-              </h3>
-=======
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Featured listings</h3>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
               <Link to="/admin/properties" className="text-xs text-brass hover:underline">
                 All {db.properties.length} listings →
               </Link>
@@ -300,24 +228,16 @@ export function Dashboard() {
                 >
                   <div className="aspect-[16/10] w-full overflow-hidden rounded bg-muted">
                     {p.cover ? (
-                      <img
-                        src={p.cover}
-                        alt=""
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      <img src={p.cover} alt="" className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-                        No image
-                      </div>
+                      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No image</div>
                     )}
                   </div>
                   <div className="mt-2">
                     <p className="text-[10px] font-mono text-brass">{p.ref}</p>
                     <p className="truncate text-xs font-semibold text-foreground">{p.title}</p>
                     <div className="mt-1 flex items-center justify-between text-xs">
-                      <span className="font-semibold tabular-nums">
-                        {fmtMoney(p.amount, p.currency)}
-                      </span>
+                      <span className="font-semibold tabular-nums">{fmtMoney(p.amount, p.currency)}</span>
                       <Status v={p.availability} />
                     </div>
                   </div>
@@ -342,9 +262,7 @@ export function Dashboard() {
             </div>
             <div className="mt-3 divide-y">
               {today.length === 0 ? (
-                <p className="py-4 text-center text-xs text-muted-foreground">
-                  No property viewings booked for today.
-                </p>
+                <p className="py-4 text-center text-xs text-muted-foreground">No property viewings booked for today.</p>
               ) : (
                 today.map((v) => {
                   const prop = db.properties.find((p) => p.id === v.propertyId);
@@ -352,12 +270,8 @@ export function Dashboard() {
                   return (
                     <div key={v.id} className="py-2.5 flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-foreground truncate">
-                          {contact?.name || "Client"}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {prop?.title} ({fmtDate(v.start, true)})
-                        </p>
+                        <p className="text-xs font-medium text-foreground truncate">{contact?.name || "Client"}</p>
+                        <p className="text-[11px] text-muted-foreground">{prop?.title} ({fmtDate(v.start, true)})</p>
                       </div>
                       {v.status !== "Confirmed" ? (
                         <button
@@ -387,9 +301,7 @@ export function Dashboard() {
             </div>
             <div className="mt-3 divide-y">
               {overdue.length === 0 && db.tasks.length === 0 ? (
-                <p className="py-3 text-xs text-muted-foreground text-center">
-                  All client follow-ups are up to date.
-                </p>
+                <p className="py-3 text-xs text-muted-foreground text-center">All client follow-ups are up to date.</p>
               ) : (
                 (overdue.length > 0 ? overdue : db.tasks.slice(0, 3)).map((t) => (
                   <div key={t.id} className="py-2.5 flex items-center justify-between gap-2">
@@ -399,16 +311,12 @@ export function Dashboard() {
                         aria-label={t.done ? "Reopen task" : "Complete task"}
                         onClick={() => toggleTask(t)}
                         className={`h-4 w-4 rounded border flex items-center justify-center transition-colors ${
-                          t.done
-                            ? "bg-brass text-primary-foreground border-brass"
-                            : "hover:border-brass"
+                          t.done ? "bg-brass text-primary-foreground border-brass" : "hover:border-brass"
                         }`}
                       >
                         {t.done && <CheckCircle2 className="h-3.5 w-3.5" />}
                       </button>
-                      <span
-                        className={`text-xs truncate ${t.done ? "line-through text-muted-foreground" : "text-foreground font-medium"}`}
-                      >
+                      <span className={`text-xs truncate ${t.done ? "line-through text-muted-foreground" : "text-foreground font-medium"}`}>
                         {t.title}
                       </span>
                     </div>
@@ -427,22 +335,14 @@ export function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between border-b pb-3">
-<<<<<<< HEAD
-            <h2 className="text-sm font-semibold text-foreground">
-              Listings Awaiting Editorial Review
-            </h2>
-=======
             <h2 className="text-sm font-semibold text-foreground">Listings to review</h2>
->>>>>>> 79a7162f934d90675238098147e8ead1264bc06f
             <Link to="/admin/properties" className="text-xs text-brass hover:underline">
               Inventory →
             </Link>
           </div>
           <div className="mt-3 divide-y">
             {awaitingReview.length === 0 ? (
-              <p className="py-4 text-center text-xs text-muted-foreground">
-                All inventory listings are published or drafted cleanly.
-              </p>
+              <p className="py-4 text-center text-xs text-muted-foreground">All inventory listings are published or drafted cleanly.</p>
             ) : (
               awaitingReview.map((p) => (
                 <div key={p.id} className="py-3 flex items-center justify-between gap-3">
@@ -450,9 +350,7 @@ export function Dashboard() {
                     <Thumb p={p} />
                     <div className="min-w-0">
                       <p className="text-xs font-semibold text-foreground truncate">{p.title}</p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {p.ref} · {p.district}
-                      </p>
+                      <p className="text-[11px] text-muted-foreground">{p.ref} · {p.district}</p>
                     </div>
                   </div>
                   <Link
