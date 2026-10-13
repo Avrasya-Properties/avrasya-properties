@@ -4,8 +4,9 @@ import { LegalDraft, meta } from "@/components/site/TextPage";
 export const Route = createFileRoute("/investment-disclaimer")({
   head: () => ({
     ...meta(
-      "Investment Disclaimer (draft)",
-      "Draft Investment Disclaimer for Avrasya Properties — approved text pending.",
+      "Investment Disclaimer · Avrasya Properties",
+      "Draft Investment Disclaimer for Avrasya Properties — approved text pending legal review.",
+      "/investment-disclaimer"
     ),
   }),
   component: () => (

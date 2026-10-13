@@ -4,8 +4,9 @@ import { LegalDraft, meta } from "@/components/site/TextPage";
 export const Route = createFileRoute("/cookie-policy")({
   head: () => ({
     ...meta(
-      "Cookie Policy (draft)",
-      "Draft Cookie Policy for Avrasya Properties — approved text pending.",
+      "Cookie Policy · Avrasya Properties",
+      "Draft Cookie Policy for Avrasya Properties — approved text pending legal review.",
+      "/cookie-policy"
     ),
   }),
   component: () => (

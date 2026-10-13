@@ -24,6 +24,7 @@ export const Route = createFileRoute("/citizenship")({
     meta(
       "Turkish Citizenship by Investment ($400,000) · Avrasya Properties",
       "Clear, comprehensive guide and interactive cost calculator for obtaining Turkish citizenship through qualifying Istanbul real estate. Step-by-step roadmap and cost breakdowns.",
+      "/citizenship"
     ),
   component: () => <ManagedPage slug="citizenship"><CitizenshipPage /></ManagedPage>,
 });

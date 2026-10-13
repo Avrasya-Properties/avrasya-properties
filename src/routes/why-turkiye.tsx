@@ -22,6 +22,7 @@ export const Route = createFileRoute("/why-turkiye")({
     meta(
       "Why Istanbul Real Estate · Avrasya Properties",
       "Neighborhood guides, lifestyle insights, and freehold property rights in Istanbul for international home buyers and families.",
+      "/why-turkiye"
     ),
   component: () => <ManagedPage slug="why-turkiye"><WhyTurkiye /></ManagedPage>,
 });

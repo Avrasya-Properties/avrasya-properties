@@ -52,11 +52,35 @@ export function Faq({ items }: { items: [string, string][] }) {
   );
 }
 
-export const meta = (title: string, description: string) => ({
-  meta: [
-    { title: `${title} — Avrasya Properties` },
-    { name: "description", content: description },
-    { property: "og:title", content: `${title} — Avrasya Properties` },
-    { property: "og:description", content: description },
-  ],
-});
+export const meta = (
+  title: string,
+  description: string,
+  optionsOrPath?: string | { canonical?: string; image?: string; noindex?: boolean; path?: string }
+) => {
+  const options = typeof optionsOrPath === "string" ? { path: optionsOrPath } : optionsOrPath;
+  const fullTitle = title.includes("Avrasya Properties") ? title : `${title} — Avrasya Properties`;
+  const path = options?.path;
+  const canonical = options?.canonical || (path !== undefined ? `https://avrasyaproperties.com${path.startsWith("/") ? "" : "/"}${path}` : "https://avrasyaproperties.com");
+  const image = options?.image || "https://avrasyaproperties.com/images/properties/hero-main.jpg";
+  return {
+    meta: [
+      { title: fullTitle },
+      { name: "description", content: description },
+      { property: "og:title", content: fullTitle },
+      { property: "og:description", content: description },
+      { property: "og:url", content: canonical },
+      { property: "og:site_name", content: "Avrasya Properties" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: image },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: fullTitle },
+      { name: "twitter:description", content: description },
+      { name: "twitter:image", content: image },
+      ...(options?.noindex
+        ? [{ name: "robots", content: "noindex, nofollow" }]
+        : [{ name: "robots", content: "index, follow" }]),
+    ],
+    links: [{ rel: "canonical", href: canonical }],
+  };
+};
+

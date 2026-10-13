@@ -10,5 +10,6 @@ describe("persistent admin mappings",()=>{
  it("maps viewing offer references and instants without timezone arithmetic",()=>{expect(encode("viewings",{propertyId:"uuid",start:"2026-12-20T10:00:00+03:00",end:"2026-12-20T11:00:00+03:00"})).toEqual({offer_id:"uuid",start_time:"2026-12-20T10:00:00+03:00",end_time:"2026-12-20T11:00:00+03:00"});});
  it("retains revision information for stale-editor detection",()=>{const c=decode("contacts",{id:"c",name:"Buyer",updated_at:"version-a"});expect((c as unknown as Record<string,unknown>)["revision"]).toBe("version-a");});
  it("round-trips every website setting without renaming legal identity",()=>{expect(decodeSettings(encodeSettings(DEFAULT_SITE_SETTINGS))).toEqual(DEFAULT_SITE_SETTINGS);});
+ it("round-trips custom SEO settings and indexing configurations",()=>{const custom={...DEFAULT_SITE_SETTINGS,siteTitle:"Custom Istanbul Luxury Advisory",metaDescription:"Verified Istanbul penthouse and villa collection with legal due diligence.",siteUrl:"https://avrasyaproperties.com",ogImage:"https://avrasyaproperties.com/images/custom-og.jpg",keywords:"istanbul, luxury, real estate",indexingEnabled:false};expect(decodeSettings(encodeSettings(custom))).toEqual(custom);});
  it("excludes mutation of settings audit columns",()=>{expect(encodeSettings({companyName:"New"})).toEqual({company_name:"New"});});
 });

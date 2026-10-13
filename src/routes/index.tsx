@@ -33,15 +33,31 @@ import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
-import { useCatalogue } from "@/data/live";
+import { useCatalogue, loadPublicSettings } from "@/data/live";
 import { useSiteSettings } from "@/admin/store";
 
 export const Route = createFileRoute("/")({
-  head: () =>
-    meta(
-      "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory",
-      "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services."
-    ),
+  loader: async ({ context }) => {
+    try {
+      const settings = await context.queryClient.ensureQueryData({
+        queryKey: ["site-settings"],
+        queryFn: loadPublicSettings,
+        staleTime: 60000,
+      });
+      return { settings };
+    } catch {
+      return { settings: null };
+    }
+  },
+  head: ({ loaderData }) => {
+    const s = loaderData?.settings;
+    const title = s?.siteTitle?.trim() || "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory";
+    const desc = s?.metaDescription?.trim() || "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services.";
+    const canonical = s?.siteUrl?.trim() || "https://avrasyaproperties.com";
+    const image = s?.ogImage?.trim() || "https://avrasyaproperties.com/images/properties/hero-main.jpg";
+    const noindex = s?.indexingEnabled === false;
+    return meta(title, desc, { canonical, image, noindex });
+  },
   component: Home,
 });
 
@@ -316,7 +332,7 @@ function HomeCollection({
                 onChange={(e) => setSearch({ ...search, loc: e.target.value })}
               >
                 <option value="">All Istanbul Districts</option>
-                {LOCATIONS.map((l) => (
+                {LOCATIONS.map((l: string) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
@@ -334,7 +350,7 @@ function HomeCollection({
                 onChange={(e) => setSearch({ ...search, layout: e.target.value })}
               >
                 <option value="">All Layout Configurations</option>
-                {LAYOUTS.map((l) => (
+                {LAYOUTS.map((l: string) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
@@ -352,7 +368,7 @@ function HomeCollection({
                 onChange={(e) => setSearch({ ...search, budget: e.target.value })}
               >
                 <option value="">Any Budget</option>
-                {BUDGETS.map((b) => (
+                {BUDGETS.map((b: { id: string; label: string }) => (
                   <option key={b.id} value={b.id}>
                     {b.label}
                   </option>

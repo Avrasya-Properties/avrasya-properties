@@ -22,6 +22,7 @@ export const Route = createFileRoute("/investment-catalog")({
     meta(
       "Avrasya Investment Catalog — Comprehensive Portfolio & Citizenship Guide",
       "Official 17-page Avrasya Properties Group Investment Catalog. Detailed six-phase acquisition pathway, verified 10-year financial projections, and Turkish Citizenship by Investment framework.",
+      "/investment-catalog"
     ),
   component: () => <ManagedPage slug="investment-catalog"><Catalog /></ManagedPage>,
 });

@@ -20,6 +20,7 @@ export const Route = createFileRoute("/about")({
     meta(
       "About Avrasya Properties · Trusted Istanbul Real Estate Advisory",
       "Headquartered on Istanbul's historic Asian shoreline, Avrasya Properties provides trusted, transparent property guidance for international home buyers and investors.",
+      "/about"
     ),
   component: () => <ManagedPage slug="about"><AboutPage /></ManagedPage>,
 });

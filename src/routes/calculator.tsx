@@ -30,7 +30,8 @@ export const Route = createFileRoute("/calculator")({
   head: () =>
     meta(
       "Istanbul Property Acquisition & Investment Calculator · Avrasya Properties",
-      "Model all-in title deed (Tapu) transfer taxes, foreigner VAT exemption (Law No. 3065), rental yields, and Turkish Citizenship ($400,000 CBI) outlay with complete statutory accuracy."
+      "Model all-in title deed (Tapu) transfer taxes, foreigner VAT exemption (Law No. 3065), rental yields, and Turkish Citizenship ($400,000 CBI) outlay with complete statutory accuracy.",
+      "/calculator"
     ),
   component: CalculatorPage,
 });

@@ -50,7 +50,7 @@ export function Enquiry({
   const servicesQuery = useServices();
   const services = DEMO_MODE
     ? SERVICES
-    : ["General consultation", ...(servicesQuery.data || []).map((s) => s.title)];
+    : ["General consultation", ...(servicesQuery.data || []).map((s: { title: string }) => s.title)];
   const previousTopic = useRef(defaultTopic);
   const contact = useLiveContact();
   const catalogue = useCatalogue();

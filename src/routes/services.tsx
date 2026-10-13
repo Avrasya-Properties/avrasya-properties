@@ -26,6 +26,7 @@ export const Route = createFileRoute("/services")({
     meta(
       "Property Advisory & Buying Services · Avrasya Properties",
       "Ten end-to-end property advisory services covering personalized search, Turkish citizenship, independent legal checks, interior setup, and ongoing management.",
+      "/services"
     ),
   component: () => <ManagedPage slug="services"><ServicesPage /></ManagedPage>,
 });
@@ -158,7 +159,16 @@ const PHASES = [
 export function ServicesPage() {
   const serviceQuery=useServices();
   const faqQuery=useFaqs();
-  const services:ServiceItem[]=DEMO_MODE?SERVICES:(serviceQuery.data||[]).map((s,i)=>({num:String(i+1).padStart(2,"0"),title:s.title,category:s.category||"Advisory",desc:s.description,deliverables:s.process_steps.filter((x):x is string=>typeof x==="string"),icon:Building2}));
+  const services: ServiceItem[] = DEMO_MODE
+    ? SERVICES
+    : (serviceQuery.data || []).map((s: { title: string; category?: string | null; description: string; process_steps: unknown[] }, i: number) => ({
+        num: String(i + 1).padStart(2, "0"),
+        title: s.title,
+        category: s.category || "Advisory",
+        desc: s.description,
+        deliverables: s.process_steps.filter((x: unknown): x is string => typeof x === "string"),
+        icon: Building2,
+      }));
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
   const categories = ["All",...new Set(services.map(s=>s.category))];
@@ -272,7 +282,7 @@ export function ServicesPage() {
         </Link>
       </div>
 
-      {!DEMO_MODE && <section className="container-site py-10">{serviceQuery.isError && <p role="alert">Services are temporarily unavailable.</p>}{(faqQuery.data||[]).map(faq=><details key={faq.id} className="border-b py-4"><summary className="cursor-pointer font-medium">{faq.question}</summary><p className="mt-3 text-muted-foreground">{faq.answer}</p></details>)}</section>}<CtaBand />
+      {!DEMO_MODE && <section className="container-site py-10">{serviceQuery.isError && <p role="alert">Services are temporarily unavailable.</p>}{(faqQuery.data||[]).map((faq: { id: string; question: string; answer: string })=><details key={faq.id} className="border-b py-4"><summary className="cursor-pointer font-medium">{faq.question}</summary><p className="mt-3 text-muted-foreground">{faq.answer}</p></details>)}</section>}<CtaBand />
     </>
   );
 }

@@ -87,13 +87,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Avrasya Properties — Istanbul property-investment consultancy" },
+      { title: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
       {
         name: "description",
-        content: "Istanbul-based advisory for international property buyers in Türkiye.",
+        content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment.",
       },
+      { property: "og:site_name", content: "Avrasya Properties" },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
+      { property: "og:description", content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment." },
+      { property: "og:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
+      { name: "twitter:description", content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment." },
+      { name: "twitter:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -106,6 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "canonical", href: "https://avrasyaproperties.com" },
     ],
   }),
   shellComponent: RootShell,
@@ -115,10 +123,69 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const jsonLdWebSite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Avrasya Properties",
+    alternateName: ["Avrasya Real Estate Istanbul", "Avrasya Properties Turkey"],
+    url: "https://avrasyaproperties.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://avrasyaproperties.com/properties?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const jsonLdRealEstateAgent = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "@id": "https://avrasyaproperties.com/#organization",
+    name: "Avrasya Properties",
+    legalName: "Avrasya Properties Group",
+    url: "https://avrasyaproperties.com",
+    logo: "https://avrasyaproperties.com/favicon.svg",
+    image: "https://avrasyaproperties.com/images/properties/hero-main.jpg",
+    description: "Premier Istanbul luxury real estate and investment advisory firm assisting international investors with prime residential acquisitions and Turkish Citizenship by Investment.",
+    telephone: "+90 545 924 80 42",
+    email: "info@avrasyaproperties.com",
+    priceRange: "$$$$",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Mimar Sinan Mahallesi, Selam-i Ali Efendi Caddesi, Ara Kafe Yanı No:17",
+      addressLocality: "Üsküdar",
+      addressRegion: "Istanbul",
+      postalCode: "34672",
+      addressCountry: "TR",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 41.0264,
+      longitude: 29.0153,
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      opens: "09:30",
+      closes: "18:30",
+    },
+    sameAs: [
+      "https://instagram.com/avrasyaproperties",
+      "https://linkedin.com/company/avrasya-properties",
+    ],
+  };
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdRealEstateAgent) }}
+        />
       </head>
       <body>
         {children}

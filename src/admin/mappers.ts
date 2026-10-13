@@ -13,7 +13,8 @@ export const FIELDS: Record<Collection, Record<string,string>> = {
 };
 export const SETTINGS: Record<keyof SiteSettings,string> = {
 companyName:"company_name",registeredEntity:"registered_entity",taxOffice:"tax_office",licenseNo:"license_no",tagline:"tagline",email:"email",phone:"phone",whatsapp:"whatsapp",address:"address",advisoryHours:"advisory_hours",heroHeadline:"hero_headline",heroSubtitle:"hero_subtitle",eyebrowText:"eyebrow_text",cbiThresholdUsd:"cbi_threshold_usd",preloaderOpacity:"preloader_opacity",exchangeRateEur:"exchange_rate_eur",exchangeRateTry:"exchange_rate_try",exchangeRateGbp:"exchange_rate_gbp",enableFrankfurterSync:"enable_frankfurter_sync",announcementText:"announcement_text",announcementActive:"announcement_active",
-districts:"districts",layouts:"layouts",budgetRanges:"budget_ranges"
+districts:"districts",layouts:"layouts",budgetRanges:"budget_ranges",
+siteTitle:"site_title",metaDescription:"meta_description",siteUrl:"site_url",ogImage:"og_image",keywords:"keywords",googleVerification:"google_verification",indexingEnabled:"indexing_enabled"
 };
 export function decode<C extends Collection>(collection:C,row:Row): DB[C][number] {
  const value:Row={revision:row["updated_at"]};
@@ -48,6 +49,14 @@ export function decodeSettings(row:Row):SiteSettings {
  if (!Array.isArray(s.budgetRanges)) {
   s.budgetRanges = typeof s.budgetRanges === "string" ? JSON.parse(s.budgetRanges) : DEFAULT_SITE_SETTINGS.budgetRanges;
  }
+ s.siteTitle = typeof s.siteTitle === "string" && s.siteTitle.trim() ? s.siteTitle : DEFAULT_SITE_SETTINGS.siteTitle;
+ s.metaDescription = typeof s.metaDescription === "string" && s.metaDescription.trim() ? s.metaDescription : DEFAULT_SITE_SETTINGS.metaDescription;
+ s.siteUrl = typeof s.siteUrl === "string" && s.siteUrl.trim() ? s.siteUrl : DEFAULT_SITE_SETTINGS.siteUrl;
+ s.ogImage = typeof s.ogImage === "string" && s.ogImage.trim() ? s.ogImage : DEFAULT_SITE_SETTINGS.ogImage;
+ s.keywords = typeof s.keywords === "string" ? s.keywords : DEFAULT_SITE_SETTINGS.keywords;
+ s.googleVerification = typeof s.googleVerification === "string" ? s.googleVerification : DEFAULT_SITE_SETTINGS.googleVerification;
+ s.indexingEnabled = typeof s.indexingEnabled === "boolean" ? s.indexingEnabled : DEFAULT_SITE_SETTINGS.indexingEnabled;
  return s;
 }
-export function encodeSettings(settings:Partial<SiteSettings>):Row {return Object.fromEntries(Object.entries(settings).map(([key,value])=>[SETTINGS[key as keyof SiteSettings],value]));}
+export function encodeSettings(settings:Partial<SiteSettings>):Row {return Object.fromEntries(Object.entries(settings).filter(([key])=>key in SETTINGS).map(([key,value])=>[SETTINGS[key as keyof SiteSettings],value]));}
+

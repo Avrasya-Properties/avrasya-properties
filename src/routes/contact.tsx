@@ -22,6 +22,7 @@ export const Route = createFileRoute("/contact")({
     meta(
       "Contact & Private Consultation · Avrasya Properties",
       "Schedule a private property consultation in Istanbul or via encrypted video conference. WhatsApp, phone, and office visiting directions.",
+      "/contact"
     ),
   component: ContactPage,
 });

@@ -56,7 +56,8 @@ export const Route = createFileRoute("/properties/")({
   head: () =>
     meta(
       "Istanbul Property Listings — Avrasya Properties",
-      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
+      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence.",
+      "/properties"
     ),
   component: Catalog,
 });
@@ -145,14 +146,14 @@ function Catalog() {
             </label>
             <button className="btn btn-outline md:hidden" aria-expanded={filtersOpen} aria-controls="catalogue-filters" onClick={()=>setFiltersOpen(x=>!x)}><SlidersHorizontal className="h-4 w-4"/>{filtersOpen?"Hide filters":"Show filters"}</button>
             <div id="catalogue-filters" className={`${filtersOpen?"grid":"hidden"} min-w-0 gap-4 sm:grid-cols-2 md:grid lg:grid-cols-5`}>
-            {sel("loc", "District", "All districts", LOCATIONS.map((l) => [l, l]))}
+            {sel("loc", "District", "All districts", LOCATIONS.map((l: string) => [l, l]))}
             {sel("side", "Istanbul side", "Both sides", [
               ["Europe", "European Side"],
               ["Asia", "Asian Side"],
             ])}
-            {sel("layout", "Layout", "All Layouts", LAYOUT_OPTIONS.map((l) => [l, l]))}
+            {sel("layout", "Layout", "All Layouts", LAYOUT_OPTIONS.map((l: string) => [l, l]))}
             {sel("type", "Property type", "All types", Object.entries(TYPE_LABEL))}
-            {sel("budget", "Budget", "Any budget", BUDGET_OPTIONS.map((b) => [b.id, b.label]))}
+            {sel("budget", "Budget", "Any budget", BUDGET_OPTIONS.map((b: { id: string; label: string }) => [b.id, b.label]))}
             </div>
           </div>
 
@@ -195,7 +196,7 @@ function Catalog() {
                   >
                     <span>
                       {k === "budget"
-                        ? BUDGET_OPTIONS.find((b) => b.id === v)?.label
+                        ? BUDGET_OPTIONS.find((b: { id: string; label: string }) => b.id === v)?.label
                         : k === "type"
                         ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
                         : k==="savedOnly"?"Saved properties":k==="cbiOnly"?"Verified citizenship eligibility":k==="side"?(v==="Asia"?"Asian side":"European side"):String(v)}

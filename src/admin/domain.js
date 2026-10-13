@@ -29,8 +29,8 @@ export function exactBudget(text) {
   return Number.isFinite(amount) ? { amount, currency } : null;
 }
 export function validateSettings(s) {
-  const textKeys = ["companyName", "registeredEntity", "taxOffice", "licenseNo", "tagline", "email", "phone", "whatsapp", "address", "advisoryHours", "heroHeadline", "heroSubtitle", "eyebrowText", "announcementText"];
-  for (const k of textKeys) if (typeof s[k] !== "string" || s[k].length > 4000) throw new Error("Invalid setting: " + k);
+  const textKeys = ["companyName", "registeredEntity", "taxOffice", "licenseNo", "tagline", "email", "phone", "whatsapp", "address", "advisoryHours", "heroHeadline", "heroSubtitle", "eyebrowText", "announcementText", "siteTitle", "metaDescription", "siteUrl", "ogImage", "keywords", "googleVerification"];
+  for (const k of textKeys) if (s[k] !== undefined && (typeof s[k] !== "string" || s[k].length > 4000)) throw new Error("Invalid setting: " + k);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) throw new Error("Enter a valid contact email.");
   let url; try { url = new URL(s.whatsapp); } catch { throw new Error("Enter a valid WhatsApp URL."); }
   if (url.protocol !== "https:" || !["wa.me", "api.whatsapp.com"].includes(url.hostname)) throw new Error("WhatsApp URL must use https://wa.me or https://api.whatsapp.com.");
@@ -41,6 +41,7 @@ export function validateSettings(s) {
   requireAmount(s.preloaderOpacity, "preloaderOpacity", false);
   if (s.preloaderOpacity > 1) throw new Error("Preloader opacity must be between zero and one.");
   if (typeof s.announcementActive !== "boolean" || typeof s.enableFrankfurterSync !== "boolean") throw new Error("Invalid settings flags.");
+  if (s.indexingEnabled !== undefined && typeof s.indexingEnabled !== "boolean") throw new Error("Invalid indexing flag.");
   if (s.districts !== undefined && (!Array.isArray(s.districts) || s.districts.some((x) => typeof x !== "string"))) throw new Error("Invalid districts list.");
   if (s.layouts !== undefined && (!Array.isArray(s.layouts) || s.layouts.some((x) => typeof x !== "string"))) throw new Error("Invalid layouts list.");
   if (s.budgetRanges !== undefined && (!Array.isArray(s.budgetRanges) || s.budgetRanges.some((b) => !b || typeof b !== "object" || typeof b.id !== "string" || typeof b.label !== "string"))) throw new Error("Invalid budget ranges list.");
