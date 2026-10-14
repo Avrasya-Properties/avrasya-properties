@@ -10,6 +10,7 @@ insert into auth.sessions(id,user_id) select ('00000000-0000-4000-8000-'||lpad((
 insert into staff_profiles(id,email,name,role) values
 ('00000000-0000-4000-8000-000000000001','owner@example.test','Owner','admin'),
 ('00000000-0000-4000-8000-000000000002','manager@example.test','Manager','manager'),
+('00000000-0000-4000-8000-000000000003','agent@example.test','Agent','agent'),
 ('00000000-0000-4000-8000-000000000005','viewer@example.test','Viewer','viewer');
 insert into contacts(id,name,assigned_agent_id) values('00000000-0000-4000-8000-000000001001','Test buyer','00000000-0000-4000-8000-000000000002');
 insert into deals(id,title,contact_id,assigned_agent_id,currency) values('00000000-0000-4000-8000-000000009001','Managed deal','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000002','USD');
@@ -59,9 +60,14 @@ select test.ok((select status from payment_milestones where id='00000000-0000-40
 insert into leases(physical_unit_id,landlord_contact_id,tenant_contact_id,agent_id,start_date,end_date,rent_amount,rent_currency,deposit_amount,deposit_currency)
 values('00000000-0000-4000-8000-000000002001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000002','2027-01-01','2028-01-01',1500,'USD',1500,'USD');
 select test.ok((select count(*) from leases)=1,'Lease creation includes required deposit currency');
+insert into viewings(id,contact_id,offer_id,agent_id,start_time,end_time,status) select '00000000-0000-4000-8000-000000009003','00000000-0000-4000-8000-000000001001',id,'00000000-0000-4000-8000-000000000002','2027-02-01T09:00:00+03:00','2027-02-01T10:00:00+03:00','Scheduled' from marketing_offers where ref='MANAGED';
+update viewings set notes='Managed viewing edit',start_time='2027-02-02T09:00:00+03:00',end_time='2027-02-02T10:00:00+03:00' where id='00000000-0000-4000-8000-000000009003';
+select test.ok((select notes from viewings where id='00000000-0000-4000-8000-000000009003')='Managed viewing edit','Actual database viewing creation and editing do not reference lead-only fields');
 insert into commission_allocations(deal_id,agent_id,role_in_deal,percentage,calculated_amount,currency) values('00000000-0000-4000-8000-000000009001','00000000-0000-4000-8000-000000000002','Lead agent',10,1000,'USD');
 select test.ok((select count(*) from commission_allocations)=1,'Manager can record an agent commission');
 select test.denied('update commission_allocations set percentage=101','Commission share cannot exceed 100 percent');
+select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000003","session_id":"00000000-0000-4000-8000-000000000103"}',true);
+select test.denied('insert into viewings(contact_id,agent_id,start_time,end_time,status) values(''00000000-0000-4000-8000-000000001001'',''00000000-0000-4000-8000-000000000003'',''2027-02-01T09:00:00+03:00'',''2027-02-01T10:00:00+03:00'',''Scheduled'')','An agent still cannot book another advisor buyer');
 select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000005","session_id":"00000000-0000-4000-8000-000000000105"}',true);
 select test.denied($q$select record_payment('{}')$q$,'View-only staff cannot record receipts');
 select test.denied('insert into document_checklists(deal_id,document_type,title) values(''00000000-0000-4000-8000-000000009001'',''contract'',''No permission'')','View-only staff cannot change deal documents');

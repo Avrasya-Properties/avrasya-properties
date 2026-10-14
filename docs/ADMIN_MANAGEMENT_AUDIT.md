@@ -25,6 +25,8 @@ This repair keeps the current website design and existing data. It adds controls
 
 The workflow runs the complete migration chain in disposable PostgreSQL, existing permissions/transaction checks, new management SQL checks, frontend tests, build and type checking, existing admin/mobile journeys and expanded persistent browser journeys. These exercise real saved records and anonymous website reads; they do not write test records to production.
 
+The new persistent viewing check found an existing shared-trigger bug: it bound a lead-only `deal_id` field for viewing rows. A separate migration fixes that trigger without relaxing contact assignment checks. Managed WhatsApp links also preserve an existing phone query instead of adding a second question mark.
+
 The additive migration must be applied before releasing the new frontend. It does not publish drafts, reset accounts, replace existing content, or alter existing receipt amounts. Newly added appearance settings default to the original assets.
 
 ## Deployment checks
