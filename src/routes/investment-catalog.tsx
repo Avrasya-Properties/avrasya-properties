@@ -16,6 +16,7 @@ import {
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
 import { useLiveContact } from "@/hooks/useLiveContact";
+import { publicDocumentUrl } from "@/lib/public-document";
 
 export const Route = createFileRoute("/investment-catalog")({
   head: () =>
@@ -98,7 +99,7 @@ function Catalog() {
   const waLink=useWhatsAppLink();
   const docs=usePublishedDocuments();
   const doc=docs.data?.[0];
-  const PDF_DOWNLOAD_URL=DEMO_MODE?"/downloads/Avrasya_Properties_Investment_Catalog.pdf":doc?.storage_path?.startsWith("/")?doc.storage_path:doc?publicSupabase.storage.from("public-marketing").getPublicUrl(doc.storage_path).data.publicUrl:undefined;
+  const PDF_DOWNLOAD_URL=DEMO_MODE?"/downloads/Avrasya_Properties_Investment_Catalog.pdf":doc?publicDocumentUrl(doc.storage_path):undefined;
   const contact = useLiveContact();
   return (
     <>
@@ -226,3 +227,4 @@ function Catalog() {
     </>
   );
 }
+

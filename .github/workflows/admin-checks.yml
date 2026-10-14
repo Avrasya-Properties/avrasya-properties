@@ -50,6 +50,7 @@ jobs:
             psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction -f "$migration"
           done
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/backend.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/management.sql
           bun scripts/backend-concurrency.mjs
       - run: bun scripts/enquiry-endpoint-check.mjs
       - run: bun scripts/staff-accounts-check.mjs

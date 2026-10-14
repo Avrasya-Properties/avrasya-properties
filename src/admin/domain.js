@@ -29,6 +29,7 @@ export function exactBudget(text) {
   return Number.isFinite(amount) ? { amount, currency } : null;
 }
 export function validateSettings(s) {
+  if(s.websiteDesign!==undefined){if(!s.websiteDesign||typeof s.websiteDesign!=="object"||Array.isArray(s.websiteDesign))throw new Error("Invalid website appearance settings");for(const [key,value] of Object.entries(s.websiteDesign)){if(typeof value!=="string"||value.length>4000)throw new Error("Invalid website appearance text");if(["logoDark","logoLight","heroMain","heroAlt","footerImage"].includes(key)&&value!==""&&!/^(https:\/\/|\/images\/)[^\s]+$/.test(value))throw new Error("Use an HTTPS image link or an existing website image");}}
   const textKeys = ["companyName", "registeredEntity", "taxOffice", "licenseNo", "tagline", "email", "phone", "whatsapp", "address", "advisoryHours", "heroHeadline", "heroSubtitle", "eyebrowText", "announcementText"];
   for (const k of textKeys) if (typeof s[k] !== "string" || s[k].length > 4000) throw new Error("Invalid setting: " + k);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) throw new Error("Enter a valid contact email.");

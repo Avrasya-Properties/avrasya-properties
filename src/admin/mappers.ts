@@ -12,6 +12,7 @@ export const FIELDS: Record<Collection, Record<string,string>> = {
  inquiries:{id:"id",name:"name",email:"email",phone:"phone",topic:"topic",budget:"budget",message:"message",source:"source",propertySlug:"property_slug",status:"status",createdAt:"created_at",notes:"notes",leadId:"lead_id",agentId:"assigned_agent_id"},
 };
 export const SETTINGS: Record<keyof SiteSettings,string> = {
+websiteDesign:"website_design",
 companyName:"company_name",registeredEntity:"registered_entity",taxOffice:"tax_office",licenseNo:"license_no",tagline:"tagline",email:"email",phone:"phone",whatsapp:"whatsapp",address:"address",advisoryHours:"advisory_hours",heroHeadline:"hero_headline",heroSubtitle:"hero_subtitle",eyebrowText:"eyebrow_text",cbiThresholdUsd:"cbi_threshold_usd",preloaderOpacity:"preloader_opacity",exchangeRateEur:"exchange_rate_eur",exchangeRateTry:"exchange_rate_try",exchangeRateGbp:"exchange_rate_gbp",enableFrankfurterSync:"enable_frankfurter_sync",announcementText:"announcement_text",announcementActive:"announcement_active",
 districts:"districts",layouts:"layouts",budgetRanges:"budget_ranges"
 };
@@ -47,6 +48,7 @@ export function decodeSettings(row:Row):SiteSettings {
  s.districts=array(s.districts,DEFAULT_SITE_SETTINGS.districts);
  s.layouts=array(s.layouts,DEFAULT_SITE_SETTINGS.layouts);
  s.budgetRanges=array(s.budgetRanges,DEFAULT_SITE_SETTINGS.budgetRanges);
+ s.websiteDesign=s.websiteDesign&&typeof s.websiteDesign==="object"&&!Array.isArray(s.websiteDesign)?s.websiteDesign:{};
  return s;
 }
 export function encodeSettings(settings:Partial<SiteSettings>):Row {return Object.fromEntries(Object.entries(settings).filter(([key])=>key in SETTINGS).map(([key,value])=>[SETTINGS[key as keyof SiteSettings],value]));}
