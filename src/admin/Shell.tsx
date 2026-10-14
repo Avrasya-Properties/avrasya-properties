@@ -83,6 +83,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [time, setTime] = useState("");
+  const [oldBrowserData,setOldBrowserData]=useState(false);
+  useEffect(()=>{if(!DEMO_ENABLED){try{setOldBrowserData(localStorage.getItem("avrasya-admin-db-v4")!==null);}catch{}}},[]);
 
   useEffect(() => {
     const update = () => {
@@ -186,7 +188,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <button className="flex h-11 w-11 items-center justify-center" onClick={async () => { try { await logout(); } catch(error) { toast.error((error as Error).message); } nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{oldBrowserData&&<p role="status" className="mb-3 rounded border bg-muted p-3 text-sm">Earlier browser-only data was found. It has not been published or imported. Add or edit properties in this live panel to save them to the shared website database.</p>}{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
       </div>
     </div>
   );

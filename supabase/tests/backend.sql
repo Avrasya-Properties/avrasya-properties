@@ -14,7 +14,7 @@ insert into public.staff_profiles(id,email,name,role,is_active) values
 ('00000000-0000-4000-8000-000000000004','other@example.test','Other agent','agent',true),
 ('00000000-0000-4000-8000-000000000005','viewer@example.test','Viewer','viewer',true),
 ('00000000-0000-4000-8000-000000000006','inactive@example.test','Inactive','agent',false);
-insert into site_settings(singleton_key) values('default');
+insert into site_settings(singleton_key) values('default') on conflict(singleton_key) do nothing;
 insert into contacts(id,name,assigned_agent_id) values
 ('00000000-0000-4000-8000-000000001001','Assigned buyer','00000000-0000-4000-8000-000000000003'),
 ('00000000-0000-4000-8000-000000001002','Other buyer','00000000-0000-4000-8000-000000000004');
