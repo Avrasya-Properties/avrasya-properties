@@ -38,16 +38,16 @@ export function encode(collection:Collection,item:Row):Row {
  return row;
 }
 export function decodeSettings(row:Row):SiteSettings {
- const s = Object.fromEntries(Object.entries(SETTINGS).map(([key,column])=>[key,row[column]])) as unknown as SiteSettings;
- if (!Array.isArray(s.districts)) {
-  s.districts = typeof s.districts === "string" ? JSON.parse(s.districts) : DEFAULT_SITE_SETTINGS.districts;
- }
- if (!Array.isArray(s.layouts)) {
-  s.layouts = typeof s.layouts === "string" ? JSON.parse(s.layouts) : DEFAULT_SITE_SETTINGS.layouts;
- }
- if (!Array.isArray(s.budgetRanges)) {
-  s.budgetRanges = typeof s.budgetRanges === "string" ? JSON.parse(s.budgetRanges) : DEFAULT_SITE_SETTINGS.budgetRanges;
- }
+ const s = Object.fromEntries(Object.entries(SETTINGS).map(([key,column])=>[key,row[column]??DEFAULT_SITE_SETTINGS[key as keyof SiteSettings]])) as unknown as SiteSettings;
+ const array = <T,>(value:unknown,fallback:T[]):T[] => {
+  if(Array.isArray(value))return value as T[];
+  if(typeof value==="string"){try{const parsed:unknown=JSON.parse(value);if(Array.isArray(parsed))return parsed as T[];}catch{}}
+  return fallback;
+ };
+ s.districts=array(s.districts,DEFAULT_SITE_SETTINGS.districts);
+ s.layouts=array(s.layouts,DEFAULT_SITE_SETTINGS.layouts);
+ s.budgetRanges=array(s.budgetRanges,DEFAULT_SITE_SETTINGS.budgetRanges);
  return s;
 }
-export function encodeSettings(settings:Partial<SiteSettings>):Row {return Object.fromEntries(Object.entries(settings).map(([key,value])=>[SETTINGS[key as keyof SiteSettings],value]));}
+export function encodeSettings(settings:Partial<SiteSettings>):Row {return Object.fromEntries(Object.entries(settings).filter(([key])=>key in SETTINGS).map(([key,value])=>[SETTINGS[key as keyof SiteSettings],value]));}
+

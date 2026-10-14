@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { DEMO_MODE, publicSupabase } from "@/lib/supabase";
+import { DEMO_MODE } from "@/lib/supabase";
 import { useServices, useCatalogue } from "@/data/live";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { recordPublicEnquiry } from "@/admin/store";
@@ -98,7 +98,7 @@ export function Enquiry({
       return setErr("Please enter a valid email address.");
     if (!v.email.trim() && v.phone.replace(/\D/g, "").length < 7)
       return setErr("Please provide a contact phone number or email.");
-    if (!compact && !consent) return setErr("Please consent to being contacted.");
+    if (!DEMO_MODE && !consent) return setErr("Please consent to being contacted.");
 
     setBusy(true);
     try {
@@ -112,6 +112,9 @@ export function Enquiry({
         topic: v.topic,
         budget: v.budget,
         message: v.message,
+        consent,
+        idempotencyKey: submission.current,
+        website: v.website,
         source: (propertySlug || property) ? "Property Modal" : "Website Consultation",
         ...(resolvedSlug ? { propertySlug: resolvedSlug } : {}),
       });
@@ -312,3 +315,4 @@ export function Enquiry({
     </form>
   );
 }
+

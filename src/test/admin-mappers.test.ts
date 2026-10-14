@@ -11,4 +11,6 @@ describe("persistent admin mappings",()=>{
  it("retains revision information for stale-editor detection",()=>{const c=decode("contacts",{id:"c",name:"Buyer",updated_at:"version-a"});expect((c as unknown as Record<string,unknown>)["revision"]).toBe("version-a");});
  it("round-trips every website setting without renaming legal identity",()=>{expect(decodeSettings(encodeSettings(DEFAULT_SITE_SETTINGS))).toEqual(DEFAULT_SITE_SETTINGS);});
  it("excludes mutation of settings audit columns",()=>{expect(encodeSettings({companyName:"New"})).toEqual({company_name:"New"});});
+ it("loads legacy settings without losing defaults or throwing on malformed arrays",()=>{const settings=decodeSettings({company_name:"Actual company",districts:"invalid JSON"});expect(settings.companyName).toBe("Actual company");expect(settings.districts).toEqual(DEFAULT_SITE_SETTINGS.districts);expect(settings.email).toBe(DEFAULT_SITE_SETTINGS.email);});
+ it("preserves intentionally empty managed filters",()=>{expect(decodeSettings({districts:[],layouts:[],budget_ranges:[]}).budgetRanges).toEqual([]);});
 });

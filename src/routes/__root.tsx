@@ -18,6 +18,7 @@ import { MotionRoot } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import {loadCatalogue,loadPublicSettings} from "@/data/live";
+import {DEMO_MODE,SUPABASE_URL} from "@/lib/supabase";
 
 function NotFoundComponent() {
   return (
@@ -79,8 +80,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Load critical public data before rendering, then hydrate the same cache.
     // A failed catalogue read is displayed inside the homepage, not as a redirect.
     await Promise.allSettled([
-      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:300000,retry:false}),
-      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:300000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:15000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
     ]);
   },
   head: () => ({
@@ -94,6 +95,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "avrasya-data-mode", content: DEMO_MODE?"demo":"live" },
+      { name: "avrasya-database", content: new URL(SUPABASE_URL).hostname },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -131,6 +134,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = path.startsWith("/admin");
   useEffect(
     () =>
       watchWebsiteChanges(() => {
@@ -138,11 +143,9 @@ function RootComponent() {
           predicate: (q) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
         });
         void router.invalidate();
-      }),
-    [queryClient, router],
+      },{poll:!isAdmin&&!DEMO_MODE}),
+    [queryClient, router,isAdmin],
   );
-  const path = useRouterState({ select: (s) => s.location.pathname });
-  const isAdmin = path.startsWith("/admin");
   if (isAdmin)
     return (
       <QueryClientProvider client={queryClient}>
@@ -164,3 +167,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+

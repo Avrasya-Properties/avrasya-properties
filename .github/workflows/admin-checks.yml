@@ -41,7 +41,8 @@ jobs:
           PGPASSWORD: postgres
         run: |
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/bootstrap.sql
-          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/baseline.sql
+          # The core migrations now exist in Git. Apply the complete chain once;
+          # replaying it on the full baseline snapshot duplicates policies.
           for migration in supabase/migrations/*.sql; do
             if [[ "$migration" == *enable_auth_admin_transport.sql ]]; then continue; fi
             psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$migration"
@@ -70,3 +71,4 @@ jobs:
           name: admin-smoke-failure
           path: test-results/
           if-no-files-found: ignore
+

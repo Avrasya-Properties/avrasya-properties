@@ -39,12 +39,12 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company Profile", "Homepage", "Taxonomy & Filters", "Exchange rates", "Export data"] as const;
+const TABS = ["Company details", "Homepage", "Search filters", "Exchange rates", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
   const user = useSession();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Company Profile");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Company details");
   const [form, setForm] = useState<SiteSettings>({ ...db.siteSettings });
   const [newDistrict, setNewDistrict] = useState("");
   const [newLayout, setNewLayout] = useState("");
@@ -156,8 +156,8 @@ export function AdminSettingsPage() {
       </div>
 
       <fieldset id="cms-fields" disabled={!editable} className="min-w-0">
-      {/* TAB 1: Company Profile */}
-      {tab === "Company Profile" && (
+      {/* TAB 1: Company details */}
+      {tab === "Company details" && (
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
@@ -380,8 +380,8 @@ export function AdminSettingsPage() {
         </div>
       )}
 
-      {/* TAB 3: Taxonomy & Filters (Regions, Apartment Layouts, Budgets) */}
-      {tab === "Taxonomy & Filters" && (
+      {/* TAB 3: Search filters (Regions, Apartment Layouts, Budgets) */}
+      {tab === "Search filters" && (
         <div className="max-w-4xl space-y-6">
           {/* Card 1: Istanbul Districts / Regions */}
           <div className="rounded-xl border bg-card p-6">
@@ -850,3 +850,4 @@ export function AdminSettingsPage() {
     </div>
   );
 }
+
