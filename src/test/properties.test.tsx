@@ -17,6 +17,11 @@ describe("property rules", () => {
       /Package total/,
     );
   });
+  it("filters by the administrator's custom budget tiers", () => {
+    const offer=getProperty("topkapi-two-apartment-package-480")!;
+    expect(filterProperties({budget:"custom"},[offer],[{id:"custom",min:400000,max:500000}])).toEqual([offer]);
+    expect(filterProperties({budget:"custom"},[offer],[{id:"custom",min:0,max:300000}])).toEqual([]);
+  });
   it("excludes TRY, unresolved and on-request prices from budget matching", () => {
     for (const s of [
       "gunesli-2-1-installment",
@@ -52,3 +57,4 @@ describe("property rules", () => {
     expect(live.length).toBeGreaterThanOrEqual(18);
   });
 });
+

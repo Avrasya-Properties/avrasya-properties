@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-export const DEMO_MODE = import.meta.env["VITE_ENABLE_ADMIN_DEMO"] === "true";
+import { isDemoMode } from "./app-mode";
+export const DEMO_MODE = isDemoMode(import.meta.env);
 export const SUPABASE_URL = import.meta.env["VITE_SUPABASE_URL"] || "https://ufcpvjhzitmxgitoaolx.supabase.co";
 export const SUPABASE_KEY = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || "sb_publishable_vmlTaa9tPFNuR3z_ADhOfA_XeH4oHUx";
 // Only publishable credentials belong in frontend code. RLS authorizes each request.

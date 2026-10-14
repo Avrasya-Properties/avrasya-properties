@@ -138,13 +138,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <ShieldCheck className="h-3.5 w-3.5 text-brass" />
           <span>Avrasya Internal Workspace</span>
         </div>
-        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Shared team workspace"}</p>
+        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Live data · Saved to the shared database"}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="admin-workspace flex min-h-screen bg-background font-sans text-foreground">
+    <div data-admin-mode={DEMO_ENABLED?"demo":"live"} className="admin-workspace flex min-h-screen bg-background font-sans text-foreground">
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 md:block">{sidebar}</aside>
       <Sheet open={open} onOpenChange={setOpen}><SheetContent side="left" className="w-64 p-0">{sidebar}</SheetContent></Sheet>
       <div className="flex min-w-0 flex-1 flex-col">

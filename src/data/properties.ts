@@ -631,9 +631,10 @@ export function useLiveProperties(): PropertyRecord[] {
   return properties;
 }
 
-export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties) {
+export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties,
+  budgets: readonly { id: string; min: number; max: number }[] = BUDGETS) {
   const q = f.q?.toLowerCase().trim();
-  const b = BUDGETS.find((x) => x.id === f.budget);
+  const b = budgets.find((x) => x.id === f.budget);
   let list = catalogue.filter((r) => {
     if (
       q &&
@@ -715,3 +716,4 @@ export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
     ...(floorPlan ? { floorPlan } : {}),
   };
 }
+
