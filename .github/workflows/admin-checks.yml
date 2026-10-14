@@ -45,7 +45,9 @@ jobs:
           # replaying it on the full baseline snapshot duplicates policies.
           for migration in supabase/migrations/*.sql; do
             if [[ "$migration" == *enable_auth_admin_transport.sql ]]; then continue; fi
-            psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$migration"
+            # Match transactional migration execution so SET LOCAL takes effect
+            # and a failed migration cannot leave half-applied changes.
+            psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction -f "$migration"
           done
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/backend.sql
           bun scripts/backend-concurrency.mjs
@@ -61,7 +63,7 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
-          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/browser-fixtures.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 --single-transaction -f supabase/tests/browser-fixtures.sql
           docker run --detach --network host --name avrasya-test-api -e PGRST_DB_URI=postgres://authenticator:isolated-test-only@127.0.0.1:5432/postgres -e PGRST_DB_SCHEMA=public -e PGRST_DB_ANON_ROLE=anon -e PGRST_JWT_SECRET=isolated-browser-test-secret-at-least-32-characters -e PGRST_SERVER_PORT=3001 postgrest/postgrest:v13.0.7
           for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:3001/site_settings && break || sleep 1; done
           bun scripts/backend-smoke.mjs

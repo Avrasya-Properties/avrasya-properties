@@ -11,10 +11,17 @@ try{
  await query(`insert into auth.users values('${u}');insert into auth.sessions values('${session}','${u}');insert into staff_profiles(id,email,name,role) values('${u}','concurrency@example.test','Concurrency manager','manager');insert into contacts(id,name,assigned_agent_id) values('${contact}','Concurrency buyer','${u}');insert into physical_units(id,unit_number,status) values('${unit}','CONCURRENT-21','Available');insert into marketing_offers(id,ref,slug,marketing_title,district,record_type,physical_unit_id,availability) values('${offerA}','CONCUR-A','concur-a','Offer A','Test','unit_offer','${unit}','Available'),('${offerB}','CONCUR-B','concur-b','Offer B','Test','unit_offer','${unit}','Available');`);
  await query(`insert into deals(id,title,contact_id,assigned_agent_id,stage,total_amount,currency) values('${dealA}','Deal A','${contact}','${u}','Offer Accepted',420000,'USD'),('${dealB}','Deal B','${contact}','${u}','Offer Accepted',420000,'USD');insert into deal_selected_units(deal_id,offer_id,physical_unit_id,currency) values('${dealA}','${offerA}','${unit}','USD'),('${dealB}','${offerB}','${unit}','USD');`);
  const reserve=id=>query(`begin;set local statement_timeout='10s';set local role authenticated;select set_config('request.jwt.claims','${claims}',true);select public.transition_deal('${id}','Reserved',1);select pg_sleep(0.3);commit;`);
+ // These IDs are deals competing for unit ...008201, not physical-unit IDs.
+ // One unavailable-unit exception is expected: allowing both would double-book it.
  const results=await Promise.allSettled([reserve(dealA),reserve(dealB)]);
  assert.equal(results.filter(r=>r.status==="fulfilled").length,1,"Exactly one concurrent reservation wins");
  const failed=results.find(r=>r.status==="rejected");assert.match(failed.reason.message,/Selected unit is not available/);assert(!/deadlock/i.test(failed.reason.message));
+ const winner=[dealA,dealB][results.findIndex(r=>r.status==="fulfilled")];
+ const loser=[dealA,dealB][results.findIndex(r=>r.status==="rejected")];
  assert.equal(await query(`select count(*) from reservations where physical_unit_id='${unit}' and status='active';`),"1");
+ assert.equal(await query(`select deal_id from reservations where physical_unit_id='${unit}' and status='active';`),winner,"Reservation belongs to the successful deal");
+ assert.equal(await query(`select stage::text||':'||version from deals where id='${loser}';`),"Offer Accepted:1","Rejected reservation leaves the competing deal unchanged");
  assert.equal(await query(`select status from physical_units where id='${unit}';`),"Reserved");
+ console.log(`PASS: competing deal ${loser} was correctly rejected with "Selected unit is not available" (expected; protects against double booking)`);
  console.log("PASS: concurrent offers for one physical unit produce one reservation without deadlock");
 }finally{await query(cleanup);}
