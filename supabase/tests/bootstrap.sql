@@ -5,6 +5,7 @@ create role service_role nologin bypassrls;
 create schema auth;
 create schema storage;
 create schema extensions;
+create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
 create table auth.users(id uuid primary key);
 create table auth.sessions(id uuid primary key,user_id uuid references auth.users(id));
 create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,owner_id text);
