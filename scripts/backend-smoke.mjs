@@ -17,10 +17,10 @@ const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdi
 let serverOutput="";for(const stream of [child.stdout,child.stderr])stream.on("data",c=>serverOutput=(serverOutput+c).slice(-4000));
 let browser,page;const pageErrors=[];const results=[];
 async function clickText(text, root = "body") {
-  await page.waitForFunction((text, root) => [...document.querySelectorAll(root + " button")].some((button) => button.textContent.trim() === text && !button.matches(":disabled")), {}, text, root);
+  await page.waitForFunction((text, root) => {const dialog=document.querySelector('[role="dialog"]');return [...document.querySelectorAll(root + " button")].some((button) => button.textContent.trim() === text && !button.matches(":disabled") && (!dialog||dialog.contains(button)));}, {}, text, root);
   const handles = await page.$$(root + " button");
   for (const handle of handles) {
-    const matches = await handle.evaluate((button, wanted) => button.textContent.trim() === wanted && !button.matches(":disabled"), text);
+    const matches = await handle.evaluate((button, wanted) => {const dialog=document.querySelector('[role="dialog"]');return button.textContent.trim() === wanted && !button.matches(":disabled") && (!dialog||dialog.contains(button));}, text);
     if (matches) { await handle.click(); return; }
   }
   throw new Error("Enabled button not found: " + text);
