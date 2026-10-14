@@ -11,7 +11,7 @@ revoke all on function private.guard_website_design() from public,anon,authentic
 create trigger guard_website_design before insert or update on public.site_settings for each row execute function private.guard_website_design();
 -- These older tables lacked a revision, so a stale edit could silently overwrite a colleague.
 do $$declare name text;begin
- foreach name in array array['amenities','offer_amenities','pricing_options','instalment_schedules','package_memberships','payment_milestones','contact_shortlists','rent_charges','rental_deposits','vendors'] loop
+ foreach name in array array['amenities','offer_amenities','pricing_options','instalment_schedules','package_memberships','payment_milestones','commission_allocations','contact_shortlists','rent_charges','rental_deposits','vendors'] loop
  execute format('alter table public.%I add column updated_at timestamptz not null default now()',name);
  execute format('create trigger record_updated before insert or update on public.%I for each row execute function private.touch_record()',name);
  end loop;
@@ -74,6 +74,14 @@ create trigger public_related_changed after insert or update or delete on public
 create trigger public_related_changed after insert or update or delete on public.pricing_options for each row execute function private.refresh_related_public_offers();
 create trigger public_related_changed after insert or update or delete on public.instalment_schedules for each row execute function private.refresh_related_public_offers();
 create trigger public_related_changed after insert or update or delete on public.package_memberships for each row execute function private.refresh_related_public_offers();
+create or replace function private.unit_guard() returns trigger language plpgsql set search_path='' as $$
+begin
+ if new.status in('Reserved','Sold','Rented') and new.status is distinct from old.status then raise exception 'Use Deals to reserve or complete a property transaction';end if;
+ if old.status in('Reserved','Sold','Rented') and (new.status is distinct from old.status or new.unit_number is distinct from old.unit_number or new.project_id is distinct from old.project_id or new.building_id is distinct from old.building_id) then raise exception 'Reserved or closed units require a reviewed transaction';end if;
+ return new;
+end $$;
+revoke all on function private.unit_guard() from public,anon;
+grant execute on function private.unit_guard() to authenticated;
 
 -- Managers may maintain deal documents and payment schedules. Receipts remain immutable.
 create policy manager_insert on public.document_checklists for insert to authenticated with check ((select private.manager()));
@@ -82,6 +90,10 @@ grant insert,update on public.document_checklists to authenticated;
 create policy manager_insert on public.payment_milestones for insert to authenticated with check ((select private.manager()));
 create policy manager_update on public.payment_milestones for update to authenticated using ((select private.manager())) with check ((select private.manager()));
 grant insert,update on public.payment_milestones to authenticated;
+create policy manager_insert on public.commission_allocations for insert to authenticated with check ((select private.manager()));
+create policy manager_update on public.commission_allocations for update to authenticated using ((select private.manager())) with check ((select private.manager()));
+grant insert,update on public.commission_allocations to authenticated;
+alter table public.commission_allocations add constraint commission_values_valid check(percentage between 0 and 100 and calculated_amount>=0) not valid;
 create function private.guard_payment_schedule() returns trigger language plpgsql set search_path='' as $$
 declare paid numeric;
 begin

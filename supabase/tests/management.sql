@@ -28,6 +28,8 @@ update developers set name='Renamed developer' where id='00000000-0000-4000-8000
 select test.ok((select published_snapshot->'details'->>'developer' from marketing_offers where ref='MANAGED')='Renamed developer','Developer edit updates public details');
 update physical_units set floor=5 where id='00000000-0000-4000-8000-000000002001';
 select test.ok((select published_snapshot->'details'->>'floor' from marketing_offers where ref='MANAGED')='5','Unit details update public listing');
+select test.denied('update physical_units set status=''Reserved'' where unit_number=''A-21''','Unit management cannot bypass reservation transactions');
+select test.denied($q$update site_settings set website_design='{"heroMain":"javascript:alert(1)"}'$q$,'Unsafe appearance image links are rejected by the database');
 insert into amenities(id,name) values('00000000-0000-4000-8000-000000006003','Managed feature');
 insert into offer_amenities select id,'00000000-0000-4000-8000-000000006003' from marketing_offers where ref='MANAGED';
 select test.ok((select published_snapshot->'details'->'amenities' from marketing_offers where ref='MANAGED')='["Managed feature"]','Adding a feature updates published details');
@@ -57,6 +59,9 @@ select test.ok((select status from payment_milestones where id='00000000-0000-40
 insert into leases(physical_unit_id,landlord_contact_id,tenant_contact_id,agent_id,start_date,end_date,rent_amount,rent_currency,deposit_amount,deposit_currency)
 values('00000000-0000-4000-8000-000000002001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000002','2027-01-01','2028-01-01',1500,'USD',1500,'USD');
 select test.ok((select count(*) from leases)=1,'Lease creation includes required deposit currency');
+insert into commission_allocations(deal_id,agent_id,role_in_deal,percentage,calculated_amount,currency) values('00000000-0000-4000-8000-000000009001','00000000-0000-4000-8000-000000000002','Lead agent',10,1000,'USD');
+select test.ok((select count(*) from commission_allocations)=1,'Manager can record an agent commission');
+select test.denied('update commission_allocations set percentage=101','Commission share cannot exceed 100 percent');
 select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000005","session_id":"00000000-0000-4000-8000-000000000105"}',true);
 select test.denied($q$select record_payment('{}')$q$,'View-only staff cannot record receipts');
 select test.denied('insert into document_checklists(deal_id,document_type,title) values(''00000000-0000-4000-8000-000000009001'',''contract'',''No permission'')','View-only staff cannot change deal documents');

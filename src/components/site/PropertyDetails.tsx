@@ -316,6 +316,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               <Fact k="Listing" v={r.mode==="rent"?"For rent":"For sale"} />
               {r.bathrooms!=null&&<Fact k="Bathrooms" v={r.bathrooms}/>}<Fact k="Availability" v={r.availability||"To confirm"} />
               {r.tapu_status&&<Fact k="Title deed status" v={r.tapu_status}/>}
+              {typeof d["bedrooms"]==="number"&&<Fact k="Bedrooms" v={d["bedrooms"]}/>}
               <Fact k="Apartment layout" v={r.layout_label ?? "To confirm"} />
               {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?"Gross area":area.basis==="net"?"Net area":"Area (basis to confirm)"} v={`${area.value_m2.toLocaleString("en-US")} m²`}/>):<Fact k="Area" v="To confirm"/>}
               {typeof d.project === "string"&&d.project&&<Fact k="Development" v={d.project} />}

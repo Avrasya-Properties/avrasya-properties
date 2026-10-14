@@ -25,7 +25,7 @@ function Deals() {
   };
   return (
     <>
-      <PageHead title="Deals" crumbs="Clients" action={can(user,"edit-inventory")&&<div className="flex flex-wrap gap-2">{([["document_checklists","Deal documents"],["payment_milestones","Payment schedules"],["recorded_payments","Recorded payments"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section}} className={btnGhost}>{label}</Link>)}</div>}/>
+      <PageHead title="Deals" crumbs="Clients" action={can(user,"edit-inventory")&&<div className="flex flex-wrap gap-2">{([["document_checklists","Deal documents"],["payment_milestones","Payment schedules"],["recorded_payments","Recorded payments"],["commission_allocations","Agent commissions"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section}} className={btnGhost}>{label}</Link>)}</div>}/>
       <div className="overflow-x-auto rounded-md border bg-card"><table className="w-full text-sm">
         <thead className="border-b text-left text-xs text-muted-foreground"><tr><th className="p-2">Deal</th><th>Buyer</th><th>Selected units</th><th className="text-right">Agreed amount</th><th className="px-2">Expected close</th><th>Agent</th><th>Stage</th><th>Actions</th></tr></thead>
         <tbody>{db.deals.map((deal) => {
