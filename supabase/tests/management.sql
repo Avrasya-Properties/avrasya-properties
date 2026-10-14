@@ -1,0 +1,78 @@
+\set ON_ERROR_STOP on
+begin;
+create schema test;
+create function test.ok(condition boolean,label text) returns void language plpgsql as $$begin if condition is distinct from true then raise exception 'FAILED: %',label;end if;raise notice 'PASS: %',label;end$$;
+create function test.denied(statement text,label text) returns void language plpgsql as $$begin begin execute statement;exception when insufficient_privilege or check_violation or raise_exception or foreign_key_violation then raise notice 'PASS: % (%)',label,sqlerrm;return;end;raise exception 'FAILED: expected denial: %',label;end$$;
+grant usage on schema test to anon,authenticated;
+grant execute on all functions in schema test to anon,authenticated;
+insert into auth.users(id) select ('00000000-0000-4000-8000-'||lpad(i::text,12,'0'))::uuid from generate_series(1,5) i;
+insert into auth.sessions(id,user_id) select ('00000000-0000-4000-8000-'||lpad((100+i)::text,12,'0'))::uuid,('00000000-0000-4000-8000-'||lpad(i::text,12,'0'))::uuid from generate_series(1,5) i;
+insert into staff_profiles(id,email,name,role) values
+('00000000-0000-4000-8000-000000000001','owner@example.test','Owner','admin'),
+('00000000-0000-4000-8000-000000000002','manager@example.test','Manager','manager'),
+('00000000-0000-4000-8000-000000000003','agent@example.test','Agent','agent'),
+('00000000-0000-4000-8000-000000000005','viewer@example.test','Viewer','viewer');
+insert into contacts(id,name,assigned_agent_id) values('00000000-0000-4000-8000-000000001001','Test buyer','00000000-0000-4000-8000-000000000002');
+insert into deals(id,title,contact_id,assigned_agent_id,currency) values('00000000-0000-4000-8000-000000009001','Managed deal','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000002','USD');
+set local role authenticated;
+select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000002","session_id":"00000000-0000-4000-8000-000000000102"}',true);
+insert into developers(id,name,slug) values('00000000-0000-4000-8000-000000006002','Managed developer','managed-developer');
+insert into projects(id,developer_id,name,slug,district) values('00000000-0000-4000-8000-000000006001','00000000-0000-4000-8000-000000006002','Initial development','managed-development','Test district');
+insert into physical_units(id,project_id,unit_number,status,floor,bedrooms) values('00000000-0000-4000-8000-000000002001','00000000-0000-4000-8000-000000006001','A-21','Available',4,2);
+select save_offer('{"ref":"MANAGED","slug":"managed-property","marketing_title":"Managed property","district":"Test district","record_type":"unit_offer","price_type":"on-request","project_id":"00000000-0000-4000-8000-000000006001","cover_image_path":"/images/properties/hero-main.jpg","availability":"Available","publication":"Published"}',null);
+select link_physical_unit((select id from marketing_offers where ref='MANAGED'),'00000000-0000-4000-8000-000000002001',(select version from marketing_offers where ref='MANAGED'));
+select test.ok((select published_snapshot->'details'->>'floor' from marketing_offers where ref='MANAGED')='4','Linked floor appears on published property');
+update projects set name='Renamed development',delivery_date='2027-05-01' where id='00000000-0000-4000-8000-000000006001';
+select test.ok((select published_snapshot->'details'->>'project' from marketing_offers where ref='MANAGED')='Renamed development','Development rename updates an already published listing');
+select test.ok((select published_snapshot->'details'->>'delivery' from marketing_offers where ref='MANAGED')='2027-05-01','Delivery date updates public details');
+update developers set name='Renamed developer' where id='00000000-0000-4000-8000-000000006002';
+select test.ok((select published_snapshot->'details'->>'developer' from marketing_offers where ref='MANAGED')='Renamed developer','Developer edit updates public details');
+update physical_units set floor=5 where id='00000000-0000-4000-8000-000000002001';
+select test.ok((select published_snapshot->'details'->>'floor' from marketing_offers where ref='MANAGED')='5','Unit details update public listing');
+select test.denied('update physical_units set status=''Reserved'' where unit_number=''A-21''','Unit management cannot bypass reservation transactions');
+select test.denied($q$update site_settings set website_design='{"heroMain":"javascript:alert(1)"}'$q$,'Unsafe appearance image links are rejected by the database');
+insert into amenities(id,name) values('00000000-0000-4000-8000-000000006003','Managed feature');
+insert into offer_amenities select id,'00000000-0000-4000-8000-000000006003' from marketing_offers where ref='MANAGED';
+select test.ok((select published_snapshot->'details'->'amenities' from marketing_offers where ref='MANAGED')='["Managed feature"]','Adding a feature updates published details');
+delete from offer_amenities where amenity_id='00000000-0000-4000-8000-000000006003';
+select test.ok((select published_snapshot->'details'->'amenities' from marketing_offers where ref='MANAGED')='[]','Removing a feature removes it from public details');
+insert into pricing_options(id,offer_id,option_name,amount,currency,basis) select '00000000-0000-4000-8000-000000006004',id,'Managed plan',420000,'USD','cash' from marketing_offers where ref='MANAGED';
+insert into instalment_schedules(pricing_option_id,installment_no,due_month_offset,amount,currency) values('00000000-0000-4000-8000-000000006004',1,6,100000,'USD');
+select test.ok((select published_snapshot#>>'{details,pricing_options,0,schedule,0,amount}' from marketing_offers where ref='MANAGED')='100000.00','Payment plan schedule reaches published details');
+delete from pricing_options where id='00000000-0000-4000-8000-000000006004';
+select test.ok((select published_snapshot->'details'->'pricing_options' from marketing_offers where ref='MANAGED')='[]','Removing a plan removes its public schedule');
+insert into document_checklists(deal_id,document_type,title,status) values('00000000-0000-4000-8000-000000009001','title_deed','Title deed','verified');
+select test.ok((select verified_by from document_checklists limit 1)='00000000-0000-4000-8000-000000000002','Document verification records the actual staff account');
+insert into payment_milestones(id,deal_id,milestone_name,due_date,expected_amount,currency) values('00000000-0000-4000-8000-000000009002','00000000-0000-4000-8000-000000009001','Deposit',current_date+10,1000,'USD');
+select record_payment('{"deal_id":"00000000-0000-4000-8000-000000009001","milestone_id":"00000000-0000-4000-8000-000000009002","payment_reference":"RCPT-1","amount":500,"currency":"USD","payment_date":"2026-10-15","payment_method":"bank transfer"}');
+select record_payment('{"deal_id":"00000000-0000-4000-8000-000000009001","milestone_id":"00000000-0000-4000-8000-000000009002","payment_reference":"RCPT-1","amount":500,"currency":"USD","payment_date":"2026-10-15","payment_method":"bank transfer"}');
+select test.ok((select count(*) from recorded_payments)=1,'Retrying the same receipt does not duplicate payment');
+select test.ok((select status from payment_milestones where id='00000000-0000-4000-8000-000000009002')='partial','Actual receipts set the schedule to partially paid');
+update payment_milestones set status='paid' where id='00000000-0000-4000-8000-000000009002';
+select test.ok((select status from payment_milestones where id='00000000-0000-4000-8000-000000009002')='partial','A schedule cannot falsely claim payment receipt');
+select test.denied('update recorded_payments set amount=1','Recorded receipts cannot be edited');
+select test.denied('update payment_milestones set currency=''TRY''','A paid schedule cannot silently change currency');
+select test.denied($q$select record_payment('{"deal_id":"00000000-0000-4000-8000-000000009001","milestone_id":"00000000-0000-4000-8000-000000009002","payment_reference":"RCPT-2","amount":500,"currency":"TRY","payment_date":"2026-10-15","payment_method":"bank transfer"}')$q$,'Mismatched receipt currency is rejected');
+select reverse_payment((select id from recorded_payments where payment_reference='RCPT-1'),'Receipt entered for the wrong transfer');
+select reverse_payment((select id from recorded_payments where payment_reference='RCPT-1'),'Receipt entered for the wrong transfer');
+select test.ok((select count(*) from recorded_payments)=2,'Retrying a reversal creates one reversal and keeps the original');
+select test.ok((select status from payment_milestones where id='00000000-0000-4000-8000-000000009002')='pending','Reversal updates payment schedule honestly');
+insert into leases(physical_unit_id,landlord_contact_id,tenant_contact_id,agent_id,start_date,end_date,rent_amount,rent_currency,deposit_amount,deposit_currency)
+values('00000000-0000-4000-8000-000000002001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000001001','00000000-0000-4000-8000-000000000002','2027-01-01','2028-01-01',1500,'USD',1500,'USD');
+select test.ok((select count(*) from leases)=1,'Lease creation includes required deposit currency');
+insert into viewings(id,contact_id,offer_id,agent_id,start_time,end_time,status) select '00000000-0000-4000-8000-000000009003','00000000-0000-4000-8000-000000001001',id,'00000000-0000-4000-8000-000000000002','2027-02-01T09:00:00+03:00','2027-02-01T10:00:00+03:00','Scheduled' from marketing_offers where ref='MANAGED';
+update viewings set notes='Managed viewing edit',start_time='2027-02-02T09:00:00+03:00',end_time='2027-02-02T10:00:00+03:00' where id='00000000-0000-4000-8000-000000009003';
+select test.ok((select notes from viewings where id='00000000-0000-4000-8000-000000009003')='Managed viewing edit','Actual database viewing creation and editing do not reference lead-only fields');
+insert into commission_allocations(deal_id,agent_id,role_in_deal,percentage,calculated_amount,currency) values('00000000-0000-4000-8000-000000009001','00000000-0000-4000-8000-000000000002','Lead agent',10,1000,'USD');
+select test.ok((select count(*) from commission_allocations)=1,'Manager can record an agent commission');
+select test.denied('update commission_allocations set percentage=101','Commission share cannot exceed 100 percent');
+select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000003","session_id":"00000000-0000-4000-8000-000000000103"}',true);
+select test.denied('insert into viewings(contact_id,agent_id,start_time,end_time,status) values(''00000000-0000-4000-8000-000000001001'',''00000000-0000-4000-8000-000000000003'',''2027-02-01T09:00:00+03:00'',''2027-02-01T10:00:00+03:00'',''Scheduled'')','An agent still cannot book another advisor buyer');
+select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000005","session_id":"00000000-0000-4000-8000-000000000105"}',true);
+select test.denied($q$select record_payment('{}')$q$,'View-only staff cannot record receipts');
+select test.denied('insert into document_checklists(deal_id,document_type,title) values(''00000000-0000-4000-8000-000000009001'',''contract'',''No permission'')','View-only staff cannot change deal documents');
+set local role anon;
+select test.denied($q$select record_payment('{}')$q$,'Visitors cannot record receipts');
+select test.denied('select * from recorded_payments','Payments stay private');
+select test.ok((select count(*) from published_catalogue())=1,'Enriched catalogue stays readable to visitors');
+rollback;

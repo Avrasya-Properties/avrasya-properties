@@ -62,6 +62,7 @@ export type BudgetRange = {
 };
 
 export type SiteSettings = {
+  websiteDesign?: Record<string,string>;
   companyName: string;
   registeredEntity: string;
   taxOffice: string;
@@ -89,6 +90,7 @@ export type SiteSettings = {
 };
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
+  websiteDesign: {},
   companyName: "Avrasya Properties Group",
   registeredEntity: "Avrasya Properties Group",
   taxOffice: "Üsküdar / İstanbul",

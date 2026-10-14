@@ -14,6 +14,8 @@ export function ManagedPage({slug,children}:{slug:string;children:ReactNode}){
  },[q.data?.published,q.data?.title,q.data?.meta_description]);
  if(DEMO_MODE)return <>{children}</>;
  // Render default rich page content immediately without displaying a blocking loading screen
+ if(q.isError)return <><div role="alert" className="container-site my-6 rounded border p-4 text-sm">This page's saved content is temporarily unavailable. <button className="underline" onClick={()=>void q.refetch()}>Try again</button></div>{children}</>;
  if(!q.data||!q.data.published)return <>{children}</>;
  return <article className="container-site max-w-4xl py-16"><h1 className="headline text-4xl">{q.data.title}</h1>{(q.data.sections||[]).map((section,i)=><section key={i} className="my-10">{section.title&&<h2 className="mb-4 font-display text-2xl">{section.title}</h2>}{Array.isArray(section.content_json["paragraphs"])&&section.content_json["paragraphs"].filter((p):p is string=>typeof p==="string").map((p,j)=><p key={j} className="mb-4 whitespace-pre-line text-muted-foreground">{p}</p>)}{section.content_json["enquiry"]===true&&<Enquiry compact />}</section>)}</article>;
 }
+

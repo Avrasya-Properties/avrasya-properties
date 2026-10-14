@@ -37,6 +37,7 @@ function Editor() {
         {can(user, "publish") && d.publication === "Published" && <button className={btnGhost} onClick={() => save({ publication: "Draft" })}>Unpublish</button>}
       </div>} />
       <div className="mb-4 flex gap-1 overflow-x-auto border-b">{TABS.map((t) => <button key={t} onClick={() => setTab(t)} className={`whitespace-nowrap px-3 py-2 text-sm ${tab === t ? "border-b-2 border-brass font-medium" : "text-muted-foreground"}`}>{t}</button>)}</div>
+      {!DEMO_ENABLED&&<div className="mb-4 flex flex-wrap gap-2">{([["physical_units","Registered apartments"],["offer_amenities","Listing features"],["pricing_options","Payment plans"],["package_memberships","Package contents"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section,property:id}} className={btnGhost}>{label}</Link>)}</div>}
       <div className={tab==="Website Preview"?"w-full overflow-hidden rounded-md border bg-background":"max-w-3xl rounded-md border bg-card p-4"}>
         {tab === "Property details" && <div className="grid gap-3 sm:grid-cols-2">
           {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}{inp("District", "district")}{inp("City", "city")}{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}

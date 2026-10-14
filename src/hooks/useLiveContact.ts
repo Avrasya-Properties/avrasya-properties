@@ -7,6 +7,8 @@ export function useLiveContact():LiveContact{const s=useSiteSettings();return {c
 
 export function useWhatsAppLink() {
   const contact = useLiveContact();
-  return (text: string) => contact.whatsapp + "?text=" + encodeURIComponent(text);
+  return (text: string) => buildWhatsAppLink(contact.whatsapp,text);
 }
+export function buildWhatsAppLink(base:string,text:string){const url=new URL(base);url.searchParams.set("text",text);return url.toString();}
+
 

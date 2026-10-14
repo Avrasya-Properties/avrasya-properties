@@ -79,8 +79,9 @@ export function upsert<T extends {id:string}>(collection:Collection,item:Row & {
  if(typeof payload["cover_image_path"]==="string"&&payload["cover_image_path"].startsWith("data:"))throw new Error("Upload the image to Storage before saving.");
  result=await rpc<Row>("save_offer",{p_data:payload,p_version:original?.["version"]||null});
  }else if(collection==="deals"){
- await rpc("save_deal",{p_data:payload,p_version:original?.["version"],p_offers:merged["propertyIds"]||[]});
- result={...original,...payload,property_ids:merged["propertyIds"]||[]};
+ const dealId=await rpc<string>("save_deal",{p_data:payload,p_version:original?.["version"],p_offers:merged["propertyIds"]||[]});
+ const {data,error}=await supabase.from("deals").select().eq("id",dealId).single();if(error)throw error;
+ result={...data,property_ids:merged["propertyIds"]||[]};
  }else{
  delete payload["id"];
  if(collection==="inquiries")for(const key of Object.keys(payload))if(!["status","notes","assigned_agent_id"].includes(key))delete payload[key];

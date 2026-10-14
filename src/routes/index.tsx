@@ -89,8 +89,8 @@ function HomeCollection({
   const navigate = useNavigate();
   const [heroView, setHeroView] = useState<"skyline" | "terrace">("skyline");
   const heroImages = {
-    skyline: "/images/properties/hero-main.jpg",
-    terrace: "/images/properties/bosphorus-terrace.jpg",
+    skyline: settings.websiteDesign?.["heroMain"]||"/images/properties/hero-main.jpg",
+    terrace: settings.websiteDesign?.["heroAlt"]||"/images/properties/bosphorus-terrace.jpg",
   };
   const [search, setSearch] = useState({ loc: "", layout: "", budget: "" });
 
@@ -269,7 +269,7 @@ function HomeCollection({
                           <span className="text-white/70">41.0422° N, 29.0064° E</span>
                         </div>
                         <p className="font-display text-base sm:text-lg font-medium text-white truncate mt-0.5">
-                          {heroView === "skyline" ? "Bosphorus Coastline Residences" : "Bosphorus Strait Private Deck"}
+                          {heroView === "skyline" ? settings.websiteDesign?.["heroMainTitle"]||"Bosphorus Coastline Residences" : settings.websiteDesign?.["heroAltTitle"]||"Bosphorus Strait Private Deck"}
                         </p>
                         <p className="text-xs text-white/70 truncate mt-0.5">
                           Direct Title Clearance · Prime European & Asian Corridors
@@ -617,4 +617,5 @@ function HomeCollection({
     </div>
   );
 }
+
 

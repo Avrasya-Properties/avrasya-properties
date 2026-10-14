@@ -4,7 +4,7 @@ import type {PropertyRecord,Price,RecordType,Area} from "@/data/properties";
 // Use the same editable fields and source price rules as save_offer's public snapshot.
 export function listingPreview(p:Property,raw?:Row):PropertyRecord {
  const source=(raw?.["source_record"]||{}) as Row;
- const details=(source["details"]||{}) as Row;
+ const details={...(source["details"]||{}) as Row,...((raw?.["published_snapshot"] as Row|undefined)?.["details"]||{}) as Row};
  const oldPrice=(source["price"]||{}) as Price;
  const basis=p.priceBasis||"advertised";
  const sourcePrice=!raw||basis===raw["price_basis"]?oldPrice:{} as Price;
