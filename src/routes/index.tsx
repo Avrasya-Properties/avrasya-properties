@@ -35,6 +35,7 @@ import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useCatalogue, loadPublicSettings } from "@/data/live";
 import { useSiteSettings } from "@/admin/store";
+import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
@@ -550,82 +551,137 @@ function HomeCollection({
         </div>
       </section>
 
+      {/* Interactive Title Deed (Tapu) & Acquisition Cost Ledger */}
+      <section className="container-site pb-14 md:pb-20">
+        <AcquisitionCalculator />
+      </section>
+
       {/* Sovereign Gateway & Private Portfolio Consultation CTA (Combined Advisory & CBI Band) */}
-      <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-24">
-        {/* Subtle decorative radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/15 via-transparent to-transparent pointer-events-none" />
+      <section className="border-t bg-ink text-on-dark relative overflow-hidden py-20 md:py-28">
+        {/* Art-Directed Family Backdrop with Feathered Side-Fades & Vignette */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+          {/* Base image with radial and lateral gradient mask */}
+          <img
+            src="/images/family-future.png"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center lg:object-[50%_35%] scale-105 motion-safe:transition-transform motion-safe:duration-1000 opacity-45 sm:opacity-52"
+            style={{
+              maskImage:
+                "radial-gradient(ellipse 72% 68% at 50% 42%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.4) 65%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, transparent 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 72% 68% at 50% 42%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.4) 65%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, transparent 100%)",
+              filter: "contrast(1.08) brightness(0.92)",
+            }}
+          />
+
+          {/* Deep Horizontal Side-Fades (smoothly dissolving flanks into canvas ink) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, #07191e 0%, rgba(7,25,30,0.94) 14%, rgba(7,25,30,0.42) 32%, transparent 46%, transparent 54%, rgba(7,25,30,0.42) 68%, rgba(7,25,30,0.94) 86%, #07191e 100%)",
+            }}
+          />
+
+          {/* Vertical Top/Bottom Transitions & Contrast Scrim */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, #07191e 0%, rgba(7,25,30,0.72) 16%, rgba(7,25,30,0.42) 46%, rgba(7,25,30,0.85) 86%, #07191e 100%)",
+            }}
+          />
+
+          {/* Luxury Brass Ambient Glows */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_45%_at_50%_0%,rgba(197,160,89,0.22),transparent_75%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(197,160,89,0.14),transparent_50%)]" />
+        </div>
 
         <div className="container-site relative z-10 text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brass backdrop-blur-md shadow-[0_0_20px_rgba(197,160,89,0.15)]">
             <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Direct Istanbul Guidance · Turkish Citizenship Desk
           </div>
 
-          <h2 className="headline mx-auto mt-4 max-w-3xl text-3xl md:text-5xl text-on-dark leading-tight">
+          <h2 className="headline mx-auto mt-4 max-w-3xl text-3xl md:text-5xl text-on-dark leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.7)]">
             Your trusted path to Istanbul real estate:{" "}
             <em className="italic text-brass font-normal">Expert guidance at every step.</em>
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-on-dark-muted text-sm md:text-base leading-relaxed">
+          <p className="mx-auto mt-4 max-w-2xl text-on-dark-muted text-sm md:text-base leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
             Schedule a friendly consultation with our Istanbul advisory team. Ask us anything about top neighborhoods,
             Turkish citizenship qualifications (${settings.cbiThresholdUsd.toLocaleString("en-US")} USD),
             clean title deeds, or arranging private viewings.
           </p>
 
-          {/* 3 Metric Parameter Cards */}
-          <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3 max-w-3xl mx-auto text-left">
-            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40">
-              <p className="eyebrow !text-brass">Citizenship Requirement</p>
+          {/* 3 Metric Parameter Cards (Floating glassmorphism with spatial elevation) */}
+          <div className="mt-8 grid grid-cols-2 gap-4 border-y border-white/10 py-6 sm:grid-cols-3 max-w-3xl mx-auto text-left relative z-10">
+            <div className="group rounded-md bg-[#07191e]/80 border border-white/15 p-5 backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-brass/70 hover:shadow-[0_16px_40px_rgba(197,160,89,0.18)]">
+              <p className="eyebrow !text-brass flex items-center justify-between">
+                <span>Citizenship Requirement</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-brass/80 group-hover:scale-125 transition-transform" />
+              </p>
               <p className="font-display text-2xl font-semibold text-on-dark mt-1">
                 ${settings.cbiThresholdUsd.toLocaleString("en-US")} USD
               </p>
               <p className="text-[0.7rem] text-on-dark-muted mt-0.5">Or TRY equivalent on transfer day</p>
             </div>
-            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40">
-              <p className="eyebrow !text-brass">Holding Period</p>
+            <div className="group rounded-md bg-[#07191e]/80 border border-white/15 p-5 backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-brass/70 hover:shadow-[0_16px_40px_rgba(197,160,89,0.18)]">
+              <p className="eyebrow !text-brass flex items-center justify-between">
+                <span>Holding Period</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-brass/80 group-hover:scale-125 transition-transform" />
+              </p>
               <p className="font-display text-2xl font-semibold text-on-dark mt-1">3 Years</p>
               <p className="text-[0.7rem] text-on-dark-muted mt-0.5">Keep for 3 years to maintain citizenship</p>
             </div>
-            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40 col-span-2 sm:col-span-1">
-              <p className="eyebrow !text-brass">Family Included</p>
-              <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse & Kids &lt;18</p>
+            <div className="group rounded-md bg-[#07191e]/80 border border-white/15 p-5 backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-brass/70 hover:shadow-[0_16px_40px_rgba(197,160,89,0.18)] col-span-2 sm:col-span-1">
+              <p className="eyebrow !text-brass flex items-center justify-between">
+                <span>Family Included</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-brass/80 group-hover:scale-125 transition-transform" />
+              </p>
+              <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse &amp; Kids &lt;18</p>
               <p className="text-[0.7rem] text-on-dark-muted mt-0.5">All included under one single application</p>
             </div>
           </div>
 
           {/* Combined Action Buttons */}
-          <div className="mt-8 flex flex-wrap justify-center items-center gap-3">
-            <Link to="/contact" className="btn btn-primary btn-shimmer shadow-sm">
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-3 relative z-10">
+            <Link to="/contact" className="btn btn-primary btn-shimmer shadow-lg shadow-brass/20">
               Request a Consultation
             </Link>
             <a
               href={waLink("Hello Avrasya Properties, I would like to schedule a private portfolio consultation regarding Istanbul real estate and Turkish citizenship.")}
               target="_blank"
               rel="noreferrer"
-              className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"
+              className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md shadow-sm gap-1.5"
             >
               <MessageSquare className="h-3.5 w-3.5 text-brass" /> Chat on WhatsApp
             </a>
             <Link
               to="/calculator"
-              className="btn btn-light shadow-sm gap-2"
+              className="btn btn-light shadow-md gap-2 hover:scale-[1.02] transition-transform"
             >
               <Calculator className="h-4 w-4 text-brass" />
               <span>Calculate Total Purchase Costs</span>
             </Link>
             <Link
               to="/citizenship"
-              className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 transition-colors"
+              className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md transition-colors"
             >
               Turkish Citizenship Guide
             </Link>
           </div>
         </div>
 
-        {/* Elegant typography watermark */}
+        {/* Elegant typography watermark with enhanced opacity & warm brass aura */}
         <div
           aria-hidden
           data-parallax="0.2"
-          className="outline-word pointer-events-none absolute -bottom-12 right-0 select-none text-[12rem] outline-light opacity-20 hidden md:block"
+          className="outline-word pointer-events-none absolute -bottom-8 sm:-bottom-12 md:-bottom-16 lg:-bottom-20 right-0 sm:right-4 md:right-8 select-none text-[7.5rem] sm:text-[11rem] md:text-[15rem] lg:text-[19rem] xl:text-[22rem] outline-light !opacity-45 md:!opacity-52 tracking-widest leading-none z-0"
+          style={{
+            WebkitTextStroke: "1.75px rgba(220, 185, 125, 0.65)",
+            filter: "drop-shadow(0 0 40px rgba(197, 160, 89, 0.32))",
+          }}
         >
           TÜRKİYE
         </div>

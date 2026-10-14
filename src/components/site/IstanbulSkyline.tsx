@@ -14,7 +14,7 @@ export function IstanbulSkyline({ className = "", opacity = 1 }: IstanbulSkyline
       <img
         src={skyline}
         alt="Istanbul Architectural Panorama"
-        className="w-full h-auto block"
+        className="w-full h-auto block object-contain object-bottom"
         style={{ opacity }}
         loading="eager"
         decoding="sync"

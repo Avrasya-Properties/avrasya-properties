@@ -5,6 +5,7 @@ import { CONTACT, type SupportedCurrency } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { Magnetic } from "./Motion";
+import { IstanbulSkyline } from "./IstanbulSkyline";
 
 export function Logo({
   className = "h-10",
@@ -296,10 +297,20 @@ export function Footer() {
   ] as const;
 
   return (
-    <footer className="border-t border-border/40 bg-primary text-on-dark">
-      <div className="container-site grid gap-10 py-16 md:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
+    <footer className="border-t border-border/40 bg-primary text-on-dark relative z-10 overflow-hidden">
+      {/* Authentic Istanbul Skyline Architectural Panorama Silhouette */}
+      <div className="w-full overflow-hidden border-b border-white/10 pt-6 pb-2 px-4 select-none pointer-events-none">
+        <div className="container-site flex justify-center">
+          <IstanbulSkyline
+            opacity={0.75}
+            className="w-full max-w-5xl transition-opacity duration-500 hover:opacity-90 drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
+          />
+        </div>
+      </div>
+
+      <div className="container-site grid gap-10 py-12 md:py-16 md:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         <div className="space-y-4 text-sm text-on-dark-muted">
-          <Logo className="h-10" variant="light" />
+          <Logo className="h-10 sm:h-11" variant="light" />
           <p className="text-on-dark font-medium">{contact.tagline}</p>
           <p className="text-xs leading-relaxed text-on-dark-muted/80">
             Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and
@@ -356,7 +367,10 @@ export function Footer() {
           periodically by Turkish authorities. Our team will verify all latest details and legal
           requirements with you before signing any contract.
         </div>
-        <div className="container-site flex flex-col gap-3 pb-8 text-xs text-on-dark-muted md:flex-row md:items-center md:justify-between">
+        <div
+          className="container-site flex flex-col gap-3 pb-24 lg:pb-8 text-xs text-on-dark-muted md:flex-row md:items-center md:justify-between"
+          style={{ paddingBottom: "max(5.5rem, calc(4rem + env(safe-area-inset-bottom, 0px)))" }}
+        >
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span>© 2026 {contact.company}. All rights reserved.</span>
             <span className="text-on-dark-muted/40" aria-hidden="true">
@@ -364,7 +378,7 @@ export function Footer() {
             </span>
             <span className="text-on-dark-muted/90 font-medium">Built by Zarif</span>
           </div>
-          <span className="flex flex-wrap gap-5">
+          <span className="flex flex-wrap gap-5 relative z-20">
             <Link to="/privacy-policy" className="hover:text-on-dark transition-colors">
               Privacy Policy
             </Link>
@@ -446,21 +460,52 @@ export function CtaBand() {
   const contact=useLiveContact();
   return (
     <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-20">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/10 via-transparent to-transparent pointer-events-none" />
-      <div className="container-site relative text-center">
-        <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
+      {/* Art-Directed Family Backdrop with Feathered Side-Fades & Scrim */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+        <img
+          src="/images/family-future.png"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover object-center scale-105 opacity-25"
+          style={{
+            maskImage:
+              "radial-gradient(ellipse 75% 70% at 50% 45%, rgba(0,0,0,0.9) 20%, transparent 85%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, transparent 100%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 75% 70% at 50% 45%, rgba(0,0,0,0.9) 20%, transparent 85%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, transparent 100%)",
+            filter: "contrast(1.05) brightness(0.85)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, #07191e 0%, rgba(7,25,30,0.92) 15%, transparent 40%, transparent 60%, rgba(7,25,30,0.92) 85%, #07191e 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, #07191e 0%, rgba(7,25,30,0.6) 20%, rgba(7,25,30,0.8) 80%, #07191e 100%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/15 via-transparent to-transparent pointer-events-none" />
+      </div>
+
+      <div className="container-site relative z-10 text-center">
+        <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass backdrop-blur-md shadow-[0_0_15px_rgba(197,160,89,0.12)]">
           Direct Istanbul Guidance
         </span>
-        <h2 className="headline mx-auto mt-4 max-w-2xl text-3xl md:text-4xl text-on-dark">
+        <h2 className="headline mx-auto mt-4 max-w-2xl text-3xl md:text-4xl text-on-dark drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
           Ready to find your dream property in Istanbul?
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-on-dark-muted text-sm md:text-base leading-relaxed">
+        <p className="mx-auto mt-4 max-w-xl text-on-dark-muted text-sm md:text-base leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
           Speak directly with our team in Istanbul. Whether you are exploring neighborhoods,
           seeking Turkish citizenship, or arranging a viewing, we are here to help.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Magnetic>
-            <Link to="/contact" className="btn btn-primary shadow-sm">
+            <Link to="/contact" className="btn btn-primary shadow-lg shadow-brass/20">
               Request a Consultation
             </Link>
           </Magnetic>
@@ -468,7 +513,7 @@ export function CtaBand() {
             href={contact.whatsapp}
             target="_blank"
             rel="noreferrer"
-            className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"
+            className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md gap-1.5"
           >
             <MessageSquare className="h-3.5 w-3.5 text-brass" /> Chat on WhatsApp
           </a>

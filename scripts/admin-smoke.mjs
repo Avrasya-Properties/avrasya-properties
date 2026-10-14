@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 import puppeteer from "puppeteer-core";
 
 const origin = "http://127.0.0.1:8080";
-const child = spawn("bun", ["run", "dev", "--host", "127.0.0.1", "--port", "8080"], { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, VITE_ENABLE_ADMIN_DEMO: "true" } });
+const child = spawn("bun", ["run", "dev", "--host", "127.0.0.1", "--port", "8080"], { stdio: ["ignore", "pipe", "pipe"], shell: true, env: { ...process.env, VITE_ENABLE_ADMIN_DEMO: "true" } });
 let serverOutput = "";
 child.stdout.on("data", (chunk) => { serverOutput = (serverOutput + chunk).slice(-8000); });
 child.stderr.on("data", (chunk) => { serverOutput = (serverOutput + chunk).slice(-8000); });
@@ -82,7 +82,15 @@ try {
     if (attempt === 59) throw new Error("Dev server failed to become ready: " + serverOutput);
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+  browser = await puppeteer.launch({
+    executablePath:
+      process.env.CHROME_PATH ||
+      (process.platform === "win32"
+        ? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+        : "/usr/bin/google-chrome"),
+    headless: true,
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
+  });
   page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 1000 });
   page.setDefaultTimeout(20000);
