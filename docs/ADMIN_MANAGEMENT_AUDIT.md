@@ -30,3 +30,5 @@ The additive migration must be applied before releasing the new frontend. It doe
 ## Deployment checks
 
 Repository and isolated browser checks do not identify which revision a separately hosted Lovable preview or public domain is serving. Publish the merged version in Lovable and verify the actual URL. Public enquiry submission still depends on the deployment's allowed-origin configuration; Auth recovery depends on its approved redirect URLs and mail settings. These deployment settings are separate from saving and publishing properties.
+
+The live Supabase security review found no new database permission warnings. It still reports [leaked-password protection disabled](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection), an Auth dashboard setting. The rate-limit table intentionally has no visitor/staff access policy because it is server-only.
