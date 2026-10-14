@@ -44,6 +44,7 @@ export function validateSettings(s) {
   if (s.districts !== undefined && (!Array.isArray(s.districts) || s.districts.some((x) => typeof x !== "string"))) throw new Error("Invalid districts list.");
   if (s.layouts !== undefined && (!Array.isArray(s.layouts) || s.layouts.some((x) => typeof x !== "string"))) throw new Error("Invalid layouts list.");
   if (s.budgetRanges !== undefined && (!Array.isArray(s.budgetRanges) || s.budgetRanges.some((b) => !b || typeof b !== "object" || typeof b.id !== "string" || typeof b.label !== "string"))) throw new Error("Invalid budget ranges list.");
+  if(s.budgetRanges){const ids=new Set();for(const b of s.budgetRanges){if(!b.id.trim()||ids.has(b.id)||!b.label.trim()||!Number.isFinite(b.min)||!Number.isFinite(b.max)||b.min<0||b.max<=b.min)throw new Error("Each budget tier needs a unique name and a valid lower and upper amount.");ids.add(b.id);}}
   return s;
 }
 export function validateWorkspace(input) {
@@ -163,3 +164,4 @@ export function currencyTotals(records) {
   }
   return totals;
 }
+
