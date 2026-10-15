@@ -79,7 +79,7 @@ function Catalog() {
   const [currency] = useCurrency();
   const { shortlist, count: savedCount, isSaved, toggle } = useShortlist();
 
-  let list = filterProperties(f, properties);
+  let list = filterProperties(f, properties, BUDGET_OPTIONS);
   if (f.savedOnly) {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
@@ -363,4 +363,5 @@ function Catalog() {
     </>
   );
 }
+
 

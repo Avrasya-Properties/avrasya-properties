@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalDraft, meta } from "@/components/site/TextPage";
 
@@ -10,13 +11,14 @@ export const Route = createFileRoute("/cookie-policy")({
     ),
   }),
   component: () => (
-    <LegalDraft
+    <ManagedPage slug="cookie-policy"><LegalDraft
       title="Cookie Policy"
       topics={[
         "Cookies and similar technologies used",
         "Analytics and preferences",
         "How to manage cookies",
       ]}
-    />
+    /></ManagedPage>
   ),
 });
+

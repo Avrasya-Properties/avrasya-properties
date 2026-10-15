@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 import puppeteer from "puppeteer-core";
 
 const origin = "http://127.0.0.1:8080";
-const child = spawn("bun", ["run", "dev", "--host", "127.0.0.1", "--port", "8080"], { stdio: ["ignore", "pipe", "pipe"], shell: true, env: { ...process.env, VITE_ENABLE_ADMIN_DEMO: "true" } });
+const child = spawn("bun", ["run", "dev", "--mode", "demo", "--host", "127.0.0.1", "--port", "8080"], { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, VITE_ENABLE_ADMIN_DEMO: "true" } });
 let serverOutput = "";
 child.stdout.on("data", (chunk) => { serverOutput = (serverOutput + chunk).slice(-8000); });
 child.stderr.on("data", (chunk) => { serverOutput = (serverOutput + chunk).slice(-8000); });

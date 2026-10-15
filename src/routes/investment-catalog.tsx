@@ -17,6 +17,7 @@ import {
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
 import { useLiveContact } from "@/hooks/useLiveContact";
+import { publicDocumentUrl } from "@/lib/public-document";
 
 export const Route = createFileRoute("/investment-catalog")({
   head: () =>
@@ -165,3 +166,4 @@ function Catalog() {
     </>
   );
 }
+

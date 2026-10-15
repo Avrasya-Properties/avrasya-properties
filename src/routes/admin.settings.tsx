@@ -23,6 +23,8 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
+import { DESIGN_FIELDS } from "@/admin/website-design";
+import { uploadImage } from "@/admin/store";
 import { 
   DEMO_ENABLED,
   DEFAULT_SITE_SETTINGS, 
@@ -41,12 +43,12 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company Profile", "Homepage", "SEO & Search", "Taxonomy & Filters", "Exchange rates", "Export data"] as const;
+const TABS = ["Company details", "Homepage", "Website appearance", "Search filters", "Exchange rates", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
   const user = useSession();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Company Profile");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Company details");
   const [form, setForm] = useState<SiteSettings>({ ...db.siteSettings });
   const [newDistrict, setNewDistrict] = useState("");
   const [newLayout, setNewLayout] = useState("");
@@ -158,8 +160,9 @@ export function AdminSettingsPage() {
       </div>
 
       <fieldset id="cms-fields" disabled={!editable} className="min-w-0">
-      {/* TAB 1: Company Profile */}
-      {tab === "Company Profile" && (
+      {tab==="Website appearance"&&<div className="max-w-4xl space-y-5 rounded border bg-card p-5"><h2 className="font-semibold">Website images and footer</h2><p className="text-sm text-muted-foreground">Use image links or upload JPEG, PNG or WebP files under 5 MB. Leave an image link empty to use the original branding. Save website settings to apply your changes.</p>{DESIGN_FIELDS.map(design=><label key={design.key} className="block text-sm">{design.label}<input className={field} value={form.websiteDesign?.[design.key]||""} onChange={e=>setField("websiteDesign",{...form.websiteDesign,[design.key]:e.target.value})}/>{"image" in design&&design.image&&<><input aria-label={"Upload "+design.label.toLowerCase()} className="mt-2 block max-w-full text-xs" type="file" accept="image/jpeg,image/png,image/webp" disabled={DEMO_ENABLED} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;try{const url=await uploadImage(file);setField("websiteDesign",{...form.websiteDesign,[design.key]:url});toast.success("Image uploaded. Save settings to apply it.");}catch(error){toast.error((error as Error).message);}}}/>{form.websiteDesign?.[design.key]&&<img src={form.websiteDesign[design.key]} alt={design.label} className="mt-3 max-h-36 max-w-full rounded border bg-muted object-contain"/>}</>}</label>)}</div>}
+      {/* TAB 1: Company details */}
+      {tab === "Company details" && (
         <div className="max-w-4xl space-y-6">
           <div className="rounded-xl border bg-card p-6">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
@@ -620,6 +623,8 @@ export function AdminSettingsPage() {
 
       {/* TAB 3: Taxonomy & Filters (Regions, Apartment Layouts, Budgets) */}
       {tab === "Taxonomy & Filters" && (
+      {/* TAB 3: Search filters (Regions, Apartment Layouts, Budgets) */}
+      {tab === "Search filters" && (
         <div className="max-w-4xl space-y-6">
           {/* Card 1: Istanbul Districts / Regions */}
           <div className="rounded-xl border bg-card p-6">
@@ -1088,3 +1093,4 @@ export function AdminSettingsPage() {
     </div>
   );
 }
+

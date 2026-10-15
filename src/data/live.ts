@@ -43,7 +43,7 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
  if(error)throw new Error("The property catalogue is unavailable. Please contact our advisory team.");
  return z.array(record).parse(data) as PropertyRecord[];
 }
-export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:60000,refetchOnMount:false,refetchOnWindowFocus:false,refetchInterval:60000});return {...q,properties:q.data||[]};}
+export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,refetchOnWindowFocus:true,refetchInterval:30000});return {...q,properties:q.data||[]};}
 export async function loadPublicSettings(){
  if(DEMO_MODE){
    if(typeof window!=="undefined"){
@@ -61,7 +61,7 @@ export async function loadPublicSettings(){
  if(error)throw error;return decodeSettings(data as Row);
 }
 export function usePublicSettings(){
- const q=useQuery({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:60000,refetchInterval:60000});
+ const q=useQuery({queryKey:["site-settings"],queryFn:loadPublicSettings,enabled:!DEMO_MODE,staleTime:15000,refetchOnWindowFocus:true,refetchInterval:30000});
  return {...q,settings:q.data||DEFAULT_SITE_SETTINGS};
 }
 export async function resolveRedirect(slug:string):Promise<string|null>{const {data,error}=await publicSupabase.rpc("published_redirect",{p_slug:slug});if(error)throw error;return data as string|null;}
@@ -146,3 +146,6 @@ export function useFaqs(){return useQuery({queryKey:["faqs"],queryFn:async()=>{
   }
   const {data,error}=await publicSupabase.from("faqs").select("id,question,answer,category").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;question:string;answer:string;category:string}[];
 },staleTime:15000,refetchInterval:30000});}
+export function useServices(){return useQuery({queryKey:["services"],enabled:!DEMO_MODE,queryFn:async()=>{const {data,error}=await publicSupabase.from("services").select("id,title,category,description,process_steps").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;title:string;category:string|null;description:string;process_steps:unknown[]}[];},staleTime:15000,refetchInterval:30000});}
+export function useFaqs(){return useQuery({queryKey:["faqs"],enabled:!DEMO_MODE,queryFn:async()=>{const {data,error}=await publicSupabase.from("faqs").select("id,question,answer,category").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;question:string;answer:string;category:string}[];},staleTime:15000,refetchInterval:30000});}
+

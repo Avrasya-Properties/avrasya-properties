@@ -63,6 +63,7 @@ export type BudgetRange = {
 };
 
 export type SiteSettings = {
+  websiteDesign?: Record<string,string>;
   companyName: string;
   registeredEntity: string;
   taxOffice: string;
@@ -97,6 +98,7 @@ export type SiteSettings = {
 };
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
+  websiteDesign: {},
   companyName: "Avrasya Properties Group",
   registeredEntity: "Avrasya Properties Group",
   taxOffice: "Üsküdar / İstanbul",
@@ -531,6 +533,9 @@ export type PublicEnquiryInput = {
   message: string;
   source?: Inquiry["source"] | undefined;
   propertySlug?: string | undefined;
+  consent?: boolean;
+  idempotencyKey?: string;
+  website?: string;
 };
 
 export function recordPublicEnquiry(input: PublicEnquiryInput): {
@@ -717,3 +722,4 @@ export const userName = (id: string) => USERS.find((u) => u.id === id)?.name ?? 
 export const fmtMoney = (n: number | null, c: string | null) => (n == null || !c ? "—" : new Intl.NumberFormat("en-US", { style: "currency", currency: c, maximumFractionDigits: 0 }).format(n));
 export const fmtDate = (s: string | null, time = false) => (!s ? "—" : new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Istanbul", day: "2-digit", month: "short", ...(time ? { hour: "2-digit", minute: "2-digit" } : {}) }).format(new Date(s)));
 export const normPhone = (s: string) => s.replace(/\D/g, "");
+

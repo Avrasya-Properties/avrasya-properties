@@ -12,4 +12,6 @@ describe("persistent admin mappings",()=>{
  it("round-trips every website setting without renaming legal identity",()=>{expect(decodeSettings(encodeSettings(DEFAULT_SITE_SETTINGS))).toEqual(DEFAULT_SITE_SETTINGS);});
  it("round-trips custom SEO settings and indexing configurations",()=>{const custom={...DEFAULT_SITE_SETTINGS,siteTitle:"Custom Istanbul Luxury Advisory",metaDescription:"Verified Istanbul penthouse and villa collection with legal due diligence.",siteUrl:"https://avrasyaproperties.com",ogImage:"https://avrasyaproperties.com/images/custom-og.jpg",keywords:"istanbul, luxury, real estate",indexingEnabled:false};expect(decodeSettings(encodeSettings(custom))).toEqual(custom);});
  it("excludes mutation of settings audit columns",()=>{expect(encodeSettings({companyName:"New"})).toEqual({company_name:"New"});});
+ it("loads legacy settings without losing defaults or throwing on malformed arrays",()=>{const settings=decodeSettings({company_name:"Actual company",districts:"invalid JSON"});expect(settings.companyName).toBe("Actual company");expect(settings.districts).toEqual(DEFAULT_SITE_SETTINGS.districts);expect(settings.email).toBe(DEFAULT_SITE_SETTINGS.email);});
+ it("preserves intentionally empty managed filters",()=>{expect(decodeSettings({districts:[],layouts:[],budget_ranges:[]}).budgetRanges).toEqual([]);});
 });

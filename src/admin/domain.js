@@ -29,8 +29,9 @@ export function exactBudget(text) {
   return Number.isFinite(amount) ? { amount, currency } : null;
 }
 export function validateSettings(s) {
-  const textKeys = ["companyName", "registeredEntity", "taxOffice", "licenseNo", "tagline", "email", "phone", "whatsapp", "address", "advisoryHours", "heroHeadline", "heroSubtitle", "eyebrowText", "announcementText", "siteTitle", "metaDescription", "siteUrl", "ogImage", "keywords", "googleVerification"];
-  for (const k of textKeys) if (s[k] !== undefined && (typeof s[k] !== "string" || s[k].length > 4000)) throw new Error("Invalid setting: " + k);
+  if(s.websiteDesign!==undefined){if(!s.websiteDesign||typeof s.websiteDesign!=="object"||Array.isArray(s.websiteDesign))throw new Error("Invalid website appearance settings");for(const [key,value] of Object.entries(s.websiteDesign)){if(typeof value!=="string"||value.length>4000)throw new Error("Invalid website appearance text");if(["logoDark","logoLight","heroMain","heroAlt","footerImage"].includes(key)&&value!==""&&!/^(https:\/\/|\/images\/)[^\s]+$/.test(value))throw new Error("Use an HTTPS image link or an existing website image");}}
+  const textKeys = ["companyName", "registeredEntity", "taxOffice", "licenseNo", "tagline", "email", "phone", "whatsapp", "address", "advisoryHours", "heroHeadline", "heroSubtitle", "eyebrowText", "announcementText"];
+  for (const k of textKeys) if (typeof s[k] !== "string" || s[k].length > 4000) throw new Error("Invalid setting: " + k);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) throw new Error("Enter a valid contact email.");
   let url; try { url = new URL(s.whatsapp); } catch { throw new Error("Enter a valid WhatsApp URL."); }
   if (url.protocol !== "https:" || !["wa.me", "api.whatsapp.com"].includes(url.hostname)) throw new Error("WhatsApp URL must use https://wa.me or https://api.whatsapp.com.");
@@ -45,6 +46,7 @@ export function validateSettings(s) {
   if (s.districts !== undefined && (!Array.isArray(s.districts) || s.districts.some((x) => typeof x !== "string"))) throw new Error("Invalid districts list.");
   if (s.layouts !== undefined && (!Array.isArray(s.layouts) || s.layouts.some((x) => typeof x !== "string"))) throw new Error("Invalid layouts list.");
   if (s.budgetRanges !== undefined && (!Array.isArray(s.budgetRanges) || s.budgetRanges.some((b) => !b || typeof b !== "object" || typeof b.id !== "string" || typeof b.label !== "string"))) throw new Error("Invalid budget ranges list.");
+  if(s.budgetRanges){const ids=new Set();for(const b of s.budgetRanges){if(!b.id.trim()||ids.has(b.id)||!b.label.trim()||!Number.isFinite(b.min)||!Number.isFinite(b.max)||b.min<0||b.max<=b.min)throw new Error("Each budget tier needs a unique name and a valid lower and upper amount.");ids.add(b.id);}}
   return s;
 }
 export function validateWorkspace(input) {
@@ -164,3 +166,4 @@ export function currencyTotals(records) {
   }
   return totals;
 }
+

@@ -2,7 +2,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import { websiteChanged } from "@/lib/website-sync";
 import { supabase } from "@/lib/supabase";
 import { decode,decodeSettings,encode,encodeSettings,TABLES,type Collection,type Row } from "./mappers";
-import * as demo from "./demo";
+import { submitPublicEnquiry } from "@/lib/public-enquiry";
 import { DEFAULT_SITE_SETTINGS,type DB,type User,type SiteSettings,type Property,type Lead,type Deal,type Inquiry,type Activity } from "./demo";
 import { validateSettings,requireText } from "./domain.js";
 const empty:DB={properties:[],contacts:[],leads:[],tasks:[],viewings:[],deals:[],inquiries:[],siteSettings:DEFAULT_SITE_SETTINGS,activity:[],readNotes:[]};
@@ -79,8 +79,9 @@ export function upsert<T extends {id:string}>(collection:Collection,item:Row & {
  if(typeof payload["cover_image_path"]==="string"&&payload["cover_image_path"].startsWith("data:"))throw new Error("Upload the image to Storage before saving.");
  result=await rpc<Row>("save_offer",{p_data:payload,p_version:original?.["version"]||null});
  }else if(collection==="deals"){
- await rpc("save_deal",{p_data:payload,p_version:original?.["version"],p_offers:merged["propertyIds"]||[]});
- result={...original,...payload,property_ids:merged["propertyIds"]||[]};
+ const dealId=await rpc<string>("save_deal",{p_data:payload,p_version:original?.["version"],p_offers:merged["propertyIds"]||[]});
+ const {data,error}=await supabase.from("deals").select().eq("id",dealId).single();if(error)throw error;
+ result={...data,property_ids:merged["propertyIds"]||[]};
  }else{
  delete payload["id"];
  if(collection==="inquiries")for(const key of Object.keys(payload))if(!["status","notes","assigned_agent_id"].includes(key))delete payload[key];
@@ -112,6 +113,8 @@ export async function recordPublicEnquiry(input: Parameters<typeof demo.recordPu
     receipt: data.receipt as string,
   };
 }
+export const recordPublicEnquiry = submitPublicEnquiry;
 export async function exportBackup(){if(user?.role!=="admin")throw new Error("Administrator access required.");const tables=await Promise.all(["staff_profiles","developers","projects","buildings","physical_units","marketing_offers","package_memberships","amenities","offer_amenities","pricing_options","instalment_schedules","price_history","availability_history","publication_history","property_slug_redirects","contacts","buyer_requirements","contact_shortlists","enquiries","leads","tasks","viewings","activities","notes","contact_merges","deals","deal_selected_units","offer_revisions","reservations","document_checklists","payment_milestones","recorded_payments","commission_allocations","leases","rent_charges","rent_payment_allocations","rental_deposits","vendors","maintenance_tickets","site_settings","content_pages","content_sections","services","faqs","catalog_documents","audit_events","notifications","storage_files","source_files","extraction_candidates","import_runs","notification_receipts"].map(fetchRows));return JSON.stringify({schemaVersion:2,exportedAt:new Date().toISOString(),data:Object.fromEntries(["staff_profiles","developers","projects","buildings","physical_units","marketing_offers","package_memberships","amenities","offer_amenities","pricing_options","instalment_schedules","price_history","availability_history","publication_history","property_slug_redirects","contacts","buyer_requirements","contact_shortlists","enquiries","leads","tasks","viewings","activities","notes","contact_merges","deals","deal_selected_units","offer_revisions","reservations","document_checklists","payment_milestones","recorded_payments","commission_allocations","leases","rent_charges","rent_payment_allocations","rental_deposits","vendors","maintenance_tickets","site_settings","content_pages","content_sections","services","faqs","catalog_documents","audit_events","notifications","storage_files","source_files","extraction_candidates","import_runs","notification_receipts"].map((name,i)=>[name,tables[i]])),externalFilesIncluded:false},null,2);}
 export async function uploadImage(file:File){if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024)throw new Error("Use a JPEG, PNG or WebP under 5 MB.");const path="offers/"+crypto.randomUUID()+"."+file.type.split("/")[1];const {error}=await supabase.storage.from("public-marketing").upload(path,file,{upsert:false,contentType:file.type});if(error)throw error;return supabase.storage.from("public-marketing").getPublicUrl(path).data.publicUrl;}
 export function rawRecord(collection:Collection,id:string){return rows.get(TABLES[collection]+":"+id);}
+

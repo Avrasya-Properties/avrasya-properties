@@ -372,7 +372,7 @@ try {
   await page.waitForSelector("[data-empty-collection]");
   await fits("Empty catalogue homepage");
   assert.ok(await page.$("[data-home-hero]"));
-  assert.ok(await page.$("#calculator"));
+  assert.ok(await page.$('main a[href="/calculator"]'),"The full homepage retains its calculator link");
   assert.equal(await page.$('main input[autocomplete="name"]'), null);
   await screenshot("home-empty-390");
   results.push(

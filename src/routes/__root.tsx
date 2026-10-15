@@ -19,6 +19,7 @@ import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import {loadCatalogue,loadPublicSettings} from "@/data/live";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import {DEMO_MODE,SUPABASE_URL} from "@/lib/supabase";
 
 function NotFoundComponent() {
   return (
@@ -80,8 +81,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Load critical public data before rendering, then hydrate the same cache.
     // A failed catalogue read is displayed inside the homepage, not as a redirect.
     await Promise.allSettled([
-      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:300000,retry:false}),
-      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:300000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:15000,retry:false}),
+      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
     ]);
   },
   head: () => ({
@@ -102,6 +103,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
       { name: "twitter:description", content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment." },
       { name: "twitter:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
+      { name: "avrasya-data-mode", content: DEMO_MODE?"demo":"live" },
+      { name: "avrasya-database", content: new URL(SUPABASE_URL).hostname },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -199,6 +202,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = path.startsWith("/admin");
   useEffect(
     () =>
       watchWebsiteChanges(() => {
@@ -206,11 +211,9 @@ function RootComponent() {
           predicate: (q) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
         });
         void router.invalidate();
-      }),
-    [queryClient, router],
+      },{poll:!isAdmin&&!DEMO_MODE}),
+    [queryClient, router,isAdmin],
   );
-  const path = useRouterState({ select: (s) => s.location.pathname });
-  const isAdmin = path.startsWith("/admin");
   if (isAdmin)
     return (
       <QueryClientProvider client={queryClient}>
@@ -234,3 +237,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+

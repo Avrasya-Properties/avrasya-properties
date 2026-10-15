@@ -14,7 +14,7 @@ insert into public.staff_profiles(id,email,name,role,is_active) values
 ('00000000-0000-4000-8000-000000000004','other@example.test','Other agent','agent',true),
 ('00000000-0000-4000-8000-000000000005','viewer@example.test','Viewer','viewer',true),
 ('00000000-0000-4000-8000-000000000006','inactive@example.test','Inactive','agent',false);
-insert into site_settings(singleton_key) values('default');
+insert into site_settings(singleton_key) values('default') on conflict(singleton_key) do nothing;
 insert into contacts(id,name,assigned_agent_id) values
 ('00000000-0000-4000-8000-000000001001','Assigned buyer','00000000-0000-4000-8000-000000000003'),
 ('00000000-0000-4000-8000-000000001002','Other buyer','00000000-0000-4000-8000-000000000004');
@@ -22,6 +22,8 @@ insert into physical_units(id,unit_number,status) values
 ('00000000-0000-4000-8000-000000002001','A-21','Available'),
 ('00000000-0000-4000-8000-000000002002','A-22','Available');
 set local role anon;
+select test.ok((select count(*) from website_revision)=1,'Visitors can read the public revision only');
+select test.denied('update website_revision set revision=gen_random_uuid()','Visitors cannot forge website change notifications');
 select test.denied('select * from contacts','Anonymous cannot read contacts');
 select test.denied('insert into enquiries(ref_number,name,email,phone,topic,message,source) values(''fake'',''Fake'',''fake@example.test'',''1234567'',''Test'',''Message'',''Website'')','Anonymous cannot bypass submission endpoint');
 select test.denied('select public.publish_offer_atomic(null,null)','Legacy publication bypass is revoked');
@@ -45,7 +47,11 @@ select test.denied('select save_offer(''{}'',null)','Agent cannot edit inventory
 reset role;
 select set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000002","session_id":"00000000-0000-4000-8000-000000000102"}',true);
 set local role authenticated;
+select set_config('test.website_revision',(select revision::text from website_revision),true);
 select save_offer('{"ref":"TEST-1","cover_image_path":"/images/test.jpg","slug":"verified-unit","marketing_title":"Verified unit","district":"Istanbul","city":"Istanbul","record_type":"unit_offer","mode":"sale","price_type":"fixed","amount":420000,"currency":"USD","availability":"Available","publication":"Published"}',null);
+select test.ok((select revision::text from website_revision)<>current_setting('test.website_revision'),'Publishing changes the cross-device revision');
+update site_settings set districts='["Test district"]',layouts='["2+1"]',budget_ranges='[{"id":"test-budget","label":"Test budget","min":0,"max":450000}]' where singleton_key='default';
+select test.ok((select districts->>0 from site_settings)='Test district','Managed filter settings persist in the real schema');
 select test.ok((select count(*) from published_catalogue())=1,'Manager publication creates one public snapshot');
 select save_offer(jsonb_build_object('id',(select id from marketing_offers where ref='TEST-1'),'bathrooms',2,'source_note','Confirm the terrace','tapu_status','Review needed','highlights',jsonb_build_array('Confirmed garden','')),(select version from marketing_offers where ref='TEST-1'));
 select test.ok((select published_snapshot->>'ref' from marketing_offers where ref='TEST-1')='TEST-1','Public reference matches the editor');
@@ -85,7 +91,9 @@ select test.ok((select availability from marketing_offers where ref='TEST-1')='S
 select test.ok((select published_snapshot->>'availability' from marketing_offers where ref='TEST-1')='Sold','Published snapshot availability follows completion');
 select test.denied('select transition_deal('''||(select id from deals)::text||''',''Opportunity'',(select version from deals))','Closed transactions cannot reopen');
 select test.denied('select save_deal(jsonb_build_object(''id'',(select id from deals),''total_amount'',1),(select version from deals),''{}'')','Closed transactions cannot be edited');
+select set_config('test.website_revision',(select revision::text from website_revision),true);
 select save_offer('{"ref":"TEST-2","slug":"unidentified-unit","marketing_title":"Unidentified unit","district":"Istanbul","record_type":"unit_type","mode":"sale","price_type":"on-request","availability":"Available","publication":"Draft"}',null);
+select test.ok((select revision::text from website_revision)=current_setting('test.website_revision'),'Private draft changes do not notify public visitors');
 select test.denied('select bulk_publication(array[(select id from marketing_offers where ref=''TEST-2''),gen_random_uuid()],''Published'')','Bulk publication rejects missing records atomically');
 select test.ok((select publication from marketing_offers where ref='TEST-2')='Draft','Failed bulk publication does not change prior records');
 select staff_create_enquiry('{"name":"Buyer A","email":"","phone":"","topic":"Advice","budget":"TRY 15–20m","message":"Please contact me.","source":"Contact Brief"}');

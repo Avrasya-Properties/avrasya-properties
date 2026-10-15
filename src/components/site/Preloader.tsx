@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { IstanbulSkyline } from "./IstanbulSkyline";
+import { useSiteSettings } from "@/admin/store";
 
 export function Preloader() {
+  const settings=useSiteSettings();
   const [percent, setPercent] = useState(0);
   const [isDone, setIsDone] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -76,7 +78,7 @@ export function Preloader() {
         {/* Refined Luxury Vector Logo */}
         <div className="relative w-full flex justify-center py-4">
           <img
-            src="/images/avrasya-logo-pure-white.svg"
+            src={settings.websiteDesign?.["logoLight"]||"/images/avrasya-logo-pure-white.svg"}
             alt="Avrasya Properties Group"
             className="w-[58vw] max-w-sm md:max-w-md lg:max-w-[420px] h-auto max-h-[14vh] object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]"
           />
@@ -104,9 +106,10 @@ export function Preloader() {
       {/* Authentic Istanbul Architectural Skyline covering the bottom edge-to-edge */}
       <div className="pointer-events-none absolute bottom-0 inset-x-0 w-full overflow-hidden select-none flex flex-col items-center justify-end">
         <div className="w-full flex justify-center items-end">
-          <IstanbulSkyline opacity={1} className="w-full" />
+          <IstanbulSkyline opacity={settings.preloaderOpacity} className="w-full" />
         </div>
       </div>
     </div>
   );
 }
+

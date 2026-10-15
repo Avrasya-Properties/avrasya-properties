@@ -83,6 +83,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [time, setTime] = useState("");
+  const [oldBrowserData,setOldBrowserData]=useState(false);
+  useEffect(()=>{if(!DEMO_ENABLED){try{setOldBrowserData(localStorage.getItem("avrasya-admin-db-v4")!==null);}catch{}}},[]);
 
   useEffect(() => {
     const update = () => {
@@ -138,13 +140,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <ShieldCheck className="h-3.5 w-3.5 text-brass" />
           <span>Avrasya Internal Workspace</span>
         </div>
-        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Shared team workspace"}</p>
+        <p className="mt-1">{DEMO_ENABLED ? "Demo sandbox · Saved in this browser" : "Live data · Saved to the shared database"}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="admin-workspace flex min-h-screen bg-background font-sans text-foreground">
+    <div data-admin-mode={DEMO_ENABLED?"demo":"live"} className="admin-workspace flex min-h-screen bg-background font-sans text-foreground">
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 md:block">{sidebar}</aside>
       <Sheet open={open} onOpenChange={setOpen}><SheetContent side="left" className="w-64 p-0">{sidebar}</SheetContent></Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -186,7 +188,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <button className="flex h-11 w-11 items-center justify-center" onClick={async () => { try { await logout(); } catch(error) { toast.error((error as Error).message); } nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{oldBrowserData&&<p role="status" className="mb-3 rounded border bg-muted p-3 text-sm">Earlier browser-only data was found. It has not been published or imported. Add or edit properties in this live panel to save them to the shared website database.</p>}{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
       </div>
     </div>
   );

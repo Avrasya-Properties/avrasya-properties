@@ -71,9 +71,10 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
   const inst = r.details.installment_offer as { total: number; down_payment_percent: number; months: number } | undefined;
   if (inst) rows.push(["Developer Instalment Plan", `${usd(inst.total)} · ${inst.down_payment_percent}% down · ${inst.months} months`]);
   if (p.basis === "installment_schedule") {
-    rows.push([`Down Payment (${p.down_payment_percent}%)`, tryf(p.down_payment_amount!)]);
-    rows.push([`At Delivery (${p.delivery_payment_percent}%)`, tryf(p.delivery_payment_amount!)]);
-    rows.push(["Instalments", `${p.installment_count} × ${tryf(p.installment_amount!)}`]);
+    const money=(n:number)=>`${p.currency||"TRY"} ${n.toLocaleString("en-US")}`;
+    if(typeof p.down_payment_amount==="number")rows.push([p.down_payment_percent!=null?`Down Payment (${p.down_payment_percent}%)`:"Down payment",money(p.down_payment_amount)]);
+    if(typeof p.delivery_payment_amount==="number")rows.push([p.delivery_payment_percent!=null?`At Delivery (${p.delivery_payment_percent}%)`:"At delivery",money(p.delivery_payment_amount)]);
+    if(typeof p.installment_amount==="number")rows.push(["Instalments",`${p.installment_count??"To confirm"} × ${money(p.installment_amount)}`]);
   }
   p.source_offers?.forEach((o, i) =>
     rows.push([`Starting Offer ${i + 1}`, `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m² gross` : ""}`])
@@ -339,6 +340,15 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               <Fact k={t.propertyDetail.apartmentLayout} v={r.layout_label ?? t.propertyDetail.toConfirm} />
               {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?t.propertyDetail.grossArea:area.basis==="net"?t.propertyDetail.netArea:t.propertyDetail.areaToConfirm} v={`${area.value_m2.toLocaleString()} m²`}/>):<Fact k={t.propertyDetail.areaToConfirm} v={t.propertyDetail.toConfirm}/>}
               {typeof d.project === "string"&&d.project&&<Fact k={t.propertyDetail.development} v={d.project} />}
+              <Fact k="District" v={locationText(r)} />
+              <Fact k="Istanbul side" v={sideText(r)} />
+              <Fact k="Listing" v={r.mode==="rent"?"For rent":"For sale"} />
+              {r.bathrooms!=null&&<Fact k="Bathrooms" v={r.bathrooms}/>}<Fact k="Availability" v={r.availability||"To confirm"} />
+              {r.tapu_status&&<Fact k="Title deed status" v={r.tapu_status}/>}
+              {typeof d["bedrooms"]==="number"&&<Fact k="Bedrooms" v={d["bedrooms"]}/>}
+              <Fact k="Apartment layout" v={r.layout_label ?? "To confirm"} />
+              {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?"Gross area":area.basis==="net"?"Net area":"Area (basis to confirm)"} v={`${area.value_m2.toLocaleString("en-US")} m²`}/>):<Fact k="Area" v="To confirm"/>}
+              {typeof d.project === "string"&&d.project&&<Fact k="Development" v={d.project} />}
               {["block", "floor", "unit"].map(
                 (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />
               )}
@@ -350,6 +360,9 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             </div>
 
             <PriceBlock r={r} />
+            {Array.isArray(d["amenities"])&&d["amenities"].length>0&&<div className="mt-6"><h3 className="font-medium">Property features</h3><div className="mt-3 flex flex-wrap gap-2">{d["amenities"].filter((v):v is string=>typeof v==="string").map(feature=><span key={feature} className="rounded border bg-secondary/30 px-3 py-2 text-sm">{feature}</span>)}</div></div>}
+            {Array.isArray(d["pricing_options"])&&d["pricing_options"].length>0&&<div data-payment-plans className="mt-6 space-y-4"><h3 className="font-medium">Payment plans</h3>{(d["pricing_options"] as {name:string;amount:number|null;currency:string;down_payment_amount:number|null;down_payment_percent:number|null;installment_amount:number|null;installment_count:number|null;schedule:{number:number;date:string|null;month:number|null;amount:number;currency:string}[]}[]).map((plan,i)=><div key={i} className="rounded border bg-secondary/30 p-4"><h4 className="font-medium">{plan.name}</h4>{plan.amount!=null&&<Fact k="Total price" v={`${plan.currency} ${plan.amount.toLocaleString("en-US")}`}/>} {plan.down_payment_amount!=null&&<Fact k="Down payment" v={`${plan.currency} ${plan.down_payment_amount.toLocaleString("en-US")}`}/>} {plan.down_payment_percent!=null&&<Fact k="Down payment share" v={`${plan.down_payment_percent}%`}/>} {plan.installment_count!=null&&<Fact k="Number of payments" v={plan.installment_count}/>} {plan.installment_amount!=null&&<Fact k="Regular payment" v={`${plan.currency} ${plan.installment_amount.toLocaleString("en-US")}`}/>} {(plan.schedule||[]).map((payment,j)=><Fact key={j} k={`Payment ${payment.number}${payment.date?" · "+payment.date:payment.month!=null?" · Month "+payment.month:""}`} v={`${payment.currency} ${payment.amount.toLocaleString("en-US")}`}/>)}</div>)}</div>}
+            {Array.isArray(d["package_members"])&&d["package_members"].length>0&&<div className="mt-6"><h3 className="font-medium">Package contents</h3>{(d["package_members"] as {title:string|null;description:string|null}[]).map((member,i)=><p key={i} className="mt-2 text-sm text-muted-foreground">{member.title||member.description||"Identified apartment included"}{member.title&&member.description?" · "+member.description:""}</p>)}</div>}
 
             {typeof d.note === "string" && (
               <div className="mt-6 whitespace-pre-line rounded-xs border border-border/70 bg-secondary/30 p-4 text-sm text-muted-foreground leading-relaxed">

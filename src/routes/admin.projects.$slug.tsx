@@ -1,14 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {useEffect,useState} from "react";
 import { toast } from "sonner";
 import { PageHead, Status, btnPrimary } from "@/admin/Shell";
-import { AVAIL, can, fmtMoney, upsert, useDB, useSession, userName, type Property } from "@/admin/store";
+import { AVAIL,DEMO_ENABLED, can, fmtMoney, upsert, useDB, useSession, userName, type Property } from "@/admin/store";
+import {managedRows} from "@/admin/management";
+import type {Row} from "@/admin/mappers";
 import { slugify } from "./admin.projects.index";
 
 export const Route = createFileRoute("/admin/projects/$slug")({ component: ProjectDetail });
 
 function ProjectDetail() {
   const { slug } = Route.useParams(); const db = useDB(); const user = useSession(); const nav = useNavigate();
+  const [project,setProject]=useState<Row|null>(null),[loaded,setLoaded]=useState(DEMO_ENABLED);
+  useEffect(()=>{if(DEMO_ENABLED)return;let live=true;void managedRows("projects").then(rows=>{if(live){setProject(rows.find(r=>slugify(String(r["name"]))===slug)||null);setLoaded(true);}}).catch(e=>{toast.error(e.message);setLoaded(true);});return()=>{live=false;};},[slug,db.properties]);
   const units = db.properties.filter((p) => slugify(p.project || "Unassigned") === slug);
+  if(!units.length&&project)return <><PageHead title={String(project["name"])} action={<Link to="/admin/manage" search={{section:"projects",record:String(project["id"])}} className={btnPrimary}>{can(user,"edit-inventory")?"Edit development":"View development"}</Link>}/><p className="mb-4 text-sm text-muted-foreground">No listings are linked to this development yet.</p>{can(user,"edit-inventory")&&<Link to="/admin/properties" className={btnPrimary}>Add a property listing</Link>}</>;
+  if(!loaded&&!units.length)return <p role="status">Loading development…</p>;
   if (!units.length) return <p>Project not found. <Link to="/admin/projects" className="text-brass-text">Back</Link></p>;
   const base = units[0]!;
   const addUnit = async () => {

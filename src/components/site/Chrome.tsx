@@ -8,6 +8,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Magnetic } from "./Motion";
 import { IstanbulSkyline } from "./IstanbulSkyline";
+import { useSiteSettings } from "@/admin/store";
 
 export function Logo({
   className = "h-10",
@@ -17,9 +18,10 @@ export function Logo({
   variant?: "auto" | "light" | "dark";
 }) {
   const isLight = variant === "light";
+  const settings=useSiteSettings();
   return (
     <img
-      src={isLight ? "/images/avrasya-logo-pure-white.svg" : "/images/avrasya-logo.svg"}
+      src={(isLight?settings.websiteDesign?.["logoLight"]:settings.websiteDesign?.["logoDark"])||(isLight ? "/images/avrasya-logo-pure-white.svg" : "/images/avrasya-logo.svg")}
       alt="Avrasya Properties Group"
       className={`w-auto shrink-0 select-none object-contain ${className}`}
     />
@@ -294,6 +296,7 @@ export function Header() {
 export function Footer() {
   const contact = useLiveContact();
   const { t } = useLanguage();
+  const settings=useSiteSettings();
   const cols = [
     {
       h: t.footer.explorePortfolio,
@@ -330,10 +333,11 @@ export function Footer() {
 
       <div className="container-site grid gap-10 py-12 md:py-16 md:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         <div className="space-y-4 text-sm text-on-dark-muted">
-          <Logo className="h-10 sm:h-11" variant="light" />
-          <p className="text-on-dark font-medium">{t.footer.tagline}</p>
+          <Logo className="h-12 max-w-full" variant="light" />
+          {settings.websiteDesign?.["footerImage"]&&<img src={settings.websiteDesign["footerImage"]} alt={contact.company} className="block max-h-36 max-w-full object-contain"/>}
+          <p className="text-on-dark font-medium">{contact.tagline}</p>
           <p className="text-xs leading-relaxed text-on-dark-muted/80">
-            {t.footer.description}
+            {settings.websiteDesign?.["footerNote"]??"Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and independent legal peace of mind."}
           </p>
           <div className="pt-2 flex items-center gap-3">
             <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-[0.7rem] font-semibold text-brass">
@@ -540,3 +544,4 @@ export function CtaBand() {
     </section>
   );
 }
+

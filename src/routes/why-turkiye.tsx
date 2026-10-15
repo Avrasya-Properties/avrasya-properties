@@ -196,7 +196,7 @@ export function WhyTurkiye() {
 
       {/* District Intelligence Explorer */}
       <section className="container-site py-20">
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end mb-10">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end mb-10">
           <div>
             <p className="eyebrow">{t.whyTurkiye.districtsEyebrow}</p>
             <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
@@ -336,3 +336,4 @@ export function WhyTurkiye() {
     </>
   );
 }
+
