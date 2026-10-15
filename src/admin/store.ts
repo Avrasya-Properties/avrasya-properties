@@ -15,7 +15,7 @@ export const login = (email: string, pw: string) =>
 export const logout = () => (DEMO_MODE ? demo.logout() : remote.signOut());
 export const userName = (id: string) => USERS.find((u) => u.id === id)?.name || "Unassigned";
 export function useBackendStatus() {
-  return DEMO_MODE ? { loading: false, saving: 0, error: "" } : remote.useStatus();
+  return DEMO_MODE ? { loading: false, saving: 0, error: "",idleSeconds:0 } : remote.useStatus();
 }
 export function useSiteSettings() {
   if (DEMO_MODE) return demo.useSiteSettings();
@@ -98,3 +98,4 @@ export const uploadImage = remote.uploadImage;
 export const resetPassword = remote.resetPassword;
 export const changePassword = remote.changePassword;
 export const refreshBackend = remote.refresh;
+

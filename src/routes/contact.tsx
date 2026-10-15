@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -39,7 +40,7 @@ export function ContactPage() {
 
   return (
     <>
-      <PageIntro
+      <ManagedPage slug="contact"><PageIntro
         eyebrow="Istanbul Office · International Advisory Desk"
         title={
           <>
@@ -52,7 +53,7 @@ export function ContactPage() {
           video conference. We provide objective, unhurried guidance tailored to your family's
           objectives.
         </p>
-      </PageIntro>
+      </PageIntro></ManagedPage>
 
       <section className="container-site py-16">
         <div className="grid gap-12 lg:grid-cols-12">
@@ -194,3 +195,4 @@ export function ContactPage() {
     </>
   );
 }
+

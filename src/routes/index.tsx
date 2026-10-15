@@ -1,3 +1,4 @@
+import { ManagedPage } from "@/components/site/ManagedPage";
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -367,6 +368,7 @@ function HomeCollection({
           </form>
         </div>
       </section>
+      <ManagedPage slug="home" secondary>{null}</ManagedPage>
 
       {/* Marquee Ticker */}
       <Marquee
@@ -393,11 +395,11 @@ function HomeCollection({
                 <p className="eyebrow !text-brass-text">Handpicked Homes · Prime Neighborhoods</p>
               </div>
               <h2 className="headline text-3xl md:text-5xl text-foreground">
-                Selected properties & <em className="italic text-brass font-normal">Locations</em>
+                {settings.websiteDesign?.["homeCollectionTitle"]||<>Selected properties & <em className="italic text-brass font-normal">Locations</em></>}
               </h2>
             </div>
             <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-              Explore handpicked homes across Istanbul's top European and Asian neighborhoods. Our dedicated advisors are here to answer your questions on pricing, citizenship benefits, and private viewings.
+              {settings.websiteDesign?.["homeCollectionText"]||"Explore handpicked homes across Istanbul’s top European and Asian neighborhoods. Our dedicated advisors are here to answer your questions on pricing, citizenship benefits, and private viewings."}
             </p>
           </div>
 
@@ -457,7 +459,7 @@ function HomeCollection({
           <div className="flex items-end justify-between">
             <div>
               <p className="eyebrow eyebrow-mark">How We Help You</p>
-              <h2 className="headline mt-2 text-3xl md:text-4xl">Your simple 3-step buying journey</h2>
+              <h2 className="headline mt-2 text-3xl md:text-4xl">{settings.websiteDesign?.["homeJourneyTitle"]||"Your simple 3-step buying journey"}</h2>
             </div>
             <Link
               to="/services"

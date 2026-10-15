@@ -1,16 +1,20 @@
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import puppeteer from "puppeteer-core";
 const origin="http://127.0.0.1:8081";
 const api="http://127.0.0.1:3001";
 const secret="isolated-browser-test-secret-at-least-32-characters";
+let failReads=false;
 const ids={admin:1,manager:2,agent:3,other:4,viewer:5};
 const uuid=n=>"00000000-0000-4000-8000-"+String(n).padStart(12,"0");
 const jwt=role=>{const head=Buffer.from(JSON.stringify({alg:"HS256",typ:"JWT"})).toString("base64url");const body=Buffer.from(JSON.stringify({sub:uuid(ids[role]),role:"authenticated",session_id:uuid(100+ids[role]),aud:"authenticated",exp:Math.floor(Date.now()/1000)+3600})).toString("base64url");return head+"."+body+"."+createHmac("sha256",secret).update(head+"."+body).digest("base64url");};
 const actor=role=>({id:uuid(ids[role]),email:role+"@example.test",aud:"authenticated",role:"authenticated",app_metadata:{provider:"email"},user_metadata:{},created_at:"2026-10-10T00:00:00Z"});
 const adminToken=jwt("admin");
+const serviceToken=(()=>{const h=Buffer.from(JSON.stringify({alg:"HS256",typ:"JWT"})).toString("base64url");const b=Buffer.from(JSON.stringify({role:"service_role",exp:Math.floor(Date.now()/1000)+3600})).toString("base64url");return h+"."+b+"."+createHmac("sha256",secret).update(h+"."+b).digest("base64url");})();
+let accessHandler;
+new Function("Deno","fetch",new Bun.Transpiler({loader:"ts"}).transformSync(await readFile("supabase/functions/admin-access/index.ts","utf8")))({env:{get:name=>({SUPABASE_URL:"http://127.0.0.1:8082",SUPABASE_SERVICE_ROLE_KEY:serviceToken})[name]},serve:fn=>accessHandler=fn},fetch);
 async function rest(path,method="GET",data,token=adminToken){const response=await fetch(api+path,{method,headers:{Authorization:"Bearer "+token,"Content-Type":"application/json",Prefer:"return=representation"},...(data?{body:JSON.stringify(data)}:{})});const text=await response.text();if(!response.ok)throw new Error(response.status+" "+text);return text?JSON.parse(text):null;}
 // A stray demo flag must not disconnect a normal application build from its database.
 const child=spawn("bun",["run","dev","--host","127.0.0.1","--port","8081"],{stdio:["ignore","pipe","pipe"],env:{...process.env,VITE_ENABLE_ADMIN_DEMO:"true",VITE_SUPABASE_URL:"http://127.0.0.1:8082"}});
@@ -65,14 +69,16 @@ async function visit(path, heading) {
 }
 // Both SSR loaders and browser reads use this isolated Auth/PostgREST adapter.
 const apiProxy=Bun.serve({hostname:"127.0.0.1",port:8082,async fetch(req){
- const url=new URL(req.url),body=await req.text();
- const request={method:()=>req.method,headers:()=>Object.fromEntries(req.headers),postData:()=>body};
+ const url=new URL(req.url),requestBody=await req.text();
+ const request={method:()=>req.method,headers:()=>Object.fromEntries(req.headers),postData:()=>requestBody};
   try{
+   if(url.pathname==="/functions/v1/admin-access")return accessHandler(new Request(req.url,{method:req.method,headers:req.headers,body:requestBody||undefined}));
    if(request.method()==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"*","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS"}});
    let status=200,body,headers={"content-type":"application/json","access-control-allow-origin":"*"};
+   if(failReads&&url.pathname==="/rest/v1/tasks")return Response.json({message:"Temporary read failure"},{status:503,headers});
    if(url.pathname.startsWith("/auth/v1/token")){
     const input=JSON.parse(request.postData()||"{}");const role=String(input.email||"").split("@")[0];
-    if(!ids[role]||input.password!=="IsolatedTestPassword!26"){status=400;body={error:"invalid_grant",error_description:"Invalid login credentials"};}
+    if(!ids[role]||input.password!=="IsolatedTestPassword!26"){status=400;body={error:"invalid_grant",error_code:"invalid_credentials",error_description:"Invalid login credentials"};}
     else body={access_token:jwt(role),refresh_token:"test-"+role,expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,token_type:"bearer",user:actor(role)};
    }else if(url.pathname==="/auth/v1/user"){
     const token=(request.headers().authorization||"").replace("Bearer ","");const claims=JSON.parse(Buffer.from(token.split(".")[1]||"","base64url").toString());const role=Object.keys(ids).find(r=>uuid(ids[r])===claims.sub);
@@ -124,7 +130,7 @@ try{
  await visit("/admin/manage?section=pricing_options&property="+property.id,"Website and team");await clickText("Add payment plans");await fillLabel("Plan name","Managed cash plan");await fillLabel("Total price","420000");await selectLabel("Price basis","cash");await clickText("Save");await waitRow("pricing_options","option_name","Managed cash plan");
  const extrasPage=await publicContext.newPage();await extrasPage.evaluateOnNewDocument(()=>Object.defineProperty(document,"visibilityState",{get:()=>"visible"}));await attachProxy(extrasPage);await extrasPage.goto(origin+"/properties/"+property.slug,{waitUntil:"domcontentloaded"});await extrasPage.waitForFunction(()=>document.body.textContent.includes("Managed swimming pool")&&document.body.textContent.includes("Managed cash plan"));
  await visit("/admin/manage?section=offer_amenities&property="+property.id,"Website and team");await page.waitForFunction(()=>document.querySelector("tbody")?.textContent.includes("Managed swimming pool"));await clickText("Edit");await clickText("Delete");await extrasPage.waitForFunction(()=>!document.body.textContent.includes("Managed swimming pool"),{timeout:10000,polling:"mutation"});await extrasPage.close();results.push("Feature/plan editors update public details and feature deletion reaches a separate visitor context");
- await visit("/admin/settings","Website settings");await clickText("Website appearance");await fillLabel("Footer description","Managed footer description");await fillLabel("Main homepage photo","/images/properties/bosphorus-terrace.jpg");await clickText("Save website settings");await waitRow("site_settings","hero_headline","Managed homepage headline");const appearancePage=await browser.newPage();await appearancePage.goto(origin+"/",{waitUntil:"domcontentloaded"});await appearancePage.waitForFunction(()=>document.querySelector("footer")?.textContent.includes("Managed footer description"));await appearancePage.waitForFunction(()=>document.querySelector('[data-home-hero] img[src="/images/properties/bosphorus-terrace.jpg"]'));await appearancePage.close();results.push("Homepage photo and footer appearance persist and reach the website");
+ await visit("/admin/settings","Website settings");await clickText("Website appearance");await fillLabel("Footer description","Managed footer description");await fillLabel("Property collection heading","Managed collection heading");await fillLabel("Main homepage photo","/images/properties/bosphorus-terrace.jpg");await clickText("Save website settings");await waitRow("site_settings","hero_headline","Managed homepage headline");const appearancePage=await browser.newPage();await appearancePage.goto(origin+"/",{waitUntil:"domcontentloaded"});await appearancePage.waitForFunction(()=>document.querySelector("footer")?.textContent.includes("Managed footer description")&&document.body.textContent.includes("Managed collection heading"));await appearancePage.waitForFunction(()=>document.querySelector('[data-home-hero] img[src="/images/properties/bosphorus-terrace.jpg"]'));await appearancePage.close();results.push("Homepage photo and footer appearance persist and reach the website");
  await rest("/tasks","POST",{title:"Task to edit",assignee_id:uuid(1),due_date:"2027-02-01T09:00:00+03:00",priority:"Normal"});await visit("/admin/tasks","Tasks");await page.waitForFunction(()=>document.body.textContent.includes("Task to edit"));await clickText("Edit task");await fillLabel("Task title","Updated task");await fillLabel("Due time in Istanbul","2027-02-02T10:30");await clickText("Save task");const changedTask=await waitRow("tasks","title","Updated task");assert.equal(new Date(changedTask.due_date).toISOString(),"2027-02-02T07:30:00.000Z");
  const viewingBuyer=await waitRow("contacts","name","Persistent buyer");await rest("/viewings","POST",{contact_id:viewingBuyer.id,offer_id:property.id,agent_id:uuid(1),start_time:"2027-02-01T09:00:00+03:00",end_time:"2027-02-01T10:00:00+03:00",status:"Scheduled",notes:""});await visit("/admin/calendar","Viewings");await page.waitForFunction(()=>[...document.querySelectorAll("button")].some(b=>b.textContent==="Edit viewing"));await clickText("Edit viewing");await fillLabel("Starts in Istanbul","2027-02-03T11:00");await fillLabel("Ends in Istanbul","2027-02-03T12:00");await fillLabel("Notes","Updated viewing notes");await clickText("Save viewing");const changedViewing=await waitRow("viewings","notes","Updated viewing notes");assert.equal(new Date(changedViewing.start_time).toISOString(),"2027-02-03T08:00:00.000Z");results.push("Task and viewing edit buttons save changes with the correct Istanbul time");
  await visit("/admin/inquiries","Enquiries");await clickText("Add enquiry");await page.waitForSelector("form textarea");const inputs=await page.$$("form input");await inputs[0].type("Persistent enquiry");await inputs[1].type("enquiry@example.test");await page.type("form textarea","Please advise on this unit.");await clickText("Save to Inbox");await waitRow("enquiries","name","Persistent enquiry");
@@ -142,6 +148,14 @@ try{
  await clickText("Page sections");await clickText("Add page sections");await selectLabel("Content page",authored.id);await fillLabel("Section name","intro");await page.type("form textarea","Managed first paragraph.\n\nManaged second paragraph.");await clickText("Save");await waitRow("content_sections","section_key","intro");
  const contentPage=await browser.newPage();await attachProxy(contentPage);await contentPage.goto(origin+"/about",{waitUntil:"domcontentloaded"});await contentPage.waitForFunction(()=>document.body.textContent.includes("Managed second paragraph."));await contentPage.close();results.push("Plain-text page editing is published to the website");
  await visit("/admin/manage?section=catalog_documents","Website and team");await clickText("Add brochures");await fillLabel("Title","Managed brochure");await fillLabel("Download link","https://documents.example.test/approved-brochure.pdf");await page.$eval('[role="dialog"] input[type="checkbox"]',input=>input.click());await clickText("Save");await waitRow("catalog_documents","title","Managed brochure");const brochurePage=await browser.newPage();await brochurePage.goto(origin+"/investment-catalog",{waitUntil:"domcontentloaded"});await brochurePage.waitForFunction(()=>!!document.querySelector('a[href="https://documents.example.test/approved-brochure.pdf"]'));await brochurePage.close();results.push("Published HTTPS brochure links remain exact public download URLs");
+ for(const slug of ['home','contact']){
+  await visit('/admin/manage?section=content_pages','Website and team');await clickText('Add website pages');await selectLabel('Page address',slug);await fillLabel('Page title','Managed '+slug+' introduction');await selectLabel('Website status','Published');await clickText('Save');const managedPage=await waitRow('content_pages','slug',slug);
+  await visit('/admin/manage?section=content_sections','Website and team');await clickText('Add page sections');await selectLabel('Content page',managedPage.id);await fillLabel('Section name',slug+'-intro');await page.type('form textarea','Managed '+slug+' text from the admin panel.');await clickText('Save');await waitRow('content_sections','section_key',slug+'-intro');
+  const visitor=await publicContext.newPage();await visitor.goto(origin+(slug==='home'?'/':'/contact'),{waitUntil:'domcontentloaded'});await visitor.waitForFunction(slug=>document.body.textContent.includes('Managed '+slug+' text from the admin panel.'),{},slug);
+  if(slug==='home')assert.ok(await visitor.$('[data-home-hero]'));else assert.ok(await visitor.$('form input[autocomplete="name"]'));
+  await visitor.close();
+ }
+ results.push('Admin-authored homepage and contact introductions reach separate visitors and retain search/contact functionality');
  await visit("/admin/properties/"+property.id,"Persistent property");await clickText("Unpublish");await waitRow("marketing_offers","publication","Draft");
  const hiddenPage=await browser.newPage();await attachProxy(hiddenPage);await hiddenPage.goto(origin+"/properties",{waitUntil:"domcontentloaded"});await hiddenPage.waitForFunction(()=>!document.querySelector('[role="status"]')?.textContent.includes("Loading current offers"));assert.equal(await hiddenPage.evaluate(()=>[...document.querySelectorAll("main h2")].some(h=>h.textContent.includes("Persistent property"))),false);await hiddenPage.close();results.push("Unpublishing removes the listing from public browsing");
  
@@ -158,6 +172,29 @@ try{
  results.push("Authenticated mobile settings, listing preview and management fit 320px, 390px and tablet widths");
  await page.setViewport({width:1440,height:1000});
  await page.click('[aria-label="Log out"]');await page.waitForSelector('input[type="email"]');await login("viewer");await visit("/admin/settings","Website settings");assert.equal(await page.$eval("#cms-fields",e=>e.disabled),true);results.push("Viewer has read-only management controls");
+ // Exercise server-side lockout through the browser using disposable accounts.
+ await page.click('[aria-label="Log out"]');await page.waitForSelector('input[type="email"]');
+ for(let attempt=1;attempt<=3;attempt++){
+  await fill('input[type="email"]','other@example.test');await fill('input[type="password"]','WrongIsolatedPassword!');await clickText('Sign in');
+  await page.waitForFunction(attempt=>document.querySelector('[role="alert"]')?.textContent.includes(attempt===3?'blocked for 15 minutes':'incorrect'),{},attempt);
+ }
+ await fill('input[type="password"]','IsolatedTestPassword!26');await clickText('Sign in');await page.waitForFunction(()=>document.querySelector('[role="alert"]')?.textContent.includes('15 minutes'));
+ assert.ok((await rest('/rpc/admin_login_begin','POST',{p_email:'other@example.test',p_attempt:crypto.randomUUID()},serviceToken)).blocked_until);
+ await rest('/rpc/admin_recovery_finish','POST',{p_user:uuid(4)},serviceToken);
+ results.push('Three actual browser password attempts persist a database block; correct credentials remain blocked');
+ await login('admin');await visit('/admin/properties/'+property.id,'Persistent property');
+ await fillLabel('Title','Unsaved draft retained');failReads=true;
+ await page.evaluate(async()=>{await import('/src/admin/remote.ts').then(module=>module.refresh());});
+ assert.equal(await page.$eval('[data-admin-mode]',el=>el.dataset.adminMode),'live');
+ assert.equal(await page.$eval('label input',input=>input.value),'Unsaved draft retained');assert.ok((await page.evaluate(()=>document.body.textContent)).includes('The workspace could not refresh'));failReads=false;await clickText('Try again');await page.waitForFunction(()=>!document.body.textContent.includes('The workspace could not refresh'));
+ results.push('Actual failed background data read preserves login and an unsaved property draft');
+ // A wall-clock jump exercises expiry in the browser without waiting ten minutes.
+ await page.evaluate(()=>{const actual=Date.now.bind(Date);Date.now=()=>actual()+9*60000;});
+ await page.waitForFunction(()=>document.body.textContent.includes('You have been inactive'));
+ await fillLabel('Title','Actively editing');await page.waitForFunction(()=>!document.body.textContent.includes('You have been inactive'));
+ await page.evaluate(()=>{const previous=Date.now;Date.now=()=>previous()+10*60000+1000;});
+ await page.waitForFunction(()=>location.pathname==='/admin/login');
+ results.push('Browser warns at nine minutes, typing postpones expiry, and ten idle minutes really sign out');
  assert.deepEqual(pageErrors,[]);console.log(JSON.stringify({persistentBrowserChecks:results},null,2));
 }catch(error){await mkdir("test-results",{recursive:true});await page?.screenshot({path:"test-results/backend-smoke-failure.png",fullPage:true}).catch(()=>{});console.error("Persistent browser failure:",error.message,error.stack);console.error("Passed:",JSON.stringify(results));console.error("Page errors:",pageErrors);if(page)console.error(await page.evaluate(()=>document.body.innerText.slice(0,3500)).catch(()=>""));console.error("Database listing:",await rest("/marketing_offers?select=id,marketing_title,description,version,project_id,publication").catch(e=>e.message));
  for(const tab of await browser?.pages()||[]){console.error("Tab:",tab.url(),await tab.evaluate(()=>({body:document.body.innerText.slice(-2500),toasts:[...document.querySelectorAll("[data-sonner-toast]")].map(t=>t.textContent),description:[...document.querySelectorAll("textarea")].map(t=>t.value)})).catch(()=>null));}
