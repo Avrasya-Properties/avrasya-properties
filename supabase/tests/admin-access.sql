@@ -48,7 +48,13 @@ select public.admin_login_finish('00000000-0000-4000-8000-000000000901','0000000
 select test.ok((select failures=0 from private.admin_login_state),'Successful sign-in resets the consecutive failure count');
 update private.admin_login_state set failures=3,locked_at=now()-interval '16 minutes',blocked_until=now()-interval '1 minute';
 select test.ok(public.admin_login_begin('admin@avrasyaproperties.com',gen_random_uuid())->>'user_id' is not null,'Block automatically expires after 15 minutes');
-select test.ok(public.admin_mail_worker_valid((select credential from private.admin_security_worker)),'Private generated worker credential is accepted');
+select set_config('test.worker_nonce',private.issue_admin_worker_nonce(),true);
+select test.ok(public.admin_mail_worker_valid(current_setting('test.worker_nonce')),'Single-use worker nonce is accepted');
+select test.ok(not public.admin_mail_worker_valid(current_setting('test.worker_nonce')),'Worker nonce replay is rejected');
+select set_config('test.worker_nonce',private.issue_admin_worker_nonce(),true);
+update private.admin_security_worker set nonce_expires_at=now()-interval '1 second';
+select test.ok(not public.admin_mail_worker_valid(current_setting('test.worker_nonce')),'Expired worker nonce is rejected');
+select test.ok(not public.admin_mail_worker_valid((select credential from private.admin_security_worker)),'Old reusable worker credential is rejected');
 select test.ok(not public.admin_mail_worker_valid(repeat('x',72)),'Forged worker credential is rejected');
 select test.ok(not has_table_privilege('authenticated','private.admin_security_worker','select'),'Browser cannot read the worker credential');
 set local role authenticated;

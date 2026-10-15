@@ -186,7 +186,7 @@ try{
  await fillLabel('Title','Unsaved draft retained');failReads=true;
  await page.evaluate(async()=>{await import('/src/admin/remote.ts').then(module=>module.refresh());});
  assert.equal(await page.$eval('[data-admin-mode]',el=>el.dataset.adminMode),'live');
- assert.equal(await page.$eval('label input',input=>input.value),'Unsaved draft retained');failReads=false;
+ assert.equal(await page.$eval('label input',input=>input.value),'Unsaved draft retained');assert.ok((await page.evaluate(()=>document.body.textContent)).includes('The workspace could not refresh'));failReads=false;await clickText('Try again');await page.waitForFunction(()=>!document.body.textContent.includes('The workspace could not refresh'));
  results.push('Actual failed background data read preserves login and an unsaved property draft');
  // A wall-clock jump exercises expiry in the browser without waiting ten minutes.
  await page.evaluate(()=>{const actual=Date.now.bind(Date);Date.now=()=>actual()+9*60000;});

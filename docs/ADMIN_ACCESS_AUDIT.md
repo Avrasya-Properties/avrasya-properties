@@ -30,7 +30,7 @@ The owner selected “Custom domain” but did not provide its address. Never in
 
 In Supabase Authentication → Hooks, enable the **Password Verification Attempt** Postgres hook `public.admin_password_verification`. This native hook currently requires a Teams or Enterprise plan; do not upgrade or claim activation without the owner’s decision. Without that setting, gateway attempts are counted and database access is blocked after the third gateway failure, but incorrect passwords sent directly to Supabase Auth are not counted. The repository migration alone cannot change hosted Auth settings.
 
-Queued alerts retry on a successful gateway sign-in, the admin’s Retry queued alerts button, and a scheduled Supabase worker every minute. The worker uses a private database-generated credential; the browser cannot read it or invoke deliveries. Hosted scheduler activation is verified after applying the migration. It leaves alerts queued while email sending is unconfigured.
+Queued alerts retry on a successful gateway sign-in, the admin’s Retry queued alerts button, and a scheduled Supabase worker every minute. The worker uses a random single-use request token that expires after 90 seconds; only its hash is stored privately. Replaying a captured request is rejected. A reusable credential never goes into extension request logs. The hosted scheduler is active and runs every minute. It leaves alerts queued while email sending is unconfigured.
 
 The existing public enquiry endpoint separately requires `WEBSITE_ALLOWED_ORIGINS` containing the actual website origin. Missing configuration previously produced HTTP 503. This setting cannot safely be replaced with a guessed domain or wildcard.
 
@@ -39,3 +39,13 @@ The existing public enquiry endpoint separately requires `WEBSITE_ALLOWED_ORIGIN
 The automated checks use a disposable database and fictional accounts, not production customer or property records. They cover migration replay, permissions, counter concurrency, exact three-attempt blocking, direct-session access, recovery targeting, queued-mail claiming, provider failure and session revocation checks. Persistent browser checks operate the actual sign-in form and deployed handler source against PostgreSQL/PostgREST, test an actual failing data refresh with an unsaved property edit, and advance the browser clock to observe warnings and sign-out. Existing property publishing, separate-visitor website synchronization, receipts, deal transitions and mobile checks remain in CI.
 
 A passing test with a stubbed mail provider proves the integration contract; it does not prove real inbox delivery. Complete a real recovery and mailbox delivery check once sender credentials and website URL are configured.
+
+## Production checks and limits
+
+A correct administrator sign-in through the deployed gateway returned real Supabase Auth tokens. The deployed status endpoint confirms ten idle minutes, three attempts, a fifteen-minute block and the requested Gmail recovery address. It also confirms that email sending is unconfigured. Recovery therefore returns an honest setup error rather than claiming delivery.
+
+Lockout and publishing trials run in the isolated PostgreSQL browser workflow. No production lockout trial or live inbox delivery is claimed. The temporary production verification account is disabled and has no active sessions; permanent deletion through the connector returned an expired approval-state error. Its disabled account record remains for owner cleanup; no customer, property or payment records were created for this trial.
+
+Supabase manages the pg_net extension's default request-queue grants. A grant-only migration did not override its owner-issued PUBLIC grant. The single-use worker-token design removes reusable secrets from those logs without rebuilding the extension. The extension namespace advisor warning remains; moving/recreating production infrastructure was not necessary for this application fix and was not performed.
+
+The earlier production-account lockout trial was stopped by automatic approval review because it could leave persistent test records. Lockout verification was completed in the isolated browser/database environment instead. The live administrator’s successful sign-in was verified separately; no live lockout or inbox-delivery result is claimed.
