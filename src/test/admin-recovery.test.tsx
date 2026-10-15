@@ -1,0 +1,15 @@
+import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react';
+import {afterEach,beforeEach,expect,it,vi} from 'vitest';
+import {StrictMode,type ComponentType} from 'react';
+const auth=vi.hoisted(()=>({verify:vi.fn(),getSession:vi.fn(),change:vi.fn(),logout:vi.fn(),listener:null as null|((event:string,session?:unknown)=>void)}));
+vi.mock('@tanstack/react-router',()=>({createFileRoute:()=> (options:unknown)=>({options}),Link:({children}:{children:React.ReactNode})=><a>{children}</a>}));
+vi.mock('@/lib/supabase',()=>({supabase:{auth:{verifyOtp:auth.verify,getSession:auth.getSession,onAuthStateChange:(fn:typeof auth.listener)=>{auth.listener=fn;return {data:{subscription:{unsubscribe:vi.fn()}}};}}}}));
+vi.mock('@/admin/store',()=>({changePassword:auth.change,logout:auth.logout}));
+vi.mock('@/admin/Shell',()=>({btnPrimary:'',field:''}));
+import {Route} from '@/routes/admin.recover';
+const Recover=Route.options.component as ComponentType;
+beforeEach(()=>{vi.clearAllMocks();history.replaceState(null,'','/admin/recover#token_hash=once-only&type=recovery');auth.getSession.mockResolvedValue({data:{session:{user:{id:'another-account'}}}});auth.change.mockResolvedValue(undefined);auth.logout.mockResolvedValue(undefined);});
+afterEach(cleanup);
+it('cannot reset a previously signed-in account when the recovery link fails',async()=>{auth.verify.mockResolvedValue({error:{message:'expired'},data:{session:null}});render(<Recover/>);auth.listener?.('INITIAL_SESSION',{user:{id:'another-account'}});await screen.findByText(/expired or was already used/);expect(screen.getByRole('button',{name:'Update password'})).toBeDisabled();expect(auth.getSession).not.toHaveBeenCalled();expect(location.hash).toBe('');});
+it('verifies a recovery link only once across Strict Mode effect replay',async()=>{auth.verify.mockResolvedValue({error:null,data:{session:{}}});render(<StrictMode><Recover/></StrictMode>);await waitFor(()=>expect(screen.getByRole('button',{name:'Update password'})).toBeEnabled());expect(auth.verify).toHaveBeenCalledTimes(1);expect(auth.verify).toHaveBeenCalledWith({token_hash:'once-only',type:'recovery'});});
+it('updates the password through the verified server flow and signs out',async()=>{auth.verify.mockResolvedValue({error:null,data:{session:{}}});const {container}=render(<Recover/>);await waitFor(()=>expect(screen.getByRole('button',{name:'Update password'})).toBeEnabled());fireEvent.change(screen.getByLabelText('New password'),{target:{value:'new-test-password'}});fireEvent.submit(container.querySelector('form')!);await screen.findByText('Password updated. Sign in with your new password.');expect(auth.change).toHaveBeenCalledWith('new-test-password');expect(auth.logout).toHaveBeenCalledOnce();expect(screen.getByRole('button',{name:'Update password'})).toBeDisabled();});

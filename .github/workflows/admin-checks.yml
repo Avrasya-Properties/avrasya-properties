@@ -51,9 +51,11 @@ jobs:
           done
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/backend.sql
           psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/management.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/admin-access.sql
           bun scripts/backend-concurrency.mjs
       - run: bun scripts/enquiry-endpoint-check.mjs
       - run: bun scripts/staff-accounts-check.mjs
+      - run: bun scripts/admin-access-check.mjs
       - run: bun run test
       - run: bun run build
       - run: bun run typecheck

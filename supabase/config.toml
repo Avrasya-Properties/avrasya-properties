@@ -4,3 +4,7 @@ verify_jwt = false
 
 [functions.staff-accounts]
 verify_jwt = false
+
+[functions.admin-access]
+# Password entry and recovery are public. Other actions explicitly verify Auth and staff access.
+verify_jwt = false

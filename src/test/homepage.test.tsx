@@ -7,8 +7,10 @@ const state = vi.hoisted(() => ({
   isPending: false,
   isError: false,
   refetch: vi.fn(),
+  page:null as null|{published:boolean;title:string;sections:{title:string;content_json:Record<string,unknown>}[]},
 }));
-vi.mock("@/data/live", () => ({ useCatalogue: () => state }));
+vi.mock("@/lib/supabase",()=>({DEMO_MODE:false}));
+vi.mock("@/data/live", () => ({ useCatalogue: () => state,useManagedPage:()=>({data:state.page,isError:false}) }));
 vi.mock("@/admin/store", () => ({
   useSiteSettings: () => ({
     heroHeadline: "Find your place in Istanbul.",
@@ -56,11 +58,15 @@ const Home = Route.options.component as ComponentType;
 afterEach(cleanup);
 beforeEach(() => {
   state.properties = [];
+  state.page=null;
   state.isPending = false;
   state.isError = false;
   state.refetch.mockClear();
 });
 describe("Homepage remains the homepage", () => {
+  it("shows published managed homepage sections and preserves property search",()=>{state.page={published:true,title:"Managed introduction",sections:[{title:"Our approach",content_json:{paragraphs:["A real managed paragraph."]}}]};render(<Home/>);expect(screen.getByText("A real managed paragraph.")).toBeInTheDocument();expect(screen.getByRole("heading",{level:1})).toHaveTextContent("Find your place in Istanbul.");expect(screen.getByRole("button",{name:"Find a property"})).toBeInTheDocument();});
+  it("does not show unpublished managed homepage sections",()=>{state.page={published:false,title:"Draft",sections:[{title:"Hidden",content_json:{paragraphs:["Unpublished draft text"]}}]};render(<Home/>);expect(screen.queryByText("Unpublished draft text")).toBeNull();});
+
   it("keeps the main hero, search and sections when no listings are published", () => {
     const { container } = render(<Home />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
