@@ -10,13 +10,13 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
-  sideText,
-    TYPE_LABEL,
   type PropertyRecord,
 } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function ImageFallback({ r, className = "" }: { r: PropertyRecord; className?: string }) {
+  const { t } = useLanguage();
   const media = getPropertyMedia(r);
   const [imgSrc, setImgSrc] = useState(media.cover);
   const [loaded, setLoaded] = useState(false);
@@ -34,7 +34,7 @@ export function ImageFallback({ r, className = "" }: { r: PropertyRecord; classN
           loaded ? "opacity-100" : "opacity-90"
         }`}
       />
-      :<span className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-white/70">Property photo not supplied</span>}
+      :<span className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-white/70">{t.propertyCard.photoNotSupplied}</span>}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
     </div>
   );
@@ -46,10 +46,29 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
   const media = getPropertyMedia(r);
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
+  const { t, isRtl } = useLanguage();
   const saved = isSaved(r.slug);
   const usdVal = comparableUsd(r.price);
-  const displayPrice = currency === "USD" || usdVal === null ? p.main : convertUsdPrice(usdVal, currency);
+  const displayPrice = currency === "USD" || usdVal === null ? (p.main === "Price on request" ? t.common.priceOnRequest : p.main) : convertUsdPrice(usdVal, currency);
   const isCbiEligible = r.details["cbi_verified"] === true;
+
+  const sideLabel =
+    r.side === "Europe"
+      ? t.common.sideEurope
+      : r.side === "Asia"
+        ? t.common.sideAsia
+        : t.common.sideUnknown;
+
+  const typeLabel =
+    r.record_type === "unit_offer"
+      ? t.common.unitOffer
+      : r.record_type === "unit_type"
+        ? t.common.unitType
+        : r.record_type === "package"
+          ? t.common.multiApartmentPackage
+          : r.record_type === "project"
+            ? t.common.projectIntroduction
+            : t.common.offerToConfirm;
 
   return (
     <Tilt className="h-full">
@@ -67,7 +86,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
           </Link>
 
           {/* Top Badges */}
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 z-10 pointer-events-none rtl:left-auto rtl:right-3">
             {r.layout_label && (
               <span className="glass-pill-dark rounded-xs px-2.5 py-0.5 text-[0.68rem] font-semibold tracking-wider text-white">
                 {r.layout_label}
@@ -75,12 +94,12 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
             )}
             {isCbiEligible && (
               <span className="flex items-center gap-1 rounded-xs bg-brass/95 backdrop-blur-xs px-2.5 py-0.5 text-[0.68rem] font-bold uppercase tracking-wider text-primary shadow-xs">
-                CBI verified
+                {t.propertyCard.cbiVerified}
               </span>
             )}
           </div>
 
-          <div className="absolute right-3 top-3 flex items-center gap-1.5 z-10">
+          <div className="absolute right-3 top-3 flex items-center gap-1.5 z-10 rtl:right-auto rtl:left-3">
             {/* Heart Favorite Button */}
             <button
               onClick={(e) => {
@@ -105,7 +124,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
               <MapPin className="h-3 w-3 text-brass" /> {r.location_label ?? "Istanbul"}
             </span>
             <span className="glass-pill-dark px-2.5 py-1 rounded-xs font-medium">
-              {sideText(r)}
+              {sideLabel}
             </span>
           </div>
         </div>
@@ -114,7 +133,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
         <div className="property-card-body flex flex-1 flex-col p-5">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
             <span className="eyebrow !text-brass-text text-[0.65rem]">
-              {TYPE_LABEL[r.record_type]}
+              {typeLabel}
             </span>
             <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
               Ref: {r.ref || r.slug}
@@ -134,12 +153,12 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
                 {areaText(r)}
               </span>
             )}
-            {media.tags.slice(0, 1).map((t) => (
+            {media.tags.slice(0, 1).map((tag) => (
               <span
-                key={t}
+                key={tag}
                 className="rounded-xs border border-border/80 bg-secondary/40 px-2 py-0.5 text-[0.65rem] text-muted-foreground"
               >
-                {t}
+                {tag}
               </span>
             ))}
           </div>
@@ -147,7 +166,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
           {/* Pricing & CTA Footer */}
           <div className="property-card-price mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
             <div>
-              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode === "rent" ? "Monthly rent" : "Price"}</p>
+              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode === "rent" ? t.propertyCard.forRent : t.propertyCard.forSale}</p>
               <p className="text-xl font-sans font-semibold text-foreground tracking-tight tabular-nums">
                 {displayPrice}
               </p>
@@ -166,7 +185,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xs border border-border/80 bg-card hover:border-brass hover:text-brass hover:scale-105 transition-all duration-300"
-                title="Enquire on WhatsApp"
+                title={t.propertyCard.inquireWhatsApp}
               >
                 <MessageSquare className="h-4 w-4" />
               </a>
@@ -175,7 +194,7 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
                 params={{ slug: r.slug }}
                 className="btn btn-outline hover:border-brass hover:bg-primary hover:text-on-dark !min-h-9 !px-3.5 !text-[0.72rem] gap-1.5 shrink-0 transition-all duration-300"
               >
-                <span>Details</span> <ArrowRight className="h-3 w-3 arrow" />
+                <span>{t.propertyCard.viewDetails}</span> <ArrowRight className="h-3 w-3 arrow rtl-flip" />
               </Link>
             </div>
           </div>

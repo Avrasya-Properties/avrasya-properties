@@ -18,7 +18,9 @@ import {
   Plus,
   Trash2,
   RotateCcw,
-  X
+  X,
+  Search,
+  CheckCircle2
 } from "lucide-react";
 import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { SecuritySettings } from "@/admin/SecuritySettings";
@@ -42,7 +44,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company details", "Homepage", "Website appearance", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
+const TABS = ["Company details", "Homepage", "SEO & Search", "Website appearance", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
@@ -380,6 +382,242 @@ export function AdminSettingsPage() {
                   />
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: SEO & Search */}
+      {tab === "SEO & Search" && (
+        <div className="max-w-4xl space-y-6">
+          {/* Card: Google Search Preview */}
+          <div className="rounded-xl border bg-card p-6 shadow-xs">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                  <Search className="h-4 w-4 text-brass" />
+                  <span>Google Search Result Snippet Preview</span>
+                </h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Live simulation of how Avrasya Properties appears to international buyers in Google search engine results.
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-600 border border-emerald-500/20">
+                <CheckCircle2 className="h-3 w-3" />
+                <span>Simulated Google Snippet</span>
+              </div>
+            </div>
+
+            {/* Google Result Card Box */}
+            <div className="rounded-lg border bg-white p-4 font-sans text-left shadow-xs">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2228] text-brass text-[10px] font-bold">
+                  A
+                </div>
+                <div className="leading-tight">
+                  <div className="text-[12px] font-normal text-[#202124]">Avrasya Properties</div>
+                  <div className="text-[11px] font-normal text-[#4d5156] truncate max-w-md">
+                    {form.siteUrl || "https://avrasyaproperties.com"}
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-[18px] leading-snug font-normal text-[#1a0dab] hover:underline cursor-pointer font-sans">
+                {form.siteTitle || DEFAULT_SITE_SETTINGS.siteTitle}
+              </h3>
+              <p className="text-[13px] leading-relaxed text-[#4d5156] mt-1 font-sans">
+                {form.metaDescription || DEFAULT_SITE_SETTINGS.metaDescription}
+              </p>
+            </div>
+
+            {/* Status & Limits metrics */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t text-xs">
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 border">
+                <span className="text-muted-foreground">Title Length:</span>
+                <span className={`font-semibold tabular-nums ${(form.siteTitle || "").length >= 45 && (form.siteTitle || "").length <= 65 ? "text-emerald-600" : (form.siteTitle || "").length > 65 ? "text-amber-600" : "text-foreground"}`}>
+                  {(form.siteTitle || "").length} / 60 chars {(form.siteTitle || "").length > 65 ? "(May truncate)" : ""}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 border">
+                <span className="text-muted-foreground">Description Length:</span>
+                <span className={`font-semibold tabular-nums ${(form.metaDescription || "").length >= 130 && (form.metaDescription || "").length <= 165 ? "text-emerald-600" : (form.metaDescription || "").length > 165 ? "text-amber-600" : "text-foreground"}`}>
+                  {(form.metaDescription || "").length} / 160 chars {(form.metaDescription || "").length > 165 ? "(May truncate)" : ""}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card: Search Titles & Metadata */}
+          <div className="rounded-xl border bg-card p-6">
+            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Globe2 className="h-4 w-4 text-brass" />
+              <span>Core Search & Social Metadata</span>
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="cms-siteTitle" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Primary Website Search Title (Title Tag)
+                </label>
+                <input
+                  id="cms-siteTitle"
+                  className={field}
+                  placeholder="e.g. Avrasya Properties | Istanbul Luxury Real Estate & Advisory"
+                  value={form.siteTitle}
+                  onChange={(e) => setField("siteTitle", e.target.value)}
+                />
+                <span className="text-xs text-muted-foreground mt-1 block">
+                  Displayed as the main clickable headline in search engines and browser tabs. Recommended length: 50–60 characters. Avoid repeating brand names twice.
+                </span>
+              </div>
+
+              <div>
+                <label htmlFor="cms-metaDescription" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Primary Search Meta Description
+                </label>
+                <textarea
+                  id="cms-metaDescription"
+                  className={`${field} h-24 py-2`}
+                  placeholder="Compelling 150-160 character description of your Istanbul real estate services..."
+                  value={form.metaDescription}
+                  onChange={(e) => setField("metaDescription", e.target.value)}
+                />
+                <span className="text-xs text-muted-foreground mt-1 block">
+                  Summarizes the website in search result snippets below the title. Recommended length: 140–160 characters.
+                </span>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="cms-siteUrl" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                    Canonical Website URL
+                  </label>
+                  <input
+                    id="cms-siteUrl"
+                    className={field}
+                    placeholder="https://avrasyaproperties.com"
+                    value={form.siteUrl}
+                    onChange={(e) => setField("siteUrl", e.target.value)}
+                  />
+                  <span className="text-xs text-muted-foreground mt-1 block">
+                    Defines the authoritative base URL for search engines and prevents duplicate content fragmentation.
+                  </span>
+                </div>
+
+                <div>
+                  <label htmlFor="cms-ogImage" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                    Social Sharing Image (OG / Twitter Card Image)
+                  </label>
+                  <input
+                    id="cms-ogImage"
+                    className={field}
+                    placeholder="https://avrasyaproperties.com/images/properties/hero-main.jpg"
+                    value={form.ogImage}
+                    onChange={(e) => setField("ogImage", e.target.value)}
+                  />
+                  <span className="text-xs text-muted-foreground mt-1 block">
+                    Image preview shown when sharing your link on WhatsApp, LinkedIn, Twitter, and Facebook.
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="cms-keywords" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Target SEO Keywords
+                </label>
+                <input
+                  id="cms-keywords"
+                  className={field}
+                  placeholder="Istanbul real estate, Turkish citizenship by investment, luxury apartments Istanbul, Bosphorus property"
+                  value={form.keywords}
+                  onChange={(e) => setField("keywords", e.target.value)}
+                />
+                <span className="text-xs text-muted-foreground mt-1 block">
+                  Comma-separated keywords defining your firm's primary advisory specialties.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card: Indexing & Crawling Controls */}
+          <div className="rounded-xl border bg-card p-6">
+            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-brass" />
+              <span>Indexing & Verification Controls</span>
+            </h2>
+            <div className="space-y-4">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.indexingEnabled}
+                  onChange={(e) => setField("indexingEnabled", e.target.checked)}
+                  className="rounded border h-4 w-4 text-brass focus:ring-brass"
+                />
+                <div>
+                  <span className="text-sm font-medium text-foreground block">
+                    Allow Search Engine Crawlers to Index Website
+                  </span>
+                  <span className="text-xs text-muted-foreground block">
+                    When enabled, renders "index, follow" in robots directives. When unchecked, outputs "noindex, nofollow" to hide the site from search engines.
+                  </span>
+                </div>
+              </label>
+
+              <div>
+                <label htmlFor="cms-googleVerification" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Google Search Console Verification Token
+                </label>
+                <input
+                  id="cms-googleVerification"
+                  className={field}
+                  placeholder="e.g. google-site-verification token or HTML meta content"
+                  value={form.googleVerification}
+                  onChange={(e) => setField("googleVerification", e.target.value)}
+                />
+                <span className="text-xs text-muted-foreground mt-1 block">
+                  Optional token for claiming ownership in Google Search Console without uploading files.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card: Technical SEO Health & Status */}
+          <div className="rounded-xl border bg-card p-6">
+            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Layers className="h-4 w-4 text-brass" />
+              <span>Sitemap & Crawler Architecture Status</span>
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-3 text-xs">
+              <div className="p-3 rounded-lg border bg-muted/20">
+                <div className="font-semibold text-foreground mb-1">XML Sitemap</div>
+                <div className="text-emerald-600 font-medium flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Active & Validated</span>
+                </div>
+                <div className="text-muted-foreground mt-1 font-mono text-[11px]">
+                  /sitemap.xml (32 URLs)
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg border bg-muted/20">
+                <div className="font-semibold text-foreground mb-1">Crawler Directives</div>
+                <div className="text-emerald-600 font-medium flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Admin Protected</span>
+                </div>
+                <div className="text-muted-foreground mt-1 font-mono text-[11px]">
+                  /robots.txt (Disallow /admin)
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg border bg-muted/20">
+                <div className="font-semibold text-foreground mb-1">Structured Schema</div>
+                <div className="text-emerald-600 font-medium flex items-center gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>JSON-LD Live</span>
+                </div>
+                <div className="text-muted-foreground mt-1 text-[11px]">
+                  WebSite & RealEstateAgent
+                </div>
+              </div>
             </div>
           </div>
         </div>

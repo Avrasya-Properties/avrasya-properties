@@ -24,6 +24,8 @@ export function Preloader() {
     const startTime = performance.now();
     let animId=0;
     const timers:ReturnType<typeof setTimeout>[]=[];
+    // Hard safety timeout: preloader must never trap users under any circumstance
+    timers.push(setTimeout(() => { setIsDone(true); setDismissed(true); }, 2200));
 
     const update = (now: number) => {
       const elapsed = now - startTime;

@@ -35,4 +35,12 @@ export function watchWebsiteChanges(refresh:()=>void,options:{poll?:boolean;read
  if(enabled){void poll();timer=setInterval(()=>void poll(),5000);window.addEventListener("focus",onFocus);window.addEventListener("online",onFocus);document.addEventListener("visibilitychange",onFocus);}
  return()=>{active=false;clearTimeout(scheduled);clearInterval(timer);window.removeEventListener(WEBSITE_CHANGED,schedule);window.removeEventListener("storage",onStorage);window.removeEventListener("focus",onFocus);window.removeEventListener("online",onFocus);document.removeEventListener("visibilitychange",onFocus);channel?.close();};
 }
-export const PUBLIC_QUERY_KEYS=new Set(["published-catalogue","site-settings","website-page","catalogue-documents","services","faqs"]);
+
+export const PUBLIC_QUERY_KEYS = new Set([
+  "published-catalogue",
+  "site-settings",
+  "website-page",
+  "catalogue-documents",
+  "services",
+  "faqs",
+]);

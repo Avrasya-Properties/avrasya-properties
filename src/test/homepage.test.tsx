@@ -64,7 +64,7 @@ beforeEach(() => {
   state.refetch.mockClear();
 });
 describe("Homepage remains the homepage", () => {
-  it("shows published managed homepage sections and preserves property search",()=>{state.page={published:true,title:"Managed introduction",sections:[{title:"Our approach",content_json:{paragraphs:["A real managed paragraph."]}}]};render(<Home/>);expect(screen.getByText("A real managed paragraph.")).toBeInTheDocument();expect(screen.getByRole("heading",{level:1})).toHaveTextContent("Find your place in Istanbul.");expect(screen.getByRole("button",{name:"Find a property"})).toBeInTheDocument();});
+  it("shows published managed homepage sections and preserves property search",()=>{state.page={published:true,title:"Managed introduction",sections:[{title:"Our approach",content_json:{paragraphs:["A real managed paragraph."]}}]};render(<Home/>);expect(screen.getByText("A real managed paragraph.")).toBeInTheDocument();expect(screen.getByRole("heading",{level:1})).toHaveTextContent("Find your place in Istanbul.");expect(screen.getByRole("button",{name:"Search Listings"})).toBeInTheDocument();});
   it("does not show unpublished managed homepage sections",()=>{state.page={published:false,title:"Draft",sections:[{title:"Hidden",content_json:{paragraphs:["Unpublished draft text"]}}]};render(<Home/>);expect(screen.queryByText("Unpublished draft text")).toBeNull();});
 
   it("keeps the main hero, search and sections when no listings are published", () => {
@@ -72,8 +72,8 @@ describe("Homepage remains the homepage", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Find your place in Istanbul.",
     );
-    expect(screen.getByRole("button", { name: "Find a property" })).toBeInTheDocument();
-    expect(screen.getByText("Our next collection is being prepared.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Search Listings" })).toBeInTheDocument();
+    expect(screen.getByText("No properties match your filter criteria")).toBeInTheDocument();
     expect(screen.getByText("Explore Istanbul districts")).toBeInTheDocument();
     expect(container.querySelector('input[autocomplete="name"]')).toBeNull();
   });
@@ -83,7 +83,7 @@ describe("Homepage remains the homepage", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Find your place in Istanbul.",
     );
-    expect(screen.getByRole("status")).toHaveTextContent("Loading the property collection");
+    expect(screen.getByRole("status")).toHaveTextContent("Loading...");
   });
   it("retains the homepage and offers a real retry when the collection request fails", () => {
     state.isError = true;

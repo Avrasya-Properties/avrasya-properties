@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "@/hooks/useLanguage";
 import {
   Grid3X3,
   List,
@@ -56,12 +57,14 @@ export const Route = createFileRoute("/properties/")({
   head: () =>
     meta(
       "Istanbul Property Listings — Avrasya Properties",
-      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence."
+      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence.",
+      "/properties"
     ),
   component: Catalog,
 });
 
 function Catalog() {
+  const { t } = useTranslation();
   const catalogue = useCatalogue();
   const properties = catalogue.properties;
   const settings = useSiteSettings();
@@ -96,9 +99,9 @@ function Catalog() {
       <span className={lbl}>{label}</span>
       <select className="field text-xs md:text-sm" value={String(f[k] ?? "")} onChange={(e) => set(k, e.target.value)}>
         <option value="">{any}</option>
-        {opts.map(([v, t]) => (
+        {opts.map(([v, text]) => (
           <option key={v} value={v}>
-            {t}
+            {text}
           </option>
         ))}
       </select>
@@ -108,35 +111,33 @@ function Catalog() {
   return (
     <>
       <PageIntro
-        eyebrow="Istanbul Portfolio Collection"
-        title={<>Curated Offers & Developments in <em>Istanbul.</em></>}
+        eyebrow={t.properties.eyebrow}
+        title={<>{t.properties.title} <em>{t.properties.titleEm}</em></>}
         aside={
           <div className="flex flex-col gap-1 text-right">
             <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-              Prime Corridors · European & Asian Side
+              {t.properties.allSides}
             </span>
-            <span className="text-xs text-foreground font-medium">{properties.length} Published Opportunities</span>
+            <span className="text-xs text-foreground font-medium">{properties.length} {t.properties.showingCount}</span>
           </div>
         }
       >
-        <p>
-          Source-backed investment opportunities across central and Asian-side Istanbul. Every property is subject to preliminary title deed, zoning, and legal clearance before acquisition.
-        </p>
+        <p>{t.properties.description}</p>
       </PageIntro>
 
       <section className="container-site py-8">
-        {catalogue.isPending && !properties.length && <p role="status" className="text-muted-foreground text-sm mb-4">Loading current offers…</p>}
-        {catalogue.isError && <p role="alert" className="text-destructive text-sm mb-4">The catalogue is temporarily unavailable. Please contact our advisory team.</p>}
+        {catalogue.isPending && !properties.length && <p role="status" className="text-muted-foreground text-sm mb-4">{t.properties.showingCount}…</p>}
+        {catalogue.isError && <p role="alert" className="text-destructive text-sm mb-4">{t.properties.noResultsTitle}</p>}
         {/* Search & Filter Panel */}
         <div className="card-elevate rounded-xs border border-border/80 bg-card/95 backdrop-blur-md p-5 shadow-[0_10px_30px_-10px_rgba(23,43,51,0.08)]">
           <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,5fr)]">
             <label className="block">
-              <span className={lbl}>Keyword or District Search</span>
+              <span className={lbl}>{t.properties.searchPlaceholder}</span>
               <div className="relative">
                 <input
                   className="field pl-8"
                   type="search"
-                  placeholder="e.g. Şişli, Maslak, Duplex, Terrace"
+                  placeholder={t.properties.searchPlaceholder}
                   value={f.q ?? ""}
                   onChange={(e) => set("q", e.target.value)}
                 />
@@ -145,14 +146,14 @@ function Catalog() {
             </label>
             <button className="btn btn-outline md:hidden" aria-expanded={filtersOpen} aria-controls="catalogue-filters" onClick={()=>setFiltersOpen(x=>!x)}><SlidersHorizontal className="h-4 w-4"/>{filtersOpen?"Hide filters":"Show filters"}</button>
             <div id="catalogue-filters" className={`${filtersOpen?"grid":"hidden"} min-w-0 gap-4 sm:grid-cols-2 md:grid lg:grid-cols-5`}>
-            {sel("loc", "District", "All districts", LOCATIONS.map((l) => [l, l]))}
-            {sel("side", "Istanbul side", "Both sides", [
-              ["Europe", "European Side"],
-              ["Asia", "Asian Side"],
+            {sel("loc", t.home.filterDistrict, t.properties.allDistricts, LOCATIONS.map((l: string) => [l, l]))}
+            {sel("side", t.home.filterSide, t.properties.allSides, [
+              ["Europe", t.properties.sideEurope],
+              ["Asia", t.properties.sideAsia],
             ])}
-            {sel("layout", "Layout", "All Layouts", LAYOUT_OPTIONS.map((l) => [l, l]))}
-            {sel("type", "Property type", "All types", Object.entries(TYPE_LABEL))}
-            {sel("budget", "Budget", "Any budget", BUDGET_OPTIONS.map((b) => [b.id, b.label]))}
+            {sel("layout", t.home.filterLayout, t.properties.allLayouts, LAYOUT_OPTIONS.map((l: string) => [l, l]))}
+            {sel("type", t.propertyDetail.listingType, t.properties.allTypes, Object.entries(TYPE_LABEL))}
+            {sel("budget", t.home.filterBudget, t.properties.allBudgets, BUDGET_OPTIONS.map((b: { id: string; label: string }) => [b.id, b.label]))}
             </div>
           </div>
 
@@ -168,7 +169,7 @@ function Catalog() {
                     : "border-border bg-secondary hover:border-brass/70 text-foreground"
                 }`}
               >
-                <span>Verified citizenship eligibility</span>
+                <span>{t.properties.cbiOnly}</span>
               </button>
 
               {/* Saved Shortlist Filter */}
@@ -181,35 +182,12 @@ function Catalog() {
                 }`}
               >
                 <Heart className={`h-3 w-3 ${f.savedOnly ? "fill-white" : ""}`} />
-                <span>Saved Shortlist ({savedCount})</span>
+                <span>{t.properties.savedOnly} ({savedCount})</span>
               </button>
-
-              <span className="text-muted-foreground ml-2">Filters:</span>
-              {active.length > 0 ? (
-                active.map(([k, v]) => (
-                  <button
-                    key={k}
-                    className="flex items-center gap-1 rounded-xs border border-border/80 bg-secondary/80 px-2 py-0.5 text-xs hover:bg-secondary"
-                    onClick={() => set(k as keyof Filters, undefined)}
-                    aria-label={`Remove ${k} filter`}
-                  >
-                    <span>
-                      {k === "budget"
-                        ? BUDGET_OPTIONS.find((b) => b.id === v)?.label
-                        : k === "type"
-                        ? TYPE_LABEL[v as keyof typeof TYPE_LABEL]
-                        : k==="savedOnly"?"Saved properties":k==="cbiOnly"?"Verified citizenship eligibility":k==="side"?(v==="Asia"?"Asian side":"European side"):String(v)}
-                    </span>
-                    <X className="h-3 w-3 text-muted-foreground" />
-                  </button>
-                ))
-              ) : (
-                <span className="text-muted-foreground">None selected</span>
-              )}
 
               {active.length > 0 && (
                 <Link to="/properties" search={{}} className="text-brass font-medium underline ml-1">
-                  Reset filters
+                  {t.properties.resetFilters}
                 </Link>
               )}
             </div>
@@ -217,7 +195,7 @@ function Catalog() {
             {/* View Mode & Sorting Controls */}
             <div className="flex flex-wrap items-center gap-4">
               <span className="text-muted-foreground" aria-live="polite">
-                <strong>{list.length}</strong> of {properties.length} results
+                <strong>{list.length}</strong> {t.properties.showingCount}
               </span>
 
               {/* Grid / List Switcher */}
@@ -227,7 +205,7 @@ function Catalog() {
                   className={`flex h-7 w-7 items-center justify-center rounded-xs transition-colors ${
                     viewMode === "grid" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                   }`}
-                  title="Grid View"
+                  title={t.properties.viewingGrid}
                 >
                   <Grid3X3 className="h-4 w-4" />
                 </button>
@@ -236,22 +214,22 @@ function Catalog() {
                   className={`flex h-7 w-7 items-center justify-center rounded-xs transition-colors ${
                     viewMode === "list" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                   }`}
-                  title="List View"
+                  title={t.properties.viewingList}
                 >
                   <List className="h-4 w-4" />
                 </button>
               </div>
 
               <label className="flex items-center gap-2 font-medium">
-                Sort:
+                {t.properties.sortBy}:
                 <select
                   className="field !min-h-8 !w-auto text-xs"
                   value={f.sort ?? ""}
                   onChange={(e) => set("sort", e.target.value)}
                 >
-                  <option value="">Curated Order</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
+                  <option value="">{t.properties.sortNewest}</option>
+                  <option value="price-asc">{t.properties.sortLowest}</option>
+                  <option value="price-desc">{t.properties.sortHighest}</option>
                 </select>
               </label>
             </div>
@@ -338,7 +316,7 @@ function Catalog() {
                               ? "border-destructive bg-destructive text-white"
                               : "border-border hover:border-brass text-muted-foreground"
                           }`}
-                          title="Save to shortlist"
+                          title={t.propertyCard.save}
                         >
                           <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} />
                         </button>
@@ -347,7 +325,7 @@ function Catalog() {
                           params={{ slug: r.slug }}
                           className="btn btn-primary !min-h-9 !px-3 text-xs"
                         >
-                          Details →
+                          {t.propertyCard.viewDetails} →
                         </Link>
                       </div>
                     </div>
@@ -359,18 +337,16 @@ function Catalog() {
         ) : (
           /* Empty State */
           <div className="mt-10 rounded-xs border border-border/80 bg-card p-6 md:p-12 text-center">
-            <h2 className="headline text-2xl">{!properties.length&&!active.length?"Our next collection is being prepared.":"No listings match your filters."}</h2>
+            <h2 className="headline text-2xl">{t.properties.noResultsTitle}</h2>
             <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-              {f.savedOnly
-                ? "You haven't saved any listings to your private shortlist yet. Click the heart icon on any card to save it."
-                : "Try widening your district or layout filters, or request a bespoke off-market portfolio search directly from our Istanbul team."}
+              {t.properties.noResultsDesc}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link to="/properties" search={{}} className="btn btn-outline">
-                Clear All Filters
+                {t.properties.resetFilters}
               </Link>
               <Link to="/contact" className="btn btn-primary">
-                Request Bespoke Shortlist
+                {t.cta.requestConsultation}
               </Link>
             </div>
           </div>

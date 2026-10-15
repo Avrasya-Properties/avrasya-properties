@@ -17,7 +17,7 @@ function Manage(){
  const module=MODULES.find(m=>m.table===table)!;const editable=!module.readonly&&(module.admin?can(user,"admin"):can(user,"edit-inventory"));
  const visible=MODULES.filter(m=>(!m.admin||can(user,"admin"))&&(!privateTables.includes(m.table)||can(user,"edit-inventory")));
  useEffect(()=>{if(search.section&&visible.some(m=>m.table===search.section))setTable(search.section);},[search.section]);
- useEffect(()=>{if(DEMO_ENABLED)return;let live=true;setBusy(true);setError("");setData([]);setDraft(null);setOriginal(null);setQuery("");
+ useEffect(()=>{let live=true;setBusy(true);setError("");setData([]);setDraft(null);setOriginal(null);setQuery("");
  const needed=[...new Set(module.fields.map(f=>f.ref).filter((x):x is string=>!!x))];
  void Promise.all([managedRows(table),Promise.all(needed.map(async name=>[name,await managedRows(name)] as const))]).then(([rows,values])=>{if(live){setData(rows);setRefs(Object.fromEntries(values));}}).catch(e=>{if(live)setError(e.message);}).finally(()=>{if(live)setBusy(false);});return()=>{live=false;};},[table]);
  async function reload(){if(currentTable.current!==table)return;setBusy(true);setError("");try{const needed=[...new Set(module.fields.map(f=>f.ref).filter((x):x is string=>!!x))];const [rows,values]=await Promise.all([managedRows(table),Promise.all(needed.map(async name=>[name,await managedRows(name)] as const))]);if(currentTable.current===table){setData(rows);setRefs(Object.fromEntries(values));}}catch(e){if(currentTable.current===table)setError((e as Error).message);}finally{if(currentTable.current===table)setBusy(false);}}

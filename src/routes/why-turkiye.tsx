@@ -1,6 +1,7 @@
 import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "@/hooks/useLanguage";
 import {
   Building,
   Compass,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/why-turkiye")({
     meta(
       "Why Istanbul Real Estate · Avrasya Properties",
       "Neighborhood guides, lifestyle insights, and freehold property rights in Istanbul for international home buyers and families.",
+      "/why-turkiye"
     ),
   component: () => <ManagedPage slug="why-turkiye"><WhyTurkiye /></ManagedPage>,
 });
@@ -112,6 +114,7 @@ const DISTRICTS: DistrictProfile[] = [
 ];
 
 export function WhyTurkiye() {
+  const { t } = useTranslation();
   const [activeSide, setActiveSide] = useState<"All" | "European" | "Asian">("All");
 
   const filteredDistricts = DISTRICTS.filter((d) => activeSide === "All" || d.side === activeSide);
@@ -119,27 +122,23 @@ export function WhyTurkiye() {
   return (
     <>
       <PageIntro
-        eyebrow="Why Istanbul · Prime Location & Lifestyle"
+        eyebrow={t.whyTurkiye.eyebrow}
         title={
           <>
-            Istanbul: where continents meet, <em>your investment thrives.</em>
+            {t.whyTurkiye.title} <em>{t.whyTurkiye.titleEm}</em>
           </>
         }
       >
-        <p>
-          Home to 16 million residents, Istanbul is one of the world's most vibrant and dynamic
-          cities. Offering 100% permanent freehold ownership, strong rental demand, and a unique
-          bridge between East and West, Türkiye is a welcoming and rewarding place to own property.
-        </p>
+        <p>{t.whyTurkiye.description}</p>
       </PageIntro>
 
       {/* 4 Core Pillars */}
       <section className="border-b bg-card py-16">
         <div className="container-site">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="eyebrow">Key Advantages</p>
+            <p className="eyebrow">{t.whyTurkiye.macroEyebrow}</p>
             <h2 className="font-display text-3xl font-semibold">
-              Four Reasons to Choose Istanbul
+              {t.whyTurkiye.macroTitle}
             </h2>
           </div>
 
@@ -149,12 +148,10 @@ export function WhyTurkiye() {
                 <Scale className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Permanent Freehold
+                {t.whyTurkiye.macro1Title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Foreign buyers enjoy the exact same rights as Turkish citizens: 100% permanent
-                freehold ownership (Tapu) that belongs to you and your family forever—never a
-                temporary leasehold.
+                {t.whyTurkiye.macro1Desc}
               </p>
             </div>
 
@@ -163,11 +160,10 @@ export function WhyTurkiye() {
                 <Plane className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Global Connectivity
+                {t.whyTurkiye.macro2Title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Istanbul Airport connects directly to over 300 international destinations, putting
-                Europe, the Middle East, and Central Asia just a short, convenient flight away.
+                {t.whyTurkiye.macro2Desc}
               </p>
             </div>
 
@@ -176,11 +172,10 @@ export function WhyTurkiye() {
                 <TrendingUp className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Steady Rental Demand
+                {t.whyTurkiye.macro3Title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                With a young, dynamic population and growing workforce, quality homes enjoy
-                year-round rental demand from local professionals and international families.
+                {t.whyTurkiye.macro3Desc}
               </p>
             </div>
 
@@ -189,11 +184,10 @@ export function WhyTurkiye() {
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
-                Secure Legal Protections
+                {t.whyTurkiye.macro4Title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Government-licensed property appraisals, official Central Bank exchange certificates,
-                and protected bank transfer procedures ensure your purchase is completely safe.
+                {t.whyTurkiye.macro4Desc}
               </p>
             </div>
           </div>
@@ -204,13 +198,12 @@ export function WhyTurkiye() {
       <section className="container-site py-20">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end mb-10">
           <div>
-            <p className="eyebrow">Neighborhood Guides</p>
+            <p className="eyebrow">{t.whyTurkiye.districtsEyebrow}</p>
             <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
-              Explore Istanbul's Top Neighborhoods
+              {t.whyTurkiye.districtsTitle}
             </h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              Every Istanbul neighborhood offers something unique—from high-energy financial hubs and
-              cultural centers to tranquil waterfront living. Here is what to expect in prime areas.
+              {t.whyTurkiye.districtsSubtitle}
             </p>
           </div>
 
@@ -226,7 +219,7 @@ export function WhyTurkiye() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {side === "All" ? "All Districts" : `${side} Side`}
+                {side === "All" ? t.properties.allDistricts : side === "European" ? t.whyTurkiye.filterEuropean : t.whyTurkiye.filterAsian}
               </button>
             ))}
           </div>
@@ -256,13 +249,13 @@ export function WhyTurkiye() {
                 <div className="mt-5 grid grid-cols-2 gap-3 rounded-xs border border-border/60 bg-secondary/30 p-3 text-xs">
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase tracking-wider">
-                      Avg Price / m²
+                      {t.whyTurkiye.pricePerM2}
                     </span>
                     <span className="font-mono font-bold text-foreground">{d.pricePerM2}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase tracking-wider">
-                      Expected Rental Return
+                      {t.whyTurkiye.targetYield}
                     </span>
                     <span className="font-mono font-bold text-brass">{d.yieldRange}</span>
                   </div>

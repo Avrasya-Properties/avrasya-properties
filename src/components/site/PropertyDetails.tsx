@@ -33,7 +33,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-    type PropertyRecord,
+  type PropertyRecord,
 } from "@/data/properties";
 import { useCatalogue } from "@/data/live";
 
@@ -42,12 +42,13 @@ import { Enquiry } from "@/components/site/Enquiry";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useSiteSettings } from "@/admin/store";
 import { useLiveContact } from "@/hooks/useLiveContact";
+import { useLanguage } from "@/hooks/useLanguage";
 
 function Fact({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start gap-4 border-b border-border/70 py-3 text-sm">
       <span className="text-muted-foreground">{k}</span>
-      <span className="break-words text-right font-medium text-foreground">{v}</span>
+      <span className="break-words text-right font-medium text-foreground rtl:text-left">{v}</span>
     </div>
   );
 }
@@ -61,6 +62,7 @@ const usd = (n: number) => "$" + n.toLocaleString("en-US");
 const tryf = (n: number) => "TRY " + n.toLocaleString("en-US");
 
 function PriceBlock({ r }: { r: PropertyRecord }) {
+  const { t } = useLanguage();
   const p = r.price;
   const rows: [string, string][] = [];
   if (p.previous_advertised_amount) rows.push(["Formerly Advertised", usd(p.previous_advertised_amount)]);
@@ -81,13 +83,13 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
   return (
     <div className="mt-6 rounded-xs border border-border/80 bg-secondary/40 p-4">
       <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-        Price details
+        {t.propertyDetail.priceDetails}
       </h3>
       {rows.map(([k, v]) => (
         <Fact key={k} k={k} v={v} />
       ))}
       <p className="pt-3 text-[0.72rem] text-muted-foreground leading-relaxed">
-        Figures sourced from developer offering documents. Official binding contracts and currency conversion rates (DAB) are confirmed with legal advisers prior to deposit.
+        {t.propertyDetail.priceDetailsNotice}
       </p>
     </div>
   );
@@ -98,6 +100,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
   const media = getPropertyMedia(r);
   const p = priceDisplay(r.price);
   const contact = useLiveContact();
+  const { t, isRtl } = useLanguage();
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [ready,setReady]=useState(false);
@@ -107,9 +110,27 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(r.slug);
   const usdVal = comparableUsd(r.price);
-  const displayPrice = currency === "USD"||usdVal===null ? p.main : convertUsdPrice(usdVal, currency);
+  const displayPrice = currency === "USD"||usdVal===null ? (p.main === "Price on request" ? t.common.priceOnRequest : p.main) : convertUsdPrice(usdVal, currency);
   const settings=useSiteSettings();
   const isCbi = r.details["cbi_verified"]===true;
+
+  const sideLabel =
+    r.side === "Europe"
+      ? t.common.sideEurope
+      : r.side === "Asia"
+        ? t.common.sideAsia
+        : t.common.sideUnknown;
+
+  const typeLabel =
+    r.record_type === "unit_offer"
+      ? t.common.unitOffer
+      : r.record_type === "unit_type"
+        ? t.common.unitType
+        : r.record_type === "package"
+          ? t.common.multiApartmentPackage
+          : r.record_type === "project"
+            ? t.common.projectIntroduction
+            : t.common.offerToConfirm;
 
   const d = r.details;
   const facts = Object.entries(d).filter(
@@ -145,7 +166,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
   const handleShare = () => {
     if (!preview&&typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
-      toast.success("Listing link copied to clipboard!");
+      toast.success(t.propertyDetail.shareSuccess);
     }
   };
 
@@ -155,9 +176,9 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
       <div className="border-b border-border/60 bg-card/60">
         <nav aria-label="Breadcrumb" className="container-site flex flex-wrap items-center justify-between gap-2 py-3 text-xs text-muted-foreground">
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <Link to="/" className="shrink-0 hover:text-foreground">Home</Link>
+            <Link to="/" className="shrink-0 hover:text-foreground">{t.propertyDetail.home}</Link>
             <span className="shrink-0" aria-hidden="true">/</span>
-            <Link to="/properties" className="shrink-0 hover:text-foreground">Properties</Link>
+            <Link to="/properties" className="shrink-0 hover:text-foreground">{t.propertyDetail.properties}</Link>
             <span className="shrink-0" aria-hidden="true">/</span>
             <span className="min-w-0 flex-1 truncate font-medium text-foreground">{r.marketing_title}</span>
           </div>
@@ -167,18 +188,18 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               disabled={preview}
               onClick={handleShare}
               className="flex min-h-11 min-w-11 items-center justify-center gap-1 hover:text-foreground transition-colors"
-              title="Share listing link"
+              title={t.propertyDetail.share}
             >
-              <Share2 className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Share</span>
+              <Share2 className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t.propertyDetail.share}</span>
             </button>
             <button
               disabled={preview}
               onClick={() => toggle(r.slug)}
               className="flex min-h-11 min-w-11 items-center justify-center gap-1 hover:text-foreground transition-colors"
-              title="Save to shortlist"
+              title={t.propertyDetail.save}
             >
               <Heart className={`h-3.5 w-3.5 ${saved ? "fill-destructive text-destructive" : ""}`} />
-              <span className="hidden sm:inline">{saved ? "Saved" : "Save"}</span>
+              <span className="hidden sm:inline">{saved ? t.propertyDetail.saved : t.propertyDetail.save}</span>
             </button>
           </div>
         </nav>
@@ -197,11 +218,11 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               </span>
               {isCbi ? (
                 <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
-                  Citizenship eligibility verified
+                  {t.propertyDetail.cbiVerified}
                 </span>
               ) : (
                 <span className="rounded-xs border border-brass/50 bg-brass/10 px-2 py-0.5 text-xs font-medium text-brass-text">
-                  Citizenship eligibility to confirm
+                  {t.propertyDetail.cbiToConfirm}
                 </span>
               )}
             </div>
@@ -213,14 +234,14 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               <MapPin className="h-4 w-4 text-brass" />
               <span>{locationText(r)}</span>
               <span>·</span>
-              <span>{r.layout_label ?? "Layout to confirm"}</span>
+              <span>{r.layout_label ?? t.propertyDetail.toConfirm}</span>
               <span>·</span>
               <span>{areaText(r)}</span>
             </p>
           </div>
 
           <div className="lg:text-right flex flex-col items-start lg:items-end">
-            <p className="eyebrow !text-muted-foreground">{r.mode==="rent"?"Monthly rent":"Asking price"}</p>
+            <p className="eyebrow !text-muted-foreground">{r.mode==="rent"?t.propertyDetail.monthlyRent:t.propertyDetail.askingPrice}</p>
             <p className="font-display break-words text-3xl md:text-5xl font-semibold text-foreground tracking-tight">
               {displayPrice}
             </p>
@@ -228,7 +249,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               <p className="text-xs text-muted-foreground mt-0.5">USD {p.main}</p>
             )}
             <p className="text-xs text-muted-foreground mt-1">
-              {p.note} · Subject to contract confirmation
+              {p.note} · {t.propertyDetail.subjectToContract}
             </p>
           </div>
         </div>
@@ -243,7 +264,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               alt={r.marketing_title}
               className="h-full w-full object-contain transition-transform duration-500"
             />
-            :<div className="flex h-full items-center justify-center text-sm text-muted-foreground">Property photos have not been added.</div>}
+            :<div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t.propertyDetail.noPhotos}</div>}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
             {/* Lightbox / Expand Button */}
@@ -252,7 +273,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               onClick={() => setLightbox(true)}
               className="absolute right-3 bottom-3 flex min-h-11 items-center gap-1.5 rounded-xs bg-black/60 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white hover:bg-black/80 transition-colors"
             >
-              <Maximize2 className="h-3.5 w-3.5" /> Fullscreen View
+              <Maximize2 className="h-3.5 w-3.5" /> {t.propertyDetail.fullscreen}
             </button>
 
             {/* Gallery Arrows */}
@@ -261,16 +282,16 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
                 <button
                   onClick={() => setActiveImg((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
                   className="absolute left-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-colors"
-                  aria-label="Previous image"
+                  aria-label={t.propertyDetail.previousImage}
                 >
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5 rtl-flip" />
                 </button>
                 <button
                   onClick={() => setActiveImg((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
                   className="absolute right-3 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md hover:bg-black/70 transition-colors"
-                  aria-label="Next image"
+                  aria-label={t.propertyDetail.nextImage}
                 >
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="h-5 w-5 rtl-flip" />
                 </button>
               </>
             )}
@@ -281,17 +302,17 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             {images.map((img, i) => (
               <button
                 key={i}
-                aria-label={img===media.floorPlan?"View supplied floor plan":`View photo ${i+1}`}
+                aria-label={img===media.floorPlan?t.propertyDetail.floorPlan:`${t.propertyDetail.fullscreen} ${i+1}`}
                 aria-pressed={activeImg===i}
                 onClick={() => setActiveImg(i)}
                 className={`relative h-20 w-32 shrink-0 overflow-hidden rounded-xs border transition-all ${
                   activeImg === i ? "border-brass ring-2 ring-brass/40 scale-102" : "border-border/70 opacity-70 hover:opacity-100"
                 }`}
               >
-                <GalleryImage key={img} src={img} alt={img===media.floorPlan?"Supplied floor plan":`Property photo ${i+1}`} className="h-full w-full object-cover" />
+                <GalleryImage key={img} src={img} alt={img===media.floorPlan?t.propertyDetail.floorPlan:`${t.propertyDetail.fullscreen} ${i+1}`} className="h-full w-full object-cover" />
                 {img===media.floorPlan && (
                   <span className="absolute bottom-1 left-1 rounded-xs bg-primary/90 px-1 text-[8px] font-bold text-white uppercase">
-                    Floor plan
+                    {t.propertyDetail.floorPlan}
                   </span>
                 )}
               </button>
@@ -306,11 +327,19 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           {/* Section 01: Specifications Fact Sheet */}
           <div className="rounded-xs border border-border/80 bg-card p-4 sm:p-6 md:p-8 shadow-xs">
             <div className="flex items-center gap-2 mb-2">
-              <span className="eyebrow !text-brass">Property specifications</span>
+              <span className="eyebrow !text-brass">{t.propertyDetail.specificationsEyebrow}</span>
             </div>
-            <h2 className="headline text-2xl font-semibold">Property details</h2>
+            <h2 className="headline text-2xl font-semibold">{t.propertyDetail.specificationsTitle}</h2>
 
             <div className="mt-6 grid gap-x-12 sm:grid-cols-2">
+              <Fact k={t.propertyDetail.district} v={locationText(r)} />
+              <Fact k={t.propertyDetail.istanbulSide} v={sideText(r)} />
+              <Fact k={t.propertyDetail.listingType} v={r.mode==="rent"?t.propertyDetail.forRent:t.propertyDetail.forSale} />
+              {r.bathrooms!=null&&<Fact k={t.propertyDetail.bathrooms} v={r.bathrooms}/>}<Fact k={t.propertyDetail.availability} v={r.availability||t.propertyDetail.toConfirm} />
+              {r.tapu_status&&<Fact k={t.propertyDetail.titleDeedStatus} v={r.tapu_status}/>}
+              <Fact k={t.propertyDetail.apartmentLayout} v={r.layout_label ?? t.propertyDetail.toConfirm} />
+              {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?t.propertyDetail.grossArea:area.basis==="net"?t.propertyDetail.netArea:t.propertyDetail.areaToConfirm} v={`${area.value_m2.toLocaleString()} m²`}/>):<Fact k={t.propertyDetail.areaToConfirm} v={t.propertyDetail.toConfirm}/>}
+              {typeof d.project === "string"&&d.project&&<Fact k={t.propertyDetail.development} v={d.project} />}
               <Fact k="District" v={locationText(r)} />
               <Fact k="Istanbul side" v={sideText(r)} />
               <Fact k="Listing" v={r.mode==="rent"?"For rent":"For sale"} />
@@ -337,7 +366,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
             {typeof d.note === "string" && (
               <div className="mt-6 whitespace-pre-line rounded-xs border border-border/70 bg-secondary/30 p-4 text-sm text-muted-foreground leading-relaxed">
-                <strong className="text-foreground block mb-1">Property description:</strong>
+                <strong className="text-foreground block mb-1">{t.propertyDetail.propertyDescription}</strong>
                 {d.note}
               </div>
             )}
@@ -346,9 +375,9 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           {/* Section 02: Approved highlights */}
           {media.highlights.length>0&&<div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
             <div className="flex items-center gap-2 mb-2">
-              <span className="eyebrow !text-brass">Key Property Highlights</span>
+              <span className="eyebrow !text-brass">{t.propertyDetail.highlightsEyebrow}</span>
             </div>
-            <h2 className="headline text-2xl font-semibold">Property highlights</h2>
+            <h2 className="headline text-2xl font-semibold">{t.propertyDetail.highlightsTitle}</h2>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {media.highlights.map((h, i) => (
@@ -365,8 +394,8 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           {media.floorPlan&&<div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="eyebrow !text-brass">Architectural Layout</p>
-                <h2 className="headline text-2xl font-semibold mt-1">Floor plan & space distribution</h2>
+                <p className="eyebrow !text-brass">{t.propertyDetail.floorPlan}</p>
+                <h2 className="headline text-2xl font-semibold mt-1">{t.propertyDetail.floorPlan}</h2>
               </div>
               <button
                 onClick={() => {
@@ -375,7 +404,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
                 }}
                 className="btn btn-outline !min-h-9 !px-3 text-xs gap-1.5"
               >
-                <Maximize2 className="h-3.5 w-3.5" /> View floor plan
+                <Maximize2 className="h-3.5 w-3.5" /> {t.propertyDetail.fullscreen}
               </button>
             </div>
 
@@ -383,13 +412,10 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               <GalleryImage
                 key={media.floorPlan}
                 src={media.floorPlan}
-                alt="Architectural Floor Plan"
+                alt={t.propertyDetail.floorPlan}
                 className="h-full w-full object-contain p-4"
               />
             </div>
-            <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-              The supplied plan is for reference. Confirm measurements and the exact apartment before purchase.
-            </p>
           </div>
 
           }
@@ -397,17 +423,16 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           <div className="rounded-xs border border-brass/40 bg-primary p-6 md:p-8 text-on-dark shadow-md">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck className="h-4 w-4 text-brass" />
-              <p className="eyebrow !text-brass">Citizenship review</p>
+              <p className="eyebrow !text-brass">{t.propertyDetail.legalVerificationEyebrow}</p>
             </div>
             <h2 className="headline text-2xl font-semibold text-on-dark">
-              Turkish citizenship eligibility assessment
+              {t.propertyDetail.legalVerificationTitle}
             </h2>
 
-            <p className="mt-4 text-sm text-on-dark-muted">{isCbi?"Eligibility has been recorded as verified by the team. Confirm current terms with the advisor before proceeding.":"Eligibility has not been verified for this listing. Price alone does not establish eligibility."}</p>
-            <p className="mt-3 text-xs text-on-dark-muted">The website's advisory investment amount is {usd(settings.cbiThresholdUsd)}. Ask our team to confirm requirements for your circumstances.</p>
+            <p className="mt-4 text-sm text-on-dark-muted">{t.propertyDetail.legalVerificationDesc}</p>
             <div className="mt-6 pt-4 border-t border-on-dark/15 flex flex-wrap gap-3">
               <Link to="/citizenship" className="btn btn-light !min-h-9 !text-xs">
-                View Full CBI Regulations Guide
+                {t.home.cbiExploreRoadmap}
               </Link>
               <a
                 href={waLink(`Hello Avrasya, I'd like to check citizenship eligibility for ${r.marketing_title} (${r.slug})`)}
@@ -415,12 +440,12 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
                 rel="noreferrer"
                 className="btn btn-outline !border-on-dark/30 !text-on-dark !min-h-9 !text-xs hover:!bg-on-dark/10"
               >
-                Inquire With Citizenship Team
+                {t.propertyDetail.whatsappDirect}
               </a>
             </div>
           </div>
 
-          {(r.source_note||claims.length>0)&&<section className="rounded-xs border border-brass/40 bg-card p-6"><h2 className="headline text-xl">Details to confirm</h2>{r.source_note&&<p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{r.source_note}</p>}{claims.length>0&&<ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">{claims.map((claim,i)=><li key={i}>{claim}</li>)}</ul>}</section>}
+          {(r.source_note||claims.length>0)&&<section className="rounded-xs border border-brass/40 bg-card p-6"><h2 className="headline text-xl">{t.propertyDetail.specificationsTitle}</h2>{r.source_note&&<p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{r.source_note}</p>}{claims.length>0&&<ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">{claims.map((claim,i)=><li key={i}>{claim}</li>)}</ul>}</section>}
         </div>
 
         {/* Sticky Consultation & Enquiry Sidebar */}
@@ -429,15 +454,15 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <div className="flex items-center justify-between border-b pb-3 mb-4">
               <span className="text-xs font-semibold text-muted-foreground">REF: {r.ref||r.slug}</span>
               <span className="rounded-xs bg-emerald-500/10 text-emerald-600 px-2 py-0.5 text-[0.65rem] font-bold uppercase">
-                {r.availability||"To confirm"}
+                {r.availability||t.propertyDetail.toConfirm}
               </span>
             </div>
 
             <h3 className="font-display text-xl font-semibold text-foreground">
-              {r.record_type === "project" ? "Enquire about project units" : "Schedule a private viewing"}
+              {t.propertyDetail.bookViewing}
             </h3>
             <p className="mt-1 mb-5 text-xs text-muted-foreground leading-relaxed">
-              We confirm real-time inventory, floor options, and private developer discount allocations before your visit.
+              {t.propertyDetail.bookViewingDesc}
             </p>
 
             <Enquiry defaultTopic={r.marketing_title} propertySlug={r.slug} preview={preview} compact />
@@ -445,7 +470,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
           {/* Quick Direct Contacts */}
           <div className="rounded-xs border border-border/80 bg-card p-5 text-xs space-y-3">
-            <p className="eyebrow !text-brass">Direct Istanbul Team</p>
+            <p className="eyebrow !text-brass">{t.common.directInquiries}</p>
             <div className="space-y-2">
               <a
                 href={`${contact.whatsapp}?text=${encodeURIComponent(`Inquiry regarding ${r.marketing_title} (${r.slug})`)}`}
@@ -453,7 +478,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
                 rel="noreferrer"
                 className="flex items-center gap-2 text-foreground hover:text-brass transition-colors font-medium"
               >
-                <MessageSquare className="h-4 w-4 text-brass" /> Direct WhatsApp Consultation
+                <MessageSquare className="h-4 w-4 text-brass" /> {t.propertyDetail.whatsappDirect}
               </a>
               <a
                 href={contact.phoneHref}
@@ -462,9 +487,6 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
                 <Phone className="h-4 w-4 text-brass" /> {contact.phone}
               </a>
             </div>
-            <p className="pt-2 text-[0.7rem] text-muted-foreground border-t border-border/60">
-              Languages spoken: English, Turkish, Arabic.
-            </p>
           </div>
         </aside>
       </section>
@@ -474,13 +496,13 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
         <section className="container-site border-t border-border/80 pb-24 pt-16">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="eyebrow eyebrow-mark">Comparable Portfolios</p>
+              <p className="eyebrow eyebrow-mark">{t.propertyDetail.similarProperties}</p>
               <h2 className="headline text-2xl md:text-3xl font-semibold mt-1">
-                {r.side==="unknown"?"More properties":"More properties on the "+(r.side==="Europe"?"European":"Asian")+" side"}
+                {t.propertyDetail.similarSubtitle}
               </h2>
             </div>
             <Link to="/properties" className="text-xs font-semibold text-foreground hover:text-brass underline">
-              View all listings →
+              {t.propertyDetail.browseCurrent} →
             </Link>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -493,7 +515,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
       {/* Mobile Sticky Bar */}
       {!preview&&<div className="property-contact-bar fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border/80 bg-card/95 backdrop-blur-md p-3 lg:hidden shadow-lg">
-        <a href="#property-enquiry" className="btn btn-primary flex-1 !px-3">Enquire</a>
+        <a href="#property-enquiry" className="btn btn-primary flex-1 !px-3">{t.propertyDetail.bookViewing}</a>
         <a
           href={`${contact.whatsapp}?text=${encodeURIComponent(`Hello, I'm interested in ${r.marketing_title} (${r.slug}).`)}`}
           target="_blank"
@@ -505,7 +527,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
         <a
           href={contact.phoneHref}
           className="btn btn-outline !px-3"
-          aria-label="Call Avrasya"
+          aria-label={t.common.directInquiries}
         >
           <Phone className="h-4 w-4" />
         </a>

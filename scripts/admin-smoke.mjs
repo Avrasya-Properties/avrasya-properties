@@ -82,7 +82,15 @@ try {
     if (attempt === 59) throw new Error("Dev server failed to become ready: " + serverOutput);
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+  browser = await puppeteer.launch({
+    executablePath:
+      process.env.CHROME_PATH ||
+      (process.platform === "win32"
+        ? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+        : "/usr/bin/google-chrome"),
+    headless: true,
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
+  });
   page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 1000 });
   page.setDefaultTimeout(20000);

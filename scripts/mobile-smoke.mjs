@@ -115,6 +115,7 @@ const child = spawn(
   ["run", "dev", "--host", "127.0.0.1", "--port", "8083"],
   {
     stdio: ["ignore", "pipe", "pipe"],
+    shell: true,
     env: { ...process.env, VITE_ENABLE_ADMIN_DEMO: "false", VITE_SUPABASE_URL: apiOrigin },
   },
 );
@@ -189,7 +190,11 @@ try {
     await pause(500);
   }
   browser = await puppeteer.launch({
-    executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome",
+    executablePath:
+      process.env.CHROME_PATH ||
+      (process.platform === "win32"
+        ? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+        : "/usr/bin/google-chrome"),
     headless: true,
     pipe: true,
     args: process.env.AVRASYA_BROWSER_ARGS

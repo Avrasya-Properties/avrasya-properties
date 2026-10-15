@@ -2,6 +2,7 @@ import { ManagedPage } from "@/components/site/ManagedPage";
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/hooks/useLanguage";
 import {
   ArrowRight,
   Building,
@@ -34,15 +35,32 @@ import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { BosphorusNavigator } from "@/components/site/BosphorusNavigator";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
-import { useCatalogue } from "@/data/live";
+import { useCatalogue, loadPublicSettings } from "@/data/live";
 import { useSiteSettings } from "@/admin/store";
+import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
 
 export const Route = createFileRoute("/")({
-  head: () =>
-    meta(
-      "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory",
-      "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services."
-    ),
+  loader: async ({ context }) => {
+    try {
+      const settings = await context.queryClient.ensureQueryData({
+        queryKey: ["site-settings"],
+        queryFn: loadPublicSettings,
+        staleTime: 60000,
+      });
+      return { settings };
+    } catch {
+      return { settings: null };
+    }
+  },
+  head: ({ loaderData }) => {
+    const s = loaderData?.settings;
+    const title = s?.siteTitle?.trim() || "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory";
+    const desc = s?.metaDescription?.trim() || "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services.";
+    const canonical = s?.siteUrl?.trim() || "https://avrasyaproperties.com";
+    const image = s?.ogImage?.trim() || "https://avrasyaproperties.com/images/properties/hero-main.jpg";
+    const noindex = s?.indexingEnabled === false;
+    return meta(title, desc, { canonical, image, noindex });
+  },
   component: Home,
 });
 
@@ -73,6 +91,7 @@ function HomeCollection({
   retry: () => void;
 }) {
   const waLink = useWhatsAppLink();
+  const { t, locale } = useTranslation();
   const EDITORIAL = properties.slice(0, 6);
   const settings = useSiteSettings();
   const LOCATIONS = settings.districts?.length
@@ -115,12 +134,14 @@ function HomeCollection({
             <div className="lg:col-span-7 flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-3">
                 <span className="eyebrow !text-brass-text">
-                  {settings.eyebrowText || "Private Advisory · Istanbul · Europe & Asia"}
+                  {locale === "en" && settings.eyebrowText ? settings.eyebrowText : t.home.heroEyebrow}
                 </span>
               </div>
               <h1 className="display-hero">
                 <span className="split-line">
-                  <span style={{ ["--d" as string]: "150ms" }}>{settings.heroHeadline}</span>
+                  <span style={{ ["--d" as string]: "150ms" }}>
+                    {locale === "en" && settings.heroHeadline ? settings.heroHeadline : `${t.home.heroTitle} ${t.home.heroTitleEm}`}
+                  </span>
                 </span>
               </h1>
 
@@ -129,8 +150,7 @@ function HomeCollection({
                 style={{ ["--d" as string]: "350ms" }}
                 className="mt-5 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed"
               >
-                {settings.heroSubtitle ||
-                  "Discover carefully selected homes and investments across Istanbul. Every property is personally checked for clear legal ownership, fair market value, and smooth title transfer."}
+                {locale === "en" && settings.heroSubtitle ? settings.heroSubtitle : t.home.heroSubtitle}
               </p>
 
               {/* Key Highlights Bar with tactile hover micro-lift */}
@@ -143,23 +163,23 @@ function HomeCollection({
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground group-hover:text-brass transition-colors">
                     {properties.length}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Available homes</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t.properties.allTypes}</p>
                 </div>
                 <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground group-hover:text-brass transition-colors">
                     {LOCATIONS.length}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Istanbul districts</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t.home.filterDistrict}</p>
                 </div>
                 <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
-                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">Verified</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">100% Legal & title checked</p>
+                  <p className="font-display text-2xl md:text-3xl font-semibold text-brass">100%</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t.home.stat1Title}</p>
                 </div>
                 <div className="group rounded-xs p-2 transition-all duration-300 hover:bg-white/5">
                   <p className="font-display text-2xl md:text-3xl font-semibold text-foreground group-hover:text-brass transition-colors">
                     ${settings.cbiThresholdUsd ? `${Math.round(settings.cbiThresholdUsd / 1000)}K` : "400K"}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Citizenship threshold</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t.home.cbiEyebrow.split("·")[0] || "CBI"}</p>
                 </div>
               </div>
 
@@ -170,8 +190,8 @@ function HomeCollection({
                 className="mt-8 flex flex-wrap items-center gap-3.5"
               >
                 <Link to="/contact" className="btn btn-primary gap-1.5 shadow-sm btn-shimmer">
-                  <span>Book Consultation</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <span>{t.nav.bookConsultation}</span>
+                  <ArrowRight className="h-4 w-4 rtl-flip" />
                 </Link>
                 <a
                   href={waLink("Inquiry regarding prime Istanbul real estate opportunities")}
@@ -180,7 +200,7 @@ function HomeCollection({
                   className="btn !bg-white/10 !border !border-white/20 !text-white hover:!bg-white/20 hover:!border-brass/50 text-xs gap-1.5 shadow-xs"
                 >
                   <MessageSquare className="h-3.5 w-3.5 text-brass" />
-                  <span>Direct Advisory Desk</span>
+                  <span>{t.nav.advisoryDesk}</span>
                 </a>
               </div>
             </div>
@@ -280,7 +300,7 @@ function HomeCollection({
                         to="/contact"
                         className="shrink-0 btn !min-h-9 !px-4 !text-xs !bg-brass !text-[#07191e] hover:!bg-white font-semibold shadow-xs transition-colors"
                       >
-                        Inquire
+                        {t.common.inquire}
                       </Link>
                     </div>
                   </div>
@@ -309,15 +329,15 @@ function HomeCollection({
           >
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                District
+                {t.home.filterDistrict}
               </span>
               <select
                 className="field transition-all duration-200 focus:border-brass/80"
                 value={search.loc}
                 onChange={(e) => setSearch({ ...search, loc: e.target.value })}
               >
-                <option value="">All Istanbul Districts</option>
-                {LOCATIONS.map((l) => (
+                <option value="">{t.home.filterAllDistricts}</option>
+                {LOCATIONS.map((l: string) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
@@ -327,15 +347,15 @@ function HomeCollection({
 
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                Apartment layout
+                {t.home.filterLayout}
               </span>
               <select
                 className="field transition-all duration-200 focus:border-brass/80"
                 value={search.layout}
                 onChange={(e) => setSearch({ ...search, layout: e.target.value })}
               >
-                <option value="">All Layout Configurations</option>
-                {LAYOUTS.map((l) => (
+                <option value="">{t.home.filterAllLayouts}</option>
+                {LAYOUTS.map((l: string) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
@@ -345,15 +365,15 @@ function HomeCollection({
 
             <label className="block">
               <span className="eyebrow !text-muted-foreground !text-[0.65rem] mb-1.5 block">
-                Budget (USD)
+                {t.home.filterBudget} (USD)
               </span>
               <select
                 className="field transition-all duration-200 focus:border-brass/80"
                 value={search.budget}
                 onChange={(e) => setSearch({ ...search, budget: e.target.value })}
               >
-                <option value="">Any Budget</option>
-                {BUDGETS.map((b) => (
+                <option value="">{t.home.filterAnyBudget}</option>
+                {BUDGETS.map((b: { id: string; label: string }) => (
                   <option key={b.id} value={b.id}>
                     {b.label}
                   </option>
@@ -362,8 +382,8 @@ function HomeCollection({
             </label>
 
             <button type="submit" className="btn btn-primary w-full md:w-auto shadow-xs gap-1.5 btn-shimmer">
-              <span>Find a property</span>
-              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+              <span>{t.home.filterSearchBtn}</span>
+              <ArrowRight className="h-3.5 w-3.5 rtl-flip transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           </form>
         </div>
@@ -392,27 +412,31 @@ function HomeCollection({
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="pulse-live h-2 w-2 rounded-full bg-emerald-500 mr-1" />
-                <p className="eyebrow !text-brass-text">Handpicked Homes · Prime Neighborhoods</p>
+                <p className="eyebrow !text-brass-text">{t.home.editorialEyebrow}</p>
               </div>
               <h2 className="headline text-3xl md:text-5xl text-foreground">
-                {settings.websiteDesign?.["homeCollectionTitle"]||<>Selected properties & <em className="italic text-brass font-normal">Locations</em></>}
+                {settings.websiteDesign?.["homeCollectionTitle"] || (
+                  <>
+                    {t.home.editorialTitle} <em className="italic text-brass font-normal">{t.home.editorialTitleEm}</em>
+                  </>
+                )}
               </h2>
             </div>
             <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-              {settings.websiteDesign?.["homeCollectionText"]||"Explore handpicked homes across Istanbul’s top European and Asian neighborhoods. Our dedicated advisors are here to answer your questions on pricing, citizenship benefits, and private viewings."}
+              {settings.websiteDesign?.["homeCollectionText"] || t.home.editorialSubtitle}
             </p>
           </div>
 
           {/* Published Properties / Collection Status */}
           {loading ? (
             <p role="status" className="rounded-xs border border-border/70 bg-card p-6 text-sm text-muted-foreground">
-              Loading the property collection…
+              {t.common.loading}
             </p>
           ) : unavailable ? (
             <div role="alert" className="rounded-xs border border-destructive/30 bg-card p-6">
-              <p className="text-sm text-foreground">The property collection could not be loaded.</p>
+              <p className="text-sm text-foreground">{t.common.error}</p>
               <button onClick={retry} className="btn btn-outline mt-4 text-xs">
-                Try again
+                {t.common.retry}
               </button>
             </div>
           ) : !properties.length ? (
@@ -424,18 +448,18 @@ function HomeCollection({
                 <div className="flex items-center gap-2 mb-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-brass" />
                   <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-brass-text">
-                    Curated Availability
+                    {t.home.editorialEyebrow}
                   </span>
                 </div>
                 <h3 className="font-display text-xl font-semibold text-foreground">
-                  Our next collection is being prepared.
+                  {t.properties.noResultsTitle}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground max-w-xl leading-relaxed">
-                  Our team can help you find current opportunities while reviewed listings are being added.
+                  {t.properties.noResultsDesc}
                 </p>
               </div>
               <Link to="/contact" className="btn btn-outline text-xs shrink-0 hover:border-brass hover:text-brass">
-                Ask about available properties
+                {t.cta.requestConsultation}
               </Link>
             </div>
           ) : (
@@ -465,7 +489,7 @@ function HomeCollection({
               to="/services"
               className="group hidden text-xs font-semibold uppercase tracking-wider md:flex items-center gap-1 hover:text-brass transition-colors"
             >
-              <span>View all services</span> <ArrowRight className="h-3.5 w-3.5 arrow" />
+              <span>{t.nav.advisoryServices}</span> <ArrowRight className="h-3.5 w-3.5 rtl-flip arrow" />
             </Link>
           </div>
 
@@ -536,82 +560,135 @@ function HomeCollection({
         </div>
       </section>
 
+      {/* Interactive Title Deed (Tapu) & Acquisition Cost Ledger */}
+      <section className="container-site pb-14 md:pb-20">
+        <AcquisitionCalculator />
+      </section>
+
       {/* Sovereign Gateway & Private Portfolio Consultation CTA (Combined Advisory & CBI Band) */}
-      <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-24">
-        {/* Subtle decorative radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/15 via-transparent to-transparent pointer-events-none" />
+      <section className="border-t bg-ink text-on-dark relative overflow-hidden py-20 md:py-28">
+        {/* Art-Directed Family Backdrop with Feathered Side-Fades & Vignette */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+          {/* Base image with radial and lateral gradient mask */}
+          <img
+            src="/images/family-future.png"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center lg:object-[50%_35%] scale-105 motion-safe:transition-transform motion-safe:duration-1000 opacity-45 sm:opacity-52"
+            style={{
+              maskImage:
+                "radial-gradient(ellipse 72% 68% at 50% 42%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.4) 65%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, transparent 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 72% 68% at 50% 42%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.4) 65%, transparent 100%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, transparent 100%)",
+              filter: "contrast(1.08) brightness(0.92)",
+            }}
+          />
+
+          {/* Deep Horizontal Side-Fades (smoothly dissolving flanks into canvas ink) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, #07191e 0%, rgba(7,25,30,0.94) 14%, rgba(7,25,30,0.42) 32%, transparent 46%, transparent 54%, rgba(7,25,30,0.42) 68%, rgba(7,25,30,0.94) 86%, #07191e 100%)",
+            }}
+          />
+
+          {/* Vertical Top/Bottom Transitions & Contrast Scrim */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, #07191e 0%, rgba(7,25,30,0.72) 16%, rgba(7,25,30,0.42) 46%, rgba(7,25,30,0.85) 86%, #07191e 100%)",
+            }}
+          />
+
+          {/* Luxury Brass Ambient Glows */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_45%_at_50%_0%,rgba(197,160,89,0.22),transparent_75%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(197,160,89,0.14),transparent_50%)]" />
+        </div>
 
         <div className="container-site relative z-10 text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass">
-            <ShieldCheck className="h-3.5 w-3.5 text-brass" /> Direct Istanbul Guidance · Turkish Citizenship Desk
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-brass/50 bg-brass/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brass backdrop-blur-md shadow-[0_0_20px_rgba(197,160,89,0.15)]">
+            <ShieldCheck className="h-3.5 w-3.5 text-brass" /> {t.home.cbiEyebrow}
           </div>
 
-          <h2 className="headline mx-auto mt-4 max-w-3xl text-3xl md:text-5xl text-on-dark leading-tight">
-            Your trusted path to Istanbul real estate:{" "}
-            <em className="italic text-brass font-normal">Expert guidance at every step.</em>
+          <h2 className="headline mx-auto mt-4 max-w-3xl text-3xl md:text-5xl text-on-dark leading-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.7)]">
+            {t.home.cbiTitle}{" "}
+            <em className="italic text-brass font-normal">{t.home.cbiTitleEm}</em>
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-on-dark-muted text-sm md:text-base leading-relaxed">
-            Schedule a friendly consultation with our Istanbul advisory team. Ask us anything about top neighborhoods,
-            Turkish citizenship qualifications (${settings.cbiThresholdUsd.toLocaleString("en-US")} USD),
-            clean title deeds, or arranging private viewings.
+          <p className="mx-auto mt-4 max-w-2xl text-on-dark-muted text-sm md:text-base leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
+            {t.home.cbiSubtitle}
           </p>
 
-          {/* 3 Metric Parameter Cards */}
-          <div className="mt-8 grid grid-cols-2 gap-4 border-y border-on-dark/15 py-6 sm:grid-cols-3 max-w-3xl mx-auto text-left">
-            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40">
-              <p className="eyebrow !text-brass">Citizenship Requirement</p>
+          {/* 3 Metric Parameter Cards (Floating glassmorphism with spatial elevation) */}
+          <div className="mt-8 grid grid-cols-2 gap-4 border-y border-white/10 py-6 sm:grid-cols-3 max-w-3xl mx-auto text-left relative z-10">
+            <div className="group rounded-md bg-[#07191e]/80 border border-white/15 p-5 backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-brass/70 hover:shadow-[0_16px_40px_rgba(197,160,89,0.18)]">
+              <p className="eyebrow !text-brass flex items-center justify-between">
+                <span>{t.calculator.cbiEligibilityStatus}</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-brass/80 group-hover:scale-125 transition-transform" />
+              </p>
               <p className="font-display text-2xl font-semibold text-on-dark mt-1">
                 ${settings.cbiThresholdUsd.toLocaleString("en-US")} USD
               </p>
-              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">Or TRY equivalent on transfer day</p>
+              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">{t.home.cbiPillar3Desc}</p>
             </div>
-            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40">
-              <p className="eyebrow !text-brass">Holding Period</p>
+            <div className="group rounded-md bg-[#07191e]/80 border border-white/15 p-5 backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-brass/70 hover:shadow-[0_16px_40px_rgba(197,160,89,0.18)]">
+              <p className="eyebrow !text-brass flex items-center justify-between">
+                <span>{t.home.cbiPillar3Title}</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-brass/80 group-hover:scale-125 transition-transform" />
+              </p>
               <p className="font-display text-2xl font-semibold text-on-dark mt-1">3 Years</p>
-              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">Keep for 3 years to maintain citizenship</p>
+              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">{t.home.cbiPillar3Desc}</p>
             </div>
-            <div className="rounded-xs bg-white/5 border border-white/10 p-4 backdrop-blur-xs transition-colors hover:border-brass/40 col-span-2 sm:col-span-1">
-              <p className="eyebrow !text-brass">Family Included</p>
-              <p className="font-display text-2xl font-semibold text-on-dark mt-1">Spouse & Kids &lt;18</p>
-              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">All included under one single application</p>
+            <div className="group rounded-md bg-[#07191e]/80 border border-white/15 p-5 backdrop-blur-md shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-brass/70 hover:shadow-[0_16px_40px_rgba(197,160,89,0.18)] col-span-2 sm:col-span-1">
+              <p className="eyebrow !text-brass flex items-center justify-between">
+                <span>{t.home.cbiPillar1Title}</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-brass/80 group-hover:scale-125 transition-transform" />
+              </p>
+              <p className="font-display text-2xl font-semibold text-on-dark mt-1">{t.home.cbiPillar1Title}</p>
+              <p className="text-[0.7rem] text-on-dark-muted mt-0.5">{t.home.cbiPillar1Desc}</p>
             </div>
           </div>
 
           {/* Combined Action Buttons */}
-          <div className="mt-8 flex flex-wrap justify-center items-center gap-3">
-            <Link to="/contact" className="btn btn-primary btn-shimmer shadow-sm">
-              Request a Consultation
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-3 relative z-10">
+            <Link to="/contact" className="btn btn-primary btn-shimmer shadow-lg shadow-brass/20">
+              {t.cta.requestConsultation}
             </Link>
             <a
               href={waLink("Hello Avrasya Properties, I would like to schedule a private portfolio consultation regarding Istanbul real estate and Turkish citizenship.")}
               target="_blank"
               rel="noreferrer"
-              className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"
+              className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md shadow-sm gap-1.5"
             >
-              <MessageSquare className="h-3.5 w-3.5 text-brass" /> Chat on WhatsApp
+              <MessageSquare className="h-3.5 w-3.5 text-brass" /> {t.cta.chatWhatsApp}
             </a>
             <Link
               to="/calculator"
-              className="btn btn-light shadow-sm gap-2"
+              className="btn btn-light shadow-md gap-2 hover:scale-[1.02] transition-transform"
             >
               <Calculator className="h-4 w-4 text-brass" />
-              <span>Calculate Total Purchase Costs</span>
+              <span>{t.footer.acquisitionCalculator}</span>
             </Link>
             <Link
               to="/citizenship"
-              className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 transition-colors"
+              className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md transition-colors"
             >
-              Turkish Citizenship Guide
+              {t.footer.citizenshipAdvice}
             </Link>
           </div>
         </div>
 
-        {/* Elegant typography watermark */}
+        {/* Elegant typography watermark with enhanced opacity & warm brass aura */}
         <div
           aria-hidden
           data-parallax="0.2"
-          className="outline-word pointer-events-none absolute -bottom-12 right-0 select-none text-[12rem] outline-light opacity-20 hidden md:block"
+          className="outline-word pointer-events-none absolute -bottom-8 sm:-bottom-12 md:-bottom-16 lg:-bottom-20 right-0 sm:right-4 md:right-8 select-none text-[7.5rem] sm:text-[11rem] md:text-[15rem] lg:text-[19rem] xl:text-[22rem] outline-light !opacity-45 md:!opacity-52 tracking-widest leading-none z-0"
+          style={{
+            WebkitTextStroke: "1.75px rgba(220, 185, 125, 0.65)",
+            filter: "drop-shadow(0 0 40px rgba(197, 160, 89, 0.32))",
+          }}
         >
           TÜRKİYE
         </div>

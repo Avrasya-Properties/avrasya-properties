@@ -3,6 +3,7 @@ import { DEMO_MODE } from "@/lib/supabase";
 import { useServices, useCatalogue } from "@/data/live";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { recordPublicEnquiry } from "@/admin/store";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const SERVICES = [
   "General consultation",
@@ -47,10 +48,11 @@ export function Enquiry({
   propertySlug?: string;
   preview?: boolean;
 }) {
+  const { t, isRtl } = useLanguage();
   const servicesQuery = useServices();
   const services = DEMO_MODE
     ? SERVICES
-    : ["General consultation", ...(servicesQuery.data || []).map((s) => s.title)];
+    : ["General consultation", ...(servicesQuery.data || []).map((s: { title: string }) => s.title)];
   const previousTopic = useRef(defaultTopic);
   const contact = useLiveContact();
   const catalogue = useCatalogue();
@@ -92,13 +94,13 @@ export function Enquiry({
     e.preventDefault();
     if (preview) return;
     setErr(null);
-    if (v.name.trim().length < 2) return setErr("Please add your name.");
-    if (v.message.trim().length < 5) return setErr("Please add a short message.");
+    if (v.name.trim().length < 2) return setErr(t.enquiry.fullName + " *");
+    if (v.message.trim().length < 5) return setErr(t.enquiry.message + " *");
     if (v.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))
-      return setErr("Please enter a valid email address.");
+      return setErr(t.enquiry.email + " *");
     if (!v.email.trim() && v.phone.replace(/\D/g, "").length < 7)
-      return setErr("Please provide a contact phone number or email.");
-    if (!DEMO_MODE && !consent) return setErr("Please consent to being contacted.");
+      return setErr(t.enquiry.phone + " *");
+    if (!DEMO_MODE && !consent) return setErr(t.enquiry.termsConsent || "Please consent to being contacted.");
 
     setBusy(true);
     try {
@@ -121,7 +123,7 @@ export function Enquiry({
 
       setReceipt(res.receipt);
     } catch (error) {
-      setErr((error as Error).message || "Could not record enquiry. Please contact us via WhatsApp directly.");
+      setErr((error as Error).message || t.enquiry.errorDesc);
     } finally {
       setBusy(false);
     }
@@ -133,7 +135,7 @@ export function Enquiry({
       <fieldset disabled={busy || preview} className="space-y-4">
         <div>
           <label htmlFor={id + "-name"} className={label}>
-            Your full name *
+            {t.enquiry.fullName} *
           </label>
           <input
             id={id + "-name"}
@@ -142,13 +144,14 @@ export function Enquiry({
             onChange={set("name")}
             autoComplete="name"
             maxLength={200}
+            placeholder={t.enquiry.fullNamePlaceholder}
           />
         </div>
         {!DEMO_MODE && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor={id + "-email"} className={label}>
-                Email *
+                {t.enquiry.email} *
               </label>
               <input
                 id={id + "-email"}
@@ -158,11 +161,12 @@ export function Enquiry({
                 value={v.email}
                 onChange={set("email")}
                 maxLength={254}
+                placeholder={t.enquiry.emailPlaceholder}
               />
             </div>
             <div>
               <label htmlFor={id + "-phone"} className={label}>
-                Phone *
+                {t.enquiry.phone} *
               </label>
               <input
                 id={id + "-phone"}
@@ -172,13 +176,14 @@ export function Enquiry({
                 value={v.phone}
                 onChange={set("phone")}
                 maxLength={40}
+                placeholder={t.enquiry.phonePlaceholder}
               />
             </div>
           </div>
         )}
         <div>
           <label htmlFor={id + "-topic"} className={label}>
-            Property or service
+            {t.enquiry.topic}
           </label>
           <select
             id={id + "-topic"}
@@ -189,13 +194,13 @@ export function Enquiry({
             {defaultTopic && !services.includes(defaultTopic) && (
               <option>{defaultTopic}</option>
             )}
-            <optgroup label="Services">
+            <optgroup label={t.nav.services}>
               {services.map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </optgroup>
             {!compact && (
-              <optgroup label="Offers & projects">
+              <optgroup label={t.footer.explorePortfolio}>
                 {catalogue.properties.map((p) => (
                   <option key={p.slug}>{p.marketing_title}</option>
                 ))}
@@ -205,20 +210,20 @@ export function Enquiry({
         </div>
         <div>
           <label htmlFor={id + "-budget"} className={label}>
-            Budget (optional)
+            {t.enquiry.budget}
           </label>
           <input
             id={id + "-budget"}
             className="field"
             value={v.budget}
             onChange={set("budget")}
-            placeholder="e.g. USD 400,000"
+            placeholder={t.enquiry.budgetPlaceholder}
             maxLength={200}
           />
         </div>
         <div>
           <label htmlFor={id + "-message"} className={label}>
-            Message *
+            {t.enquiry.message} *
           </label>
           <textarea
             id={id + "-message"}
@@ -226,6 +231,7 @@ export function Enquiry({
             value={v.message}
             onChange={set("message")}
             maxLength={4000}
+            placeholder={t.enquiry.messagePlaceholder}
           />
         </div>
         {!DEMO_MODE && (
@@ -241,13 +247,13 @@ export function Enquiry({
                 />
               </label>
             </div>
-            <label className="flex gap-2 text-xs">
+            <label className="flex items-center gap-2 text-xs">
               <input
                 type="checkbox"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
               />
-              I agree to Avrasya contacting me about this enquiry.
+              <span>{t.enquiry.termsConsent}</span>
             </label>
           </>
         )}
@@ -260,10 +266,10 @@ export function Enquiry({
           <div role="status" className="rounded-xs border border-brass/50 bg-[#07191e] p-4 text-sm text-foreground space-y-2.5">
             <div className="flex items-center gap-2 text-brass font-medium">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Enquiry Logged with Advisory Desk</span>
+              <span>{t.enquiry.successTitle}</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Reference: <strong className="text-brass font-mono">{receipt}</strong>. Our private Istanbul advisory desk has received your details and will review your request.
+              {t.enquiry.propertyReference} <strong className="text-brass font-mono">{receipt}</strong>. {t.enquiry.successDesc}
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <a
@@ -272,7 +278,7 @@ export function Enquiry({
                 rel="noreferrer"
                 className="btn btn-primary text-xs !py-1.5"
               >
-                Open WhatsApp Desk Now →
+                {t.enquiry.directWhatsappBtn} →
               </a>
               <button
                 type="button"
@@ -282,17 +288,17 @@ export function Enquiry({
                 }}
                 className="btn btn-outline text-xs !py-1.5"
               >
-                Send Another
+                {t.common.retry}
               </button>
             </div>
           </div>
         ) : (
           <button type="submit" className="btn btn-primary w-full shadow-sm btn-shimmer">
-            {busy ? "Submitting to Advisory Desk…" : "Send Consultation Request →"}
+            {busy ? t.enquiry.submitting : t.enquiry.submitBtn}
           </button>
         )}
         <p className="text-xs text-muted-foreground">
-          Prefer a direct conversation?{" "}
+          {t.enquiry.whatsappAlternative}{" "}
           <a
             className="underline"
             href={contact.whatsapp + "?text=" + encodeURIComponent(buildMessage(v))}

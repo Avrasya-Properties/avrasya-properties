@@ -1,5 +1,6 @@
 // Browser-only demo repository. These role checks are UX rules, not backend security.
 import { useSyncExternalStore } from "react";
+import { websiteChanged } from "@/lib/website-sync";
 import { contactMatch, exactBudget, requireAmount, requireDate, requireEnum, requireText, validateDealSelection, validateSettings, validateWorkspace } from "./domain.js";
 import { properties as sourceRecords, getPropertyMedia } from "@/data/properties";
 
@@ -87,6 +88,13 @@ export type SiteSettings = {
   districts: string[];
   layouts: string[];
   budgetRanges: BudgetRange[];
+  siteTitle: string;
+  metaDescription: string;
+  siteUrl: string;
+  ogImage: string;
+  keywords: string;
+  googleVerification: string;
+  indexingEnabled: boolean;
 };
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
@@ -145,6 +153,13 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     { id: "600-1m", label: "$600,000 – $1,000,000", min: 600000, max: 1000000 },
     { id: "1m-plus", label: "$1,000,000+", min: 1000000, max: 99999999 },
   ],
+  siteTitle: "Avrasya Properties | Istanbul Luxury Real Estate & Advisory",
+  metaDescription: "Istanbul property advisory for international buyers. Explore published property opportunities, independent legal review, and citizenship advisory services.",
+  siteUrl: "https://avrasyaproperties.com",
+  ogImage: "https://avrasyaproperties.com/images/properties/hero-main.jpg",
+  keywords: "Istanbul real estate, Turkish citizenship by investment, luxury apartments Istanbul, Bosphorus property",
+  googleVerification: "",
+  indexingEnabled: true,
 };
 
 export type DB = {
@@ -314,6 +329,7 @@ function save() {
   }
   window.dispatchEvent(new CustomEvent("site-settings-updated", { detail: db?.siteSettings }));
   listeners.forEach((l) => l());
+  websiteChanged();
 }
 export function useDB(): DB {
   return useSyncExternalStore((l) => (listeners.add(l), () => listeners.delete(l)), load, () => serverSnapshot);

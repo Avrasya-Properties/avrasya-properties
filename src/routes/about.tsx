@@ -1,5 +1,6 @@
 import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "@/hooks/useLanguage";
 import {
   Award,
   Building2,
@@ -20,49 +21,51 @@ export const Route = createFileRoute("/about")({
     meta(
       "About Avrasya Properties · Trusted Istanbul Real Estate Advisory",
       "Headquartered on Istanbul's historic Asian shoreline, Avrasya Properties provides trusted, transparent property guidance for international home buyers and investors.",
+      "/about"
     ),
   component: () => <ManagedPage slug="about"><AboutPage /></ManagedPage>,
 });
 
 export function AboutPage() {
+  const { t } = useTranslation();
   const contact = useLiveContact();
   const leadership = [
     {
       name: "Selin Arda",
-      role: "Founder & Head of Property Advisory",
-      desc: "14 years of experience guiding international buyers to prime residential and lifestyle homes across Istanbul's top European and Asian neighborhoods.",
+      role: t.about.leader1Role,
+      desc: t.about.leader1Desc,
     },
     {
       name: "Murat Kaya",
-      role: "Head of International Client Advisory",
-      desc: "Dedicated to making the buying experience smooth and straightforward, assisting clients worldwide with currency transfers, viewings, and property selection.",
+      role: t.about.leader2Role,
+      desc: t.about.leader2Desc,
     },
     {
       name: "Elif Demir",
-      role: "Head of Legal & Title Due Diligence",
-      desc: "Coordinates with independent certified attorneys, government-licensed appraisers, and migration authorities to keep your purchase 100% secure and stress-free.",
+      role: t.about.leader3Role,
+      desc: t.about.leader3Desc,
     },
   ];
 
   const standards = [
     {
-      title: "Always on Your Side",
-      desc: "We work exclusively for you, the buyer. We never push high-commission projects or risky developments; every property we suggest has verified market value and clean legal standing.",
+      title: t.about.standard1Title,
+      desc: t.about.standard1Desc,
       icon: Scale,
     },
     {
-      title: "Independent Legal & Title Checks",
-      desc: "Every home is thoroughly checked by independent, licensed attorneys so you can be 100% confident your property has a clean title deed with zero hidden debts or claims.",
+      title: t.about.standard2Title,
+      desc: t.about.standard2Desc,
       icon: ShieldCheck,
     },
     {
-      title: "Safe Bank Transfers & Fair Rates",
-      desc: "We guide you step-by-step through official Central Bank currency exchange (DAB) and bank transfers, ensuring your money is protected and converted at fair government rates.",
+      title: t.about.standard3Title,
+      desc: t.about.standard3Desc,
       icon: Globe2,
     },
     {
-      title: "Care Even After You Move In",
-      desc: "Our support continues long after you receive your keys: we assist with interior setup, utility connections, tenant management, and future resale.",
+      title: t.about.standard4Title,
+      desc: t.about.standard4Desc,
       icon: HeartHandshake,
     },
   ];
@@ -70,18 +73,14 @@ export function AboutPage() {
   return (
     <>
       <PageIntro
-        eyebrow="About Avrasya Properties · Honest & Dedicated Advisory"
+        eyebrow={t.about.eyebrow}
         title={
           <>
-            Istanbul's trusted property consultancy: <em>built on integrity and care.</em>
+            {t.about.title} <em>{t.about.titleEm}</em>
           </>
         }
       >
-        <p>
-          Founded on Istanbul's Asian shoreline in Üsküdar overlooking the Bosphorus, Avrasya
-          Properties makes buying property in Türkiye safe, transparent, and straightforward for
-          international buyers. We pair deep neighborhood knowledge with honest, client-first advice.
-        </p>
+        <p>{t.about.description}</p>
       </PageIntro>
 
       {/* Metrics Bar */}
@@ -90,25 +89,25 @@ export function AboutPage() {
           <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">$120M+</p>
             <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              Properties Guided
+              {t.footer.explorePortfolio}
             </p>
           </div>
           <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">38+</p>
             <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              Countries Represented
+              {t.home.bosphorusTitleEm}
             </p>
           </div>
           <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">100%</p>
             <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              Citizenship Success Rate
+              {t.home.stat1Title}
             </p>
           </div>
           <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
             <p className="font-display text-3xl font-bold text-brass md:text-4xl">14 Yrs</p>
             <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              Local Market Experience
+              {t.footer.tagline}
             </p>
           </div>
         </div>
@@ -118,22 +117,18 @@ export function AboutPage() {
       <section className="container-site py-16">
         <div className="grid gap-12 lg:grid-cols-12 items-center">
           <div className="space-y-4 lg:col-span-7">
-            <p className="eyebrow">Our Philosophy</p>
+            <p className="eyebrow">{t.about.eyebrow}</p>
             <h2 className="font-display text-3xl font-semibold md:text-4xl">
-              Making Property Buying in Türkiye Clear & Reassuring
+              {t.about.missionTitle}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              For decades, international buyers navigating Istanbul's dynamic property landscape
-              encountered fragmented information, undisclosed markups, and aggressive developer
-              sales tactics.
+              {t.about.missionText1}
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              Avrasya Properties was established to introduce an uncompromising standard of
-              advisory. We believe purchasing a home abroad should feel calm, clear, and fully
-              protected every step of the way.
+              {t.about.missionText2}
             </p>
             <div className="pt-2">
-              <p className="text-sm font-semibold text-foreground">Registered Office & Presence:</p>
+              <p className="text-sm font-semibold text-foreground">{t.footer.headquarters}:</p>
               <p className="text-sm text-muted-foreground">{contact.company}</p>
               <p className="text-sm text-muted-foreground">{contact.address}</p>
             </div>
@@ -153,9 +148,9 @@ export function AboutPage() {
       <section className="border-t bg-ink text-on-dark py-20">
         <div className="container-site">
           <div className="max-w-2xl mb-12">
-            <p className="eyebrow text-brass">Our Core Commitments</p>
+            <p className="eyebrow text-brass">{t.about.standardsEyebrow}</p>
             <h2 className="font-display text-3xl font-semibold md:text-4xl text-on-dark">
-              Four Commitments to Protect Every Buyer
+              {t.about.standardsTitle}
             </h2>
           </div>
 
@@ -177,9 +172,9 @@ export function AboutPage() {
       {/* Leadership Team */}
       <section className="container-site py-20 border-b">
         <div className="max-w-2xl mb-12">
-          <p className="eyebrow">Our Advisory Team</p>
+          <p className="eyebrow">{t.about.leadershipEyebrow}</p>
           <h2 className="font-display text-3xl font-semibold md:text-4xl">
-            Experienced Leadership Dedicated to Your Peace of Mind
+            {t.about.leadershipTitle}
           </h2>
         </div>
 
