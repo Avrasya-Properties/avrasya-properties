@@ -1,6 +1,6 @@
 import { createFileRoute,useNavigate } from "@tanstack/react-router";
 import { useEffect,useState } from "react";
-import { DEMO_ENABLED,DEMO_PASSWORD,USERS,login,getSession,useBackendStatus,resetPassword } from "@/admin/store";
+import { DEMO_ENABLED,DEMO_PASSWORD,USERS,login,useSession,useBackendStatus,resetPassword } from "@/admin/store";
 import { btnPrimary,field } from "@/admin/Shell";
 export const Route=createFileRoute("/admin/login")({
  validateSearch:(s:Record<string,unknown>)=>({redirect:typeof s["redirect"]==="string"?s["redirect"]:undefined}),
@@ -8,12 +8,12 @@ export const Route=createFileRoute("/admin/login")({
  component:Login
 });
 function Login(){
- const {redirect}=Route.useSearch();const nav=useNavigate();const backend=useBackendStatus();
+ const {redirect}=Route.useSearch();const nav=useNavigate();const backend=useBackendStatus();const session=useSession();
  const [email,setEmail]=useState("");const [pw,setPw]=useState("");const [ready,setReady]=useState(false);const [busy,setBusy]=useState(false);const [show,setShow]=useState(false);const [err,setErr]=useState("");const [notice,setNotice]=useState("");
  const go=()=>{const destination=redirect&&/^\/admin(?:\/|$)/.test(redirect)&&!redirect.startsWith("/admin/login")?redirect:"/admin";void nav({to:destination as "/admin"});};
- useEffect(()=>{setReady(true);if(getSession())go();},[]);
+ useEffect(()=>{setReady(true);if(session)go();},[session?.id]);
  async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setErr("");try{if(!await login(email,pw))throw new Error("Email or password is incorrect.");go();}catch(error){setErr((error as Error).message);}finally{setBusy(false);}}
- async function forgot(){if(DEMO_ENABLED){setNotice("Demo password: "+DEMO_PASSWORD);return;}setBusy(true);setErr("");try{await resetPassword(email);setNotice("If this email is registered, a password reset link will arrive.");}catch(error){setErr((error as Error).message);}finally{setBusy(false);}}
+ async function forgot(){if(DEMO_ENABLED){setNotice("Demo password: "+DEMO_PASSWORD);return;}setBusy(true);setErr("");try{await resetPassword(email);setNotice(email.trim().toLowerCase()==="admin@avrasyaproperties.com"?"If this account is registered, a reset link will be sent to info.avrasyaproperties@gmail.com.":"If this account is registered, a reset link will arrive in its recovery inbox.");}catch(error){setErr((error as Error).message);}finally{setBusy(false);}}
  return <div className="flex min-h-screen items-center justify-center bg-background p-4 font-sans"><div className="w-full max-w-md rounded-md border bg-card p-6">
  <img src="/images/avrasya-logo.svg" alt="Avrasya Properties" className="mb-5 h-10 w-auto object-contain"/><h1 className="text-lg font-semibold">Sign in to the workspace</h1>
  <p className="mb-4 text-xs text-muted-foreground">{DEMO_ENABLED?"Use fictional information only. Demo accounts, not secure authentication.":"Use your team email and password."}</p>

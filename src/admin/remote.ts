@@ -1,10 +1,12 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { websiteChanged } from "@/lib/website-sync";
+import { freshAdminActivity } from "./inactivity";
 import { supabase } from "@/lib/supabase";
 import { decode,decodeSettings,encode,encodeSettings,TABLES,type Collection,type Row } from "./mappers";
 import { submitPublicEnquiry } from "@/lib/public-enquiry";
 import { DEFAULT_SITE_SETTINGS,type DB,type User,type SiteSettings,type Property,type Lead,type Deal,type Inquiry,type Activity } from "./demo";
 import { validateSettings,requireText } from "./domain.js";
+class AccessDenied extends Error {}
 const empty:DB={properties:[],contacts:[],leads:[],tasks:[],viewings:[],deals:[],inquiries:[],siteSettings:DEFAULT_SITE_SETTINGS,activity:[],readNotes:[]};
 let snapshot:DB=empty;
 let user:User|null=null;
@@ -26,9 +28,10 @@ export async function refresh(){
  try{
  const {data:{session},error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;
  if(!session){user=null;snapshot=empty;staff.splice(0);rows.clear();status={...status,loading:false,error:""};notify();return;}
- const {data:{user:verified},error:authError}=await supabase.auth.getUser();if(authError||!verified)throw authError||new Error("Session expired");
+ const {data:{user:verified},error:authError}=await supabase.auth.getUser();if(authError||!verified){if(authError?.status===401||authError?.status===403||(!authError&&!verified))throw new AccessDenied("Your session ended. Sign in again.");throw authError;}
  const {data:profile,error:profileError}=await supabase.from("staff_profiles").select("id,name,email,role,is_active").eq("id",verified.id).single();
- if(profileError||!profile?.is_active)throw new Error("This account has no active staff access. Ask the owner to add your staff profile.");
+ if(profileError)throw profileError.code==="PGRST116"?new AccessDenied("This account has no active staff access. Ask the owner to check your account."):profileError;
+ if(!profile?.is_active)throw new AccessDenied("This account has no active staff access. Ask the owner to check your account.");
  const names=[...Object.values(TABLES),"site_settings","activities","deal_selected_units","staff_profiles","projects","notification_receipts"];
  const result=await Promise.all(names.map(fetchRows));
  if(ticket!==generation)return;
@@ -46,17 +49,27 @@ export async function refresh(){
  next.readNotes=tables["notification_receipts"]!.map(r=>String(r["notification_key"]));
  staff.splice(0,staff.length,...tables["staff_profiles"]!.filter(r=>r["is_active"]).map(r=>({id:String(r["id"]),name:String(r["name"]),email:String(r["email"]),role:r["role"] as User["role"]})));
  user={id:profile.id,name:profile.name,email:profile.email,role:profile.role};snapshot=next;status={...status,loading:false,error:""};notify();
- }catch(error){if(ticket!==generation)return;user=null;snapshot=empty;rows.clear();staff.splice(0);status={...status,loading:false,error:message(error)};notify();}
+ }catch(error){if(ticket!==generation)return;if(error instanceof AccessDenied){user=null;snapshot=empty;rows.clear();staff.splice(0);}status={...status,loading:false,error:message(error)};notify();}
 }
-function start(){if(started||typeof window==="undefined")return;started=true;void refresh();supabase.auth.onAuthStateChange(()=>{queueMicrotask(()=>void refresh());});window.addEventListener("focus",()=>void refresh());setInterval(()=>{if(user&&!status.saving)void refresh();},30000);}
+function start(){if(started||typeof window==="undefined")return;started=true;void refresh();supabase.auth.onAuthStateChange((event)=>{if(event==="SIGNED_OUT"){++generation;user=null;snapshot=empty;rows.clear();staff.splice(0);status={...status,loading:false,error:""};notify();}else queueMicrotask(()=>void refresh());});window.addEventListener("focus",()=>void refresh());setInterval(()=>{if(user&&!status.saving)void refresh();},30000);}
 export function useRemoteDB(){useEffect(start,[]);return useSyncExternalStore(subscribe,()=>snapshot,()=>empty);}
 export function getRemoteSession(){return user;}
 export function useRemoteSession(){useEffect(start,[]);return useSyncExternalStore(subscribe,()=>user,()=>null);}
 export function useStatus(){useEffect(start,[]);return useSyncExternalStore(subscribe,()=>status,()=>status);}
-export async function signIn(email:string,password:string){const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});if(error)throw error;await refresh();if(!user)throw new Error(status.error||"Staff access is not configured.");return user;}
-export async function signOut(){++generation;user=null;snapshot=empty;rows.clear();staff.splice(0);status={loading:false,saving:0,error:""};notify();const {error}=await supabase.auth.signOut();if(error)throw error;}
-export async function resetPassword(email:string){requireText(email,"Email",254);const {error}=await supabase.auth.resetPasswordForEmail(email.trim(),{redirectTo:window.location.origin+"/admin/recover"});if(error)throw error;}
-export async function changePassword(password:string){if(password.length<12)throw new Error("Use at least 12 characters.");const {error}=await supabase.auth.updateUser({password});if(error)throw error;}
+export async function accessRequest(body:Record<string,unknown>){
+ const {data,error}=await supabase.functions.invoke("admin-access",{body});
+ if(error){if("context" in error&&error.context instanceof Response){const response=await error.context.json().catch(()=>null);throw new Error(response?.error||"The security service is unavailable.");}throw error;}
+ if(data?.error)throw new Error(data.error);return data;
+}
+export async function signIn(email:string,password:string){
+ const tokens=await accessRequest({action:"sign-in",email:email.trim(),password});
+ const {data,error}=await supabase.auth.setSession(tokens);if(error)throw error;
+ if(data.session)freshAdminActivity(data.session.user.id);await refresh();
+ if(!user)throw new Error(status.error||"Staff access is not configured.");return user;
+}
+export async function signOut(){++generation;user=null;snapshot=empty;rows.clear();staff.splice(0);status={loading:false,saving:0,error:""};notify();const {error}=await supabase.auth.signOut({scope:"local"});if(error)throw error;}
+export async function resetPassword(email:string){requireText(email,"Email",254);await accessRequest({action:"recover",email:email.trim()});}
+export async function changePassword(password:string){if(password.length<12)throw new Error("Use at least 12 characters.");await accessRequest({action:"complete-recovery",password});}
 let queue:Promise<unknown>=Promise.resolve();
 async function write<T>(operation:()=>Promise<T>):Promise<T>{
  const run=async()=>{status={...status,saving:status.saving+1};notify();try{const result=await operation();await refresh();websiteChanged();return result;}finally{status={...status,saving:Math.max(0,status.saving-1)};notify();}};

@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2 } from "lucide-react";
 import { DEMO_ENABLED, fmtDate, logout, markRead, useDB, useSession, useBackendStatus } from "./store";
+import { watchAdminActivity } from "./inactivity";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -80,6 +81,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const backend = useBackendStatus();
   const db = useDB();
   const nav = useNavigate();
+  const [idleSeconds,setIdleSeconds]=useState(0);
+  useEffect(()=>{if(DEMO_ENABLED||!user)return;return watchAdminActivity(user.id,()=>{void Promise.resolve(logout()).catch(()=>toast.error("Your session ended. Please sign in again."));},setIdleSeconds);},[user?.id]);
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [time, setTime] = useState("");
@@ -188,7 +191,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <button className="flex h-11 w-11 items-center justify-center" onClick={async () => { try { await logout(); } catch(error) { toast.error((error as Error).message); } nav({ to: "/admin/login", search: { redirect: undefined } }); }} aria-label="Log out"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{oldBrowserData&&<p role="status" className="mb-3 rounded border bg-muted p-3 text-sm">Earlier browser-only data was found. It has not been published or imported. Add or edit properties in this live panel to save them to the shared website database.</p>}{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
+        <main className="min-w-0 flex-1 p-4 md:p-6">{idleSeconds>0&&<div role="alert" className="mb-3 rounded border border-brass bg-card p-3 text-sm">You have been inactive. Sign out in {idleSeconds} seconds. <button className="underline" onClick={()=>window.dispatchEvent(new Event("input"))}>Keep working</button></div>}{oldBrowserData&&<p role="status" className="mb-3 rounded border bg-muted p-3 text-sm">Earlier browser-only data was found. It has not been published or imported. Add or edit properties in this live panel to save them to the shared website database.</p>}{backend.saving > 0 && <p role="status" className="mb-3 text-sm">Saving changes…</p>}<fieldset disabled={backend.saving > 0} className="min-w-0">{children}</fieldset></main>
       </div>
     </div>
   );
