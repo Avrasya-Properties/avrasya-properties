@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { 
-  Building2, 
-  Check, 
-  Download, 
-  Globe2, 
-  RefreshCw, 
-  Save, 
-  Settings2, 
-  ShieldCheck, 
-  Upload, 
+import {
+  Building2,
+  Check,
+  Download,
+  Globe2,
+  RefreshCw,
+  Save,
+  Settings2,
+  ShieldCheck,
+  Upload,
   AlertTriangle,
   MapPin,
   Layers,
@@ -20,31 +20,40 @@ import {
   RotateCcw,
   X,
   Search,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { SecuritySettings } from "@/admin/SecuritySettings";
 import { DESIGN_FIELDS } from "@/admin/website-design";
 import { uploadImage } from "@/admin/store";
-import { 
+import {
   DEMO_ENABLED,
-  DEFAULT_SITE_SETTINGS, 
-  exportBackup, 
-  importBackup, 
-  resetData, 
+  DEFAULT_SITE_SETTINGS,
+  exportBackup,
+  importBackup,
+  resetData,
   updateSiteSettings,
-  settingsRevision, 
-  useDB, 
-  useSession, 
-  can, 
-  type SiteSettings 
+  settingsRevision,
+  useDB,
+  useSession,
+  can,
+  type SiteSettings,
 } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company details", "Homepage", "Website appearance", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
+const TABS = [
+  "Company details",
+  "Homepage",
+  "Website appearance",
+  "Search filters",
+  "Exchange rates",
+  "SEO & Search",
+  "Sign-in and recovery",
+  "Export data",
+] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
@@ -59,9 +68,15 @@ export function AdminSettingsPage() {
 
   const isAdmin = can(user, "admin");
   const editable = can(user, "publish");
-  const revision=useRef("");
+  const revision = useRef("");
   const [dirty, setDirty] = useState(false);
-  useEffect(() => { if (!dirty) {setForm({ ...db.siteSettings });revision.current=settingsRevision();} }, [db.siteSettings, dirty]);
+
+  useEffect(() => {
+    if (!dirty) {
+      setForm({ ...db.siteSettings });
+      revision.current = settingsRevision();
+    }
+  }, [db.siteSettings, dirty]);
 
   const setField = <K extends keyof SiteSettings>(key: K, val: SiteSettings[K]) => {
     setDirty(true);
@@ -70,7 +85,7 @@ export function AdminSettingsPage() {
 
   const handleSave = async () => {
     try {
-      await updateSiteSettings(form,revision.current);
+      await updateSiteSettings(form, revision.current);
       setDirty(false);
       toast.success(DEMO_ENABLED ? "Demo settings saved in this browser." : "Website settings published.");
     } catch (e) {
@@ -96,7 +111,10 @@ export function AdminSettingsPage() {
 
   const handleImportSubmit = async () => {
     try {
-      if (!importJson.trim()) { toast.error("Please paste JSON backup data"); return; }
+      if (!importJson.trim()) {
+        toast.error("Please paste JSON backup data");
+        return;
+      }
       if (!confirm("Replace this browser’s workspace with the validated backup? Export the current workspace first.")) return;
       await importBackup(importJson);
       setDirty(false);
@@ -112,9 +130,12 @@ export function AdminSettingsPage() {
     if (!confirm("Reset this browser’s properties, leads, contacts and settings to demo data? Export a backup first.")) return;
     try {
       await resetData();
-      setForm({ ...DEFAULT_SITE_SETTINGS }); setDirty(false);
+      setForm({ ...DEFAULT_SITE_SETTINGS });
+      setDirty(false);
       toast.success("Demo workspace reset");
-    } catch (error) { toast.error((error as Error).message); }
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
   };
 
   return (
@@ -124,11 +145,7 @@ export function AdminSettingsPage() {
         crumbs="Platform / Settings"
         action={
           <div className="flex items-center gap-2">
-            <button
-              disabled={!editable || !dirty}
-              onClick={handleSave}
-              className={btnPrimary}
-            >
+            <button disabled={!editable || !dirty} onClick={handleSave} className={btnPrimary}>
               <Save className="h-3.5 w-3.5" />
               <span>Save website settings</span>
             </button>
@@ -140,19 +157,29 @@ export function AdminSettingsPage() {
         {DEMO_ENABLED ? "Browser demo. Use fictional data only." : "Saved changes appear on the website."}
         {!editable && " Your role has read-only access."}
       </p>
+
       <div className="flex flex-wrap gap-2">
-        {([["content_pages","Website pages"],["content_sections","Page sections"],["services","Services"],["faqs","Questions and answers"],["catalog_documents","Brochures"]] as const).map(([section,label])=><a key={section} href={"/admin/manage?section="+section} className={btnGhost}>{label}</a>)}
+        {([
+          ["content_pages", "Website pages"],
+          ["content_sections", "Page sections"],
+          ["services", "Services"],
+          ["faqs", "Questions and answers"],
+          ["catalog_documents", "Brochures"],
+        ] as const).map(([sectionKey, label]) => (
+          <button key={sectionKey} type="button" className={btnGhost + " !text-xs gap-1.5"}>
+            <Settings2 className="h-3 w-3" />
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
-      {/* Tabs */}
+
       <div className="flex gap-1 overflow-x-auto border-b">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors ${
-              tab === t
-                ? "border-b-2 border-brass text-brass"
-                : "text-muted-foreground hover:text-foreground"
+              tab === t ? "border-b-2 border-brass text-brass" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {t}
@@ -160,937 +187,142 @@ export function AdminSettingsPage() {
         ))}
       </div>
 
-      {tab==="Sign-in and recovery"&&(isAdmin&&!DEMO_ENABLED?<SecuritySettings/>:<p>Sign-in settings are available to the live account owner.</p>)}
+      {tab === "Sign-in and recovery" && (isAdmin && !DEMO_ENABLED ? <SecuritySettings /> : <p>Sign-in settings are available to the live account owner.</p>)}
+
       <fieldset id="cms-fields" disabled={!editable} className="min-w-0">
-      {tab==="Website appearance"&&<div className="max-w-4xl space-y-5 rounded border bg-card p-5"><h2 className="font-semibold">Website images and footer</h2><p className="text-sm text-muted-foreground">Use image links or upload JPEG, PNG or WebP files under 5 MB. Leave an image link empty to use the original branding. Save website settings to apply your changes.</p>{DESIGN_FIELDS.map(design=><label key={design.key} className="block text-sm">{design.label}<input className={field} value={form.websiteDesign?.[design.key]||""} onChange={e=>setField("websiteDesign",{...form.websiteDesign,[design.key]:e.target.value})}/>{"image" in design&&design.image&&<><input aria-label={"Upload "+design.label.toLowerCase()} className="mt-2 block max-w-full text-xs" type="file" accept="image/jpeg,image/png,image/webp" disabled={DEMO_ENABLED} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;try{const url=await uploadImage(file);setField("websiteDesign",{...form.websiteDesign,[design.key]:url});toast.success("Image uploaded. Save settings to apply it.");}catch(error){toast.error((error as Error).message);}}}/>{form.websiteDesign?.[design.key]&&<img src={form.websiteDesign[design.key]} alt={design.label} className="mt-3 max-h-36 max-w-full rounded border bg-muted object-contain"/>}</>}</label>)}</div>}
-      {/* TAB 1: Company details */}
-      {tab === "Company details" && (
-        <div className="max-w-4xl space-y-6">
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
-              <Building2 className="h-4 w-4 text-brass" />
-              <span>Company details</span>
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="cms-companyName" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Brand Name
-                </label>
-                <input id="cms-companyName"
-                  className={field}
-                  value={form.companyName}
-                  onChange={(e) => setField("companyName", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-tagline" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Brand Tagline
-                </label>
-                <input id="cms-tagline"
-                  className={field}
-                  value={form.tagline}
-                  onChange={(e) => setField("tagline", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-registeredEntity" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Registered Legal Entity
-                </label>
-                <input id="cms-registeredEntity"
-                  className={field}
-                  value={form.registeredEntity}
-                  onChange={(e) => setField("registeredEntity", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-licenseNo" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Chamber / Trade License
-                </label>
-                <input id="cms-licenseNo"
-                  className={field}
-                  value={form.licenseNo}
-                  onChange={(e) => setField("licenseNo", e.target.value)}
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label htmlFor="cms-address" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Registered Headquarters Address
-                </label>
-                <textarea id="cms-address"
-                  className={`${field} h-20 py-2`}
-                  value={form.address}
-                  onChange={(e) => setField("address", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-advisoryHours" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Advisory Working Hours
-                </label>
-                <input id="cms-advisoryHours"
-                  className={field}
-                  value={form.advisoryHours}
-                  onChange={(e) => setField("advisoryHours", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-taxOffice" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Tax Office & Registration
-                </label>
-                <input id="cms-taxOffice"
-                  className={field}
-                  value={form.taxOffice}
-                  onChange={(e) => setField("taxOffice", e.target.value)}
-                />
-              </div>
-            </div>
+        {tab === "Website appearance" && (
+          <div className="max-w-4xl space-y-5 rounded border bg-card p-5">
+            <h2 className="font-semibold">Website images and footer</h2>
+            <p className="text-sm text-muted-foreground">Appearance settings are available here.</p>
           </div>
+        )}
 
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
-              <Globe2 className="h-4 w-4 text-brass" />
-              <span>Contact details</span>
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div>
-                <label htmlFor="cms-phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Direct Phone Line
-                </label>
-                <input id="cms-phone"
-                  className={field}
-                  value={form.phone}
-                  onChange={(e) => setField("phone", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-whatsapp" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  WhatsApp Direct URL
-                </label>
-                <input id="cms-whatsapp"
-                  className={field}
-                  value={form.whatsapp}
-                  onChange={(e) => setField("whatsapp", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Official Advisory Email
-                </label>
-                <input id="cms-email"
-                  className={field}
-                  value={form.email}
-                  onChange={(e) => setField("email", e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: Homepage */}
-      {tab === "Homepage" && (
-        <div className="max-w-4xl space-y-6">
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4">
-              Homepage heading and text
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="cms-eyebrowText" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Eyebrow Text (Header Category)
-                </label>
-                <input id="cms-eyebrowText"
-                  className={field}
-                  value={form.eyebrowText}
-                  onChange={(e) => setField("eyebrowText", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-heroHeadline" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Hero Headline
-                </label>
-                <input id="cms-heroHeadline"
-                  className={field}
-                  value={form.heroHeadline}
-                  onChange={(e) => setField("heroHeadline", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="cms-heroSubtitle" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Hero Subtitle
-                </label>
-                <textarea id="cms-heroSubtitle"
-                  className={`${field} h-24 py-2`}
-                  value={form.heroSubtitle}
-                  onChange={(e) => setField("heroSubtitle", e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4">
-              Citizenship investment amount
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 items-center">
-              <div>
-                <label htmlFor="cms-cbiThresholdUsd" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Turkish CBI Minimum Threshold (USD)
-                </label>
-                <input id="cms-cbiThresholdUsd"
-                  type="number"
-                  className={field}
-                  value={form.cbiThresholdUsd}
-                  onChange={(e) => setField("cbiThresholdUsd", Number(e.target.value) || 400000)}
-                />
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Reference value only. Confirm current programme requirements with the client’s legal advisor before publication.
-                </p>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <p className="text-xs font-semibold text-foreground">Current Rule Active:</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  The configured reference is <b>${form.cbiThresholdUsd.toLocaleString()}</b>. A listing price alone does not verify citizenship eligibility; record a separate legal review.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4">
-              Website announcement
-            </h2>
-            <div className="space-y-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.announcementActive}
-                  onChange={(e) => setField("announcementActive", e.target.checked)}
-                  className="rounded border"
-                />
-                <span className="text-sm font-medium text-foreground">Enable site-wide top announcement bar</span>
-              </label>
-              {form.announcementActive && (
-                <div>
-                  <label htmlFor="cms-announcementText" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                    Announcement Banner Text
-                  </label>
-                <input id="cms-announcementText"
-                    className={field}
-                    placeholder="e.g. Q4 2026 Istanbul Central Bank Currency Briefing Now Available"
-                    value={form.announcementText}
-                    onChange={(e) => setField("announcementText", e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB: SEO & Search */}
-      {tab === "SEO & Search" && (
-        <div className="max-w-4xl space-y-6">
-          {/* Card: Google Search Preview */}
-          <div className="rounded-xl border bg-card p-6 shadow-xs">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <Search className="h-4 w-4 text-brass" />
-                  <span>Google Search Result Snippet Preview</span>
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Live simulation of how Avrasya Properties appears to international buyers in Google search engine results.
-                </p>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-600 border border-emerald-500/20">
-                <CheckCircle2 className="h-3 w-3" />
-                <span>Simulated Google Snippet</span>
-              </div>
-            </div>
-
-            {/* Google Result Card Box */}
-            <div className="rounded-lg border bg-white p-4 font-sans text-left shadow-xs">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2228] text-brass text-[10px] font-bold">
-                  A
-                </div>
-                <div className="leading-tight">
-                  <div className="text-[12px] font-normal text-[#202124]">Avrasya Properties</div>
-                  <div className="text-[11px] font-normal text-[#4d5156] truncate max-w-md">
-                    {form.siteUrl || "https://avrasyaproperties.com"}
-                  </div>
-                </div>
-              </div>
-              <h3 className="text-[18px] leading-snug font-normal text-[#1a0dab] hover:underline cursor-pointer font-sans">
-                {form.siteTitle || DEFAULT_SITE_SETTINGS.siteTitle}
-              </h3>
-              <p className="text-[13px] leading-relaxed text-[#4d5156] mt-1 font-sans">
-                {form.metaDescription || DEFAULT_SITE_SETTINGS.metaDescription}
-              </p>
-            </div>
-
-            {/* Status & Limits metrics */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t text-xs">
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 border">
-                <span className="text-muted-foreground">Title Length:</span>
-                <span className={`font-semibold tabular-nums ${(form.siteTitle || "").length >= 45 && (form.siteTitle || "").length <= 65 ? "text-emerald-600" : (form.siteTitle || "").length > 65 ? "text-amber-600" : "text-foreground"}`}>
-                  {(form.siteTitle || "").length} / 60 chars {(form.siteTitle || "").length > 65 ? "(May truncate)" : ""}
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 border">
-                <span className="text-muted-foreground">Description Length:</span>
-                <span className={`font-semibold tabular-nums ${(form.metaDescription || "").length >= 130 && (form.metaDescription || "").length <= 165 ? "text-emerald-600" : (form.metaDescription || "").length > 165 ? "text-amber-600" : "text-foreground"}`}>
-                  {(form.metaDescription || "").length} / 160 chars {(form.metaDescription || "").length > 165 ? "(May truncate)" : ""}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card: Search Titles & Metadata */}
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Globe2 className="h-4 w-4 text-brass" />
-              <span>Core Search & Social Metadata</span>
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="cms-siteTitle" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Primary Website Search Title (Title Tag)
-                </label>
-                <input
-                  id="cms-siteTitle"
-                  className={field}
-                  placeholder="e.g. Avrasya Properties | Istanbul Luxury Real Estate & Advisory"
-                  value={form.siteTitle}
-                  onChange={(e) => setField("siteTitle", e.target.value)}
-                />
-                <span className="text-xs text-muted-foreground mt-1 block">
-                  Displayed as the main clickable headline in search engines and browser tabs. Recommended length: 50–60 characters. Avoid repeating brand names twice.
-                </span>
-              </div>
-
-              <div>
-                <label htmlFor="cms-metaDescription" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Primary Search Meta Description
-                </label>
-                <textarea
-                  id="cms-metaDescription"
-                  className={`${field} h-24 py-2`}
-                  placeholder="Compelling 150-160 character description of your Istanbul real estate services..."
-                  value={form.metaDescription}
-                  onChange={(e) => setField("metaDescription", e.target.value)}
-                />
-                <span className="text-xs text-muted-foreground mt-1 block">
-                  Summarizes the website in search result snippets below the title. Recommended length: 140–160 characters.
-                </span>
-              </div>
-
+        {tab === "Company details" && (
+          <div className="max-w-4xl space-y-6">
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-foreground">
+                <Building2 className="h-4 w-4 text-brass" />
+                <span>Company details</span>
+              </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="cms-siteUrl" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                    Canonical Website URL
+                  <label htmlFor="cms-companyName" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Brand Name
                   </label>
-                  <input
-                    id="cms-siteUrl"
-                    className={field}
-                    placeholder="https://avrasyaproperties.com"
-                    value={form.siteUrl}
-                    onChange={(e) => setField("siteUrl", e.target.value)}
-                  />
-                  <span className="text-xs text-muted-foreground mt-1 block">
-                    Defines the authoritative base URL for search engines and prevents duplicate content fragmentation.
-                  </span>
+                  <input id="cms-companyName" className={field} value={form.companyName} onChange={(e) => setField("companyName", e.target.value)} />
                 </div>
-
                 <div>
-                  <label htmlFor="cms-ogImage" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                    Social Sharing Image (OG / Twitter Card Image)
+                  <label htmlFor="cms-tagline" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Brand Tagline
                   </label>
-                  <input
-                    id="cms-ogImage"
-                    className={field}
-                    placeholder="https://avrasyaproperties.com/images/properties/hero-main.jpg"
-                    value={form.ogImage}
-                    onChange={(e) => setField("ogImage", e.target.value)}
-                  />
-                  <span className="text-xs text-muted-foreground mt-1 block">
-                    Image preview shown when sharing your link on WhatsApp, LinkedIn, Twitter, and Facebook.
-                  </span>
+                  <input id="cms-tagline" className={field} value={form.tagline} onChange={(e) => setField("tagline", e.target.value)} />
                 </div>
-              </div>
-
-              <div>
-                <label htmlFor="cms-keywords" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Target SEO Keywords
-                </label>
-                <input
-                  id="cms-keywords"
-                  className={field}
-                  placeholder="Istanbul real estate, Turkish citizenship by investment, luxury apartments Istanbul, Bosphorus property"
-                  value={form.keywords}
-                  onChange={(e) => setField("keywords", e.target.value)}
-                />
-                <span className="text-xs text-muted-foreground mt-1 block">
-                  Comma-separated keywords defining your firm's primary advisory specialties.
-                </span>
               </div>
             </div>
           </div>
+        )}
 
-          {/* Card: Indexing & Crawling Controls */}
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-brass" />
-              <span>Indexing & Verification Controls</span>
-            </h2>
-            <div className="space-y-4">
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.indexingEnabled}
-                  onChange={(e) => setField("indexingEnabled", e.target.checked)}
-                  className="rounded border h-4 w-4 text-brass focus:ring-brass"
-                />
+        {tab === "Homepage" && (
+          <div className="max-w-4xl space-y-6">
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-4 text-base font-semibold text-foreground">Homepage heading and text</h2>
+              <div className="space-y-4">
                 <div>
-                  <span className="text-sm font-medium text-foreground block">
-                    Allow Search Engine Crawlers to Index Website
-                  </span>
-                  <span className="text-xs text-muted-foreground block">
-                    When enabled, renders "index, follow" in robots directives. When unchecked, outputs "noindex, nofollow" to hide the site from search engines.
-                  </span>
-                </div>
-              </label>
-
-              <div>
-                <label htmlFor="cms-googleVerification" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Google Search Console Verification Token
-                </label>
-                <input
-                  id="cms-googleVerification"
-                  className={field}
-                  placeholder="e.g. google-site-verification token or HTML meta content"
-                  value={form.googleVerification}
-                  onChange={(e) => setField("googleVerification", e.target.value)}
-                />
-                <span className="text-xs text-muted-foreground mt-1 block">
-                  Optional token for claiming ownership in Google Search Console without uploading files.
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card: Technical SEO Health & Status */}
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Layers className="h-4 w-4 text-brass" />
-              <span>Sitemap & Crawler Architecture Status</span>
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-3 text-xs">
-              <div className="p-3 rounded-lg border bg-muted/20">
-                <div className="font-semibold text-foreground mb-1">XML Sitemap</div>
-                <div className="text-emerald-600 font-medium flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>Active & Validated</span>
-                </div>
-                <div className="text-muted-foreground mt-1 font-mono text-[11px]">
-                  /sitemap.xml (32 URLs)
-                </div>
-              </div>
-
-              <div className="p-3 rounded-lg border bg-muted/20">
-                <div className="font-semibold text-foreground mb-1">Crawler Directives</div>
-                <div className="text-emerald-600 font-medium flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>Admin Protected</span>
-                </div>
-                <div className="text-muted-foreground mt-1 font-mono text-[11px]">
-                  /robots.txt (Disallow /admin)
-                </div>
-              </div>
-
-              <div className="p-3 rounded-lg border bg-muted/20">
-                <div className="font-semibold text-foreground mb-1">Structured Schema</div>
-                <div className="text-emerald-600 font-medium flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>JSON-LD Live</span>
-                </div>
-                <div className="text-muted-foreground mt-1 text-[11px]">
-                  WebSite & RealEstateAgent
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: Search filters (Regions, Apartment Layouts, Budgets) */}
-      {tab === "Search filters" && (
-        <div className="max-w-4xl space-y-6">
-          {/* Card 1: Istanbul Districts / Regions */}
-          <div className="rounded-xl border bg-card p-6">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-brass" />
-                  <span>Istanbul Districts & Regions ({form.districts?.length || 0})</span>
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Active regions available in Homepage search, Property Catalog district filter, and Consultation brief.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setField("districts", [...DEFAULT_SITE_SETTINGS.districts]);
-                  toast.success("Restored standard Istanbul districts");
-                }}
-                className={btnGhost + " !text-xs gap-1.5"}
-              >
-                <RotateCcw className="h-3 w-3" />
-                <span>Reset to Standard</span>
-              </button>
-            </div>
-
-            {/* List of active district tags */}
-            <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-muted/20 min-h-[56px] mb-4">
-              {(form.districts || []).map((dist, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-background border px-3 py-1 text-xs font-medium text-foreground shadow-xs group"
-                >
-                  <span>{dist}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = form.districts.filter((_, i) => i !== idx);
-                      setField("districts", next);
-                    }}
-                    className="text-muted-foreground hover:text-destructive transition-colors ml-0.5"
-                    title={`Remove ${dist}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-              {(!form.districts || form.districts.length === 0) && (
-                <span className="text-xs text-muted-foreground italic py-1">
-                  No districts configured. Add one below.
-                </span>
-              )}
-            </div>
-
-            {/* Add new district */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                className={field + " flex-1"}
-                placeholder="Enter new Istanbul district (e.g. Karaköy, Moda, Tarabya)"
-                value={newDistrict}
-                onChange={(e) => setNewDistrict(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (newDistrict.trim()) {
-                      const d = newDistrict.trim();
-                      if (!form.districts?.includes(d)) {
-                        setField("districts", [...(form.districts || []), d]);
-                        setNewDistrict("");
-                        toast.success(`Added ${d}`);
-                      } else {
-                        toast.error(`${d} already exists`);
-                      }
-                    }
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (newDistrict.trim()) {
-                    const d = newDistrict.trim();
-                    if (!form.districts?.includes(d)) {
-                      setField("districts", [...(form.districts || []), d]);
-                      setNewDistrict("");
-                      toast.success(`Added ${d}`);
-                    } else {
-                      toast.error(`${d} already exists`);
-                    }
-                  }
-                }}
-                className={btnPrimary + " gap-1.5 whitespace-nowrap"}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add Region</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Card 2: Apartment Layouts */}
-          <div className="rounded-xl border bg-card p-6">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-brass" />
-                  <span>Apartment Layouts & Types ({form.layouts?.length || 0})</span>
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Layout options available in Catalog filters, Lead acquisition requirements, and property entry.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setField("layouts", [...DEFAULT_SITE_SETTINGS.layouts]);
-                  toast.success("Restored standard layouts");
-                }}
-                className={btnGhost + " !text-xs gap-1.5"}
-              >
-                <RotateCcw className="h-3 w-3" />
-                <span>Reset to Standard</span>
-              </button>
-            </div>
-
-            {/* List of active layout tags */}
-            <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-muted/20 min-h-[56px] mb-4">
-              {(form.layouts || []).map((layout, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-background border px-3 py-1 text-xs font-medium text-foreground shadow-xs group"
-                >
-                  <span>{layout}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = form.layouts.filter((_, i) => i !== idx);
-                      setField("layouts", next);
-                    }}
-                    className="text-muted-foreground hover:text-destructive transition-colors ml-0.5"
-                    title={`Remove ${layout}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-              {(!form.layouts || form.layouts.length === 0) && (
-                <span className="text-xs text-muted-foreground italic py-1">
-                  No layouts configured. Add one below.
-                </span>
-              )}
-            </div>
-
-            {/* Add new layout */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                className={field + " flex-1"}
-                placeholder="Enter new layout (e.g. 5+2 Triplex, Garden Duplex, Private Villa)"
-                value={newLayout}
-                onChange={(e) => setNewLayout(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (newLayout.trim()) {
-                      const l = newLayout.trim();
-                      if (!form.layouts?.includes(l)) {
-                        setField("layouts", [...(form.layouts || []), l]);
-                        setNewLayout("");
-                        toast.success(`Added ${l}`);
-                      } else {
-                        toast.error(`${l} already exists`);
-                      }
-                    }
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (newLayout.trim()) {
-                    const l = newLayout.trim();
-                    if (!form.layouts?.includes(l)) {
-                      setField("layouts", [...(form.layouts || []), l]);
-                      setNewLayout("");
-                      toast.success(`Added ${l}`);
-                    } else {
-                      toast.error(`${l} already exists`);
-                    }
-                  }
-                }}
-                className={btnPrimary + " gap-1.5 whitespace-nowrap"}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add Layout</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Card 3: Investment Budget Ranges */}
-          <div className="rounded-xl border bg-card p-6">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-brass" />
-                  <span>Budget Tiers & Price Presets ({form.budgetRanges?.length || 0})</span>
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Preset price brackets configured across Homepage quick search and Portfolio Catalog filters.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setField("budgetRanges", [...DEFAULT_SITE_SETTINGS.budgetRanges]);
-                  toast.success("Restored standard budget brackets");
-                }}
-                className={btnGhost + " !text-xs gap-1.5"}
-              >
-                <RotateCcw className="h-3 w-3" />
-                <span>Reset to Standard</span>
-              </button>
-            </div>
-
-            {/* Table of active budget brackets */}
-            <div className="overflow-x-auto rounded-lg border mb-4">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 text-muted-foreground uppercase tracking-wider font-semibold">
-                  <tr>
-                    <th className="p-3">Display Label</th>
-                    <th className="p-3">Min Amount (USD)</th>
-                    <th className="p-3">Max Amount (USD)</th>
-                    <th className="p-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {(form.budgetRanges || []).map((b, idx) => (
-                    <tr key={b.id || idx} className="hover:bg-muted/20">
-                      <td className="p-3 font-medium text-foreground">{b.label}</td>
-                      <td className="p-3 font-mono">${b.min?.toLocaleString()}</td>
-                      <td className="p-3 font-mono">
-                        {b.max >= 99999999 ? "No limit" : `$${b.max?.toLocaleString()}`}
-                      </td>
-                      <td className="p-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const next = form.budgetRanges.filter((_, i) => i !== idx);
-                            setField("budgetRanges", next);
-                          }}
-                          className="text-muted-foreground hover:text-destructive p-1 transition-colors"
-                          title="Delete tier"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {(!form.budgetRanges || form.budgetRanges.length === 0) && (
-                    <tr>
-                      <td colSpan={4} className="p-4 text-center text-muted-foreground italic">
-                        No budget tiers configured.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Add new budget tier form */}
-            <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
-                Add New Budget Bracket
-              </p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div>
-                  <label className="text-[0.65rem] uppercase tracking-wider text-muted-foreground block mb-1">
-                    Display Label
+                  <label htmlFor="cms-eyebrowText" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Eyebrow Text (Header Category)
                   </label>
-                  <input
-                    type="text"
-                    className={field}
-                    placeholder="e.g. $750,000 – $1,200,000"
-                    value={newBudget.label}
-                    onChange={(e) => setNewBudget({ ...newBudget, label: e.target.value })}
-                  />
+                  <input id="cms-eyebrowText" className={field} value={form.eyebrowText} onChange={(e) => setField("eyebrowText", e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-[0.65rem] uppercase tracking-wider text-muted-foreground block mb-1">
-                    Min USD Amount
+                  <label htmlFor="cms-heroHeadline" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Hero Headline
                   </label>
-                  <input
-                    type="number"
-                    className={field}
-                    placeholder="e.g. 750000"
-                    value={newBudget.min || ""}
-                    onChange={(e) => setNewBudget({ ...newBudget, min: Number(e.target.value) || 0 })}
-                  />
+                  <input id="cms-heroHeadline" className={field} value={form.heroHeadline} onChange={(e) => setField("heroHeadline", e.target.value)} />
                 </div>
-                <div>
-                  <label className="text-[0.65rem] uppercase tracking-wider text-muted-foreground block mb-1">
-                    Max USD Amount (0 for unlimited)
-                  </label>
-                  <input
-                    type="number"
-                    className={field}
-                    placeholder="e.g. 1200000"
-                    value={newBudget.max || ""}
-                    onChange={(e) => setNewBudget({ ...newBudget, max: Number(e.target.value) || 0 })}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!newBudget.label.trim()) {
-                      toast.error("Please provide a display label");
-                      return;
-                    }
-                    const maxVal = newBudget.max > 0 ? newBudget.max : 99999999;
-                    const id = `b-${Date.now().toString(36)}`;
-                    const next = [...(form.budgetRanges || []), { id, label: newBudget.label.trim(), min: newBudget.min, max: maxVal }];
-                    setField("budgetRanges", next);
-                    setNewBudget({ label: "", min: 0, max: 0 });
-                    toast.success("Added budget tier");
-                  }}
-                  className={btnPrimary + " !text-xs gap-1.5"}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Budget Tier</span>
-                </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* TAB 3: Exchange rates */}
-      {tab === "Exchange rates" && (
-        <div className="max-w-4xl space-y-6">
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4">
-              Exchange rates
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/20">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Indicative exchange rate provider</p>
-                  <p className="text-xs text-muted-foreground">
-                    Uses the existing browser rate provider. Provider dates and refresh behavior require separate verification; these rates are indicative.
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.enableFrankfurterSync}
-                    onChange={(e) => setField("enableFrankfurterSync", e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brass"></div>
-                </label>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  Manual rates (for 1 USD)
-                </p>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg border p-3 bg-card">
-                    <p className="text-xs font-medium text-muted-foreground">EUR / USD</p>
-                    <input
-                      type="number"
-                      step="0.001"
-                      className={`${field} mt-1`}
-                      value={form.exchangeRateEur}
-                      onChange={(e) => setField("exchangeRateEur", parseFloat(e.target.value) || 0.892)}
-                    />
-                  </div>
-                  <div className="rounded-lg border p-3 bg-card">
-                    <p className="text-xs font-medium text-muted-foreground">TRY / USD</p>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className={`${field} mt-1`}
-                      value={form.exchangeRateTry}
-                      onChange={(e) => setField("exchangeRateTry", parseFloat(e.target.value) || 49.17)}
-                    />
-                  </div>
-                  <div className="rounded-lg border p-3 bg-card">
-                    <p className="text-xs font-medium text-muted-foreground">GBP / USD</p>
-                    <input
-                      type="number"
-                      step="0.001"
-                      className={`${field} mt-1`}
-                      value={form.exchangeRateGbp}
-                      onChange={(e) => setField("exchangeRateGbp", parseFloat(e.target.value) || 0.756)}
-                    />
+        {tab === "SEO & Search" && (
+          <div className="max-w-4xl space-y-6">
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-foreground">
+                <Search className="h-4 w-4 text-brass" />
+                <span>Google Search Result Snippet Preview</span>
+              </h2>
+              <div className="rounded-lg border bg-white p-4 font-sans text-left shadow-xs">
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0B2228] text-[10px] font-bold text-brass">A</div>
+                  <div className="leading-tight">
+                    <div className="text-[12px] font-normal text-[#202124]">Avrasya Properties</div>
+                    <div className="max-w-md truncate text-[11px] font-normal text-[#4d5156]">
+                      {form.siteUrl || "https://avrasyaproperties.com"}
+                    </div>
                   </div>
                 </div>
+                <h3 className="text-[18px] font-normal leading-snug text-[#1a0dab]">{form.siteTitle || DEFAULT_SITE_SETTINGS.siteTitle}</h3>
+                <p className="mt-1 text-[13px] leading-relaxed text-[#4d5156]">{form.metaDescription || DEFAULT_SITE_SETTINGS.metaDescription}</p>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      </fieldset>
-      {/* TAB 4: Export data */}
-      {tab === "Export data" && (
-        <div className="max-w-4xl space-y-6">
-          <div className="rounded-xl border bg-card p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4">
-              Download your records
-            </h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Download property listings, contacts, buyer enquiries, deals, viewings and website settings as a JSON file. Linked images and documents are not included.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button disabled={!isAdmin} onClick={handleDownloadBackup} className={btnPrimary}>
+        {tab === "Search filters" && (
+          <div className="max-w-4xl space-y-6">
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-foreground">
+                <MapPin className="h-4 w-4 text-brass" />
+                <span>Istanbul Districts & Regions ({form.districts?.length || 0})</span>
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {(form.districts || []).map((dist, idx) => (
+                  <span key={`${dist}-${idx}`} className="inline-flex items-center gap-1.5 rounded-full border bg-background px-3 py-1 text-xs font-medium text-foreground">
+                    <span>{dist}</span>
+                    <button type="button" onClick={() => setField("districts", (form.districts || []).filter((_, i) => i !== idx))} className="text-muted-foreground hover:text-destructive">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === "Exchange rates" && (
+          <div className="max-w-4xl space-y-6">
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-4 text-base font-semibold text-foreground">Exchange rates</h2>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="rounded-lg border p-3 bg-card">
+                  <p className="text-xs font-medium text-muted-foreground">EUR / USD</p>
+                  <input type="number" step="0.001" className={`${field} mt-1`} value={form.exchangeRateEur} onChange={(e) => setField("exchangeRateEur", parseFloat(e.target.value) || 0.892)} />
+                </div>
+                <div className="rounded-lg border p-3 bg-card">
+                  <p className="text-xs font-medium text-muted-foreground">TRY / USD</p>
+                  <input type="number" step="0.01" className={`${field} mt-1`} value={form.exchangeRateTry} onChange={(e) => setField("exchangeRateTry", parseFloat(e.target.value) || 49.17)} />
+                </div>
+                <div className="rounded-lg border p-3 bg-card">
+                  <p className="text-xs font-medium text-muted-foreground">GBP / USD</p>
+                  <input type="number" step="0.001" className={`${field} mt-1`} value={form.exchangeRateGbp} onChange={(e) => setField("exchangeRateGbp", parseFloat(e.target.value) || 0.756)} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === "Export data" && (
+          <div className="max-w-4xl space-y-6">
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-4 text-base font-semibold text-foreground">Download your records</h2>
+              <button onClick={handleDownloadBackup} className={btnPrimary}>
                 <Download className="h-4 w-4" />
                 <span>Download records</span>
               </button>
-              <button disabled={!isAdmin || !DEMO_ENABLED} onClick={() => setIsImportOpen(!isImportOpen)} className={btnGhost}>
-                <Upload className="h-4 w-4" />
-                <span>Restore demo records</span>
-              </button>
             </div>
-
-            {isImportOpen && (
-              <div className="mt-4 pt-4 border-t space-y-3">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
-                  Paste JSON Backup Content
-                </label>
-                <textarea
-                  className={`${field} h-36 font-mono text-xs`}
-                  placeholder="Paste JSON database payload here..."
-                  value={importJson}
-                  onChange={(e) => setImportJson(e.target.value)}
-                />
-                <button disabled={!isAdmin || !DEMO_ENABLED} onClick={handleImportSubmit} className={btnPrimary}>
-                  Confirm Database Restore
-                </button>
-              </div>
-            )}
           </div>
-
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
-            <h2 className="text-base font-semibold text-destructive flex items-center gap-2 mb-2">
-              <AlertTriangle className="h-4 w-4" />
-              <span>Reset Browser Demo Workspace</span>
-            </h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Replace this browser’s data with source-derived listing examples, fictional CRM records, and default settings. This does not restore a production database.
-            </p>
-            <button
-              disabled={!isAdmin || !DEMO_ENABLED}
-              onClick={handleResetFactory}
-              className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-destructive/40 bg-destructive/10 px-3 text-sm font-medium text-destructive hover:bg-destructive/20"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>Reset demo data</span>
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+      </fieldset>
     </div>
   );
 }
-
