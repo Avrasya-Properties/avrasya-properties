@@ -71,7 +71,7 @@ create function private.admin_mail_claim() returns jsonb
 language plpgsql security definer set search_path='' as $$
 declare messages jsonb;
 begin
- with selected as(select id from private.admin_security_mail where sent_at is null and retry_after<=now() and attempts<10 order by created_at limit 10 for update skip locked),
+ with selected as(select id from private.admin_security_mail where sent_at is null and retry_after<=now() and attempts<10 order by created_at limit 3 for update skip locked),
  claimed as(update private.admin_security_mail m set attempts=attempts+1,retry_after=now()+interval '2 minutes' from selected s where m.id=s.id returning m.id,m.recipient,m.created_at,m.attempts)
  select coalesce(jsonb_agg(to_jsonb(claimed)),'[]'::jsonb) into messages from claimed;return messages;
 end $$;
@@ -139,3 +139,35 @@ $$;
 create function public.admin_mail_status() returns jsonb language sql security invoker set search_path='' as $$select private.admin_mail_status()$$;
 revoke all on function private.admin_mail_status(),public.admin_mail_status() from public,anon,authenticated;
 grant execute on function private.admin_mail_status(),public.admin_mail_status() to service_role;
+-- A private worker credential is generated in the database, never sent to the browser.
+create table private.admin_security_worker(singleton boolean primary key default true check(singleton),credential text not null);
+alter table private.admin_security_worker enable row level security;
+revoke all on private.admin_security_worker from public,anon,authenticated,service_role;
+insert into private.admin_security_worker(credential) values(gen_random_uuid()::text||gen_random_uuid()::text);
+create function private.admin_mail_worker_valid(p_key text) returns boolean language sql stable security definer set search_path='' as $$
+ select length(p_key)=72 and exists(select 1 from private.admin_security_worker where credential=p_key);
+$$;
+create function public.admin_mail_worker_valid(p_key text) returns boolean language sql security invoker set search_path='' as $$select private.admin_mail_worker_valid(p_key)$$;
+revoke all on function private.admin_mail_worker_valid(text),public.admin_mail_worker_valid(text) from public,anon,authenticated;
+grant execute on function private.admin_mail_worker_valid(text),public.admin_mail_worker_valid(text) to service_role;
+create function private.send_admin_security_alerts() returns bigint language plpgsql security definer set search_path='' as $$
+declare request_id bigint;
+begin
+ select net.http_post(
+  url:='https://ufcpvjhzitmxgitoaolx.supabase.co/functions/v1/admin-access',
+  headers:=jsonb_build_object('Content-Type','application/json','X-Avrasya-Worker',(select credential from private.admin_security_worker)),
+  body:='{"action":"deliver-alerts"}'::jsonb,
+  timeout_milliseconds:=50000
+ ) into request_id;
+ return request_id;
+end $$;
+revoke all on function private.send_admin_security_alerts() from public,anon,authenticated,service_role;
+-- Supabase provides these extensions. Plain CI PostgreSQL does not; it checks
+-- the worker's authorization separately rather than inventing an HTTP extension.
+do $$begin
+ if exists(select 1 from pg_available_extensions where name='pg_cron') and exists(select 1 from pg_available_extensions where name='pg_net') then
+  execute 'create extension if not exists pg_cron';
+  execute 'create extension if not exists pg_net';
+  execute $sql$select cron.schedule('avrasya-security-alerts','* * * * *','select private.send_admin_security_alerts()')$sql$;
+ end if;
+end$$;

@@ -8,6 +8,7 @@ const mockFetch=async(url,options={})=>{
  const body=options.body?JSON.parse(options.body):null;calls.push({url,body,options});
  if(url.endsWith('/rpc/admin_login_begin')){if(body.p_email==='unknown@example.test')return Response.json({unknown:true});if(blocked)return Response.json({blocked_until:'2026-10-15T01:00:00Z'});if(lease)return Response.json({busy:true});lease=true;return Response.json({user_id:'staff',email:'admin@avrasyaproperties.com'});}
  if(url.endsWith('/rpc/admin_login_finish')){lease=false;if(body.p_valid===false){failures++;if(failures===3){blocked=true;alerts.push({id:'alert',recipient:'info.avrasyaproperties@gmail.com',created_at:'2026-10-15T00:00:00Z'});}return Response.json({blocked_until:blocked?'2026-10-15T01:00:00Z':null});}if(body.p_valid===true)failures=0;return Response.json({ok:true});}
+ if(url.endsWith('/rpc/admin_mail_worker_valid'))return Response.json(body.p_key==='w'.repeat(72));
  if(url.endsWith('/rpc/admin_mail_status'))return Response.json({pending:alerts.length,needs_attention:0});
  if(url.endsWith('/rpc/admin_mail_claim')){const batch=alerts.splice(0);return Response.json(batch);}
  if(url.endsWith('/rpc/admin_mail_finish'))return Response.json(null);
@@ -45,3 +46,8 @@ blocked=true;assert.equal((await handler(req({action:'complete-recovery',passwor
 delete env.RESEND_API_KEY;calls=[];assert.equal((await handler(req({action:'recover',email:input.email}))).status,503);assert.equal(calls.length,0);
 failures=2;authStatus=400;assert.equal((await handler(req(input))).status,429);assert.equal(alerts.length,1);
 console.log('PASS: actual Edge handler paths for attempts, blocks, outage preservation, alert recipient, recovery, verified access and missing mail configuration');
+
+assert.equal((await handler(req({action:'deliver-alerts'}))).status,401);
+const workerRequest=req({action:'deliver-alerts'});workerRequest.headers.set('x-avrasya-worker','w'.repeat(72));assert.equal((await handler(workerRequest)).status,200);
+const fakeWorker=req({action:'deliver-alerts'});fakeWorker.headers.set('x-avrasya-worker','x'.repeat(72));assert.equal((await handler(fakeWorker)).status,401);
+console.log('PASS: scheduled alert worker rejects unauthorized and forged requests');

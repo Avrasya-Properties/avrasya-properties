@@ -4,7 +4,7 @@
 
 - A temporary database/API refresh failure no longer clears the admin's signed-in state or replaces loaded records. Expired Auth tokens and deactivated staff accounts still lose access.
 - Ten minutes without typing, clicks, touch input or scrolling signs the current browser session out. Background data reads and automatic token refresh do not restart the timer. A warning appears in the last minute.
-- Authenticated saves, RPC changes and Storage uploads protect the session while they run. Ten idle minutes are available after completion. Activity and short work leases are shared across tabs. Closing a tab cannot leave a permanent work exemption. Reloading a tab does not reset inactivity; a click after expiry cannot revive it.
+- Authenticated saves, RPC changes and Storage uploads protect the session while they run. Ten idle minutes are available after completion. Activity and short work leases are shared across tabs. Closing a tab cannot leave a permanent work exemption. The timer also continues after leaving the admin pages; browsing the public website does not reset admin inactivity. Reloading a tab does not reset inactivity; a click after expiry cannot revive it.
 - Password login goes through the deployed `admin-access` Edge Function. Only an active staff profile can sign in. Consecutive incorrect passwords are counted atomically in a private table; three within fifteen minutes block new gateway sign-ins for fifteen minutes. Parallel requests cannot race the count. Auth service outages do not count as wrong passwords or reset previous failures.
 - Database permissions deny admin access to fresh direct Auth sessions while the account is blocked. Existing sessions continue to work. The optional native password verification hook also tracks password attempts made directly to Supabase Auth; see activation below.
 - The administrator keeps `admin@avrasyaproperties.com` as the sign-in address. Its recovery links and security alerts target `info.avrasyaproperties@gmail.com`. Other active staff use their own email.
@@ -29,7 +29,7 @@ The owner selected “Custom domain” but did not provide its address. Never in
 
 In Supabase Authentication → Hooks, enable the **Password Verification Attempt** Postgres hook `public.admin_password_verification`. Confirm project plan support. Without that setting, gateway attempts are counted and database access is blocked after the third gateway failure, but incorrect passwords sent directly to Supabase Auth are not counted. The repository migration alone cannot change hosted Auth settings.
 
-Queued alerts retry on a successful gateway sign-in or the admin's Retry queued alerts button. Configure a scheduled server worker if unattended retries or alerts from direct native-hook attempts must be sent immediately; no scheduled worker has been falsely represented as active.
+Queued alerts retry on a successful gateway sign-in, the admin’s Retry queued alerts button, and a scheduled Supabase worker every minute. The worker uses a private database-generated credential; the browser cannot read it or invoke deliveries. Hosted scheduler activation is verified after applying the migration. It leaves alerts queued while email sending is unconfigured.
 
 The existing public enquiry endpoint separately requires `WEBSITE_ALLOWED_ORIGINS` containing the actual website origin. Missing configuration previously produced HTTP 503. This setting cannot safely be replaced with a guessed domain or wildcard.
 

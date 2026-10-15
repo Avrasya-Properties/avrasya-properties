@@ -27,6 +27,11 @@ Deno.serve(async(req:Request)=>{
   if(Number(req.headers.get('content-length')||0)>16384)return respond({error:'Request too large.'},413);
   const raw=await req.text();if(raw.length>16384)return respond({error:'Request too large.'},413);
   const body=JSON.parse(raw);const action=body.action;
+  if(action==='deliver-alerts'){
+   const worker=req.headers.get('x-avrasya-worker')||'';
+   if(worker.length!==72||!await rpc('admin_mail_worker_valid',{p_key:worker}))return respond({error:'Worker authorization required.'},401);
+   return respond(await deliverAlerts());
+  }
   if(action==='status'||action==='retry-alerts'||action==='complete-recovery'){
    const authorization=req.headers.get('authorization')||'';
    if(!/^Bearer \S+$/.test(authorization)||authorization==='Bearer '+secret)return respond({error:'Sign in to continue.'},401);

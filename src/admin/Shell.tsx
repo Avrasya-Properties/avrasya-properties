@@ -2,7 +2,6 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2 } from "lucide-react";
 import { DEMO_ENABLED, fmtDate, logout, markRead, useDB, useSession, useBackendStatus } from "./store";
-import { watchAdminActivity } from "./inactivity";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -81,8 +80,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const backend = useBackendStatus();
   const db = useDB();
   const nav = useNavigate();
-  const [idleSeconds,setIdleSeconds]=useState(0);
-  useEffect(()=>{if(DEMO_ENABLED||!user)return;return watchAdminActivity(user.id,()=>{void Promise.resolve(logout()).catch(()=>toast.error("Your session ended. Please sign in again."));},setIdleSeconds);},[user?.id]);
+  const idleSeconds=backend.idleSeconds;
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [time, setTime] = useState("");

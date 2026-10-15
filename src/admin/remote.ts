@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { websiteChanged } from "@/lib/website-sync";
-import { freshAdminActivity } from "./inactivity";
+import { freshAdminActivity,watchAdminActivity } from "./inactivity";
 import { supabase } from "@/lib/supabase";
 import { decode,decodeSettings,encode,encodeSettings,TABLES,type Collection,type Row } from "./mappers";
 import { submitPublicEnquiry } from "@/lib/public-enquiry";
@@ -11,11 +11,17 @@ const empty:DB={properties:[],contacts:[],leads:[],tasks:[],viewings:[],deals:[]
 let snapshot:DB=empty;
 let user:User|null=null;
 export const staff:User[]=[];
-let status={loading:true,saving:0,error:""};
+let status={loading:true,saving:0,error:"",idleSeconds:0};
+let stopIdle:(()=>void)|undefined, idleUserId="";
+function syncIdle(){
+ if(typeof window==="undefined"||idleUserId===(user?.id||""))return;
+ stopIdle?.();stopIdle=undefined;idleUserId=user?.id||"";
+ if(user)stopIdle=watchAdminActivity(user.id,()=>{void signOut().catch(()=>undefined);},seconds=>{if(status.idleSeconds!==seconds){status={...status,idleSeconds:seconds};notify();}});
+}
 const listeners=new Set<()=>void>();
 let generation=0;let started=false;
 const rows=new Map<string,Row>();
-const notify=()=>listeners.forEach(fn=>fn());
+const notify=()=>{syncIdle();listeners.forEach(fn=>fn());};
 const subscribe=(fn:()=>void)=>{listeners.add(fn);return()=>{listeners.delete(fn);};};
 function message(error:unknown){return error instanceof Error?error.message:String((error as {message?:string})?.message||"The request failed");}
 export async function fetchRows(table:string):Promise<Row[]> {
@@ -67,7 +73,7 @@ export async function signIn(email:string,password:string){
  if(data.session)freshAdminActivity(data.session.user.id);await refresh();
  if(!user)throw new Error(status.error||"Staff access is not configured.");return user;
 }
-export async function signOut(){++generation;user=null;snapshot=empty;rows.clear();staff.splice(0);status={loading:false,saving:0,error:""};notify();const {error}=await supabase.auth.signOut({scope:"local"});if(error)throw error;}
+export async function signOut(){++generation;user=null;snapshot=empty;rows.clear();staff.splice(0);status={loading:false,saving:0,error:"",idleSeconds:0};notify();const {error}=await supabase.auth.signOut({scope:"local"});if(error)throw error;}
 export async function resetPassword(email:string){requireText(email,"Email",254);await accessRequest({action:"recover",email:email.trim()});}
 export async function changePassword(password:string){if(password.length<12)throw new Error("Use at least 12 characters.");await accessRequest({action:"complete-recovery",password});}
 let queue:Promise<unknown>=Promise.resolve();

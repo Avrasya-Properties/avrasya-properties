@@ -9,7 +9,7 @@ export class IdleSession {
   private timer: ReturnType<typeof setInterval>;
   private key: string;
   private workKey: string;
-  constructor(private target: Window, userId: string, private expire: () => void, private warn: (seconds: number) => void, private now = Date.now) {
+  constructor(private target: Window, userId: string, private expire: () => void, private warn: (seconds: number) => void, private now = () => Date.now(), private acceptsActivity = () => true) {
     this.key = `avrasya:admin-activity:${userId}`;
     this.workKey = `avrasya:admin-work:${userId}:`;
     this.last = this.read() || now();
@@ -38,7 +38,7 @@ export class IdleSession {
   activity = () => {
     // Coming back to an expired background tab must not revive its session.
     this.check();
-    if (!this.stopped) { this.last = this.now(); this.store(); this.warn(0); }
+    if (!this.stopped && this.acceptsActivity()) { this.last = this.now(); this.store(); this.warn(0); }
   };
   work() {
     this.check();
@@ -58,7 +58,7 @@ export class IdleSession {
 }
 export function freshAdminActivity(userId: string) { if (typeof window !== 'undefined') try { window.localStorage.setItem(`avrasya:admin-activity:${userId}`, String(Date.now())); } catch {} }
 export function watchAdminActivity(userId: string, expire: () => void, warn: (seconds: number) => void) {
-  const session = new IdleSession(window, userId, expire, warn); current = session;
+  const session = new IdleSession(window, userId, expire, warn, () => Date.now(), () => /^\/admin(?:\/|$)/.test(window.location.pathname)); current = session;
   return () => { session.stop(); if (current === session) current = null; };
 }
 export const beginAdminWork = () => current?.work() || (() => {});
