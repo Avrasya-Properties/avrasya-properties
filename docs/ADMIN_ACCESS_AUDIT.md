@@ -27,7 +27,7 @@ Configure these **Supabase Edge Function secrets**, never frontend VITE variable
 
 The owner selected “Custom domain” but did not provide its address. Never infer the domain from the admin email. Recovery returns a clear setup error until all three values exist. If another provider is preferred, replace the small server-side `send` adapter before configuring it.
 
-In Supabase Authentication → Hooks, enable the **Password Verification Attempt** Postgres hook `public.admin_password_verification`. Confirm project plan support. Without that setting, gateway attempts are counted and database access is blocked after the third gateway failure, but incorrect passwords sent directly to Supabase Auth are not counted. The repository migration alone cannot change hosted Auth settings.
+In Supabase Authentication → Hooks, enable the **Password Verification Attempt** Postgres hook `public.admin_password_verification`. This native hook currently requires a Teams or Enterprise plan; do not upgrade or claim activation without the owner’s decision. Without that setting, gateway attempts are counted and database access is blocked after the third gateway failure, but incorrect passwords sent directly to Supabase Auth are not counted. The repository migration alone cannot change hosted Auth settings.
 
 Queued alerts retry on a successful gateway sign-in, the admin’s Retry queued alerts button, and a scheduled Supabase worker every minute. The worker uses a private database-generated credential; the browser cannot read it or invoke deliveries. Hosted scheduler activation is verified after applying the migration. It leaves alerts queued while email sending is unconfigured.
 

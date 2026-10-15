@@ -69,10 +69,10 @@ async function visit(path, heading) {
 }
 // Both SSR loaders and browser reads use this isolated Auth/PostgREST adapter.
 const apiProxy=Bun.serve({hostname:"127.0.0.1",port:8082,async fetch(req){
- const url=new URL(req.url),body=await req.text();
- const request={method:()=>req.method,headers:()=>Object.fromEntries(req.headers),postData:()=>body};
+ const url=new URL(req.url),requestBody=await req.text();
+ const request={method:()=>req.method,headers:()=>Object.fromEntries(req.headers),postData:()=>requestBody};
   try{
-   if(url.pathname==="/functions/v1/admin-access")return accessHandler(new Request(req.url,{method:req.method,headers:req.headers,body:body||undefined}));
+   if(url.pathname==="/functions/v1/admin-access")return accessHandler(new Request(req.url,{method:req.method,headers:req.headers,body:requestBody||undefined}));
    if(request.method()==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"*","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS"}});
    let status=200,body,headers={"content-type":"application/json","access-control-allow-origin":"*"};
    if(failReads&&url.pathname==="/rest/v1/tasks")return Response.json({message:"Temporary read failure"},{status:503,headers});
