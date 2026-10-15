@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Waves,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useLanguage";
 
 type CorridorData = {
   id: string;
@@ -225,7 +226,8 @@ const CORRIDORS: CorridorData[] = [
 ];
 
 export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } = {}) {
-  const waLink=useWhatsAppLink();
+  const { t } = useTranslation();
+  const waLink = useWhatsAppLink();
   const [side, setSide] = useState<"European" | "Asian">("European");
   const filteredCorridors = CORRIDORS.filter((c) => c.side === side);
   const [selectedId, setSelectedId] = useState<string>(filteredCorridors[0]!.id);
@@ -241,11 +243,11 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="pulse-live h-2 w-2 rounded-full bg-emerald-500 mr-1" />
-              <p className="eyebrow !text-brass-text">Explore Istanbul Neighborhoods</p>
+              <p className="eyebrow !text-brass-text">{t.whyTurkiye.eyebrow}</p>
             </div>
             <h2 className="headline text-3xl md:text-5xl text-foreground">
-              Istanbul District{" "}
-              <em className="italic text-brass font-normal">Guide & Highlights</em>
+              {t.whyTurkiye.title}{" "}
+              <em className="italic text-brass font-normal">{t.whyTurkiye.titleEm}</em>
             </h2>
           </div>
 
@@ -264,7 +266,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
                 }`}
               >
                 <Building2 className="h-3.5 w-3.5 text-brass" />
-                <span>European Side</span>
+                <span>{t.whyTurkiye.filterEuropean}</span>
               </button>
 
               <button
@@ -279,7 +281,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
                 }`}
               >
                 <Compass className="h-3.5 w-3.5 text-brass" />
-                <span>Asian Side</span>
+                <span>{t.whyTurkiye.filterAsian}</span>
               </button>
             </div>
           </div>
@@ -289,7 +291,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
           <div className="flex items-center gap-2">
             <span className="pulse-live h-2 w-2 rounded-full bg-emerald-500 mr-1" />
             <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-              Explore Istanbul Neighborhoods
+              {t.whyTurkiye.eyebrow}
             </span>
           </div>
 
@@ -307,7 +309,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
               }`}
             >
               <Building2 className="h-3.5 w-3.5 text-brass" />
-              <span>European Side</span>
+              <span>{t.whyTurkiye.filterEuropean}</span>
             </button>
 
             <button
@@ -322,7 +324,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
               }`}
             >
               <Compass className="h-3.5 w-3.5 text-brass" />
-              <span>Asian Side</span>
+              <span>{t.whyTurkiye.filterAsian}</span>
             </button>
           </div>
         </div>
@@ -506,8 +508,8 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
                   onClick={() => navigate({ to: "/properties", search: { q: active.locParam } })}
                   className="btn btn-primary shadow-xs gap-2 btn-shimmer"
                 >
-                  <span>View Available Homes in {active.name}</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <span>{t.whyTurkiye.viewPropertiesInDistrict}: {active.name}</span>
+                  <ArrowRight className="h-3.5 w-3.5 rtl-flip" />
                 </button>
 
                 <a
@@ -519,7 +521,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
                   className="btn btn-outline gap-2 hover:border-brass hover:text-brass transition-colors"
                 >
                   <MessageSquare className="h-3.5 w-3.5 text-brass" />
-                  <span>Request {active.locParam} Private Dossier</span>
+                  <span>{t.cta.whatsappDirect} ({active.locParam})</span>
                 </a>
             </div>
           </div>

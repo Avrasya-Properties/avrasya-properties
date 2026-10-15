@@ -1,5 +1,6 @@
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState } from "react";
+import { useTranslation } from "@/hooks/useLanguage";
 import {
   Building,
   Calculator,
@@ -19,7 +20,8 @@ import {useSiteSettings} from "@/admin/store";
 import { useCurrency,useLiveRates } from "@/hooks/usePreferences";
 
 export function AcquisitionCalculator() {
-  const waLink=useWhatsAppLink();
+  const { t } = useTranslation();
+  const waLink = useWhatsAppLink();
   const [priceUsd, setPriceUsd] = useState<number>(450000);
   const [tapuSplit, setTapuSplit] = useState<"full" | "split">("full");
   const [vatExempt, setVatExempt] = useState<boolean>(true); // Law 3065 foreigner exemption
@@ -90,19 +92,18 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="rounded bg-brass/10 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-brass-text">
-                Estimated purchase costs
+                {t.calculator.eyebrow}
               </span>
               <span className="font-mono text-[10px] text-muted-foreground">
                 Turkish Land Registry Law No. 4721
               </span>
             </div>
             <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-              Total Purchase &{" "}
-              <em className="italic text-brass font-normal">Cost Calculator</em>
+              {t.calculator.title}{" "}
+              <em className="italic text-brass font-normal">{t.calculator.titleEm}</em>
             </h3>
             <p className="text-xs md:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
-              Calculate your total purchase costs with zero hidden surprises. See an honest, clear
-              breakdown of government title fees, independent legal checks, and VAT tax savings.
+              {t.calculator.description}
             </p>
           </div>
 
@@ -110,10 +111,10 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
             <button
               onClick={copySummary}
               className="btn btn-outline !min-h-9 !py-1 text-xs gap-1.5 hover:border-brass/70 hover:text-brass transition-colors"
-              title="Copy complete breakdown to clipboard"
+              title={t.calculator.copyBreakdown}
             >
               <Copy className="h-3.5 w-3.5 text-brass" />
-              <span>{copied ? "Ledger Copied!" : "Copy Summary"}</span>
+              <span>{copied ? t.calculator.copiedToast : t.calculator.copyBreakdown}</span>
             </button>
           </div>
         </div>
@@ -129,7 +130,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                   htmlFor="price-slider"
                   className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                 >
-                  Property Purchase Price (USD)
+                  {t.calculator.propertyPriceLabel}
                 </label>
                 <div className="flex items-center gap-1 font-mono text-xl md:text-2xl font-bold text-foreground">
                   <span>${priceUsd.toLocaleString("en-US")}</span>
@@ -181,12 +182,12 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="rounded-xs border border-border/80 bg-background/70 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                    Title Deed Tax (Tapu)
+                    {t.calculator.tapuDeedTax}
                   </p>
                   <span className="font-mono text-xs font-bold text-brass">{tapuRate * 100}%</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Statutory 4% land registry fee. Primary developers often share 2% + 2%.
+                  {t.calculator.tapuShareFull} / {t.calculator.tapuShareSplit}
                 </p>
                 <div className="flex rounded border border-border/70 bg-card p-0.5 text-xs">
                   <button
@@ -197,7 +198,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                         : "text-muted-foreground"
                     }`}
                   >
-                    100% Buyer (4%)
+                    {t.calculator.tapuShareFull}
                   </button>
                   <button
                     onClick={() => setTapuSplit("split")}
@@ -207,7 +208,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                         : "text-muted-foreground"
                     }`}
                   >
-                    Split 50/50 (2%)
+                    {t.calculator.tapuShareSplit}
                   </button>
                 </div>
               </div>
@@ -216,17 +217,16 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="rounded-xs border border-border/80 bg-background/70 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                    Foreigner VAT (KDV)
+                    {t.calculator.vatTax}
                   </p>
                   <span
                     className={`font-mono text-xs font-bold ${vatExempt ? "text-emerald-700" : "text-foreground"}`}
                   >
-                    {vatExempt ? "0% (Exempt)" : "1% Standard"}
+                    {vatExempt ? "0%" : "1%"}
                   </span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Non-residents bringing foreign capital qualify for 0% VAT under Turkish Law No.
-                  3065.
+                  {t.calculator.vatExemptSub}
                 </p>
                 <button
                   onClick={() => setVatExempt(!vatExempt)}
@@ -239,13 +239,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                   <CheckCircle2
                     className={`h-3.5 w-3.5 ${vatExempt ? "text-emerald-700" : "text-muted-foreground"}`}
                   />
-                  <span>
-                    {vatExempt
-                      ? "Law 3065 Exemption Active (Save $" +
-                        (priceUsd * 0.01).toLocaleString() +
-                        ")"
-                      : "Apply Standard 1% VAT"}
-                  </span>
+                  <span>{t.calculator.vatExemptLabel}</span>
                 </button>
               </div>
             </div>
@@ -264,13 +258,13 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                     className={`h-5 w-5 ${isCbiQualified ? "text-emerald-700" : "text-brass"}`}
                   />
                   <span className="font-display text-base font-semibold text-foreground">
-                    Turkish Citizenship (CBI $400k) Status
+                    {t.calculator.cbiEligibilityStatus}
                   </span>
                 </div>
                 <span
                   className={`font-mono text-xs font-bold ${isCbiQualified ? "text-emerald-700" : "text-brass-text"}`}
                 >
-                  {cbiProgressPercent}% of Threshold
+                  {cbiProgressPercent}%
                 </span>
               </div>
 
@@ -289,16 +283,11 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="mt-3 text-xs leading-relaxed">
                 {isCbiQualified ? (
                   <p className="text-emerald-900 font-medium">
-                    <strong>Advisory investment target reached.</strong> Eligibility requires independent confirmation. Price alone does not establish eligibility.
+                    {t.calculator.cbiExceeds}
                   </p>
                 ) : (
                   <p className="text-muted-foreground">
-                    Requires additional{" "}
-                    <strong>${cbiDeficitUsd.toLocaleString("en-US")} USD</strong> to qualify.{" "}
-                    <em>
-                      Note: Multiple properties across Istanbul can be combined in a single
-                      application to meet the $400,000 threshold.
-                    </em>
+                    {t.calculator.cbiShortfall}: ${cbiDeficitUsd.toLocaleString("en-US")} USD
                   </p>
                 )}
               </div>
@@ -309,14 +298,14 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
           <div className="card-elevate rounded-xs border border-border/90 bg-card/95 backdrop-blur-md p-6 shadow-md flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between border-b border-border/70 pb-3 font-mono text-[11px] text-muted-foreground uppercase tracking-widest">
-                <span>Fee Classification</span>
-                <span>Estimated amount (USD)</span>
+                <span>{t.calculator.summaryTitle}</span>
+                <span>USD</span>
               </div>
 
               <div className="mt-4 divide-y divide-border/60 text-sm">
                 {/* 1. Base Price */}
                 <div className="py-2.5 flex items-center justify-between">
-                  <span className="font-medium text-foreground">Base Property Purchase Price</span>
+                  <span className="font-medium text-foreground">{t.calculator.propertyPriceLabel}</span>
                   <span className="font-mono font-semibold text-foreground">
                     ${priceUsd.toLocaleString("en-US")}
                   </span>
@@ -325,9 +314,9 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 {/* 2. Title Deed Tax */}
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
-                    <p className="text-foreground">Title Deed Transfer Tax (Tapu Harcı)</p>
+                    <p className="text-foreground">{t.calculator.tapuDeedTax}</p>
                     <p className="text-[10px] text-muted-foreground font-mono">
-                      {tapuRate * 100}% of official registry valuation
+                      {tapuRate * 100}%
                     </p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
@@ -338,25 +327,22 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 {/* 3. VAT */}
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
-                    <p className="text-foreground">VAT (KDV)</p>
+                    <p className="text-foreground">{t.calculator.vatTax}</p>
                     <p className="text-[10px] text-muted-foreground font-mono">
-                      {vatExempt ? "Foreigner Law 3065 Exempt" : "Standard 1% rate"}
+                      {vatExempt ? "0%" : "1%"}
                     </p>
                   </div>
                   <span
                     className={`font-mono font-semibold ${vatExempt ? "text-emerald-700" : "text-foreground"}`}
                   >
-                    {vatExempt ? "$0 (Exempt)" : `$${vatUsd.toLocaleString("en-US")}`}
+                    {vatExempt ? "$0" : `$${vatUsd.toLocaleString("en-US")}`}
                   </span>
                 </div>
 
                 {/* 4. SPK Valuation */}
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
-                    <p className="text-foreground">Official SPK Valuation Report</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">
-                      Statutory certified appraiser audit
-                    </p>
+                    <p className="text-foreground">{t.calculator.spkValuation}</p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
                     ${spkValuationUsd.toLocaleString("en-US")}
@@ -366,10 +352,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 {/* 5. Notary & DAB */}
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
-                    <p className="text-foreground">Notary, DAB & Sworn Translation</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">
-                      Central Bank currency exchange certificate
-                    </p>
+                    <p className="text-foreground">{t.calculator.notaryDab}</p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
                     ${notaryDabUsd.toLocaleString("en-US")}
@@ -379,10 +362,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 {/* 6. Legal Due Diligence */}
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
-                    <p className="text-foreground">Independent Legal & Title Checks</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">
-                      Full contract review & title deed verification
-                    </p>
+                    <p className="text-foreground">{t.calculator.legalReview}</p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
                     ${legalFeeUsd.toLocaleString("en-US")}
@@ -393,7 +373,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               {/* Total Summary Box */}
               <div className="mt-6 rounded-xs border border-brass/50 bg-secondary/40 p-4.5 space-y-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Total estimated purchase costs</span>
+                  <span>{t.calculator.closingCostsTotal}</span>
                   <span className="font-mono font-bold text-brass">
                     {closingPercentage}% (+${totalClosingCostsUsd.toLocaleString("en-US")})
                   </span>
@@ -401,7 +381,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
 
                 <div className="flex items-baseline justify-between border-t border-border/80 pt-2">
                   <span className="font-display text-lg font-semibold text-foreground">
-                    Estimated Total Investment
+                    {t.calculator.totalAcquisitionCost}
                   </span>
                   <span className="font-display text-2xl font-bold text-foreground tracking-tight">
                     ${allInAcquisitionUsd.toLocaleString("en-US")}
@@ -419,21 +399,21 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border/60 pt-4 text-xs">
                 <div className="rounded border border-border/60 bg-card p-3">
                   <p className="text-[10px] font-mono uppercase text-muted-foreground">
-                    Est. Monthly Rental
+                    {t.calculator.estimatedMonthlyNetRent}
                   </p>
                   <p className="font-mono text-base font-semibold text-foreground mt-0.5">
                     ${monthlyRentalUsd.toLocaleString("en-US")}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">At 7.2% Net USD Yield</p>
+                  <p className="text-[10px] text-muted-foreground">7.2% Net USD</p>
                 </div>
                 <div className="rounded border border-border/60 bg-card p-3">
                   <p className="text-[10px] font-mono uppercase text-muted-foreground">
-                    3-Yr Cumulative Rental
+                    {t.calculator.estimatedNetRentAnnual}
                   </p>
                   <p className="font-mono text-base font-semibold text-brass mt-0.5">
                     ${threeYearRentalUsd.toLocaleString("en-US")}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">USD Cashflow Projection</p>
+                  <p className="text-[10px] text-muted-foreground">3-Yr Cumulative</p>
                 </div>
               </div>
             </div>
@@ -447,7 +427,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 className="btn btn-primary w-full justify-center gap-2 shadow-sm !min-h-11 btn-shimmer"
               >
                 <MessageSquare className="h-4 w-4 text-brass" />
-                <span>Consult Legal Advisor on This Calculation</span>
+                <span>{t.calculator.whatsappShare}</span>
               </a>
             </div>
           </div>

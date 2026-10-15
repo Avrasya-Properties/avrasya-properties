@@ -1,21 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { PageIntro } from "./Chrome";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export function LegalDraft({ title, topics }: { title: string; topics: string[] }) {
+  const { t } = useTranslation();
   return (
     <>
-      <PageIntro eyebrow="Legal · Draft pending approval" title={title}>
-        <p>
-          This document has not yet been approved by Avrasya Properties. Final wording will be
-          published after legal review.
-        </p>
+      <PageIntro eyebrow={t.legalDraft.eyebrow} title={title}>
+        <p>{t.legalDraft.unapproved}</p>
       </PageIntro>
       <div className="container-site max-w-3xl py-14">
         <p className="rounded-sm border border-brass bg-warn-bg p-4 text-sm">
-          Status: pending approved text. Nothing on this page should be read as a finalised policy.
+          {t.legalDraft.status}
         </p>
         <h2 className="mt-10 font-sans text-lg font-semibold">
-          The approved version is expected to cover
+          {t.legalDraft.expected}
         </h2>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           {topics.map((t) => (
@@ -23,9 +22,9 @@ export function LegalDraft({ title, topics }: { title: string; topics: string[] 
           ))}
         </ul>
         <p className="mt-10 text-sm">
-          Questions in the meantime?{" "}
+          {t.legalDraft.questions}{" "}
           <Link to="/contact" className="underline">
-            Contact our team
+            {t.legalDraft.contactTeam}
           </Link>
           .
         </p>

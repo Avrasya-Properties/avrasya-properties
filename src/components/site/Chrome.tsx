@@ -4,6 +4,8 @@ import { Heart, Globe, Menu, X, MessageSquare, Phone, ShieldCheck } from "lucide
 import { CONTACT, type SupportedCurrency } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLiveContact } from "@/hooks/useLiveContact";
+import { useLanguage } from "@/hooks/useLanguage";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Magnetic } from "./Motion";
 import { IstanbulSkyline } from "./IstanbulSkyline";
 
@@ -24,16 +26,6 @@ export function Logo({
   );
 }
 
-const NAV = [
-  { to: "/properties", label: "Properties" },
-  { to: "/calculator", label: "Calculator" },
-  { to: "/why-turkiye", label: "Why Türkiye" },
-  { to: "/investment-in-turkiye", label: "Investing" },
-  { to: "/citizenship", label: "Citizenship" },
-  { to: "/services", label: "Services" },
-  { to: "/about", label: "About" },
-] as const;
-
 export function Header() {
   const path = useRouterState({select:s=>s.location.pathname});
   const menuButton=useRef<HTMLButtonElement>(null);
@@ -46,7 +38,18 @@ export function Header() {
   const [currency, setCurrency] = useCurrency();
   const { count: shortlistCount } = useShortlist();
   const contact = useLiveContact();
+  const { t, isRtl } = useLanguage();
   const [time, setTime] = useState("");
+
+  const navItems = [
+    { to: "/properties", label: t.nav.properties },
+    { to: "/calculator", label: t.nav.calculator },
+    { to: "/why-turkiye", label: t.nav.whyTurkiye },
+    { to: "/investment-in-turkiye", label: t.nav.investing },
+    { to: "/citizenship", label: t.nav.citizenship },
+    { to: "/services", label: t.nav.services },
+    { to: "/about", label: t.nav.about },
+  ] as const;
 
   useEffect(()=>setOpen(false),[path]);
   useEffect(()=>{
@@ -111,15 +114,23 @@ export function Header() {
           <div className="flex items-center gap-3">
             <span className="flex items-center font-medium text-brass text-[0.74rem]">
               <span className="pulse-live h-1.5 w-1.5 rounded-full bg-emerald-400 mr-2" />
-              Bosphorus Advisory Desk · {time || "Istanbul"}
+              {t.nav.advisoryDesk.replace("Istanbul", time || "Istanbul")}
             </span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
+            {/* Language Switcher in top bar */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-on-dark-muted/70 text-[0.68rem] uppercase font-semibold">
+                {t.nav.language}
+              </span>
+              <LanguageSwitcher variant="topbar" />
+            </div>
+
             {/* Currency switcher in top bar */}
             <div className="flex items-center gap-2">
               <span className="text-on-dark-muted/70 text-[0.68rem] uppercase font-semibold">
-                Currency:
+                {t.nav.currency}
               </span>
               <div className="flex rounded border border-on-dark/20 bg-primary/40 p-0.5">
                 {(["USD", "EUR", "TRY", "GBP"] as SupportedCurrency[]).map((c) => (
@@ -166,8 +177,8 @@ export function Header() {
             <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" />
           </Link>
 
-          <nav className="hidden items-center gap-6 xl:flex" aria-label="Main">
-            {NAV.map((n) => (
+          <nav className="hidden items-center gap-5 xl:flex" aria-label="Main">
+            {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
@@ -178,18 +189,21 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 xl:flex">
+          <div className="hidden items-center gap-2.5 xl:flex">
+            {/* Interactive Language Selector */}
+            <LanguageSwitcher variant="navbar" />
+
             {/* Shortlist Badge Button */}
             <Link
               to="/properties"
               search={{ savedOnly: true }}
               className="relative flex h-10 items-center gap-1.5 rounded-sm border border-border/80 bg-card/60 backdrop-blur-xs px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:border-brass hover:text-foreground hover:bg-card transition-all duration-300"
-              title="View your saved property shortlist"
+              title={t.nav.viewShortlist}
             >
               <Heart
                 className={`h-3.5 w-3.5 transition-transform duration-300 hover:scale-110 ${shortlistCount > 0 ? "fill-destructive text-destructive" : ""}`}
               />
-              <span>Saved</span>
+              <span>{t.nav.saved}</span>
               {shortlistCount > 0 && (
                 <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold text-primary animate-pulse">
                   {shortlistCount}
@@ -203,24 +217,25 @@ export function Header() {
               rel="noreferrer"
               className="btn btn-outline hover:border-brass gap-1.5 transition-all duration-300"
             >
-              <MessageSquare className="h-3.5 w-3.5 text-brass" /> WhatsApp
+              <MessageSquare className="h-3.5 w-3.5 text-brass" /> {t.nav.whatsApp}
             </a>
 
             <Magnetic>
-              <Link to="/contact" className="btn btn-primary btn-shimmer shadow-xs">
-                Book Consultation
+              <Link to="/contact" className="btn btn-primary btn-shimmer shadow-xs whitespace-nowrap">
+                {t.nav.bookConsultation}
               </Link>
             </Magnetic>
           </div>
 
           <div className="flex shrink-0 items-center gap-1 xl:hidden">
+            <LanguageSwitcher variant="topbar" className="mr-1" />
             <Link to="/properties" search={{savedOnly:true}} aria-label={`Saved properties (${shortlistCount})`} className="relative flex h-11 w-11 items-center justify-center rounded border border-border"><Heart className="h-4 w-4"/>{shortlistCount>0&&<span className="absolute right-0 top-0 rounded bg-brass px-1 text-[10px]">{shortlistCount}</span>}</Link>
             <button
               ref={menuButton}
               className="flex h-11 w-11 items-center justify-center rounded border border-border bg-card"
               aria-expanded={open}
               aria-controls="mobile-nav"
-              aria-label={open?"Close menu":"Open menu"}
+              aria-label={open?t.nav.closeMenu:t.nav.openMenu}
               onClick={() => {if(!open)sizeMenu();setOpen((o) => !o);}}
             >
               {open ? <X className="h-5 w-5"/> : <Menu className="h-5 w-5"/>}
@@ -236,7 +251,7 @@ export function Header() {
         >
           <nav ref={menu} className="min-h-0" aria-label="Mobile">
             <div className="container-site flex flex-col py-3 space-y-1">
-              {[{to:"/",label:"Home"} as const,...NAV, { to: "/contact", label: "Contact" } as const].map((n) => (
+              {[{to:"/",label:t.nav.home} as const,...navItems, { to: "/contact", label: t.nav.contact } as const].map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
@@ -246,7 +261,11 @@ export function Header() {
                   {n.label}
                 </Link>
               ))}
-              <label className="block pt-4 pb-2 text-sm">Display currency<select aria-label="Display currency" value={currency} onChange={e=>setCurrency(e.target.value as SupportedCurrency)} className="field mt-2"><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="TRY">TRY (₺)</option><option value="GBP">GBP (£)</option></select></label>
+
+              {/* Mobile Language Switcher */}
+              <LanguageSwitcher variant="mobile" />
+
+              <label className="block pt-3 pb-2 text-sm">{t.nav.displayCurrency}<select aria-label="Display currency" value={currency} onChange={e=>setCurrency(e.target.value as SupportedCurrency)} className="field mt-2"><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="TRY">TRY (₺)</option><option value="GBP">GBP (£)</option></select></label>
               <div className="pt-3 flex gap-2">
                 <a
                   href={contact.whatsapp}
@@ -261,7 +280,7 @@ export function Header() {
                   onClick={() => setOpen(false)}
                   className="btn btn-primary flex-1 justify-center"
                 >
-                  Consultation
+                  {t.nav.bookConsultation}
                 </Link>
               </div>
             </div>
@@ -274,24 +293,25 @@ export function Header() {
 
 export function Footer() {
   const contact = useLiveContact();
+  const { t } = useLanguage();
   const cols = [
     {
-      h: "Explore Portfolio",
+      h: t.footer.explorePortfolio,
       l: [
-        ["/properties", "All Offers & Projects"],
-        ["/calculator", "Acquisition & Yield Calculator"],
-        ["/citizenship", "Citizenship advice"],
-        ["/services", "Advisory services"],
-        ["/investment-catalog", "Investment catalogue"],
+        ["/properties", t.footer.allOffers],
+        ["/calculator", t.footer.acquisitionCalculator],
+        ["/citizenship", t.footer.citizenshipAdvice],
+        ["/services", t.footer.advisoryServices],
+        ["/investment-catalog", t.footer.investmentCatalog],
       ],
     },
     {
-      h: "Advisory & Market",
+      h: t.footer.advisoryMarket,
       l: [
-        ["/about", "About Avrasya Properties"],
-        ["/why-turkiye", "Why Türkiye (Location & Lifestyle)"],
-        ["/investment-in-turkiye", "Investor's Step-by-Step Journey"],
-        ["/contact", "Direct Istanbul Consultation"],
+        ["/about", t.footer.aboutAvrasya],
+        ["/why-turkiye", t.footer.whyTurkiyeNav],
+        ["/investment-in-turkiye", t.footer.investorJourney],
+        ["/contact", t.footer.directConsultation],
       ],
     },
   ] as const;
@@ -311,14 +331,13 @@ export function Footer() {
       <div className="container-site grid gap-10 py-12 md:py-16 md:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         <div className="space-y-4 text-sm text-on-dark-muted">
           <Logo className="h-10 sm:h-11" variant="light" />
-          <p className="text-on-dark font-medium">{contact.tagline}</p>
+          <p className="text-on-dark font-medium">{t.footer.tagline}</p>
           <p className="text-xs leading-relaxed text-on-dark-muted/80">
-            Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and
-            independent legal peace of mind.
+            {t.footer.description}
           </p>
           <div className="pt-2 flex items-center gap-3">
             <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-[0.7rem] font-semibold text-brass">
-              Istanbul Real Estate Advisory
+              {t.footer.realEstateAdvisoryBadge}
             </span>
           </div>
         </div>
@@ -339,22 +358,22 @@ export function Footer() {
         ))}
 
         <div className="text-sm text-on-dark-muted">
-          <p className="eyebrow !text-brass">Istanbul Headquarters</p>
+          <p className="eyebrow !text-brass">{t.footer.headquarters}</p>
           <ul className="mt-4 space-y-2.5 text-xs leading-relaxed">
             <li>
-              <strong className="text-on-dark block">Direct Advisory Email:</strong>
+              <strong className="text-on-dark block">{t.footer.directAdvisoryEmail}</strong>
               <a href={`mailto:${contact.email}`} className="hover:text-on-dark transition-colors">
                 {contact.email}
               </a>
             </li>
             <li>
-              <strong className="text-on-dark block">Direct & WhatsApp Line:</strong>
+              <strong className="text-on-dark block">{t.footer.directWhatsAppLine}</strong>
               <a href={contact.phoneHref} className="hover:text-on-dark transition-colors">
                 {contact.phone}
               </a>
             </li>
             <li>
-              <strong className="text-on-dark block">Office Address:</strong>
+              <strong className="text-on-dark block">{t.footer.officeAddress}</strong>
               <span>{contact.address}</span>
             </li>
           </ul>
@@ -363,34 +382,33 @@ export function Footer() {
 
       <div className="border-t border-on-dark/15">
         <div className="container-site py-6 text-xs leading-relaxed text-on-dark-muted/80">
-          Property prices, availability, and official citizenship regulations may be updated
-          periodically by Turkish authorities. Our team will verify all latest details and legal
-          requirements with you before signing any contract.
+          {t.footer.disclaimerNote}
         </div>
         <div
           className="container-site flex flex-col gap-3 pb-24 lg:pb-8 text-xs text-on-dark-muted md:flex-row md:items-center md:justify-between"
           style={{ paddingBottom: "max(5.5rem, calc(4rem + env(safe-area-inset-bottom, 0px)))" }}
         >
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span>© 2026 {contact.company}. All rights reserved.</span>
+            <span>© 2026 {contact.company}. {t.footer.rightsReserved}</span>
             <span className="text-on-dark-muted/40" aria-hidden="true">
               ·
             </span>
-            <span className="text-on-dark-muted/90 font-medium">Built by Zarif</span>
+            <span className="text-on-dark-muted/90 font-medium">{t.footer.builtBy}</span>
           </div>
-          <span className="flex flex-wrap gap-5 relative z-20">
+          <span className="flex flex-wrap items-center gap-5 relative z-20">
             <Link to="/privacy-policy" className="hover:text-on-dark transition-colors">
-              Privacy Policy
+              {t.footer.privacyPolicy}
             </Link>
             <Link to="/terms" className="hover:text-on-dark transition-colors">
-              Terms & Conditions
+              {t.footer.termsConditions}
             </Link>
             <Link to="/cookie-policy" className="hover:text-on-dark transition-colors">
-              Cookie Policy
+              {t.footer.cookiePolicy}
             </Link>
             <Link to="/investment-disclaimer" className="hover:text-on-dark transition-colors">
-              Investment Disclaimer
+              {t.footer.investmentDisclaimer}
             </Link>
+            <LanguageSwitcher variant="footer" />
           </span>
         </div>
       </div>
@@ -416,7 +434,7 @@ export function PageIntro({
     <section className="site-page-intro relative overflow-hidden border-b bg-primary text-on-dark">
       <div
         aria-hidden
-        className="pointer-events-none absolute right-4 lg:right-10 top-8 hidden select-none md:flex md:flex-col items-end text-right opacity-30 z-0"
+        className="pointer-events-none absolute right-4 lg:right-10 top-8 hidden select-none md:flex md:flex-col items-end text-right opacity-30 z-0 rtl:right-auto rtl:left-4 lg:rtl:left-10 rtl:items-start rtl:text-left"
       >
         <span className="outline-word outline-light text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
           AVRASYA
@@ -457,7 +475,8 @@ export function Margin({ label, children }: { label: string; children: React.Rea
 }
 
 export function CtaBand() {
-  const contact=useLiveContact();
+  const contact = useLiveContact();
+  const { t } = useLanguage();
   return (
     <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-20">
       {/* Art-Directed Family Backdrop with Feathered Side-Fades & Scrim */}
@@ -494,19 +513,18 @@ export function CtaBand() {
 
       <div className="container-site relative z-10 text-center">
         <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass backdrop-blur-md shadow-[0_0_15px_rgba(197,160,89,0.12)]">
-          Direct Istanbul Guidance
+          {t.cta.eyebrow}
         </span>
         <h2 className="headline mx-auto mt-4 max-w-2xl text-3xl md:text-4xl text-on-dark drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
-          Ready to find your dream property in Istanbul?
+          {t.cta.title}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-on-dark-muted text-sm md:text-base leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-          Speak directly with our team in Istanbul. Whether you are exploring neighborhoods,
-          seeking Turkish citizenship, or arranging a viewing, we are here to help.
+          {t.cta.description}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Magnetic>
             <Link to="/contact" className="btn btn-primary shadow-lg shadow-brass/20">
-              Request a Consultation
+              {t.cta.requestConsultation}
             </Link>
           </Magnetic>
           <a
@@ -515,7 +533,7 @@ export function CtaBand() {
             rel="noreferrer"
             className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md gap-1.5"
           >
-            <MessageSquare className="h-3.5 w-3.5 text-brass" /> Chat on WhatsApp
+            <MessageSquare className="h-3.5 w-3.5 text-brass" /> {t.cta.chatWhatsApp}
           </a>
         </div>
       </div>

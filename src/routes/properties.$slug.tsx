@@ -5,6 +5,8 @@ import {DEMO_MODE} from "@/lib/supabase";
 import {useWhatsAppLink} from "@/hooks/useLiveContact";
 import {MessageSquare} from "lucide-react";
 import {PropertyDetails} from "@/components/site/PropertyDetails";
+import {useTranslation} from "@/hooks/useLanguage";
+
 export const Route = createFileRoute("/properties/$slug")({
   loader: async ({ params,context }) => {
     const records=await loadCatalogue();
@@ -48,10 +50,18 @@ export const Route = createFileRoute("/properties/$slug")({
 });
 
 function Detail(){
+  const { t } = useTranslation();
   const loaded=Route.useLoaderData();const catalogue=useCatalogue();
   if(!loaded.record)return <Legacy/>;
   const record=catalogue.data?catalogue.properties.find(r=>r.slug===loaded.record!.slug):loaded.record;
-  if(!record)return <section className="container-site py-20"><h1 className="headline text-3xl">This listing is no longer published.</h1><Link to="/properties" className="btn btn-primary mt-5">Browse current properties</Link></section>;
+  if(!record)return (
+    <section className="container-site py-20">
+      <h1 className="headline text-3xl">{t.propertyDetail.notPublishedTitle}</h1>
+      <Link to="/properties" className="btn btn-primary mt-5">
+        {t.propertyDetail.browseCurrent}
+      </Link>
+    </section>
+  );
 
   const media = getPropertyMedia(record);
   const jsonLdListing = {
@@ -80,17 +90,18 @@ function Detail(){
   );
 }
 function Legacy() {
+  const { t } = useTranslation();
   const waLink=useWhatsAppLink();
   return (
     <div className="container-site max-w-2xl py-24 text-center">
-      <p className="eyebrow eyebrow-mark">Availability Under Review</p>
-      <h1 className="headline mt-3 text-3xl">We are currently re-confirming this listing.</h1>
+      <p className="eyebrow eyebrow-mark">{t.propertyDetail.toConfirm}</p>
+      <h1 className="headline mt-3 text-3xl">{t.propertyDetail.notPublishedTitle}</h1>
       <p className="mt-4 text-muted-foreground">
-        This listing is currently undergoing title deed and availability re-verification with the developer. You may browse our current source-verified offers or enquire directly.
+        {t.propertyDetail.notPublishedDesc}
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link to="/properties" className="btn btn-primary">
-          Browse Active Offers
+          {t.propertyDetail.browseCurrent}
         </Link>
         <a
           href={waLink("Hello Avrasya, I'd like to ask about an earlier property listing.")}
@@ -98,7 +109,7 @@ function Legacy() {
           rel="noreferrer"
           className="btn btn-outline gap-1.5"
         >
-          <MessageSquare className="h-4 w-4 text-brass" /> Enquire on WhatsApp
+          <MessageSquare className="h-4 w-4 text-brass" /> {t.cta.whatsappDirect}
         </a>
       </div>
     </div>
