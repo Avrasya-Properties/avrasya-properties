@@ -415,16 +415,15 @@ function HomeCollection({
                 <p className="eyebrow !text-brass-text">{t.home.editorialEyebrow}</p>
               </div>
               <h2 className="headline text-3xl md:text-5xl text-foreground">
-                {t.home.editorialTitle} <em className="italic text-brass font-normal">{t.home.editorialTitleEm}</em>
+                {settings.websiteDesign?.["homeCollectionTitle"] || (
+                  <>
+                    {t.home.editorialTitle} <em className="italic text-brass font-normal">{t.home.editorialTitleEm}</em>
+                  </>
+                )}
               </h2>
             </div>
             <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-              {t.home.editorialSubtitle}
-                {settings.websiteDesign?.["homeCollectionTitle"]||<>Selected properties & <em className="italic text-brass font-normal">Locations</em></>}
-              </h2>
-            </div>
-            <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-              {settings.websiteDesign?.["homeCollectionText"]||"Explore handpicked homes across Istanbul’s top European and Asian neighborhoods. Our dedicated advisors are here to answer your questions on pricing, citizenship benefits, and private viewings."}
+              {settings.websiteDesign?.["homeCollectionText"] || t.home.editorialSubtitle}
             </p>
           </div>
 
