@@ -43,7 +43,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company details", "Homepage", "Website appearance", "Search filters", "Exchange rates", "Export data"] as const;
+const TABS = ["Company details", "Homepage", "Website appearance", "SEO & Search", "Search filters", "Exchange rates", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
@@ -621,8 +621,6 @@ export function AdminSettingsPage() {
         </div>
       )}
 
-      {/* TAB 3: Taxonomy & Filters (Regions, Apartment Layouts, Budgets) */}
-      {tab === "Taxonomy & Filters" && (
       {/* TAB 3: Search filters (Regions, Apartment Layouts, Budgets) */}
       {tab === "Search filters" && (
         <div className="max-w-4xl space-y-6">

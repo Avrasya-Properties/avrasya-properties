@@ -146,6 +146,4 @@ export function useFaqs(){return useQuery({queryKey:["faqs"],queryFn:async()=>{
   }
   const {data,error}=await publicSupabase.from("faqs").select("id,question,answer,category").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;question:string;answer:string;category:string}[];
 },staleTime:15000,refetchInterval:30000});}
-export function useServices(){return useQuery({queryKey:["services"],enabled:!DEMO_MODE,queryFn:async()=>{const {data,error}=await publicSupabase.from("services").select("id,title,category,description,process_steps").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;title:string;category:string|null;description:string;process_steps:unknown[]}[];},staleTime:15000,refetchInterval:30000});}
-export function useFaqs(){return useQuery({queryKey:["faqs"],enabled:!DEMO_MODE,queryFn:async()=>{const {data,error}=await publicSupabase.from("faqs").select("id,question,answer,category").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;question:string;answer:string;category:string}[];},staleTime:15000,refetchInterval:30000});}
 

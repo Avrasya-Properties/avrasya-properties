@@ -42,7 +42,7 @@ export const MODULES=[
  {name:"Availability history",table:"availability_history",readonly:true,fields:[]},
  {name:"Publication history",table:"publication_history",readonly:true,fields:[]},
  {name:"Change history",table:"audit_events",readonly:true,admin:true,fields:[]},
-] as {name:string;table:string;fields:Field[];admin?:boolean;readonly?:boolean;existingOnly?:boolean}[];
+] as {name:string;table:string;fields:Field[];admin?:boolean;readonly?:boolean;existingOnly?:boolean;appendOnly?:boolean}[];
 
 const DEMO_STORE_KEY = "avrasya_admin_manage_demo_v2";
 
@@ -135,8 +135,6 @@ export async function managedRows(table:string):Promise<Row[]>{
  return fetchRows(table);
 }
 
-] as {name:string;table:string;fields:Field[];admin?:boolean;readonly?:boolean;existingOnly?:boolean;appendOnly?:boolean}[];
-export async function managedRows(table:string){if(!MODULES.some(m=>m.table===table)&&!["contacts","marketing_offers","deals"].includes(table))throw new Error("Unsupported management module");return fetchRows(table);}
 export async function saveManaged(table:string,data:Row,original:Row|null){
  const module=MODULES.find(m=>m.table===table);if(!module||module.readonly)throw new Error("This module is read-only");
  const payload:Row={};

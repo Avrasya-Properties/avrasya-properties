@@ -100,9 +100,7 @@ export function Enquiry({
       return setErr(t.enquiry.email + " *");
     if (!v.email.trim() && v.phone.replace(/\D/g, "").length < 7)
       return setErr(t.enquiry.phone + " *");
-    if (!compact && !consent) return setErr(t.enquiry.termsConsent);
-      return setErr("Please provide a contact phone number or email.");
-    if (!DEMO_MODE && !consent) return setErr("Please consent to being contacted.");
+    if (!DEMO_MODE && !consent) return setErr(t.enquiry.termsConsent || "Please consent to being contacted.");
 
     setBusy(true);
     try {
