@@ -51,4 +51,12 @@ select test.ok(public.admin_login_begin('admin@avrasyaproperties.com',gen_random
 select test.ok(public.admin_mail_worker_valid((select credential from private.admin_security_worker)),'Private generated worker credential is accepted');
 select test.ok(not public.admin_mail_worker_valid(repeat('x',72)),'Forged worker credential is rejected');
 select test.ok(not has_table_privilege('authenticated','private.admin_security_worker','select'),'Browser cannot read the worker credential');
+set local role authenticated;
+do $$begin
+ begin
+ update public.staff_profiles set email='broken-identity@example.test' where id='00000000-0000-4000-8000-000000000901';
+ raise exception 'FAILED: direct profile email change should be rejected';
+ exception when check_violation then raise notice 'PASS: direct profile email edit cannot break Auth identity';end;
+end$$;
+reset role;
 rollback;

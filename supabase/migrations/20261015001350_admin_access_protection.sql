@@ -171,3 +171,12 @@ do $$begin
   execute $sql$select cron.schedule('avrasya-security-alerts','* * * * *','select private.send_admin_security_alerts()')$sql$;
  end if;
 end$$;
+-- The team editor already keeps sign-in email read-only; enforce that on direct
+-- browser API updates too, so profile and Auth identities cannot drift apart.
+create function private.guard_staff_login_email() returns trigger language plpgsql set search_path='' as $$
+begin
+ if new.email is distinct from old.email then raise exception 'Sign-in email must be changed through Authentication, together with the team record.' using errcode='23514';end if;
+ return new;
+end $$;
+revoke all on function private.guard_staff_login_email() from public,anon,authenticated;
+create trigger guard_staff_login_email before update on public.staff_profiles for each row when(current_user='authenticated') execute function private.guard_staff_login_email();

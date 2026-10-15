@@ -76,7 +76,7 @@ export async function linkUnit(offerId:string,unitId:string,version:number){awai
 export async function expireReservations(){return rpc<number>("expire_reservations",{});}
 
 export const ROLE_NAMES:Record<string,string>={admin:"Administrator",manager:"Office manager",agent:"Agent",viewer:"View only"};
-export const PAGE_NAMES:Record<string,string>={about:"About us",services:"Services",citizenship:"Citizenship", "why-turkiye":"Why Türkiye","investment-in-turkiye":"Investing in Türkiye","investment-catalog":"Property brochure","privacy-policy":"Privacy policy",terms:"Terms and conditions","cookie-policy":"Cookie policy","investment-disclaimer":"Investment disclaimer"};
+export const PAGE_NAMES:Record<string,string>={home:"Homepage",contact:"Contact",about:"About us",services:"Services",citizenship:"Citizenship", "why-turkiye":"Why Türkiye","investment-in-turkiye":"Investing in Türkiye","investment-catalog":"Property brochure","privacy-policy":"Privacy policy",terms:"Terms and conditions","cookie-policy":"Cookie policy","investment-disclaimer":"Investment disclaimer"};
 export function recordName(row:Row){return String(row["marketing_title"]||row["name"]||row["title"]||row["option_name"]||row["milestone_name"]||row["payment_reference"]||row["question"]||row["company_name"]||row["filename"]||row["unit_number"]||row["email"]||(row["start_date"]?"Lease from "+row["start_date"]:"Unnamed record"));}
 export function editorRecord(row:Row|null,table:string):Row{
  const result:Row=row?{...row}:{city:"Istanbul",side:"unknown",status:table==="maintenance_tickets"?"reported":table==="leases"?"draft":"Unknown",role:"agent",is_active:true,is_published:false,published_status:"Draft",sort_order:0};
