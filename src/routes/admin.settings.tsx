@@ -44,7 +44,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company details", "Homepage", "Website appearance", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
+const TABS = ["Company details", "Homepage", "SEO & Search", "Website appearance", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
