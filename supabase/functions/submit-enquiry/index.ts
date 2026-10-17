@@ -1,5 +1,6 @@
 // Public submission endpoint. Custom project-key authentication; no privileged key reaches the browser.
-const projectKey="sb_publishable_vmlTaa9tPFNuR3z_ADhOfA_XeH4oHUx";
+// Override with the WEBSITE_PUBLISHABLE_KEY secret when the project key is rotated or a staging project is used.
+const projectKey=Deno.env.get("WEBSITE_PUBLISHABLE_KEY")||"sb_publishable_vmlTaa9tPFNuR3z_ADhOfA_XeH4oHUx";
 const json=(body:unknown,status:number,headers:HeadersInit)=>new Response(JSON.stringify(body),{status,headers:{"Content-Type":"application/json","Cache-Control":"no-store",...headers}});
 const hash=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value)))).map(x=>x.toString(16).padStart(2,"0")).join("");
 Deno.serve(async(req:Request)=>{

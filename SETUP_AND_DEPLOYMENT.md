@@ -16,7 +16,7 @@
    ```
 2. Configure credentials:
    - `VITE_SUPABASE_URL`: Your Supabase API URL.
-   - `VITE_SUPABASE_ANON_KEY`: Public anon publishable key.
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`: Public publishable key (the older name `VITE_SUPABASE_ANON_KEY` is not read by the code).
    - `SUPABASE_SERVICE_ROLE_KEY`: Secret service-role key (server only, never commit).
 
 ---
@@ -39,6 +39,10 @@ All schema definitions, triggers, and functions are tracked under `supabase/migr
 To apply migrations on a new environment:
 
 ```bash
+# CAUTION: do NOT run `supabase db push` against the live project without review (see docs/BACKEND_DEPLOYMENT.md).
+# The original remote migrations were not reconstructed, so replaying every file can fail on non-idempotent policies.
+# Apply new migrations (for example 20261017000001_regions_and_snapshot_hardening.sql) one at a time via the
+# Supabase SQL editor after testing on a staging copy.
 supabase db push
 # OR apply files sequentially with psql / Supabase SQL Editor
 ```

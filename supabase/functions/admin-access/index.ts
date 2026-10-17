@@ -1,8 +1,13 @@
 // Public password entry point; privileged actions below require a verified live session.
 // No credentials, recovery tokens, or complete email provider responses are logged.
-const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS'};
-const respond=(body:unknown,status=200)=>Response.json(body,{status,headers:{...cors,'Cache-Control':'no-store'}});
+// Browsers may call this only from the published website origins (WEBSITE_ALLOWED_ORIGINS, comma separated).
+// Server-to-server callers (the alert worker) send no Origin header and are unaffected. While the variable is
+// unset the previous open behaviour is kept, so a missing secret can never lock staff out of sign-in.
+const corsFor=(req:Request)=>{const allowed=(Deno.env.get('WEBSITE_ALLOWED_ORIGINS')||'').split(',').map(x=>x.trim()).filter(Boolean);const origin=req.headers.get('origin')||'';return {ok:!allowed.length||!origin||allowed.includes(origin),headers:{'Access-Control-Allow-Origin':!allowed.length?'*':allowed.includes(origin)?origin:'null','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-client-info','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin'}};};
 Deno.serve(async(req:Request)=>{
+ const {ok:originOk,headers:cors}=corsFor(req);
+ const respond=(body:unknown,status=200)=>Response.json(body,{status,headers:{...cors,'Cache-Control':'no-store'}});
+ if(!originOk)return respond({error:'Origin not allowed.'},403);
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
  if(req.method!=='POST')return respond({error:'Use POST.'},405);
  const base=Deno.env.get('SUPABASE_URL'),secret=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
