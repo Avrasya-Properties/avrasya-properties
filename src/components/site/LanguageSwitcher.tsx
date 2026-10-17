@@ -4,7 +4,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import type { Locale, LocaleConfig } from "@/i18n";
 
 interface LanguageSwitcherProps {
-  variant?: "topbar" | "navbar" | "mobile" | "footer";
+  variant?: "topbar" | "navbar" | "compact" | "mobile" | "footer";
   className?: string;
 }
 
@@ -100,7 +100,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
         {open && (
           <div
             role="listbox"
-            className="absolute top-full z-50 mt-1 min-w-[150px] overflow-hidden rounded-xs border border-brass/30 bg-[#0C1E23]/95 p-1 backdrop-blur-xl shadow-[0_12px_36px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-150 ltr:right-0 rtl:left-0"
+            className="absolute top-full z-50 mt-1 min-w-[150px] overflow-hidden rounded-xs border border-brass/30 bg-night p-1 shadow-[0_12px_36px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-150 ltr:right-0 rtl:left-0"
             style={{ [isRtl ? "left" : "right"]: 0 }}
           >
             <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-brass/80 border-b border-white/10 mb-1">
@@ -186,7 +186,8 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
     );
   }
 
-  // Navbar Switcher (Standard Desktop Header)
+  // Navbar Switcher (Standard Desktop Header); "compact" is the same control sized for the mobile header
+  const compact = variant === "compact";
   return (
     <div ref={containerRef} className={`relative inline-flex items-center ${className}`}>
       <button
@@ -195,9 +196,9 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label="Change language"
-        className="group flex h-10 items-center gap-2 rounded-xs border border-border/80 bg-card/70 px-3 text-xs font-semibold text-foreground backdrop-blur-md transition-all duration-300 hover:border-brass hover:bg-card hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass"
+        className={`group flex items-center gap-2 rounded-xs border border-border bg-card text-xs font-semibold text-foreground transition-colors duration-300 hover:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass ${compact ? "h-11 px-2.5" : "h-10 px-3"}`}
       >
-        <Globe className="h-3.5 w-3.5 text-brass transition-transform duration-300 group-hover:scale-110" />
+        {!compact && <Globe className="h-3.5 w-3.5 text-brass" />}
         <span className="select-none text-sm">{config.flag}</span>
         <span className="uppercase tracking-wider font-bold text-foreground text-[0.72rem]">
           {config.code}
@@ -212,7 +213,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
       {open && (
         <div
           role="listbox"
-          className="absolute top-full z-50 mt-2 min-w-[170px] overflow-hidden rounded-xs border border-border/80 bg-card/95 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+          className="absolute top-full z-50 mt-2 min-w-[170px] overflow-hidden rounded-xs border border-border bg-card p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-150"
           style={{ [isRtl ? "left" : "right"]: 0 }}
         >
           <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/50 mb-1">

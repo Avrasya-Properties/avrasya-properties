@@ -41,7 +41,6 @@ export function Header() {
   const { count: shortlistCount } = useShortlist();
   const contact = useLiveContact();
   const { t, isRtl } = useLanguage();
-  const [time, setTime] = useState("");
 
   const navItems = [
     { to: "/properties", label: t.nav.properties },
@@ -77,28 +76,7 @@ export function Header() {
     const on = () => setScrolled(window.scrollY > 8);
     on();
     window.addEventListener("scroll", on, { passive: true });
-
-    // Istanbul local time
-    const updateTime = () => {
-      try {
-        const ist = new Intl.DateTimeFormat("en-GB", {
-          timeZone: "Europe/Istanbul",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }).format(new Date());
-        setTime(`${ist} TRT`);
-      } catch {
-        setTime("Istanbul");
-      }
-    };
-    updateTime();
-    const timer = setInterval(updateTime, 30000);
-
-    return () => {
-      window.removeEventListener("scroll", on);
-      clearInterval(timer);
-    };
+    return () => window.removeEventListener("scroll", on);
   }, []);
 
   return (
@@ -114,10 +92,7 @@ export function Header() {
       <div className="hidden border-b bg-primary text-on-dark md:block">
         <div className="container-site flex h-9 items-center justify-between text-[0.72rem] tracking-wide text-on-dark-muted">
           <div className="flex items-center gap-3">
-            <span className="flex items-center font-medium text-brass text-[0.74rem]">
-              <span className="pulse-live h-1.5 w-1.5 rounded-full bg-emerald-400 mr-2" />
-              {t.nav.advisoryDesk.replace("Istanbul", time || "Istanbul")}
-            </span>
+            <span className="font-medium text-brass-light text-[0.74rem]">{contact.advisoryHours}</span>
           </div>
 
           <div className="flex items-center gap-5">
@@ -164,17 +139,15 @@ export function Header() {
       {/* Main Glassmorphic Navbar */}
       <header
         ref={headerElement}
-        className={`site-header sticky top-0 z-40 h-16 border-b transition-all duration-300 md:h-[74px] ${
-          scrolled
-            ? "border-border/80 bg-background/85 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
-            : "border-border/40 bg-background/70 backdrop-blur-md"
+        className={`site-header sticky top-0 z-40 h-16 border-b bg-background transition-shadow duration-300 md:h-[74px] ${
+          scrolled ? "border-border shadow-[0_8px_30px_rgb(0,0,0,0.05)]" : "border-border/60"
         }`}
       >
         <div className="container-site flex h-full items-center justify-between gap-4">
           <Link
             to="/"
             aria-label="Avrasya Properties home"
-            className="transition-transform duration-300 hover:scale-[1.01]"
+            className="inline-flex min-h-11 items-center"
           >
             <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" />
           </Link>
@@ -199,7 +172,7 @@ export function Header() {
             <Link
               to="/properties"
               search={{ savedOnly: true }}
-              className="relative flex h-10 items-center gap-1.5 rounded-sm border border-border/80 bg-card/60 backdrop-blur-xs px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:border-brass hover:text-foreground hover:bg-card transition-all duration-300"
+              className="relative flex h-10 items-center gap-1.5 rounded-sm border border-border/80 bg-card px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:border-brass hover:text-foreground transition-colors duration-300"
               title={t.nav.viewShortlist}
             >
               <Heart
@@ -207,7 +180,7 @@ export function Header() {
               />
               <span>{t.nav.saved}</span>
               {shortlistCount > 0 && (
-                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold text-primary animate-pulse">
+                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold text-primary">
                   {shortlistCount}
                 </span>
               )}
@@ -223,14 +196,14 @@ export function Header() {
             </a>
 
             <Magnetic>
-              <Link to="/contact" className="btn btn-primary btn-shimmer shadow-xs whitespace-nowrap">
+              <Link to="/contact" className="btn btn-primary whitespace-nowrap">
                 {t.nav.bookConsultation}
               </Link>
             </Magnetic>
           </div>
 
           <div className="flex shrink-0 items-center gap-1 xl:hidden">
-            <LanguageSwitcher variant="topbar" className="mr-1" />
+            <LanguageSwitcher variant="compact" className="me-1" />
             <Link to="/properties" search={{savedOnly:true}} aria-label={`Saved properties (${shortlistCount})`} className="relative flex h-11 w-11 items-center justify-center rounded border border-border"><Heart className="h-4 w-4"/>{shortlistCount>0&&<span className="absolute right-0 top-0 rounded bg-brass px-1 text-[10px]">{shortlistCount}</span>}</Link>
             <button
               ref={menuButton}
@@ -340,7 +313,7 @@ export function Footer() {
             {settings.websiteDesign?.["footerNote"]??"Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and independent legal peace of mind."}
           </p>
           <div className="pt-2 flex items-center gap-3">
-            <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3 py-1 text-[0.7rem] font-semibold text-brass">
+            <span className="inline-flex items-center border border-brass/40 px-3 py-1 text-[0.7rem] font-semibold text-brass-light">
               {t.footer.realEstateAdvisoryBadge}
             </span>
           </div>
@@ -393,7 +366,7 @@ export function Footer() {
           style={{ paddingBottom: "max(5.5rem, calc(4rem + env(safe-area-inset-bottom, 0px)))" }}
         >
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span>© 2026 {contact.company}. {t.footer.rightsReserved}</span>
+            <span>© {new Date().getFullYear()} {contact.company}. {t.footer.rightsReserved}</span>
             <span className="text-on-dark-muted/40" aria-hidden="true">
               ·
             </span>
@@ -435,38 +408,22 @@ export function PageIntro({
 }) {
   const content = children ?? (description ? <p>{description}</p> : null);
   return (
-    <section className="site-page-intro relative overflow-hidden border-b bg-primary text-on-dark">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-4 lg:right-10 top-8 hidden select-none md:flex md:flex-col items-end text-right opacity-30 z-0 rtl:right-auto rtl:left-4 lg:rtl:left-10 rtl:items-start rtl:text-left"
-      >
-        <span className="outline-word outline-light text-[7.5rem] lg:text-[10rem] leading-[0.9] tracking-tight">
-          AVRASYA
-        </span>
-        <span className="outline-word outline-light text-[2.4rem] lg:text-[3.2rem] tracking-[0.32em] mt-1 uppercase leading-none pr-1">
-          PROPERTIES
-        </span>
-      </div>
-      <div className="container-site relative flex flex-col gap-5 py-9 md:flex-row md:items-end md:justify-between md:py-16">
+    <section className="site-page-intro relative overflow-hidden bg-night text-on-dark">
+      <div className="container-site relative flex flex-col gap-6 border-b border-white/10 py-12 md:flex-row md:items-end md:justify-between md:py-20">
         <div className="max-w-3xl">
-          <p className="eyebrow eyebrow-mark">{eyebrow}</p>
-          <h1 className="display-hero mt-3">
+          <p className="kicker text-brass-light">{eyebrow}</p>
+          <h1 className="display-hero mt-4 !text-[2.6rem] md:!text-[4.25rem]">
             <span className="split-line">
               <span style={{ ["--d" as string]: "80ms" }}>{title}</span>
             </span>
           </h1>
-          {content && (
-            <div className="mt-5 max-w-2xl text-base text-muted-foreground leading-relaxed">
-              {content}
-            </div>
-          )}
+          {content && <div className="mt-6 max-w-2xl text-base leading-relaxed text-on-dark-muted">{content}</div>}
         </div>
         {aside}
       </div>
     </section>
   );
 }
-
 export function Margin({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="container-site grid gap-6 py-14 md:grid-cols-[14rem_1fr] md:gap-12">
@@ -482,66 +439,24 @@ export function CtaBand() {
   const contact = useLiveContact();
   const { t } = useLanguage();
   return (
-    <section className="border-t bg-ink text-on-dark relative overflow-hidden py-16 md:py-20">
-      {/* Art-Directed Family Backdrop with Feathered Side-Fades & Scrim */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-        <img
-          src="/images/family-future.png"
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover object-center scale-105 opacity-25"
-          style={{
-            maskImage:
-              "radial-gradient(ellipse 75% 70% at 50% 45%, rgba(0,0,0,0.9) 20%, transparent 85%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, transparent 100%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 75% 70% at 50% 45%, rgba(0,0,0,0.9) 20%, transparent 85%), linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, transparent 100%)",
-            filter: "contrast(1.05) brightness(0.85)",
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, #07191e 0%, rgba(7,25,30,0.92) 15%, transparent 40%, transparent 60%, rgba(7,25,30,0.92) 85%, #07191e 100%)",
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, #07191e 0%, rgba(7,25,30,0.6) 20%, rgba(7,25,30,0.8) 80%, #07191e 100%)",
-          }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brass/15 via-transparent to-transparent pointer-events-none" />
-      </div>
-
-      <div className="container-site relative z-10 text-center">
-        <span className="inline-flex items-center rounded-full border border-brass/40 bg-brass/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-brass backdrop-blur-md shadow-[0_0_15px_rgba(197,160,89,0.12)]">
-          {t.cta.eyebrow}
-        </span>
-        <h2 className="headline mx-auto mt-4 max-w-2xl text-3xl md:text-4xl text-on-dark drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
-          {t.cta.title}
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-on-dark-muted text-sm md:text-base leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-          {t.cta.description}
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
+    <section className="relative overflow-hidden bg-night py-16 text-on-dark md:py-24">
+      <div className="container-site relative z-10 grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div>
+          <p className="kicker text-brass-light">{t.cta.eyebrow}</p>
+          <h2 className="headline mt-4 max-w-2xl text-on-dark">{t.cta.title}</h2>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-on-dark-muted md:text-base">{t.cta.description}</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
           <Magnetic>
-            <Link to="/contact" className="btn btn-primary shadow-lg shadow-brass/20">
+            <Link to="/contact" className="btn btn-light">
               {t.cta.requestConsultation}
             </Link>
           </Magnetic>
-          <a
-            href={contact.whatsapp}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-outline !border-white/20 !bg-white/10 !text-white hover:!bg-white/20 backdrop-blur-md gap-1.5"
-          >
-            <MessageSquare className="h-3.5 w-3.5 text-brass" /> {t.cta.chatWhatsApp}
+          <a href={contact.whatsapp} target="_blank" rel="noreferrer" className="btn gap-1.5 !border !border-white/30 !bg-transparent !text-white">
+            <MessageSquare className="h-3.5 w-3.5" /> {t.cta.chatWhatsApp}
           </a>
         </div>
       </div>
     </section>
   );
 }
-

@@ -50,6 +50,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const isRtl = isRtlLocale(l);
       document.documentElement.lang = l;
       document.documentElement.dir = isRtl ? "rtl" : "ltr";
+      // Arabic/Persian faces are only downloaded when an RTL language is actually selected.
+      if (isRtl && !document.getElementById("rtl-fonts")) {
+        const link = document.createElement("link");
+        link.id = "rtl-fonts";
+        link.rel = "stylesheet";
+        link.href = "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap";
+        document.head.appendChild(link);
+      }
       if (isRtl) {
         document.documentElement.classList.add("rtl");
       } else {

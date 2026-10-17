@@ -2,7 +2,6 @@ import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { useState,useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, MessageSquare, ArrowRight } from "lucide-react";
-import { Tilt } from "./Motion";
 import {
   areaText,
   comparableUsd,
@@ -12,6 +11,7 @@ import {
   priceDisplay,
   type PropertyRecord,
 } from "@/data/properties";
+import { showsSide } from "@/data/regions";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -71,135 +71,91 @@ export function PropertyCard({ r }: { r: PropertyRecord }) {
             : t.common.offerToConfirm;
 
   return (
-    <Tilt className="h-full">
-      <article className="group relative flex h-full flex-col overflow-hidden rounded-xs border border-border/80 bg-card card-elevate">
-        {/* Card Image Banner */}
-        <div className="relative aspect-[16/11] overflow-hidden bg-[#0C1E23] img-zoom-container">
-          <Link
-            to="/properties/$slug"
-            params={{ slug: r.slug }}
-            className="block h-full w-full"
-            tabIndex={-1}
-            aria-label={r.marketing_title}
-          >
+    <div className="h-full">
+      <article className="group relative flex h-full flex-col overflow-hidden border border-border bg-card card-elevate">
+        {/* Photograph */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-night img-zoom-container">
+          <Link to="/properties/$slug" params={{ slug: r.slug }} className="block h-full w-full" tabIndex={-1} aria-label={r.marketing_title}>
             <ImageFallback r={r} />
           </Link>
 
-          {/* Top Badges */}
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 z-10 pointer-events-none rtl:left-auto rtl:right-3">
+          <div className="pointer-events-none absolute start-3 top-3 z-10 flex max-w-[calc(100%-5rem)] flex-wrap gap-1.5">
             {r.layout_label && (
-              <span className="glass-pill-dark rounded-xs px-2.5 py-0.5 text-[0.68rem] font-semibold tracking-wider text-white">
-                {r.layout_label}
-              </span>
+              <span className="max-w-full truncate bg-night/90 px-2.5 py-1 text-[0.68rem] font-semibold tracking-wider text-white">{r.layout_label}</span>
             )}
             {isCbiEligible && (
-              <span className="flex items-center gap-1 rounded-xs bg-brass/95 backdrop-blur-xs px-2.5 py-0.5 text-[0.68rem] font-bold uppercase tracking-wider text-primary shadow-xs">
-                {t.propertyCard.cbiVerified}
-              </span>
+              <span className="bg-brass px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-night">{t.propertyCard.cbiVerified}</span>
             )}
           </div>
 
-          <div className="absolute right-3 top-3 flex items-center gap-1.5 z-10 rtl:right-auto rtl:left-3">
-            {/* Heart Favorite Button */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggle(r.slug);
-              }}
-              aria-label={saved ? "Remove from saved shortlist" : "Save to shortlist"}
-              className={`flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 active:scale-90 ${
-                saved
-                  ? "bg-destructive text-white shadow-md scale-105"
-                  : "bg-black/45 text-white/90 hover:bg-black/65 hover:scale-110"
-              }`}
-            >
-              <Heart className={`h-4 w-4 transition-transform duration-300 ${saved ? "fill-white" : ""}`} />
-            </button>
-          </div>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggle(r.slug);
+            }}
+            aria-label={saved ? "Remove from saved shortlist" : "Save to shortlist"}
+            aria-pressed={saved}
+            className={`absolute end-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
+              saved ? "bg-destructive text-white" : "bg-white/90 text-night hover:bg-white"
+            }`}
+          >
+            <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} />
+          </button>
 
-          {/* Bottom Bar on Image */}
-          <div className="absolute inset-x-3 bottom-3 flex items-center justify-between text-[0.7rem] text-white/95 z-10 pointer-events-none">
-            <span className="flex items-center gap-1.5 glass-pill-dark px-2.5 py-1 rounded-xs">
-              <MapPin className="h-3 w-3 text-brass" /> {r.location_label ?? "Istanbul"}
+          <p className="pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-center gap-1.5 text-[0.72rem] font-medium text-white">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-brass-light" />
+            <span className="truncate">
+              {r.location_label ?? r.city}
+              {showsSide(r.city, r.side) ? ` · ${sideLabel}` : ""}
             </span>
-            <span className="glass-pill-dark px-2.5 py-1 rounded-xs font-medium">
-              {sideLabel}
-            </span>
-          </div>
+          </p>
         </div>
 
-        {/* Card Body */}
+        {/* Details */}
         <div className="property-card-body flex flex-1 flex-col p-5">
-          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-            <span className="eyebrow !text-brass-text text-[0.65rem]">
-              {typeLabel}
-            </span>
-            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-              Ref: {r.ref || r.slug}
-            </span>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="kicker !text-[0.62rem] text-brass-text">{typeLabel}</span>
+            <span className="truncate text-[0.62rem] font-medium uppercase tracking-wider text-muted-foreground">Ref {r.ref || r.slug}</span>
           </div>
 
-          <h3 className="font-display text-lg font-medium leading-snug text-foreground transition-colors duration-300 group-hover:text-brass">
-            <Link to="/properties/$slug" params={{ slug: r.slug }} className="hover:underline">
+          <h3 className="font-display text-[1.45rem] font-medium leading-[1.15] text-foreground">
+            <Link to="/properties/$slug" params={{ slug: r.slug }} className="after:absolute after:inset-0 after:content-[''] hover:underline">
               {r.marketing_title}
             </Link>
           </h3>
 
-          {/* Property Tag Pills & Verification Stamp */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {r.areas.length > 0 && (
-              <span className="rounded-xs border border-border/80 bg-secondary/50 px-2 py-0.5 text-[0.65rem] font-medium text-foreground">
-                {areaText(r)}
-              </span>
-            )}
-            {media.tags.slice(0, 1).map((tag) => (
-              <span
-                key={tag}
-                className="rounded-xs border border-border/80 bg-secondary/40 px-2 py-0.5 text-[0.65rem] text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+          {(r.areas.length > 0 || media.tags.length > 0) && (
+            <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
+              {[r.areas.length > 0 ? areaText(r) : "", ...media.tags.slice(0, 1)].filter(Boolean).join(" · ")}
+            </p>
+          )}
 
-          {/* Pricing & CTA Footer */}
-          <div className="property-card-price mt-auto pt-4 border-t border-border/60 flex items-end justify-between gap-3 mt-4">
+          <div className="property-card-price mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
             <div>
-              <p className="eyebrow !text-muted-foreground !text-[0.6rem]">{r.mode === "rent" ? t.propertyCard.forRent : t.propertyCard.forSale}</p>
-              <p className="text-xl font-sans font-semibold text-foreground tracking-tight tabular-nums">
-                {displayPrice}
-              </p>
-              {currency !== "USD" && usdVal && (
-                <p className="text-[0.68rem] text-muted-foreground font-medium">
-                  USD ${usdVal.toLocaleString("en-US")}
-                </p>
-              )}
+              <p className="kicker !text-[0.6rem] text-muted-foreground">{r.mode === "rent" ? t.propertyCard.forRent : t.propertyCard.forSale}</p>
+              <p className="font-display mt-1 text-[1.7rem] font-medium leading-none text-foreground">{displayPrice}</p>
+              {currency !== "USD" && usdVal && <p className="mt-1 text-[0.68rem] font-medium text-muted-foreground">USD ${usdVal.toLocaleString("en-US")}</p>}
             </div>
 
-            <div className="property-card-actions flex items-center gap-1.5">
+            <div className="property-card-actions relative z-20 flex items-center gap-2">
               <a
-                href={waLink(
-                  `Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`,
-                )}
+                href={waLink(`Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-xs border border-border/80 bg-card hover:border-brass hover:text-brass hover:scale-105 transition-all duration-300"
+                className="flex h-11 w-11 items-center justify-center border border-border bg-card transition-colors hover:border-brass hover:text-brass"
                 title={t.propertyCard.inquireWhatsApp}
+                aria-label={t.propertyCard.inquireWhatsApp}
               >
                 <MessageSquare className="h-4 w-4" />
               </a>
-              <Link
-                to="/properties/$slug"
-                params={{ slug: r.slug }}
-                className="btn btn-outline hover:border-brass hover:bg-primary hover:text-on-dark !min-h-9 !px-3.5 !text-[0.72rem] gap-1.5 shrink-0 transition-all duration-300"
-              >
-                <span>{t.propertyCard.viewDetails}</span> <ArrowRight className="h-3 w-3 arrow rtl-flip" />
+              <Link to="/properties/$slug" params={{ slug: r.slug }} className="btn btn-outline shrink-0 gap-1.5 !px-3.5 !text-[0.72rem]">
+                <span>{t.propertyCard.viewDetails}</span> <ArrowRight className="arrow h-3 w-3 rtl-flip" />
               </Link>
             </div>
           </div>
         </div>
       </article>
-    </Tilt>
+    </div>
   );
 }
