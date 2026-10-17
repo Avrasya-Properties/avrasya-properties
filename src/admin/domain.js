@@ -44,6 +44,21 @@ export function validateSettings(s) {
   if (typeof s.announcementActive !== "boolean" || typeof s.enableFrankfurterSync !== "boolean") throw new Error("Invalid settings flags.");
   if (s.indexingEnabled !== undefined && typeof s.indexingEnabled !== "boolean") throw new Error("Invalid indexing flag.");
   if (s.districts !== undefined && (!Array.isArray(s.districts) || s.districts.some((x) => typeof x !== "string"))) throw new Error("Invalid districts list.");
+  if (s.regions !== undefined) {
+    if (!Array.isArray(s.regions) || s.regions.length > 50) throw new Error("Use up to 50 regions.");
+    const slugs = new Set();
+    for (const r of s.regions) {
+      if (!r || typeof r !== "object" || typeof r.name !== "string" || !r.name.trim() || r.name.length > 80) throw new Error("Each region needs a name under 80 characters.");
+      if (typeof r.slug !== "string" || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(r.slug) || r.slug.length > 60) throw new Error("Region \"" + r.name + "\" needs a web address using lowercase letters, numbers and hyphens.");
+      if (slugs.has(r.slug)) throw new Error("Two regions use the web address \"" + r.slug + "\".");
+      slugs.add(r.slug);
+      if (!Array.isArray(r.districts) || r.districts.length > 200 || r.districts.some((d) => typeof d !== "string" || !d.trim() || d.length > 80)) throw new Error("Check the districts of " + r.name + ".");
+      if (typeof r.summary !== "string" || r.summary.length > 1000) throw new Error("The summary of " + r.name + " is too long.");
+      if (typeof r.heroImage !== "string" || (r.heroImage !== "" && !/^(https:\/\/|\/images\/)[^\s]+$/.test(r.heroImage))) throw new Error("Use an HTTPS image link or an existing website image for " + r.name + ".");
+      if (typeof r.seoTitle !== "string" || r.seoTitle.length > 120 || typeof r.seoDescription !== "string" || r.seoDescription.length > 320) throw new Error("Search title or summary of " + r.name + " is too long.");
+      if (typeof r.hasSides !== "boolean" || typeof r.published !== "boolean" || !Number.isFinite(r.sortOrder)) throw new Error("Invalid settings for region " + r.name + ".");
+    }
+  }
   if (s.layouts !== undefined && (!Array.isArray(s.layouts) || s.layouts.some((x) => typeof x !== "string"))) throw new Error("Invalid layouts list.");
   if (s.budgetRanges !== undefined && (!Array.isArray(s.budgetRanges) || s.budgetRanges.some((b) => !b || typeof b !== "object" || typeof b.id !== "string" || typeof b.label !== "string"))) throw new Error("Invalid budget ranges list.");
   if(s.budgetRanges){const ids=new Set();for(const b of s.budgetRanges){if(!b.id.trim()||ids.has(b.id)||!b.label.trim()||!Number.isFinite(b.min)||!Number.isFinite(b.max)||b.min<0||b.max<=b.min)throw new Error("Each budget tier needs a unique name and a valid lower and upper amount.");ids.add(b.id);}}

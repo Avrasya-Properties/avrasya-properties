@@ -59,6 +59,12 @@ export function ServicesPage() {
     icon: SERVICE_ICONS[i % SERVICE_ICONS.length] || Building2,
   }));
 
+  // Services and FAQs published in the admin are shown here; the built-in guide below stays as the baseline.
+  const stepText = (step: unknown): string => (typeof step === "string" ? step : typeof (step as { title?: unknown })?.title === "string" ? String((step as { title: string }).title) : "");
+  const managedServices = (serviceQuery.data ?? []).filter((s) => s.title && s.description);
+  const managedFaqs = (faqQuery.data ?? []).filter((f) => f.question && f.answer).map((f) => ({ q: f.question, a: f.answer }));
+  const allFaqs = [...managedFaqs, ...t.services.faqs];
+
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
   const categories = ["All", ...new Set(services.map((s) => s.category))];
@@ -77,6 +83,33 @@ export function ServicesPage() {
       >
         <p>{t.services.description}</p>
       </PageIntro>
+
+      {managedServices.length > 0 && (
+        <section data-managed-services className="border-b bg-secondary/40 py-14">
+          <div className="container-site">
+            <p className="kicker text-brass-text">{t.services.eyebrow}</p>
+            <ul className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {managedServices.map((s) => (
+                <li key={s.id} className="flex flex-col border border-border bg-card p-6">
+                  {s.category && <span className="kicker !text-[0.62rem] text-muted-foreground">{s.category}</span>}
+                  <h3 className="font-display mt-2 text-2xl leading-tight text-foreground">{s.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+                  {Array.isArray(s.process_steps) && s.process_steps.length > 0 && (
+                    <ol className="mt-5 space-y-1.5 border-t border-border pt-4 text-xs text-foreground">
+                      {s.process_steps.map(stepText).filter(Boolean).map((step, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brass" />
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* Ten Services Section */}
       <section className="container-site py-16">
@@ -150,7 +183,7 @@ export function ServicesPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {t.catalog.phases.map((p) => (
-              <div key={p.phase} className="card-elevate rounded-xs border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:border-brass/50 hover:bg-white/8">
+              <div key={p.phase} className="card-elevate rounded-xs border border-white/10 bg-white/5 p-6 transition-colors hover:border-brass/50">
                 <span className="font-mono text-xs font-bold text-brass uppercase tracking-widest">{p.phase}</span>
                 <h3 className="mt-2 font-display text-xl font-bold text-on-dark">{p.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">{p.desc}</p>
@@ -168,7 +201,7 @@ export function ServicesPage() {
             <h2 className="font-display text-3xl font-semibold md:text-4xl">{t.services.faqTitle}</h2>
           </div>
           <div className="space-y-4">
-            {t.services.faqs.map((faq, i) => (
+            {allFaqs.map((faq, i) => (
               <details key={i} className="card-elevate rounded-xs border border-border/80 bg-card p-4 transition-all">
                 <summary className="cursor-pointer font-display text-base font-semibold text-foreground flex items-center justify-between">
                   <span>{faq.q}</span>

@@ -4,7 +4,7 @@ import { DEMO_MODE,publicSupabase } from "@/lib/supabase";
 import { properties as source,type PropertyRecord } from "./properties";
 import { DEFAULT_SITE_SETTINGS } from "@/admin/demo";
 import { decodeSettings,type Row } from "@/admin/mappers";
-const record=z.object({slug:z.string(),marketing_title:z.string(),city:z.string(),location_label:z.string().nullable(),side:z.enum(["Europe","Asia","unknown"]),record_type:z.enum(["unit_offer","unit_type","package","project","ambiguous_offer"]),layout_label:z.string().nullable(),price:z.object({currency:z.enum(["USD","TRY","EUR","GBP"]).nullable(),amount:z.number().nullable(),basis:z.string(),status:z.string()}).passthrough(),areas:z.array(z.object({value_m2:z.number(),basis:z.enum(["gross","net","unspecified"])}).passthrough()),source_ids:z.array(z.string()),availability_verified:z.boolean(),details:z.record(z.unknown())}).passthrough();
+const record=z.object({slug:z.string(),marketing_title:z.string(),city:z.string(),location_label:z.string().nullable(),side:z.string(),record_type:z.enum(["unit_offer","unit_type","package","project","ambiguous_offer"]),layout_label:z.string().nullable(),price:z.object({currency:z.enum(["USD","TRY","EUR","GBP"]).nullable(),amount:z.number().nullable(),basis:z.string(),status:z.string()}).passthrough(),areas:z.array(z.object({value_m2:z.number(),basis:z.enum(["gross","net","unspecified"])}).passthrough()),source_ids:z.array(z.string()),availability_verified:z.boolean(),details:z.record(z.unknown())}).passthrough();
 export async function loadCatalogue():Promise<PropertyRecord[]>{
  if(DEMO_MODE){
    if(typeof window!=="undefined"){
@@ -13,7 +13,7 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
        if(raw){
          const parsed=JSON.parse(raw);
          if(Array.isArray(parsed?.properties)){
-           const demoProps=parsed.properties as {slug:string;publication?:string;title?:string;district?:string;layout?:string;amount?:number|null;currency?:string|null}[];
+           const demoProps=parsed.properties as {slug:string;publication?:string;title?:string;district?:string;city?:string;layout?:string;amount?:number|null;currency?:string|null}[];
            const map=new Map(demoProps.map(p=>[p.slug,p]));
            return source.filter(s=>{
              const dp=map.get(s.slug);
@@ -25,6 +25,7 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
                ...s,
                marketing_title:dp.title||s.marketing_title,
                location_label:dp.district||s.location_label,
+               city:dp.city||s.city,
                layout_label:dp.layout||s.layout_label,
                price:{
                  ...s.price,
@@ -41,9 +42,14 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
  }
  const {data,error}=await publicSupabase.rpc("published_catalogue");
  if(error)throw new Error("The property catalogue is unavailable. Please contact our advisory team.");
- return z.array(record).parse(data) as PropertyRecord[];
+ // One malformed row must never blank the whole catalogue: keep valid rows, skip bad ones.
+ if(!Array.isArray(data))throw new Error("The property catalogue is unavailable. Please contact our advisory team.");
+ const valid:PropertyRecord[]=[];
+ for(const row of data){const parsed=record.safeParse(row);if(parsed.success)valid.push(parsed.data as unknown as PropertyRecord);else if(import.meta.env.DEV)console.warn("Skipped malformed catalogue row",parsed.error.issues[0]);}
+ if(data.length>0&&valid.length===0)throw new Error("The property catalogue is unavailable. Please contact our advisory team.");
+ return valid;
 }
-export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,refetchOnWindowFocus:true,refetchInterval:30000});return {...q,properties:q.data||[]};}
+export function useCatalogue(){const q=useQuery({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:DEMO_MODE?0:15000,refetchOnWindowFocus:true,refetchInterval:30000});return {...q,properties:q.data||[]};}
 export async function loadPublicSettings(){
  if(DEMO_MODE){
    if(typeof window!=="undefined"){
@@ -107,7 +113,9 @@ export function usePublishedDocuments(){return useQuery({queryKey:["catalogue-do
   const {data,error}=await publicSupabase.from("catalog_documents").select("title,storage_path,disclaimer").eq("is_published",true).order("created_at",{ascending:false});if(error)throw error;return data as {title:string;storage_path:string;disclaimer:string|null}[];
 },staleTime:15000,refetchInterval:30000});}
 
-export function useServices(){return useQuery({queryKey:["services"],queryFn:async()=>{
+export type ManagedService={id:string;title:string;category:string|null;description:string;process_steps:unknown[]};
+export type ManagedFaq={id:string;question:string;answer:string;category:string|null};
+export function useServices(){return useQuery({queryKey:["services"],queryFn:async():Promise<ManagedService[]>=>{
   if(DEMO_MODE){
     if(typeof window!=="undefined"){
       try{
@@ -127,7 +135,7 @@ export function useServices(){return useQuery({queryKey:["services"],queryFn:asy
   const {data,error}=await publicSupabase.from("services").select("id,title,category,description,process_steps").eq("is_published",true).order("sort_order");if(error)throw error;return data as {id:string;title:string;category:string|null;description:string;process_steps:unknown[]}[];
 },staleTime:15000,refetchInterval:30000});}
 
-export function useFaqs(){return useQuery({queryKey:["faqs"],queryFn:async()=>{
+export function useFaqs(){return useQuery({queryKey:["faqs"],queryFn:async():Promise<ManagedFaq[]>=>{
   if(DEMO_MODE){
     if(typeof window!=="undefined"){
       try{

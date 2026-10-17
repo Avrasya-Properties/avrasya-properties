@@ -26,6 +26,8 @@ import { PageHead, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { SecuritySettings } from "@/admin/SecuritySettings";
 import { DESIGN_FIELDS } from "@/admin/website-design";
 import { uploadImage } from "@/admin/store";
+import { RegionsEditor } from "@/admin/RegionsEditor";
+import { allDistricts, normalizeRegions } from "@/data/regions";
 import { 
   DEMO_ENABLED,
   DEFAULT_SITE_SETTINGS, 
@@ -44,7 +46,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettingsPage,
 });
 
-const TABS = ["Company details", "Homepage", "SEO & Search", "Website appearance", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
+const TABS = ["Company details", "Homepage", "SEO & Search", "Website appearance", "Regions", "Search filters", "Exchange rates", "Sign-in and recovery", "Export data"] as const;
 
 export function AdminSettingsPage() {
   const db = useDB();
@@ -149,7 +151,7 @@ export function AdminSettingsPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors ${
               tab === t
                 ? "border-b-2 border-brass text-brass"
                 : "text-muted-foreground hover:text-foreground"
@@ -623,108 +625,32 @@ export function AdminSettingsPage() {
         </div>
       )}
 
+      {/* Regions: cities/areas with their own districts, pages and filters */}
+      {tab === "Regions" && (
+        <RegionsEditor
+          regions={form.regions && form.regions.length ? form.regions : normalizeRegions([], form.districts)}
+          disabled={!editable}
+          onChange={(next) => {
+            setDirty(true);
+            setForm((prev) => ({ ...prev, regions: next, districts: allDistricts(next) }));
+          }}
+        />
+      )}
+
       {/* TAB 3: Search filters (Regions, Apartment Layouts, Budgets) */}
       {tab === "Search filters" && (
         <div className="max-w-4xl space-y-6">
-          {/* Card 1: Istanbul Districts / Regions */}
+          {/* Districts are managed per region now */}
           <div className="rounded-xl border bg-card p-6">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-brass" />
-                  <span>Istanbul Districts & Regions ({form.districts?.length || 0})</span>
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Active regions available in Homepage search, Property Catalog district filter, and Consultation brief.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setField("districts", [...DEFAULT_SITE_SETTINGS.districts]);
-                  toast.success("Restored standard Istanbul districts");
-                }}
-                className={btnGhost + " !text-xs gap-1.5"}
-              >
-                <RotateCcw className="h-3 w-3" />
-                <span>Reset to Standard</span>
-              </button>
-            </div>
-
-            {/* List of active district tags */}
-            <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-muted/20 min-h-[56px] mb-4">
-              {(form.districts || []).map((dist, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-background border px-3 py-1 text-xs font-medium text-foreground shadow-xs group"
-                >
-                  <span>{dist}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = form.districts.filter((_, i) => i !== idx);
-                      setField("districts", next);
-                    }}
-                    className="text-muted-foreground hover:text-destructive transition-colors ml-0.5"
-                    title={`Remove ${dist}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-              {(!form.districts || form.districts.length === 0) && (
-                <span className="text-xs text-muted-foreground italic py-1">
-                  No districts configured. Add one below.
-                </span>
-              )}
-            </div>
-
-            {/* Add new district */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                className={field + " flex-1"}
-                placeholder="Enter new Istanbul district (e.g. Karaköy, Moda, Tarabya)"
-                value={newDistrict}
-                onChange={(e) => setNewDistrict(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (newDistrict.trim()) {
-                      const d = newDistrict.trim();
-                      if (!form.districts?.includes(d)) {
-                        setField("districts", [...(form.districts || []), d]);
-                        setNewDistrict("");
-                        toast.success(`Added ${d}`);
-                      } else {
-                        toast.error(`${d} already exists`);
-                      }
-                    }
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (newDistrict.trim()) {
-                    const d = newDistrict.trim();
-                    if (!form.districts?.includes(d)) {
-                      setField("districts", [...(form.districts || []), d]);
-                      setNewDistrict("");
-                      toast.success(`Added ${d}`);
-                    } else {
-                      toast.error(`${d} already exists`);
-                    }
-                  }
-                }}
-                className={btnPrimary + " gap-1.5 whitespace-nowrap"}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add Region</span>
-              </button>
-            </div>
+            <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
+              <MapPin className="h-4 w-4 text-brass" />
+              <span>Regions and districts</span>
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Districts now belong to a region ({form.regions?.length || 0} configured, {form.districts?.length || 0} districts in total). Add or edit them in the Regions tab.
+            </p>
+            <button type="button" onClick={() => setTab("Regions")} className={btnGhost + " mt-3"}>Open Regions</button>
           </div>
-
           {/* Card 2: Apartment Layouts */}
           <div className="rounded-xl border bg-card p-6">
             <div className="flex items-start justify-between gap-4 mb-4">

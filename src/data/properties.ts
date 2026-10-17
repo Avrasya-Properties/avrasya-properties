@@ -1,5 +1,6 @@
 import raw from "./source.json";
 import { useSyncExternalStore } from "react";
+import { regionForCity, slugifyRegion, type Region } from "./regions";
 
 export type Area = {
   value_m2: number;
@@ -614,6 +615,7 @@ function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
 
 export type Filters = {
   q?: string | undefined;
+  region?: string | undefined;
   loc?: string | undefined;
   side?: string | undefined;
   layout?: string | undefined;
@@ -632,17 +634,20 @@ export function useLiveProperties(): PropertyRecord[] {
 }
 
 export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties,
-  budgets: readonly { id: string; min: number; max: number }[] = BUDGETS) {
+  budgets: readonly { id: string; min: number; max: number }[] = BUDGETS,
+  regions: readonly Region[] = []) {
+  const wanted = f.region ? regions.find((x) => x.slug === f.region) : undefined;
   const q = f.q?.toLowerCase().trim();
   const b = budgets.find((x) => x.id === f.budget);
   let list = catalogue.filter((r) => {
     if (
       q &&
-      !`${r.marketing_title} ${r.location_label ?? ""} ${r.layout_label ?? ""}`
+      !`${r.marketing_title} ${r.location_label ?? ""} ${r.city ?? ""} ${r.layout_label ?? ""}`
         .toLowerCase()
         .includes(q)
     )
       return false;
+    if (f.region && !(wanted ? regionForCity(r.city, [wanted]) : slugifyRegion(r.city) === f.region)) return false;
     if (f.loc && r.location_label !== f.loc) return false;
     if (f.side && r.side !== f.side) return false;
     if (f.layout && !matchesLayout(r, f.layout)) return false;

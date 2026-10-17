@@ -14,7 +14,7 @@ export const Route = createFileRoute("/properties/$slug")({
     const r = records.find(x=>x.slug===params.slug);
     if (r) return { record: r, legacy: false };
     if (legacyRecords.some((l) => l.slug === params.slug)) return { record: null, legacy: true };
-    if(!DEMO_MODE){const target=await resolveRedirect(params.slug);if(target)throw redirect({to:"/properties/$slug",params:{slug:target}});}
+    if(!DEMO_MODE){const target=await resolveRedirect(params.slug);if(target)throw redirect({to:"/properties/$slug",params:{slug:target},statusCode:301});}
     throw notFound();
   },
   head: ({ loaderData }) => {

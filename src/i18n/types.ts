@@ -93,6 +93,11 @@ export interface HomeTranslations {
   filterAnyBudget: string;
   filterCbiOnly: string;
   filterSearchBtn: string;
+  regionsEyebrow: string;
+  regionsTitle: string;
+  regionsSubtitle: string;
+  regionsOpen: string;
+  heroCta: string;
   stat1Title: string;
   stat1Desc: string;
   stat2Title: string;
@@ -150,6 +155,12 @@ export interface PropertiesTranslations {
   description: string;
   searchPlaceholder: string;
   allDistricts: string;
+  allRegions: string;
+  filterRegion: string;
+  regionViewListings: string;
+  regionDistrictsTitle: string;
+  regionEmpty: string;
+  regionListingsLabel: string;
   allSides: string;
   sideEurope: string;
   sideAsia: string;
@@ -211,6 +222,7 @@ export interface PropertyDetailTranslations {
   forRent: string;
   forSale: string;
   bathrooms: string;
+  bedrooms: string;
   availability: string;
   toConfirm: string;
   titleDeedStatus: string;

@@ -35,6 +35,7 @@ import {
   sideText,
   type PropertyRecord,
 } from "@/data/properties";
+import { sameCity, showsSide } from "@/data/regions";
 import { useCatalogue } from "@/data/live";
 
 import { PropertyCard } from "@/components/site/PropertyCard";
@@ -133,13 +134,15 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             : t.common.offerToConfirm;
 
   const d = r.details;
+  // Only curated, buyer-facing keys are printed; unknown supplier fields stay private.
+  const PUBLIC_FACT_KEYS = ["developer","delivery","block","floor","unit","delivery_source","developer_source","status_source","title_deed_source","kitchen_source","promotion_source"];
   const facts = Object.entries(d).filter(
-    ([k, v]) => typeof v === "string" && !["note","project","unit_area_unconfirmed","floor_plan"].includes(k)
+    ([k, v]) => typeof v === "string" && v.trim() !== "" && PUBLIC_FACT_KEYS.includes(k)
   );
   const claims = (d.claims_requiring_confirmation as string[] | undefined) ?? [];
   const plan = d.supporting_plan as Record<string, unknown> | undefined;
   const { properties }=useCatalogue();
-  const related = properties.filter((x) => x.slug !== r.slug && x.side === r.side).slice(0, 3);
+  const related = properties.filter((x) => x.slug !== r.slug && sameCity(x.city, r.city)).slice(0, 3);
 
   const images = media.floorPlan?[...new Set([...media.gallery,media.floorPlan])]:media.gallery;
   const mediaKey=r.slug+"|"+media.cover+"|"+images.join("|");
@@ -333,22 +336,14 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
             <div className="mt-6 grid gap-x-12 sm:grid-cols-2">
               <Fact k={t.propertyDetail.district} v={locationText(r)} />
-              <Fact k={t.propertyDetail.istanbulSide} v={sideText(r)} />
+              {showsSide(r.city, r.side) && <Fact k={t.propertyDetail.istanbulSide} v={sideText(r)} />}
               <Fact k={t.propertyDetail.listingType} v={r.mode==="rent"?t.propertyDetail.forRent:t.propertyDetail.forSale} />
               {r.bathrooms!=null&&<Fact k={t.propertyDetail.bathrooms} v={r.bathrooms}/>}<Fact k={t.propertyDetail.availability} v={r.availability||t.propertyDetail.toConfirm} />
               {r.tapu_status&&<Fact k={t.propertyDetail.titleDeedStatus} v={r.tapu_status}/>}
               <Fact k={t.propertyDetail.apartmentLayout} v={r.layout_label ?? t.propertyDetail.toConfirm} />
               {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?t.propertyDetail.grossArea:area.basis==="net"?t.propertyDetail.netArea:t.propertyDetail.areaToConfirm} v={`${area.value_m2.toLocaleString()} m²`}/>):<Fact k={t.propertyDetail.areaToConfirm} v={t.propertyDetail.toConfirm}/>}
               {typeof d.project === "string"&&d.project&&<Fact k={t.propertyDetail.development} v={d.project} />}
-              <Fact k="District" v={locationText(r)} />
-              <Fact k="Istanbul side" v={sideText(r)} />
-              <Fact k="Listing" v={r.mode==="rent"?"For rent":"For sale"} />
-              {r.bathrooms!=null&&<Fact k="Bathrooms" v={r.bathrooms}/>}<Fact k="Availability" v={r.availability||"To confirm"} />
-              {r.tapu_status&&<Fact k="Title deed status" v={r.tapu_status}/>}
-              {typeof d["bedrooms"]==="number"&&<Fact k="Bedrooms" v={d["bedrooms"]}/>}
-              <Fact k="Apartment layout" v={r.layout_label ?? "To confirm"} />
-              {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?"Gross area":area.basis==="net"?"Net area":"Area (basis to confirm)"} v={`${area.value_m2.toLocaleString("en-US")} m²`}/>):<Fact k="Area" v="To confirm"/>}
-              {typeof d.project === "string"&&d.project&&<Fact k="Development" v={d.project} />}
+              {typeof d["bedrooms"]==="number"&&<Fact k={t.propertyDetail.bedrooms} v={d["bedrooms"]}/>}
               {["block", "floor", "unit"].map(
                 (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />
               )}

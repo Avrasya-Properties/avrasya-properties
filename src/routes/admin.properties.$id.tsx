@@ -8,6 +8,7 @@ import { useEffect,useRef, useState } from "react";
 import { toast } from "sonner";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { AVAIL, DEMO_ENABLED, uploadImage, USERS, can, fmtMoney, publishIssues, upsert, useDB, useSession, type Property } from "@/admin/store";
+import { regionForCity } from "@/data/regions";
 
 export const Route = createFileRoute("/admin/properties/$id")({ component: Editor });
 const TABS = ["Property details", "Pricing", "Media", "Checks and notes", "Website Preview"] as const;
@@ -26,6 +27,13 @@ function Editor() {
   const num = (v: string) => (v === "" ? null : Number(v));
   const save = async (patch: Partial<Property> = {}) => { try { const n = await upsert<Property>("properties", { ...d, ...patch }); setD(n); toast.success("Saved"); } catch (e) { toast.error((e as Error).message); } };
   const issues = publishIssues(d, db.properties);
+  const regions = db.siteSettings.regions || [];
+  const region = regionForCity(d.city, regions);
+  const pickRegion = (slug: string) => {
+    const next = regions.find((r) => r.slug === slug);
+    if (!next) return;
+    setD({ ...d, city: next.name, ...(next.hasSides ? {} : { side: "unknown" as const }) });
+  };
   const inp = (label: string, k: keyof Property, type = "text") => (
     <label className="text-sm">{label}<input disabled={ro} type={type} step={type==="number"?"any":undefined} className={field} value={(d[k] as string | number | null) ?? ""} onChange={(e) => f(k, (type === "number" ? num(e.target.value) : e.target.value) as never)} placeholder={type === "number" ? "Unknown" : ""} /></label>
   );
@@ -36,14 +44,15 @@ function Editor() {
         {can(user, "publish") && d.publication !== "Published" && <button className={btnPrimary} onClick={() => issues.length ? (setTab("Checks and notes"), toast.error("Publishing blocked — see fix list")) : save({ publication: "Published" })}>Publish</button>}
         {can(user, "publish") && d.publication === "Published" && <button className={btnGhost} onClick={() => save({ publication: "Draft" })}>Unpublish</button>}
       </div>} />
-      <div className="mb-4 flex gap-1 overflow-x-auto border-b">{TABS.map((t) => <button key={t} onClick={() => setTab(t)} className={`whitespace-nowrap px-3 py-2 text-sm ${tab === t ? "border-b-2 border-brass font-medium" : "text-muted-foreground"}`}>{t}</button>)}</div>
+      <div className="mb-4 flex gap-1 overflow-x-auto border-b">{TABS.map((t) => <button key={t} onClick={() => setTab(t)} className={`shrink-0 whitespace-nowrap px-3 py-2 text-sm ${tab === t ? "border-b-2 border-brass font-medium" : "text-muted-foreground"}`}>{t}</button>)}</div>
       {!DEMO_ENABLED&&<div className="mb-4 flex flex-wrap gap-2">{([["physical_units","Registered apartments"],["offer_amenities","Listing features"],["pricing_options","Payment plans"],["package_memberships","Package contents"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section,property:id}} className={btnGhost}>{label}</Link>)}</div>}
       <div className={tab==="Website Preview"?"w-full overflow-hidden rounded-md border bg-background":"max-w-3xl rounded-md border bg-card p-4"}>
         {tab === "Property details" && <div className="grid gap-3 sm:grid-cols-2">
-          {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}{inp("District", "district")}{inp("City", "city")}{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
+          {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}<label className="text-sm">Region<select disabled={ro} className={field} value={region?.slug ?? "__other"} onChange={(e) => pickRegion(e.target.value)}>{!region && <option value="__other">{d.city ? `${d.city} (not a configured region)` : "Choose a region"}</option>}{regions.map((r) => <option key={r.slug} value={r.slug}>{r.name}{r.published ? "" : " (hidden)"}</option>)}</select></label>
+          <label className="text-sm">District<input disabled={ro} list="region-districts" className={field} value={d.district ?? ""} onChange={(e) => f("district", e.target.value)} /><datalist id="region-districts">{(region?.districts ?? []).map((x) => <option key={x} value={x} />)}</datalist></label>{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
           <label className="text-sm">Development name<select disabled={ro} className={field} value={d.project} onChange={e=>f("project",e.target.value)}><option value="">Not assigned</option>{projects.map(project=><option key={String(project["id"])} value={String(project["name"])}>{String(project["name"])}</option>)}</select></label>
           {!DEMO_ENABLED&&<div className="sm:col-span-2 rounded border p-3"><label className="block text-sm">Registered apartment<select disabled={ro} className={field} value={unitId||String(rawRecord("properties",id)?.["physical_unit_id"]||"")} onChange={e=>setUnitId(e.target.value)}><option value="">No identified unit</option>{units.map(unit=><option key={String(unit["id"])} value={String(unit["id"])}>{String(unit["unit_number"])} · {String(unit["layout_label"]||"")}</option>)}</select></label><button disabled={ro||!unitId} className={btnGhost+" mt-2"} onClick={async()=>{try{if(JSON.stringify(d)!==JSON.stringify(saved))throw new Error("Save your listing changes before linking an apartment.");await linkUnit(id,unitId,Number(rawRecord("properties",id)?.["version"]));const row=rawRecord("properties",id);if(row)setD(decode("properties",{...row,project_name:d.project}));toast.success("Apartment linked");}catch(error){toast.error((error as Error).message);}}}>Link apartment</button><p className="mt-2 text-xs text-muted-foreground">Add the apartment number under Registered apartments before reserving this listing. Packages and unit types cannot be reserved as individual units.</p></div>}
-          <label className="text-sm">Istanbul side<select disabled={ro} className={field} value={d.side||"unknown"} onChange={e=>f("side",e.target.value as Property["side"])}><option value="unknown">To confirm</option><option value="Europe">European side</option><option value="Asia">Asian side</option></select></label>{inp("Title deed status","tapuStatus")}
+          {(region?.hasSides || (d.side && d.side !== "unknown")) && <label className="text-sm">{region?.name ?? "Istanbul"} side<select disabled={ro} className={field} value={d.side||"unknown"} onChange={e=>f("side",e.target.value as Property["side"])}><option value="unknown">To confirm</option><option value="Europe">European side</option><option value="Asia">Asian side</option></select></label>}{inp("Title deed status","tapuStatus")}
           <label className="text-sm sm:col-span-2">Property highlights<textarea disabled={ro} className={field+" h-24"} value={(d.highlights||[]).join("\n")} onChange={e=>f("highlights",e.target.value.split("\n"))}/><span className="text-xs text-muted-foreground">One confirmed feature per line. Empty lines are ignored when saved.</span></label>
           {inp("Gross area m²", "grossM2", "number")}{inp("Net area m²", "netM2", "number")}{inp("Area m² (basis unspecified)", "areaM2", "number")}
           <label className="text-sm">Listing type<select disabled={ro} className={field} value={d.type} onChange={(e) => f("type", e.target.value)}><option value="unit offer">Individual unit offer</option><option value="package">Packaged offer</option><option value="unit type">Unit type / not an identified unit</option><option value="ambiguous offer">Offer to confirm</option><option value="project">Development / project</option></select></label>

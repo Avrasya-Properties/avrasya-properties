@@ -38,6 +38,7 @@ import { PageIntro } from "@/components/site/Chrome";
 import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { allDistricts, publicRegions, regionForCity } from "@/data/regions";
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 const bool = (v: unknown) => (v === "true" || v === true ? true : undefined);
@@ -45,6 +46,7 @@ const bool = (v: unknown) => (v === "true" || v === true ? true : undefined);
 export const Route = createFileRoute("/properties/")({
   validateSearch: (s: Record<string, unknown>): Filters & { savedOnly?: boolean | undefined } => ({
     q: str(s["q"]),
+    region: str(s["region"]),
     loc: str(s["loc"]),
     side: str(s["side"]),
     layout: str(s["layout"]),
@@ -56,8 +58,8 @@ export const Route = createFileRoute("/properties/")({
   }),
   head: () =>
     meta(
-      "Istanbul Property Listings — Avrasya Properties",
-      "Browse published Istanbul residential developments and investment packages across Maslak, Şişli, Ataşehir, and Beşiktaş. Direct advisory with legal title due diligence.",
+      "Property Listings in Türkiye — Avrasya Properties",
+      "Browse published residential developments and investment packages across Türkiye, from Istanbul to the Aegean and Mediterranean coast. Direct advisory with legal title due diligence.",
       "/properties"
     ),
   component: Catalog,
@@ -68,18 +70,24 @@ function Catalog() {
   const catalogue = useCatalogue();
   const properties = catalogue.properties;
   const settings = useSiteSettings();
-  const derivedLocations = Array.from(new Set(properties.map((r) => r.location_label).filter((x): x is string => !!x)));
-  const LOCATIONS = settings.districts?.length ? settings.districts : derivedLocations;
+  const regions = publicRegions(settings.regions);
+  const f = Route.useSearch();
+  const selectedRegion = regions.find((x) => x.slug === f.region);
+  // Listings in scope decide which source-supplied district labels (e.g. "Şişli–Feriköy") are selectable.
+  const scoped = selectedRegion ? properties.filter((r) => regionForCity(r.city, [selectedRegion])) : properties;
+  const derivedLocations = Array.from(new Set(scoped.map((r) => r.location_label).filter((x): x is string => !!x && x !== "Location to confirm")));
+  const baseLocations = selectedRegion ? selectedRegion.districts : allDistricts(regions).length ? allDistricts(regions) : settings.districts || [];
+  const LOCATIONS = Array.from(new Set([...baseLocations, ...derivedLocations]));
+  const showSide = selectedRegion ? selectedRegion.hasSides : regions.length <= 1 && regions.some((x) => x.hasSides);
   const LAYOUT_OPTIONS = settings.layouts?.length ? settings.layouts : LAYOUTS;
   const BUDGET_OPTIONS = settings.budgetRanges?.length ? settings.budgetRanges : BUDGETS;
-  const f = Route.useSearch();
   const navigate = useNavigate({ from: "/properties/" });
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filtersOpen,setFiltersOpen]=useState(false);
   const [currency] = useCurrency();
   const { shortlist, count: savedCount, isSaved, toggle } = useShortlist();
 
-  let list = filterProperties(f, properties, BUDGET_OPTIONS);
+  let list = filterProperties(f, properties, BUDGET_OPTIONS, regions);
   if (f.savedOnly) {
     list = list.filter((r) => shortlist.includes(r.slug));
   }
@@ -145,9 +153,18 @@ function Catalog() {
               </div>
             </label>
             <button className="btn btn-outline md:hidden" aria-expanded={filtersOpen} aria-controls="catalogue-filters" onClick={()=>setFiltersOpen(x=>!x)}><SlidersHorizontal className="h-4 w-4"/>{filtersOpen?"Hide filters":"Show filters"}</button>
-            <div id="catalogue-filters" className={`${filtersOpen?"grid":"hidden"} min-w-0 gap-4 sm:grid-cols-2 md:grid lg:grid-cols-5`}>
+            <div id="catalogue-filters" className={`${filtersOpen?"grid":"hidden"} min-w-0 gap-4 sm:grid-cols-2 md:grid ${regions.length > 1 ? "lg:grid-cols-6" : "lg:grid-cols-5"}`}>
+            {regions.length > 1 && (
+              <label className="block">
+                <span className={lbl}>{t.properties.filterRegion}</span>
+                <select className="field text-xs md:text-sm" value={f.region ?? ""} onChange={(e) => navigate({ search: (p) => ({ ...p, region: e.target.value || undefined, loc: undefined, side: undefined }), replace: true, resetScroll: false })}>
+                  <option value="">{t.properties.allRegions}</option>
+                  {regions.map((x) => <option key={x.slug} value={x.slug}>{x.name}</option>)}
+                </select>
+              </label>
+            )}
             {sel("loc", t.home.filterDistrict, t.properties.allDistricts, LOCATIONS.map((l: string) => [l, l]))}
-            {sel("side", t.home.filterSide, t.properties.allSides, [
+            {showSide && sel("side", t.home.filterSide, t.properties.allSides, [
               ["Europe", t.properties.sideEurope],
               ["Asia", t.properties.sideAsia],
             ])}
