@@ -122,12 +122,10 @@ function Catalog() {
         eyebrow={t.properties.eyebrow}
         title={<>{t.properties.title} <em>{t.properties.titleEm}</em></>}
         aside={
-          <div className="flex flex-col gap-1 text-right">
-            <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-              {t.properties.allSides}
-            </span>
-            <span className="text-xs text-foreground font-medium">{properties.length} {t.properties.showingCount}</span>
-          </div>
+          <p className="text-on-dark md:text-right">
+            <span className="numeral block text-5xl">{properties.length}</span>
+            <span className="kicker mt-2 block text-on-dark-muted">{t.properties.regionListingsLabel}</span>
+          </p>
         }
       >
         <p>{t.properties.description}</p>

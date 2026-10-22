@@ -5,6 +5,7 @@ import { DEMO_MODE } from "@/lib/supabase";
 import { useSiteSettings } from "@/admin/store";
 import { normalizeRegions, publicRegions, regionForCity, type Region } from "@/data/regions";
 import { PageIntro } from "@/components/site/Chrome";
+import { HeroBackdrop } from "@/components/site/hero/HeroBackdrop";
 import { PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
 import { useTranslation } from "@/hooks/useLanguage";
@@ -62,27 +63,43 @@ function RegionPage() {
 
   return (
     <>
-      <PageIntro
-        eyebrow={`${live.country}`}
-        title={<>{live.name}</>}
-        aside={<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{listings.length} {t.properties.regionListingsLabel}</span>}
-      >
-        {live.summary && <p>{live.summary}</p>}
-      </PageIntro>
-
-      {live.heroImage && (
-        <div className="container-site">
-          <img src={live.heroImage} alt={live.name} className="aspect-[21/9] w-full rounded-xs object-cover" loading="eager" />
-        </div>
+      {live.heroImage ? (
+        <section className="relative isolate overflow-hidden bg-night text-on-dark">
+          <HeroBackdrop image={live.heroImage} />
+          <div className="container-site relative z-10 flex min-h-[min(70svh,38rem)] flex-col justify-end gap-8 pb-14 pt-24 md:flex-row md:items-end md:justify-between md:pb-20">
+            <div className="max-w-3xl">
+              <p className="kicker text-brass-light">{live.country}</p>
+              <h1 className="display-hero mt-4">{live.name}</h1>
+              {live.summary && <p className="mt-6 max-w-2xl text-base leading-relaxed text-on-dark-muted md:text-lg">{live.summary}</p>}
+            </div>
+            <p className="md:text-right">
+              <span className="numeral block text-5xl">{listings.length}</span>
+              <span className="kicker mt-2 block text-on-dark-muted">{t.properties.regionListingsLabel}</span>
+            </p>
+          </div>
+        </section>
+      ) : (
+        <PageIntro
+          eyebrow={`${live.country}`}
+          title={<>{live.name}</>}
+          aside={
+            <p className="text-on-dark md:text-right">
+              <span className="numeral block text-5xl">{listings.length}</span>
+              <span className="kicker mt-2 block text-on-dark-muted">{t.properties.regionListingsLabel}</span>
+            </p>
+          }
+        >
+          {live.summary && <p>{live.summary}</p>}
+        </PageIntro>
       )}
 
       {live.districts.length > 0 && (
-        <section className="container-site py-10">
-          <h2 className="headline text-2xl">{t.properties.regionDistrictsTitle}</h2>
+        <section className="container-site py-12 md:py-16">
+          <h2 className="headline">{t.properties.regionDistrictsTitle}</h2>
           <ul className="mt-5 flex flex-wrap gap-2">
             {live.districts.map((d) => (
               <li key={d}>
-                <Link to="/properties" search={{ region: live.slug, loc: d }} className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-border bg-card px-3.5 text-sm font-medium hover:border-brass">
+                <Link to="/properties" search={{ region: live.slug, loc: d }} className="inline-flex min-h-11 items-center gap-1.5 border border-border bg-card px-4 text-sm font-medium transition-colors hover:border-brass hover:text-brass-text">
                   <MapPin className="h-3.5 w-3.5 text-brass" />
                   {d}
                 </Link>
@@ -94,7 +111,7 @@ function RegionPage() {
 
       <section className="container-site pb-16">
         {listings.length ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div data-scroll-x className="snap-rail">
             {listings.map((r) => <PropertyCard key={r.slug} r={r} />)}
           </div>
         ) : (

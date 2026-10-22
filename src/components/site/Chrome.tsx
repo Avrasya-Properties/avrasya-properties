@@ -37,6 +37,8 @@ export function Header() {
   const sizeMenu=()=>setMenuHeight(Math.max(0,(window.visualViewport?.height||window.innerHeight)-(headerElement.current?.getBoundingClientRect().bottom||64)));
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // Headroom: tuck the bar away while reading downwards, bring it back as soon as the visitor scrolls up.
+  const [tucked, setTucked] = useState(false);
   const [currency, setCurrency] = useCurrency();
   const { count: shortlistCount } = useShortlist();
   const contact = useLiveContact();
@@ -73,7 +75,15 @@ export function Header() {
   },[open]);
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 8);
+    let last = window.scrollY;
+    const on = () => {
+      const y = window.scrollY;
+      setScrolled(y > 8);
+      if (Math.abs(y - last) > 6) {
+        setTucked(y > last && y > 240);
+        last = y;
+      }
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -139,9 +149,10 @@ export function Header() {
       {/* Main Glassmorphic Navbar */}
       <header
         ref={headerElement}
-        className={`site-header sticky top-0 z-40 h-16 border-b bg-background transition-shadow duration-300 md:h-[74px] ${
+        onFocusCapture={() => setTucked(false)}
+        className={`site-header sticky top-0 z-40 h-16 border-b bg-background transition-[translate,box-shadow] duration-300 ease-out md:h-[74px] ${
           scrolled ? "border-border shadow-[0_8px_30px_rgb(0,0,0,0.05)]" : "border-border/60"
-        }`}
+        } ${tucked && !open ? "-translate-y-full" : "translate-y-0"}`}
       >
         <div className="container-site flex h-full items-center justify-between gap-4">
           <Link
@@ -152,12 +163,12 @@ export function Header() {
             <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" />
           </Link>
 
-          <nav className="hidden items-center gap-5 xl:flex" aria-label="Main">
+          <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6" aria-label="Main">
             {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
-                className="nav-link py-1 text-sm font-medium text-foreground transition-colors duration-200 hover:text-primary"
+                className="nav-link whitespace-nowrap py-1 text-sm font-medium text-foreground transition-colors duration-200 hover:text-primary"
               >
                 {n.label}
               </Link>

@@ -45,12 +45,16 @@ export function MotionRoot() {
 
     // Create an owned GSAP context / matchMedia
     const mm = gsap.matchMedia();
+    // Set inside the matchMedia scope so the mutation observer can bind content that mounts later.
+    let bindLateContent: (() => void) | null = null;
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       // 1. Reveal [data-reveal] elements with smooth 18px translation and 0.55s duration
       const initReveals = () => {
-        const unrevealed = document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)");
+        // The bound marker stops a re-run from stacking a second tween on the same element.
+        const unrevealed = document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in):not([data-reveal-bound])");
         unrevealed.forEach((el) => {
+          el.dataset["revealBound"] = "1";
           const delayMs = parseFloat(el.style.getPropertyValue("--d") || "0");
           const delay = delayMs > 0 ? delayMs / 1000 : 0;
           const isMask = el.dataset["reveal"] === "mask";
@@ -94,7 +98,23 @@ export function MotionRoot() {
         });
       };
 
+      // Inner pages: section headings that start below the fold rise in once. Anything already on screen is
+      // left alone, so nothing visible ever flashes out and back in.
+      const autoReveal = () => {
+        if (document.querySelector("[data-home-page]")) return;
+        document.querySelectorAll<HTMLElement>("main section h2:not([data-reveal]):not([data-auto-revealed])").forEach((el) => {
+          el.dataset["autoRevealed"] = "1";
+          if (el.getBoundingClientRect().top < window.innerHeight) return;
+          gsap.from(el, { opacity: 0, y: 16, duration: 0.6, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+        });
+      };
+
       initReveals();
+      autoReveal();
+      bindLateContent = () => {
+        initReveals();
+        autoReveal();
+      };
 
       // 2. Parallax layers for fine pointer desktop devices only
       const isFinePointer = window.matchMedia("(pointer: fine)").matches;
@@ -161,10 +181,9 @@ export function MotionRoot() {
 
     // Observe dynamically mounted elements (e.g. async CMS collections)
     const observer = new MutationObserver(() => {
-      const pending = document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)");
-      if (pending.length > 0) {
-        scheduleScrollRefresh();
-      }
+      const unbound = document.querySelector("[data-reveal]:not(.is-in):not([data-reveal-bound])");
+      if (unbound) bindLateContent?.();
+      if (document.querySelector("[data-reveal]:not(.is-in)")) scheduleScrollRefresh();
     });
 
     const targetNode = document.getElementById("main") || document.body;
@@ -172,6 +191,9 @@ export function MotionRoot() {
 
     return () => {
       observer.disconnect();
+      bindLateContent = null;
+      document.querySelectorAll<HTMLElement>("[data-reveal-bound]").forEach((el) => delete el.dataset["revealBound"]);
+      document.querySelectorAll<HTMLElement>("[data-auto-revealed]").forEach((el) => delete el.dataset["autoRevealed"]);
       mm.revert();
       document.documentElement.classList.remove("js-motion");
     };

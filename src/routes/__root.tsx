@@ -19,6 +19,7 @@ import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import {loadCatalogue,loadPublicSettings} from "@/data/live";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import type { SiteSettings } from "@/admin/demo";
 import {DEMO_MODE,SUPABASE_URL} from "@/lib/supabase";
 
 function NotFoundComponent() {
@@ -85,8 +86,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
     ]);
   },
-  head: () => ({
+  // Hand the already-fetched public settings to head() so admin SEO switches apply to every public page.
+  loader: ({ context, location }) =>
+    location.pathname.startsWith("/admin") ? { settings: null } : { settings: context.queryClient.getQueryData<SiteSettings>(["site-settings"]) ?? null },
+  head: ({ loaderData }) => ({
     meta: [
+      ...(loaderData?.settings?.indexingEnabled === false ? [{ name: "robots", content: "noindex, nofollow" }] : []),
+      ...(loaderData?.settings?.googleVerification?.trim() ? [{ name: "google-site-verification", content: loaderData.settings.googleVerification.trim() }] : []),
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },

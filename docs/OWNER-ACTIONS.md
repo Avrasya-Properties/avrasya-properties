@@ -20,12 +20,20 @@ Redeploy `admin-access`, `staff-accounts`, `submit-enquiry`, then set (Supabase 
 | Secret | Value | Notes |
 |---|---|---|
 | `WEBSITE_ALLOWED_ORIGINS` | `https://avrasyaproperties.com,https://www.avrasyaproperties.com` | Exact origins, comma separated. Required by `submit-enquiry` (503 without it). Once set it also locks `admin-access` and `staff-accounts` to these origins. Include any preview/staging origin you use for admin sign-in. |
-| `RESEND_API_KEY`, `ADMIN_MAIL_FROM`, `ADMIN_SITE_URL` | your Resend key, a verified sender, the exact https site URL | Admin lock-out alerts and password recovery email. |
+| `RESEND_API_KEY`, `ADMIN_MAIL_FROM`, `ADMIN_SITE_URL` | your Resend key, a verified sender, the exact https site URL | Admin lock-out alerts, password recovery email, and new-enquiry alerts. |
+| `ENQUIRY_NOTIFY_EMAIL` | e.g. `info@avrasyaproperties.com` (comma separated for several) | Staff email for every new website enquiry, with reply-to set to the visitor. Skipped silently when unset; the enquiry is still saved and visible in Admin -> Enquiries. |
 | `WEBSITE_PUBLISHABLE_KEY` | only if you rotate the publishable key | Otherwise the built-in default is used. |
 | `TURNSTILE_SECRET_KEY` | **leave unset** | The form has no Turnstile widget yet; setting this makes every enquiry fail. |
 
 Also in the Supabase dashboard: Auth site URL and redirect URLs (including `/admin/recover`), SMTP, disable public sign-up,
 enable leaked-password protection.
+
+### Verifying the enquiry form after deploy
+1. Redeploy `submit-enquiry` and set the secrets above (at least `WEBSITE_ALLOWED_ORIGINS`).
+2. On the live site submit the contact form with a real email and a phone number with country code (the server
+   requires both). You should get an `AVR-...` reference; the form never shows success without one.
+3. Check Admin -> Enquiries for the record and, if configured, the `ENQUIRY_NOTIFY_EMAIL` inbox for the alert.
+4. Resend: verify the sending domain (DNS) used in `ADMIN_MAIL_FROM`, otherwise the provider rejects the alert.
 
 ## 3. Scheduled jobs (nothing runs them today)
 Reservation expiry, monthly rent charges and exchange-rate refresh have no scheduler. The `backend/` job files are a legacy

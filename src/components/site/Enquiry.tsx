@@ -4,6 +4,7 @@ import { useServices, useCatalogue } from "@/data/live";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { recordPublicEnquiry } from "@/admin/store";
 import { useLanguage } from "@/hooks/useLanguage";
+import { EnquiryError } from "@/lib/public-enquiry";
 
 const SERVICES = [
   "General consultation",
@@ -37,6 +38,28 @@ export function buildMessage(v: {
     .join("\n");
 }
 
+type FieldKey = "name" | "email" | "phone" | "message" | "consent";
+
+/** Mirrors the server rules in private.accept_enquiry so a form that passes here is accepted there. */
+export function validateEnquiry(
+  v: { name: string; email: string; phone: string; message: string },
+  consent: boolean,
+  demo: boolean,
+): FieldKey[] {
+  const bad: FieldKey[] = [];
+  const name = v.name.trim();
+  if (name.length < 2 || name.length > 200) bad.push("name");
+  if (!demo) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim()) || v.email.trim().length > 254) bad.push("email");
+    const digits = v.phone.replace(/\D/g, "").length;
+    if (digits < 7 || digits > 18) bad.push("phone");
+  }
+  const message = v.message.trim();
+  if (message.length < 5 || message.length > 4000) bad.push("message");
+  if (!demo && !consent) bad.push("consent");
+  return bad;
+}
+
 export function Enquiry({
   defaultTopic,
   compact,
@@ -48,7 +71,7 @@ export function Enquiry({
   propertySlug?: string;
   preview?: boolean;
 }) {
-  const { t, isRtl } = useLanguage();
+  const { t } = useLanguage();
   const servicesQuery = useServices();
   const services = DEMO_MODE
     ? SERVICES
@@ -58,6 +81,7 @@ export function Enquiry({
   const catalogue = useCatalogue();
   const id = useId();
   const submission = useRef<string | null>(null);
+  const successRef = useRef<HTMLDivElement>(null);
   const [v, setV] = useState({
     name: "",
     email: "",
@@ -70,37 +94,48 @@ export function Enquiry({
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [invalid, setInvalid] = useState<FieldKey[]>([]);
   const [receipt, setReceipt] = useState("");
+
+  const fieldMessage: Record<FieldKey, string> = {
+    name: t.enquiry.errName,
+    email: t.enquiry.errEmail,
+    phone: t.enquiry.errPhone,
+    message: t.enquiry.errMessage,
+    consent: t.enquiry.errConsent,
+  };
 
   const set =
     (key: keyof typeof v) =>
-    (
-      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-    ) => {
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       setV({ ...v, [key]: e.target.value });
+      // Any edit is a new submission; an unchanged retry keeps the same key so it cannot duplicate.
       submission.current = null;
       setReceipt("");
+      if (invalid.includes(key as FieldKey)) setInvalid(invalid.filter((k) => k !== key));
     };
 
   useEffect(() => {
     const old = previousTopic.current;
-    setV((curr) =>
-      curr.topic === old ? { ...curr, topic: defaultTopic || "General consultation" } : curr,
-    );
+    setV((curr) => (curr.topic === old ? { ...curr, topic: defaultTopic || "General consultation" } : curr));
     previousTopic.current = defaultTopic;
   }, [defaultTopic]);
 
+  useEffect(() => {
+    if (receipt) successRef.current?.focus();
+  }, [receipt]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (preview) return;
+    if (preview || busy) return;
     setErr(null);
-    if (v.name.trim().length < 2) return setErr(t.enquiry.fullName + " *");
-    if (v.message.trim().length < 5) return setErr(t.enquiry.message + " *");
-    if (v.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))
-      return setErr(t.enquiry.email + " *");
-    if (!v.email.trim() && v.phone.replace(/\D/g, "").length < 7)
-      return setErr(t.enquiry.phone + " *");
-    if (!DEMO_MODE && !consent) return setErr(t.enquiry.termsConsent || "Please consent to being contacted.");
+    const bad = validateEnquiry(v, consent, DEMO_MODE);
+    setInvalid(bad);
+    if (bad.length) {
+      setErr(t.enquiry.errFix);
+      document.getElementById(`${id}-${bad[0]}`)?.focus();
+      return;
+    }
 
     setBusy(true);
     try {
@@ -108,92 +143,109 @@ export function Enquiry({
       const property = catalogue.properties.find((r) => r.marketing_title === v.topic);
       const resolvedSlug = propertySlug || property?.slug;
       const res = await recordPublicEnquiry({
-        name: v.name,
-        email: v.email,
-        phone: v.phone,
+        name: v.name.trim(),
+        email: v.email.trim(),
+        phone: v.phone.trim(),
         topic: v.topic,
         budget: v.budget,
-        message: v.message,
+        message: v.message.trim(),
         consent,
         idempotencyKey: submission.current,
         website: v.website,
-        source: (propertySlug || property) ? "Property Modal" : "Website Consultation",
+        source: propertySlug || property ? "Property Modal" : "Website Consultation",
         ...(resolvedSlug ? { propertySlug: resolvedSlug } : {}),
       });
-
       setReceipt(res.receipt);
     } catch (error) {
-      setErr((error as Error).message || t.enquiry.errorDesc);
+      const kind = error instanceof EnquiryError ? error.kind : undefined;
+      setErr(kind === "timeout" ? t.enquiry.errTimeout : kind === "network" ? t.enquiry.errNetwork : (error as Error).message || t.enquiry.errorDesc);
     } finally {
       setBusy(false);
     }
   }
 
-  const label = "eyebrow !text-muted-foreground !text-[0.65rem] block mb-1.5";
+  const label = "kicker !text-[0.62rem] text-muted-foreground block mb-1.5";
+  const errorId = (key: FieldKey) => `${id}-${key}-error`;
+  const fieldProps = (key: FieldKey) => ({
+    id: `${id}-${key}`,
+    "aria-invalid": invalid.includes(key) || undefined,
+    "aria-describedby": invalid.includes(key) ? errorId(key) : undefined,
+  });
+  const fieldError = (key: FieldKey) =>
+    invalid.includes(key) ? (
+      <p id={errorId(key)} className="mt-1.5 text-xs text-destructive">
+        {fieldMessage[key]}
+      </p>
+    ) : null;
+
+  if (receipt) {
+    return (
+      <div ref={successRef} tabIndex={-1} role="status" className="border border-brass/60 bg-secondary/60 p-5 text-sm text-foreground outline-none">
+        <p className="kicker text-brass-text">{t.enquiry.successTitle}</p>
+        <p className="mt-3 leading-relaxed">
+          {t.enquiry.propertyReference} <strong className="font-mono text-base tracking-wide">{receipt}</strong>
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.enquiry.successNext}</p>
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <a
+            href={contact.whatsapp + "?text=" + encodeURIComponent(`Hello Avrasya Advisory, my enquiry reference is ${receipt}.`)}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-primary text-xs"
+          >
+            {t.enquiry.directWhatsappBtn}
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              setReceipt("");
+              submission.current = null;
+              setConsent(false);
+              setV({ name: "", email: "", phone: "", topic: defaultTopic || "General consultation", budget: "", message: "", website: "" });
+            }}
+            className="btn btn-outline text-xs"
+          >
+            {t.enquiry.newEnquiry}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={submit} noValidate className="space-y-4">
+    <form onSubmit={submit} noValidate className="space-y-4" aria-busy={busy}>
       <fieldset disabled={busy || preview} className="space-y-4">
         <div>
-          <label htmlFor={id + "-name"} className={label}>
+          <label htmlFor={`${id}-name`} className={label}>
             {t.enquiry.fullName} *
           </label>
-          <input
-            id={id + "-name"}
-            className="field"
-            value={v.name}
-            onChange={set("name")}
-            autoComplete="name"
-            maxLength={200}
-            placeholder={t.enquiry.fullNamePlaceholder}
-          />
+          <input {...fieldProps("name")} className="field" value={v.name} onChange={set("name")} autoComplete="name" maxLength={200} placeholder={t.enquiry.fullNamePlaceholder} />
+          {fieldError("name")}
         </div>
         {!DEMO_MODE && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor={id + "-email"} className={label}>
+              <label htmlFor={`${id}-email`} className={label}>
                 {t.enquiry.email} *
               </label>
-              <input
-                id={id + "-email"}
-                className="field"
-                type="email"
-                autoComplete="email"
-                value={v.email}
-                onChange={set("email")}
-                maxLength={254}
-                placeholder={t.enquiry.emailPlaceholder}
-              />
+              <input {...fieldProps("email")} className="field" type="email" inputMode="email" autoComplete="email" value={v.email} onChange={set("email")} maxLength={254} placeholder={t.enquiry.emailPlaceholder} />
+              {fieldError("email")}
             </div>
             <div>
-              <label htmlFor={id + "-phone"} className={label}>
+              <label htmlFor={`${id}-phone`} className={label}>
                 {t.enquiry.phone} *
               </label>
-              <input
-                id={id + "-phone"}
-                className="field"
-                type="tel"
-                autoComplete="tel"
-                value={v.phone}
-                onChange={set("phone")}
-                maxLength={40}
-                placeholder={t.enquiry.phonePlaceholder}
-              />
+              <input {...fieldProps("phone")} className="field" type="tel" inputMode="tel" autoComplete="tel" value={v.phone} onChange={set("phone")} maxLength={40} placeholder={t.enquiry.phonePlaceholder} />
+              {fieldError("phone")}
             </div>
           </div>
         )}
         <div>
-          <label htmlFor={id + "-topic"} className={label}>
+          <label htmlFor={`${id}-topic`} className={label}>
             {t.enquiry.topic}
           </label>
-          <select
-            id={id + "-topic"}
-            className="field"
-            value={v.topic}
-            onChange={set("topic")}
-          >
-            {defaultTopic && !services.includes(defaultTopic) && (
-              <option>{defaultTopic}</option>
-            )}
+          <select id={`${id}-topic`} className="field" value={v.topic} onChange={set("topic")}>
+            {defaultTopic && !services.includes(defaultTopic) && <option>{defaultTopic}</option>}
             <optgroup label={t.nav.services}>
               {services.map((s) => (
                 <option key={s}>{s}</option>
@@ -209,110 +261,64 @@ export function Enquiry({
           </select>
         </div>
         <div>
-          <label htmlFor={id + "-budget"} className={label}>
+          <label htmlFor={`${id}-budget`} className={label}>
             {t.enquiry.budget}
           </label>
-          <input
-            id={id + "-budget"}
-            className="field"
-            value={v.budget}
-            onChange={set("budget")}
-            placeholder={t.enquiry.budgetPlaceholder}
-            maxLength={200}
-          />
+          <input id={`${id}-budget`} className="field" value={v.budget} onChange={set("budget")} placeholder={t.enquiry.budgetPlaceholder} maxLength={200} />
         </div>
         <div>
-          <label htmlFor={id + "-message"} className={label}>
+          <label htmlFor={`${id}-message`} className={label}>
             {t.enquiry.message} *
           </label>
-          <textarea
-            id={id + "-message"}
-            className="field min-h-28"
-            value={v.message}
-            onChange={set("message")}
-            maxLength={4000}
-            placeholder={t.enquiry.messagePlaceholder}
-          />
+          <textarea {...fieldProps("message")} className="field min-h-28" value={v.message} onChange={set("message")} maxLength={4000} placeholder={t.enquiry.messagePlaceholder} />
+          {fieldError("message")}
         </div>
         {!DEMO_MODE && (
           <>
+            {/* Honeypot: invisible to people, tempting to bots. The server rejects any value. */}
             <div className="hidden" aria-hidden="true">
               <label>
                 Website
-                <input
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={v.website}
-                  onChange={set("website")}
-                />
+                <input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} />
               </label>
             </div>
-            <label className="flex items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-              />
-              <span>{t.enquiry.termsConsent}</span>
-            </label>
+            <div>
+              <label className="flex min-h-11 items-start gap-3 text-xs leading-relaxed">
+                <input
+                  {...fieldProps("consent")}
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brass)]"
+                  checked={consent}
+                  onChange={(e) => {
+                    setConsent(e.target.checked);
+                    if (invalid.includes("consent")) setInvalid(invalid.filter((k) => k !== "consent"));
+                  }}
+                />
+                <span>{t.enquiry.termsConsent}</span>
+              </label>
+              {fieldError("consent")}
+            </div>
           </>
         )}
         {err && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="border-s-2 border-destructive ps-3 text-sm text-destructive">
             {err}
           </p>
         )}
-        {receipt ? (
-          <div role="status" className="rounded-xs border border-brass/50 bg-[#07191e] p-4 text-sm text-foreground space-y-2.5">
-            <div className="flex items-center gap-2 text-brass font-medium">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{t.enquiry.successTitle}</span>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t.enquiry.propertyReference} <strong className="text-brass font-mono">{receipt}</strong>. {t.enquiry.successDesc}
-            </p>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <a
-                href={contact.whatsapp + "?text=" + encodeURIComponent(`Hello Avrasya Advisory, my inquiry reference is ${receipt}: ${v.message}`)}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-primary text-xs !py-1.5"
-              >
-                {t.enquiry.directWhatsappBtn} →
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  setReceipt("");
-                  setV({ name: "", email: "", phone: "", topic: defaultTopic || "General consultation", budget: "", message: "", website: "" });
-                }}
-                className="btn btn-outline text-xs !py-1.5"
-              >
-                {t.common.retry}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button type="submit" className="btn btn-primary w-full shadow-sm btn-shimmer">
-            {busy ? t.enquiry.submitting : t.enquiry.submitBtn}
-          </button>
-        )}
-        <p className="text-xs text-muted-foreground">
+        <button type="submit" className="btn btn-primary w-full">
+          {busy ? t.enquiry.submitting : t.enquiry.submitBtn}
+        </button>
+        <p className="text-xs leading-relaxed text-muted-foreground">
           {t.enquiry.whatsappAlternative}{" "}
-          <a
-            className="underline"
-            href={contact.whatsapp + "?text=" + encodeURIComponent(buildMessage(v))}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a className="underline underline-offset-2" href={contact.whatsapp + "?text=" + encodeURIComponent(buildMessage(v))} target="_blank" rel="noreferrer">
             WhatsApp
           </a>
           ,{" "}
-          <a className="underline" href={"mailto:" + contact.email}>
+          <a className="underline underline-offset-2" href={"mailto:" + contact.email}>
             {contact.email}
           </a>{" "}
           or{" "}
-          <a className="underline" href={contact.phoneHref}>
+          <a className="underline underline-offset-2" href={contact.phoneHref}>
             {contact.phone}
           </a>
           .
@@ -321,4 +327,3 @@ export function Enquiry({
     </form>
   );
 }
-

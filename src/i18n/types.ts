@@ -562,6 +562,16 @@ export interface EnquiryTranslations {
   directWhatsappBtn: string;
   termsConsent: string;
   propertyReference: string;
+  errName: string;
+  errEmail: string;
+  errPhone: string;
+  errMessage: string;
+  errConsent: string;
+  errFix: string;
+  errTimeout: string;
+  errNetwork: string;
+  successNext: string;
+  newEnquiry: string;
 }
 
 export interface LegalDraftTranslations {
