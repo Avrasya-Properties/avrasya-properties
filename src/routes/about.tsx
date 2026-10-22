@@ -29,23 +29,7 @@ export const Route = createFileRoute("/about")({
 export function AboutPage() {
   const { t } = useTranslation();
   const contact = useLiveContact();
-  const leadership = [
-    {
-      name: "Selin Arda",
-      role: t.about.leader1Role,
-      desc: t.about.leader1Desc,
-    },
-    {
-      name: "Murat Kaya",
-      role: t.about.leader2Role,
-      desc: t.about.leader2Desc,
-    },
-    {
-      name: "Elif Demir",
-      role: t.about.leader3Role,
-      desc: t.about.leader3Desc,
-    },
-  ];
+
 
   const standards = [
     {
@@ -83,35 +67,7 @@ export function AboutPage() {
         <p>{t.about.description}</p>
       </PageIntro>
 
-      {/* Metrics Bar */}
-      <section className="border-b bg-card py-8">
-        <div className="container-site grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
-          <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
-            <p className="font-display text-3xl font-bold text-brass md:text-4xl">$120M+</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              {t.footer.explorePortfolio}
-            </p>
-          </div>
-          <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
-            <p className="font-display text-3xl font-bold text-brass md:text-4xl">38+</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              {t.home.bosphorusTitleEm}
-            </p>
-          </div>
-          <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
-            <p className="font-display text-3xl font-bold text-brass md:text-4xl">100%</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              {t.home.stat1Title}
-            </p>
-          </div>
-          <div className="card-elevate rounded-xs p-3 transition-all hover:bg-secondary/40">
-            <p className="font-display text-3xl font-bold text-brass md:text-4xl">14 Yrs</p>
-            <p className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">
-              {t.footer.tagline}
-            </p>
-          </div>
-        </div>
-      </section>
+
 
       {/* Philosophy & Headquarters */}
       <section className="container-site py-16">
@@ -166,34 +122,6 @@ export function AboutPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Leadership Team */}
-      <section className="container-site py-20 border-b">
-        <div className="max-w-2xl mb-12">
-          <p className="eyebrow">{t.about.leadershipEyebrow}</p>
-          <h2 className="font-display text-3xl font-semibold md:text-4xl">
-            {t.about.leadershipTitle}
-          </h2>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {leadership.map((l) => (
-            <div key={l.name} className="card-elevate rounded-xs border border-border/80 bg-card p-6 shadow-xs hover:-translate-y-1 transition-all">
-              <div className="h-12 w-12 rounded-full bg-brass/10 text-brass flex items-center justify-center font-bold text-lg font-display mb-4">
-                {l.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </div>
-              <h3 className="font-display text-xl font-bold text-foreground">{l.name}</h3>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brass mt-1">
-                {l.role}
-              </p>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{l.desc}</p>
-            </div>
-          ))}
         </div>
       </section>
 

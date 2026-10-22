@@ -21,6 +21,7 @@ import { Route as InvestmentDisclaimerRouteImport } from './routes/investment-di
 import { Route as InvestmentInTurkiyeRouteImport } from './routes/investment-in-turkiye'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WhyTurkiyeRouteImport } from './routes/why-turkiye'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -36,6 +37,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as PropertiesSlugRouteImport } from './routes/properties.$slug'
+import { Route as RegionsSlugRouteImport } from './routes/regions.$slug'
 import { Route as AdminLeadsIndexRouteImport } from './routes/admin.leads.index'
 import { Route as AdminLeadsIdRouteImport } from './routes/admin.leads.$id'
 import { Route as AdminProjectsIndexRouteImport } from './routes/admin.projects.index'
@@ -101,6 +103,11 @@ const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -178,6 +185,11 @@ const PropertiesSlugRoute = PropertiesSlugRouteImport.update({
   path: '/properties/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegionsSlugRoute = RegionsSlugRouteImport.update({
+  id: '/regions/$slug',
+  path: '/regions/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLeadsIndexRoute = AdminLeadsIndexRouteImport.update({
   id: '/leads/',
   path: '/leads/',
@@ -222,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -235,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
+  '/regions/$slug': typeof RegionsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/properties/': typeof PropertiesIndexRoute
   '/admin/leads/$id': typeof AdminLeadsIdRoute
@@ -256,6 +270,7 @@ export interface FileRoutesByTo {
   '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -269,6 +284,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
+  '/regions/$slug': typeof RegionsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/properties': typeof PropertiesIndexRoute
   '/admin/leads/$id': typeof AdminLeadsIdRoute
@@ -292,6 +308,7 @@ export interface FileRoutesById {
   '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -305,6 +322,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
+  '/regions/$slug': typeof RegionsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/properties/': typeof PropertiesIndexRoute
   '/admin/leads/$id': typeof AdminLeadsIdRoute
@@ -329,6 +347,7 @@ export interface FileRouteTypes {
     | '/investment-in-turkiye'
     | '/privacy-policy'
     | '/services'
+    | '/sitemap.xml'
     | '/terms'
     | '/why-turkiye'
     | '/admin/analytics'
@@ -342,6 +361,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
+    | '/regions/$slug'
     | '/admin/'
     | '/properties/'
     | '/admin/leads/$id'
@@ -363,6 +383,7 @@ export interface FileRouteTypes {
     | '/investment-in-turkiye'
     | '/privacy-policy'
     | '/services'
+    | '/sitemap.xml'
     | '/terms'
     | '/why-turkiye'
     | '/admin/analytics'
@@ -376,6 +397,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
+    | '/regions/$slug'
     | '/admin'
     | '/properties'
     | '/admin/leads/$id'
@@ -398,6 +420,7 @@ export interface FileRouteTypes {
     | '/investment-in-turkiye'
     | '/privacy-policy'
     | '/services'
+    | '/sitemap.xml'
     | '/terms'
     | '/why-turkiye'
     | '/admin/analytics'
@@ -411,6 +434,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
+    | '/regions/$slug'
     | '/admin/'
     | '/properties/'
     | '/admin/leads/$id'
@@ -434,9 +458,11 @@ export interface RootRouteChildren {
   InvestmentInTurkiyeRoute: typeof InvestmentInTurkiyeRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ServicesRoute: typeof ServicesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   WhyTurkiyeRoute: typeof WhyTurkiyeRoute
   PropertiesSlugRoute: typeof PropertiesSlugRoute
+  RegionsSlugRoute: typeof RegionsSlugRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
 }
 
@@ -524,6 +550,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -631,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/regions/$slug': {
+      id: '/regions/$slug'
+      path: '/regions/$slug'
+      fullPath: '/regions/$slug'
+      preLoaderRoute: typeof RegionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/leads/': {
       id: '/admin/leads/'
       path: '/leads'
@@ -731,9 +771,11 @@ const rootRouteChildren: RootRouteChildren = {
   InvestmentInTurkiyeRoute: InvestmentInTurkiyeRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ServicesRoute: ServicesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   WhyTurkiyeRoute: WhyTurkiyeRoute,
   PropertiesSlugRoute: PropertiesSlugRoute,
+  RegionsSlugRoute: RegionsSlugRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
 }
 export const routeTree = rootRouteImport

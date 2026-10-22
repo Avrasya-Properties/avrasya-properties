@@ -1,7 +1,10 @@
 // Account creation is restricted to an active administrator with a live Auth session.
-const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization,apikey,content-type,x-client-info","Access-Control-Allow-Methods":"POST,OPTIONS"};
-const respond=(data:unknown,status:number)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json","Cache-Control":"no-store"}});
+// Same origin policy as admin-access: restricted to WEBSITE_ALLOWED_ORIGINS when that secret is set.
+const corsFor=(req:Request)=>{const allowed=(Deno.env.get("WEBSITE_ALLOWED_ORIGINS")||"").split(",").map(x=>x.trim()).filter(Boolean);const origin=req.headers.get("origin")||"";return {ok:!allowed.length||!origin||allowed.includes(origin),headers:{"Access-Control-Allow-Origin":!allowed.length?"*":allowed.includes(origin)?origin:"null","Access-Control-Allow-Headers":"authorization,apikey,content-type,x-client-info","Access-Control-Allow-Methods":"POST,OPTIONS","Vary":"Origin"}};};
 Deno.serve(async(req:Request)=>{
+ const {ok:originOk,headers:cors}=corsFor(req);
+ const respond=(data:unknown,status:number)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json","Cache-Control":"no-store"}});
+ if(!originOk)return respond({error:"Origin not allowed."},403);
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:cors});
  if(req.method!=="POST")return respond({error:"Use POST."},405);
  const bearer=req.headers.get("Authorization")||"";if(!bearer.startsWith("Bearer "))return respond({error:"Please sign in."},401);

@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // Pre-bundle animation/3D dependencies up front: discovering them mid-session re-optimises the dep cache
+    // and can leave two React copies loaded in dev ("Invalid hook call").
+    optimizeDeps: { include: ["gsap", "gsap/ScrollTrigger", "@gsap/react", "three"] },
+  },
 });

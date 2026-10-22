@@ -5,12 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Newsreader", Georgia, serif;
+  --font-display: "Cormorant Garamond", "Newsreader", Georgia, serif;
   --font-sans: "Manrope", system-ui, sans-serif;
   --radius-sm: 0.125rem;
   --radius-md: 0.25rem;
   --radius-lg: 0.375rem;
   --radius-xl: 0.5rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.5rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -27,6 +29,11 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-brass: var(--brass);
   --color-brass-text: var(--brass-text);
+  --color-brass-light: var(--brass-light);
+  --color-night: var(--night);
+  --color-night-2: var(--night-2);
+  --color-teal: var(--teal);
+  --color-stone: var(--stone);
   --color-ink: var(--ink);
   --color-on-dark: var(--on-dark);
   --color-on-dark-muted: var(--on-dark-muted);
@@ -58,6 +65,11 @@
   --accent-foreground: oklch(0.27 0.03 225);
   --brass: oklch(0.67 0.09 75); /* #B78C4D */
   --brass-text: oklch(0.47 0.08 70); /* #785728 */
+  --brass-light: #e5c378;
+  --night: #07191e;
+  --night-2: #0c1e23;
+  --teal: #14444c;
+  --stone: #eeede7;
   --ink: oklch(0.27 0.03 225);
   --on-dark: oklch(0.973 0.006 95);
   --on-dark-muted: oklch(0.84 0.01 210);
@@ -86,10 +98,12 @@
   }
   h1,
   h2,
-  h3 {
+  h3,
+  .font-display {
     font-family: var(--font-display);
     font-weight: 500;
     letter-spacing: -0.01em;
+    font-variant-numeric: lining-nums;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
@@ -149,22 +163,31 @@
 @utility display-hero {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 2.5rem;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-size: 2.75rem;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
   @media (min-width: 768px) {
-    font-size: 4.25rem;
-    line-height: 1.1;
+    font-size: 5rem;
+    line-height: 1;
   }
 }
 @utility headline {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 1.75rem;
-  line-height: 1.25;
+  font-size: 2.1rem;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
   @media (min-width: 768px) {
-    font-size: 2.25rem;
+    font-size: 3rem;
   }
+}
+/* Oversized serif figures used as editorial punctuation (counts, step numbers). */
+@utility numeral {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-variant-numeric: lining-nums;
 }
 @utility field {
   width: 100%;
@@ -220,21 +243,6 @@
     transform: translateX(3px);
   }
 }
-
-.hero-zoom {
-  animation: heroZoom 650ms ease-out both;
-}
-@keyframes heroZoom {
-  from {
-    transform: scale(1.02);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-.rise {
-  animation: rise 400ms ease-out both;
-}
 @keyframes rise {
   from {
     opacity: 0;
@@ -243,46 +251,6 @@
   to {
     opacity: 1;
     transform: none;
-  }
-}
-.fade-swap {
-  animation: fadeSwap 280ms ease-out;
-}
-@keyframes fadeSwap {
-  from {
-    opacity: 0.2;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@media (hover: hover) and (pointer: fine) {
-  .img-hover {
-    transition: transform 220ms ease-out;
-  }
-  .group:hover .img-hover {
-    transform: scale(1.025);
-  }
-}
-.preloader {
-  animation: preOut 250ms ease-in 950ms forwards;
-}
-.preloader-line {
-  animation: preLine 1s ease-in-out infinite;
-}
-@keyframes preOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-@keyframes preLine {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(250%);
   }
 }
 details > summary {
@@ -297,12 +265,17 @@ details[open] .faq-body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
   }
   .preloader {
     display: none;
@@ -416,53 +389,6 @@ details[open] .faq-body {
 .link-u:hover {
   background-size: 100% 1px;
 }
-
-/* 3D tilt + sheen */
-.tilt {
-  --rx: 0deg;
-  --ry: 0deg;
-  --mx: 50%;
-  --my: 50%;
-  transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry));
-  transform-style: preserve-3d;
-  transition:
-    transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 500ms;
-  position: relative;
-}
-.tilt:hover {
-  transition-duration: 120ms;
-  box-shadow: 0 30px 60px -30px color-mix(in oklab, var(--ink) 45%, transparent);
-}
-.tilt::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 300ms;
-  background: radial-gradient(
-    circle at var(--mx) var(--my),
-    color-mix(in oklab, var(--on-dark) 45%, transparent),
-    transparent 45%
-  );
-  mix-blend-mode: soft-light;
-}
-.tilt:hover::before {
-  opacity: 1;
-}
-.lift {
-  transform: translateZ(40px);
-}
-
-/* Architectural blueprint backdrop */
-.blueprint {
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
 .outline-word {
   font-family: var(--font-display);
   color: transparent;
@@ -471,55 +397,6 @@ details[open] .faq-body {
   letter-spacing: -0.02em;
   padding-top: 0.05em;
   display: block;
-}
-
-/* 3D tower model */
-.tower-scene {
-  perspective: 900px;
-}
-.tower {
-  position: relative;
-  width: 120px;
-  height: 260px;
-  transform-style: preserve-3d;
-  animation: towerSpin 18s linear infinite;
-}
-.tower > i {
-  position: absolute;
-  inset: 0;
-  border: 1px solid color-mix(in oklab, var(--brass) 70%, transparent);
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0 18px,
-      color-mix(in oklab, var(--brass) 30%, transparent) 18px 19px
-    ),
-    color-mix(in oklab, var(--primary) 6%, transparent);
-}
-.tower > i:nth-child(1) {
-  transform: translateZ(60px);
-}
-.tower > i:nth-child(2) {
-  transform: rotateY(90deg) translateZ(60px);
-}
-.tower > i:nth-child(3) {
-  transform: rotateY(180deg) translateZ(60px);
-}
-.tower > i:nth-child(4) {
-  transform: rotateY(-90deg) translateZ(60px);
-}
-.tower > i:nth-child(5) {
-  height: 120px;
-  transform: rotateX(90deg) translateZ(60px);
-  background: color-mix(in oklab, var(--brass) 25%, transparent);
-}
-@keyframes towerSpin {
-  from {
-    transform: rotateX(-14deg) rotateY(0);
-  }
-  to {
-    transform: rotateX(-14deg) rotateY(360deg);
-  }
 }
 
 /* Marquee */
@@ -535,39 +412,6 @@ details[open] .faq-body {
   }
 }
 
-/* Preloader v2 */
-.pl-curtain {
-  animation: curtain 700ms cubic-bezier(0.8, 0, 0.2, 1) 1050ms forwards;
-}
-@keyframes curtain {
-  to {
-    transform: translateY(-100%);
-    visibility: hidden;
-  }
-}
-.pl-logo {
-  clip-path: inset(0 100% 0 0);
-  animation: logoIn 800ms cubic-bezier(0.7, 0, 0.2, 1) 100ms forwards;
-}
-@keyframes logoIn {
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-.pl-bar {
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: bar 900ms cubic-bezier(0.7, 0, 0.2, 1) 100ms forwards;
-}
-@keyframes bar {
-  to {
-    transform: scaleX(1);
-  }
-}
-.pl-text {
-  animation: rise 500ms ease-out 500ms both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .js-motion [data-reveal] {
     opacity: 1 !important;
@@ -577,135 +421,12 @@ details[open] .faq-body {
   .tilt {
     transform: none !important;
   }
-  .marquee-track,
-  .tower {
+  .marquee-track {
     animation: none !important;
-  }
-  .pl-curtain {
-    display: none;
   }
 }
 .outline-light {
   -webkit-text-stroke-color: color-mix(in oklab, var(--on-dark) 22%, transparent);
-}
-
-/* Spatial glassmorphism and weightless motion utilities */
-.glass-panel {
-  background: color-mix(in oklab, var(--card) 88%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
-}
-
-.glass-panel-dark {
-  background: rgba(14, 25, 34, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-pill {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 4px 14px -3px rgba(23, 43, 51, 0.08);
-}
-
-.glass-pill-dark {
-  background: rgba(17, 36, 48, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.25);
-}
-
-.card-elevate {
-  transition:
-    transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 400ms ease;
-  will-change: transform;
-}
-.card-elevate:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 20px 40px -15px rgba(23, 43, 51, 0.09),
-    0 0 0 1px rgba(183, 140, 77, 0.25);
-}
-
-.img-zoom-container {
-  overflow: hidden;
-}
-.img-zoom-container img {
-  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-.group:hover .img-zoom-container img,
-.card-elevate:hover .img-zoom-container img {
-  transform: scale(1.035);
-}
-
-.ambient-glow {
-  position: relative;
-}
-.ambient-glow::after {
-  content: "";
-  position: absolute;
-  inset: -15px;
-  background: radial-gradient(circle at 50% 50%, rgba(183, 140, 77, 0.14), transparent 70%);
-  filter: blur(20px);
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 400ms ease;
-}
-.ambient-glow:hover::after {
-  opacity: 1;
-}
-
-.btn-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.btn-shimmer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-  transform: skewX(-20deg);
-  transition: none;
-}
-.btn-shimmer:hover::before {
-  left: 150%;
-  transition: left 750ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.float-gentle {
-  animation: floatGentle 5s ease-in-out infinite;
-}
-
-@keyframes floatGentle {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.hover-glow {
-  transition:
-    box-shadow 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    border-color 350ms;
-}
-.hover-glow:hover {
-  box-shadow: 0 16px 36px -12px rgba(183, 140, 77, 0.18);
-  border-color: rgba(183, 140, 77, 0.55);
 }
 
 /* Custom Luxury Range Slider */
@@ -750,117 +471,6 @@ details[open] .faq-body {
   box-shadow: 0 6px 18px rgba(183, 140, 77, 0.65);
 }
 
-.text-gradient-brass {
-  background: linear-gradient(135deg, #d4af37 0%, #b78c4d 50%, #8e6a2b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Editorial Architectural Monograph & Ledger Styling */
-.arch-crosshair {
-  position: relative;
-}
-.arch-crosshair::before,
-.arch-crosshair::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  background-color: var(--brass);
-  opacity: 0.6;
-}
-.arch-crosshair-tl::before {
-  top: -4px;
-  left: -1px;
-  width: 2px;
-  height: 9px;
-}
-.arch-crosshair-tl::after {
-  top: -1px;
-  left: -4px;
-  width: 9px;
-  height: 2px;
-}
-.arch-crosshair-tr::before {
-  top: -4px;
-  right: -1px;
-  width: 2px;
-  height: 9px;
-}
-.arch-crosshair-tr::after {
-  top: -1px;
-  right: -4px;
-  width: 9px;
-  height: 2px;
-}
-.arch-crosshair-br::before {
-  bottom: -4px;
-  right: -1px;
-  width: 2px;
-  height: 9px;
-}
-.arch-crosshair-br::after {
-  bottom: -1px;
-  right: -4px;
-  width: 9px;
-  height: 2px;
-}
-.arch-crosshair-bl::before {
-  bottom: -4px;
-  left: -1px;
-  width: 2px;
-  height: 9px;
-}
-.arch-crosshair-bl::after {
-  bottom: -1px;
-  left: -4px;
-  width: 9px;
-  height: 2px;
-}
-
-/* Micro-Pulse for Live Advisory Desk Status */
-.pulse-live {
-  position: relative;
-  display: inline-flex;
-}
-.pulse-live::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 9999px;
-  background-color: #10b981;
-  opacity: 0.75;
-  animation: pingLive 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-@keyframes pingLive {
-  75%,
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
-/* Subtle Architectural Grid Background */
-.bg-blueprint-grid {
-  background-size: 32px 32px;
-  background-image:
-    linear-gradient(to right, rgba(23, 56, 74, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(23, 56, 74, 0.04) 1px, transparent 1px);
-}
-.bg-blueprint-grid-dark {
-  background-size: 32px 32px;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-}
-
-/* Monograph Ledger Badges */
-.ledger-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 /* The navy/cream editorial hierarchy follows the supplied Avrasya reference. */
 .site-page-intro .text-muted-foreground { color: var(--on-dark-muted); }
 .site-page-intro .text-foreground { color: var(--on-dark); }
@@ -903,3 +513,185 @@ main h1, main h2, main h3, main p, footer a, footer li { overflow-wrap: break-wo
 .avrasya-preloader { animation: preloaderSafety 3s step-end forwards; }
 @keyframes preloaderSafety { to { visibility: hidden; pointer-events: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .avrasya-preloader { display: none; } }
+
+/* =====================================================================
+   Design layer v2 - "quiet architectural monograph"
+   Flat surfaces, hairline rules, one hover language (the brass fill),
+   oversized serif figures. No blur, shimmer or fake-live indicators.
+   ===================================================================== */
+.glass-pill-dark {
+  background: rgba(7, 25, 30, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.pulse-live {
+  display: inline-flex; /* static status dot; the live ping was decorative */
+}
+.card-elevate {
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+.card-elevate:hover {
+  border-color: color-mix(in oklab, var(--brass) 55%, transparent);
+  box-shadow: 0 18px 40px -26px rgba(7, 25, 30, 0.35);
+}
+.img-zoom-container {
+  overflow: hidden;
+}
+.img-zoom-container img {
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .img-zoom-container img,
+.card-elevate:hover .img-zoom-container img {
+  transform: scale(1.04);
+}
+/* Pointer tilt only exists while hovering; at rest there is no 3D context at all. */
+.tilt {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .tilt:hover {
+    transform: perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry));
+    transition-duration: 120ms;
+  }
+}
+
+/* Keyboard users get a visible skip link and focus ring on form controls. */
+.skip-link:focus {
+  position: fixed;
+  inset: 0.75rem auto auto 0.75rem;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: var(--night);
+  color: #fff;
+  clip: auto;
+  width: auto;
+  height: auto;
+}
+.field:focus,
+.field:focus-visible {
+  outline: none;
+  border-color: var(--brass);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brass) 28%, transparent);
+}
+
+/* Editorial helpers */
+.rule-t {
+  border-top: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+}
+.rule-b {
+  border-bottom: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+}
+.kicker {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Horizontal snap rail: a swipeable row on phones, a plain grid from tablet up. */
+.snap-rail {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1rem;
+  margin-inline: -1rem;
+  padding-inline: 1rem;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+.snap-rail::-webkit-scrollbar {
+  display: none;
+}
+.snap-rail > * {
+  flex: 0 0 84%;
+  max-width: 24rem;
+  scroll-snap-align: start;
+}
+@media (min-width: 640px) {
+  .snap-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    margin-inline: 0;
+    padding: 0;
+    gap: 1.5rem;
+  }
+  .snap-rail > * {
+    max-width: none;
+  }
+}
+@media (min-width: 1024px) {
+  .snap-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Phones and every touch device (including tablets): 16px inputs stop iOS zoom, 44px targets. */
+@media (pointer: coarse) {
+  main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  main select,
+  main textarea,
+  .site-header select {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  main button,
+  main a.btn,
+  .site-header button {
+    min-height: 44px;
+  }
+  main button[aria-label],
+  main button[title],
+  main a[aria-label] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  [aria-haspopup="listbox"],
+  [aria-label="Change language"] {
+    min-height: 44px;
+  }
+}
+
+/* Scroll-led process: dim inactive steps only once JavaScript has taken over (desktop). */
+.process-list.is-live .process-step {
+  opacity: 0.5;
+  transition: opacity 500ms ease;
+}
+.process-list.is-live .process-step.is-active {
+  opacity: 1;
+}
+
+/* Preloader: one clip-reveal on the logo and a hairline that draws once. */
+.preloader-logo {
+  clip-path: inset(0 100% 0 0);
+  animation: preloaderReveal 700ms cubic-bezier(0.7, 0, 0.2, 1) 120ms forwards;
+}
+.preloader-line {
+  transform: scaleX(0);
+  animation: preloaderDraw 800ms cubic-bezier(0.7, 0, 0.2, 1) 200ms forwards;
+}
+@keyframes preloaderReveal {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes preloaderDraw {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* House rule: no frosted glass. Any leftover backdrop blur utilities render as plain solid surfaces. */
+header [class*="backdrop-blur"],
+main [class*="backdrop-blur"],
+footer [class*="backdrop-blur"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}

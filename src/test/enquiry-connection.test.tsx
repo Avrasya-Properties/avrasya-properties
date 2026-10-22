@@ -16,6 +16,8 @@ describe("real enquiry form contract",()=>{
     const {container}=render(<Enquiry compact propertySlug="real-property" defaultTopic="Real property"/>);
     fireEvent.change(screen.getByLabelText(/full name/i),{target:{value:"Test buyer"}});
     fireEvent.change(screen.getByLabelText(/email/i),{target:{value:"test@example.test"}});
+    // The server requires a phone number as well as an email (private.accept_enquiry).
+    fireEvent.change(screen.getByLabelText(/phone/i),{target:{value:"+90 555 123 4567"}});
     fireEvent.change(screen.getByLabelText(/message/i),{target:{value:"Please arrange a viewing"}});
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.submit(container.querySelector("form")!);
@@ -28,5 +30,30 @@ describe("real enquiry form contract",()=>{
     await waitFor(()=>expect(invoke).toHaveBeenCalledTimes(2));
     expect(invoke.mock.calls[1]![1].body.idempotencyKey).toBe(first.idempotencyKey);
     await screen.findByText(/AVR-ACTUAL-SERVER-RECEIPT/);
+  });
+  it("blocks a submission the server would reject and says which field is wrong",async()=>{
+    const {container}=render(<Enquiry compact/>);
+    fireEvent.change(screen.getByLabelText(/full name/i),{target:{value:"Test buyer"}});
+    fireEvent.change(screen.getByLabelText(/email/i),{target:{value:"test@example.test"}});
+    fireEvent.change(screen.getByLabelText(/message/i),{target:{value:"Please arrange a viewing"}});
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.submit(container.querySelector("form")!);
+    expect(await screen.findByText(/phone number with country code/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/phone/i)).toHaveAttribute("aria-invalid","true");
+    expect(screen.getByLabelText(/phone/i)).toHaveFocus();
+    expect(invoke).not.toHaveBeenCalled();
+  });
+  it("tells the visitor when the request timed out instead of claiming success",async()=>{
+    invoke.mockResolvedValue({data:null,error:Object.assign(new Error("Failed to send a request to the Edge Function"),{name:"FunctionsFetchError",context:Object.assign(new Error("signal is aborted"),{name:"AbortError"})})});
+    const {container}=render(<Enquiry compact/>);
+    fireEvent.change(screen.getByLabelText(/full name/i),{target:{value:"Test buyer"}});
+    fireEvent.change(screen.getByLabelText(/email/i),{target:{value:"test@example.test"}});
+    fireEvent.change(screen.getByLabelText(/phone/i),{target:{value:"+90 555 123 4567"}});
+    fireEvent.change(screen.getByLabelText(/message/i),{target:{value:"Please arrange a viewing"}});
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.submit(container.querySelector("form")!);
+    expect(await screen.findByText(/connection timed out/i)).toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/AVR-/);
+    expect(invoke.mock.calls[0]![1].timeout).toBeGreaterThan(0);
   });
 });

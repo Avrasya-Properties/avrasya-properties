@@ -149,7 +149,7 @@ async function fits(label) {
         return (
           r.width > 0 &&
           (r.right > innerWidth + 2 || r.left < -2) &&
-          !e.closest(".marquee,.outline-word,[data-parallax]")
+          !e.closest(".marquee,.outline-word,[data-parallax],[data-scroll-x]")
         );
       })
       .slice(0, 15)
@@ -285,14 +285,14 @@ try {
   await fits("Expanded mobile filters");
   await page.type('input[type="search"]', "nothing matches");
   await page.waitForFunction(() =>
-    document.body.textContent.includes("No listings match your filters."),
+    document.body.textContent.includes("No properties match your filter criteria"),
   );
   await page.click('a[href="/properties"].underline');
   await page.waitForFunction(() => document.querySelector('input[type="search"]').value === "");
   results.push(
     "Mobile filters expand, keyword filtering works and reset clears the visible search field",
   );
-  await page.click('button[title="List View"]');
+  await page.click('button[title="List view"]');
   await fits("Mobile list view");
   assert.equal(
     await page.evaluate(
@@ -312,7 +312,7 @@ try {
       text.includes("MOBILE-01"),
   );
   assert.equal(text.includes("Miele / Gaggenau"), false);
-  await page.click('button[title="Save to shortlist"]');
+  await page.click('button[title="Save"]');
   await page.click('header a[aria-label^="Saved properties"]');
   await page.waitForFunction(() => location.search.includes("savedOnly=true"));
   assert.equal(await page.$$eval("main article", (els) => els.length), 1);
@@ -320,10 +320,10 @@ try {
     "Correct gross/net areas, description and reference; saved-property navigation filters the catalogue",
   );
   await visit("/properties/" + offer.slug);
-  await page.$eval('button[aria-label="View photo 2"]', (e) =>
+  await page.$eval('button[aria-label="Fullscreen View 2"]', (e) =>
     e.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }),
   );
-  await page.click('button[aria-label="View photo 2"]');
+  await page.click('button[aria-label="Fullscreen View 2"]');
   await page.waitForFunction(
     () =>
       document.querySelector("[data-property-detail] section img")?.getAttribute("src") ===

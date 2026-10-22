@@ -1,5 +1,5 @@
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -234,6 +234,14 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
   const navigate = useNavigate();
 
   const active = CORRIDORS.find((c) => c.id === selectedId) || filteredCorridors[0]!;
+  const dossier = useRef<HTMLDivElement>(null);
+  // On narrow screens the dossier sits below the list, so bring it into view after a choice.
+  const selectCorridor = (id: string) => {
+    setSelectedId(id);
+    if (typeof window !== "undefined" && window.matchMedia?.("(max-width: 1023px)").matches) {
+      requestAnimationFrame(() => dossier.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+  };
 
   const content = (
     <div className="relative z-10">
@@ -289,8 +297,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
       ) : (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border/70 pb-4">
           <div className="flex items-center gap-2">
-            <span className="pulse-live h-2 w-2 rounded-full bg-emerald-500 mr-1" />
-            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+            <span className="kicker text-muted-foreground">
               {t.whyTurkiye.eyebrow}
             </span>
           </div>
@@ -345,7 +352,8 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
                   key={c.id}
                   role="tab"
                   aria-selected={isSelected}
-                  onClick={() => setSelectedId(c.id)}
+                  aria-controls="district-dossier"
+                  onClick={() => selectCorridor(c.id)}
                   className={`card-elevate group relative flex w-full flex-col overflow-hidden rounded-xs border p-4 text-left transition-all duration-300 ${
                     isSelected
                       ? "border-brass bg-card shadow-md border-l-4 border-l-brass -translate-y-0.5"
@@ -380,8 +388,8 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
           </div>
 
           {/* Deep Architectural Intelligence Dossier for Active District */}
-          <div className="ambient-glow">
-            <div className="card-elevate rounded-xs border border-border/80 bg-card/95 backdrop-blur-md shadow-lg p-6 sm:p-8 flex flex-col justify-between">
+          <div ref={dossier} id="district-dossier" role="tabpanel" className="scroll-mt-24">
+            <div className="card-elevate rounded-xs border border-border/80 bg-card shadow-lg p-6 sm:p-8 flex flex-col justify-between">
               {/* Top Registration Info */}
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-4">
@@ -465,6 +473,10 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
                     </p>
                   </div>
                 </div>
+
+                <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+                  Market figures are indicative notes from our advisory team, not offers, valuations or guarantees of return. Ask us for current, verified numbers before you decide.
+                </p>
 
                 {/* Due Diligence Checklist Highlights */}
                 <div className="mt-6 space-y-3">

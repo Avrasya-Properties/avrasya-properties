@@ -1,4 +1,5 @@
 import { DEFAULT_SITE_SETTINGS, type DB, type SiteSettings } from "./demo";
+import { normalizeRegions } from "@/data/regions";
 export type Row = Record<string, unknown>;
 export const TABLES = {properties:"marketing_offers",contacts:"contacts",leads:"leads",tasks:"tasks",viewings:"viewings",deals:"deals",inquiries:"enquiries"} as const;
 export type Collection = keyof typeof TABLES;
@@ -14,7 +15,7 @@ export const FIELDS: Record<Collection, Record<string,string>> = {
 export const SETTINGS: Record<keyof SiteSettings,string> = {
 websiteDesign:"website_design",
 companyName:"company_name",registeredEntity:"registered_entity",taxOffice:"tax_office",licenseNo:"license_no",tagline:"tagline",email:"email",phone:"phone",whatsapp:"whatsapp",address:"address",advisoryHours:"advisory_hours",heroHeadline:"hero_headline",heroSubtitle:"hero_subtitle",eyebrowText:"eyebrow_text",cbiThresholdUsd:"cbi_threshold_usd",preloaderOpacity:"preloader_opacity",exchangeRateEur:"exchange_rate_eur",exchangeRateTry:"exchange_rate_try",exchangeRateGbp:"exchange_rate_gbp",enableFrankfurterSync:"enable_frankfurter_sync",announcementText:"announcement_text",announcementActive:"announcement_active",
-districts:"districts",layouts:"layouts",budgetRanges:"budget_ranges",
+districts:"districts",regions:"regions",layouts:"layouts",budgetRanges:"budget_ranges",
 siteTitle:"site_title",metaDescription:"meta_description",siteUrl:"site_url",ogImage:"og_image",keywords:"keywords",googleVerification:"google_verification",indexingEnabled:"indexing_enabled"
 };
 export function decode<C extends Collection>(collection:C,row:Row): DB[C][number] {
@@ -47,6 +48,7 @@ export function decodeSettings(row:Row):SiteSettings {
   return fallback;
  };
  s.districts=array(s.districts,DEFAULT_SITE_SETTINGS.districts);
+ s.regions=normalizeRegions(row["regions"],s.districts);
  s.layouts=array(s.layouts,DEFAULT_SITE_SETTINGS.layouts);
  s.budgetRanges=array(s.budgetRanges,DEFAULT_SITE_SETTINGS.budgetRanges);
  s.websiteDesign=s.websiteDesign&&typeof s.websiteDesign==="object"&&!Array.isArray(s.websiteDesign)?s.websiteDesign:{};

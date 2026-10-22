@@ -19,6 +19,7 @@ import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import {loadCatalogue,loadPublicSettings} from "@/data/live";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import type { SiteSettings } from "@/admin/demo";
 import {DEMO_MODE,SUPABASE_URL} from "@/lib/supabase";
 
 function NotFoundComponent() {
@@ -85,23 +86,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
     ]);
   },
-  head: () => ({
+  // Hand the already-fetched public settings to head() so admin SEO switches apply to every public page.
+  loader: ({ context, location }) =>
+    location.pathname.startsWith("/admin") ? { settings: null } : { settings: context.queryClient.getQueryData<SiteSettings>(["site-settings"]) ?? null },
+  head: ({ loaderData }) => ({
     meta: [
+      ...(loaderData?.settings?.indexingEnabled === false ? [{ name: "robots", content: "noindex, nofollow" }] : []),
+      ...(loaderData?.settings?.googleVerification?.trim() ? [{ name: "google-site-verification", content: loaderData.settings.googleVerification.trim() }] : []),
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
+      { title: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },
       {
         name: "description",
-        content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment.",
+        content: "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment.",
       },
       { property: "og:site_name", content: "Avrasya Properties" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
-      { property: "og:description", content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment." },
+      { property: "og:title", content: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },
+      { property: "og:description", content: "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment." },
       { property: "og:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Avrasya Properties — Istanbul Luxury Real Estate & Investment Advisory" },
-      { name: "twitter:description", content: "Istanbul property advisory for international buyers. Explore verified luxury properties, independent legal review, and Turkish citizenship by investment." },
+      { name: "twitter:title", content: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },
+      { name: "twitter:description", content: "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment." },
       { name: "twitter:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
       { name: "avrasya-data-mode", content: DEMO_MODE?"demo":"live" },
       { name: "avrasya-database", content: new URL(SUPABASE_URL).hostname },
@@ -111,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Vazirmatn:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap",
       },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -223,7 +229,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <a href="#main" className="sr-only focus:not-sr-only">
+        <a href="#main" className="skip-link sr-only">
           Skip to content
         </a>
         <Preloader />

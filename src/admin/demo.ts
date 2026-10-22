@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react";
 import { websiteChanged } from "@/lib/website-sync";
 import { contactMatch, exactBudget, requireAmount, requireDate, requireEnum, requireText, validateDealSelection, validateSettings, validateWorkspace } from "./domain.js";
 import { properties as sourceRecords, getPropertyMedia } from "@/data/properties";
+import { defaultRegions, type Region } from "@/data/regions";
 
 export type Role = "admin" | "manager" | "agent" | "viewer";
 export type User = { id: string; name: string; email: string; role: Role };
@@ -86,6 +87,7 @@ export type SiteSettings = {
   announcementText: string;
   announcementActive: boolean;
   districts: string[];
+  regions: Region[];
   layouts: string[];
   budgetRanges: BudgetRange[];
   siteTitle: string;
@@ -134,6 +136,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     "Bomonti",
     "Zekeriyaköy",
   ],
+  regions: defaultRegions(),
   layouts: [
     "Studio",
     "1+1",
