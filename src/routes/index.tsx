@@ -16,7 +16,7 @@ import { meta } from "@/components/site/TextPage";
 import { useCatalogue, loadPublicSettings } from "@/data/live";
 import { useSiteSettings } from "@/admin/store";
 import { AcquisitionCalculator } from "@/components/site/AcquisitionCalculator";
-import { allDistricts, publicRegions, regionForCity } from "@/data/regions";
+import { allDistricts, publicRegions, regionForCity, sameCity, slugifyRegion, type Region } from "@/data/regions";
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     try {
@@ -102,7 +102,24 @@ function HomeCollection({
   const { t, locale } = useTranslation();
   const EDITORIAL = properties.slice(0, 6);
   const settings = useSiteSettings();
-  const regions = publicRegions(settings.regions);
+  const rawRegions = publicRegions(settings.regions);
+  const propertyCities = Array.from(new Set(properties.map((p) => p.city).filter(Boolean)));
+  const extraRegions: Region[] = propertyCities
+    .filter((cityName) => !regionForCity(cityName, rawRegions))
+    .map((cityName) => ({
+      slug: slugifyRegion(cityName),
+      name: cityName,
+      country: "Türkiye",
+      summary: "",
+      heroImage: "",
+      districts: Array.from(new Set(properties.filter((p) => sameCity(p.city, cityName)).map((p) => p.location_label).filter((x): x is string => Boolean(x)))),
+      hasSides: false,
+      published: true,
+      sortOrder: 99,
+      seoTitle: "",
+      seoDescription: "",
+    }));
+  const regions = [...rawRegions, ...extraRegions];
   const derived = Array.from(new Set(properties.map((r) => r.location_label).filter((x): x is string => !!x && x !== "Location to confirm")));
   const LOCATIONS = allDistricts(regions).length ? allDistricts(regions) : settings.districts?.length ? settings.districts : derived;
   const LAYOUTS = settings.layouts?.length ? settings.layouts : ["1+1", "2+1", "3+1", "4+1", "Penthouse", "Duplex"];

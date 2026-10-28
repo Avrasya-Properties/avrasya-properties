@@ -33,6 +33,69 @@ export function slugifyRegion(value: string): string {
 
 export const ISTANBUL_DISTRICTS = ["Maslak", "Şişli", "Beşiktaş", "Kadıköy", "Sarıyer", "Üsküdar", "Beyoğlu", "Bakırköy", "Ataşehir", "Göktürk", "Bomonti", "Zekeriyaköy"];
 
+export const REGION_PRESETS: Omit<Region, "sortOrder">[] = [
+  {
+    slug: "antalya",
+    name: "Antalya",
+    country: "Türkiye",
+    summary: "The pearl of the Turkish Riviera: turquoise Mediterranean waters, year-round sunshine and prime resort living.",
+    heroImage: "",
+    districts: ["Konyaaltı", "Lara", "Muratpaşa", "Alanya", "Kemer", "Kaş", "Kalkan", "Belek", "Manavgat"],
+    hasSides: false,
+    published: true,
+    seoTitle: "Property for Sale in Antalya | Mediterranean Luxury",
+    seoDescription: "Discover luxury villas and sea-view residences along Antalya and the Mediterranean coastline.",
+  },
+  {
+    slug: "bodrum",
+    name: "Bodrum",
+    country: "Türkiye",
+    summary: "The Saint-Tropez of Türkiye: world-class marinas, private coves, luxury lifestyle, and Aegean beachfront villas.",
+    heroImage: "",
+    districts: ["Yalıkavak", "Türkbükü", "Gümüşlük", "Bodrum Center", "Bitez", "Turgutreis", "Gündoğan", "Torba"],
+    hasSides: false,
+    published: true,
+    seoTitle: "Bodrum Luxury Real Estate & Waterfront Villas",
+    seoDescription: "Exclusive beachfront villas, marina estates, and branded residences in Bodrum and the Aegean coast.",
+  },
+  {
+    slug: "izmir",
+    name: "Izmir",
+    country: "Türkiye",
+    summary: "Aegean modern metropolis: vibrant cosmopolitan lifestyle, coastal boulevards, and proximity to Çeşme and Alaçatı.",
+    heroImage: "",
+    districts: ["Alsancak", "Karşıyaka", "Bornova", "Çeşme", "Alaçatı", "Urla", "Konak", "Bayraklı"],
+    hasSides: false,
+    published: true,
+    seoTitle: "Properties in Izmir & Çeşme | Aegean Living",
+    seoDescription: "Modern city residences, seaside apartments, and vacation villas in Izmir and Çeşme.",
+  },
+  {
+    slug: "ankara",
+    name: "Ankara",
+    country: "Türkiye",
+    summary: "The political and diplomatic capital: embassy districts, prestigious universities, and institutional real estate stability.",
+    heroImage: "",
+    districts: ["Çankaya", "İncek", "Gölbaşı", "Çayyolu", "Bilkent", "Yenimahalle"],
+    hasSides: false,
+    published: true,
+    seoTitle: "Real Estate in Ankara | Capital City Investments",
+    seoDescription: "Prime residential and diplomatic real estate in Çankaya, İncek and Ankara's premier districts.",
+  },
+  {
+    slug: "fethiye",
+    name: "Fethiye",
+    country: "Türkiye",
+    summary: "Breathtaking turquoise bays, Ölüdeniz blue lagoon, Göcek yacht marinas, and peaceful pine-valley villa retreats.",
+    heroImage: "",
+    districts: ["Göcek", "Ölüdeniz", "Ovacık", "Hisarönü", "Çalış", "Faralya", "Fethiye Center"],
+    hasSides: false,
+    published: true,
+    seoTitle: "Villas & Property for Sale in Fethiye & Göcek",
+    seoDescription: "Luxury villas and marina residences in Göcek, Ölüdeniz and Fethiye.",
+  },
+];
+
 export function defaultRegions(districts: readonly string[] = ISTANBUL_DISTRICTS): Region[] {
   return [{
     slug: "istanbul", name: "Istanbul", country: "Türkiye",

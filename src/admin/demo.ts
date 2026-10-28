@@ -298,7 +298,7 @@ if (typeof window !== "undefined") window.addEventListener("storage", (event) =>
   if (event.key === SKEY) { session = undefined; listeners.forEach((l) => l()); }
 });
 
-function load(): DB {
+export function load(): DB {
   if (typeof window === "undefined") return serverSnapshot;
   if (db) return db;
   const raw = localStorage.getItem(KEY);

@@ -29,9 +29,15 @@ function Editor() {
   const issues = publishIssues(d, db.properties);
   const regions = db.siteSettings.regions || [];
   const region = regionForCity(d.city, regions);
+  const [customCityMode, setCustomCityMode] = useState(!region);
   const pickRegion = (slug: string) => {
+    if (slug === "__custom") {
+      setCustomCityMode(true);
+      return;
+    }
     const next = regions.find((r) => r.slug === slug);
     if (!next) return;
+    setCustomCityMode(false);
     setD({ ...d, city: next.name, ...(next.hasSides ? {} : { side: "unknown" as const }) });
   };
   const inp = (label: string, k: keyof Property, type = "text") => (
@@ -48,7 +54,24 @@ function Editor() {
       {!DEMO_ENABLED&&<div className="mb-4 flex flex-wrap gap-2">{([["physical_units","Registered apartments"],["offer_amenities","Listing features"],["pricing_options","Payment plans"],["package_memberships","Package contents"]] as const).map(([section,label])=><Link key={section} to="/admin/manage" search={{section,property:id}} className={btnGhost}>{label}</Link>)}</div>}
       <div className={tab==="Website Preview"?"w-full overflow-hidden rounded-md border bg-background":"max-w-3xl rounded-md border bg-card p-4"}>
         {tab === "Property details" && <div className="grid gap-3 sm:grid-cols-2">
-          {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}<label className="text-sm">Region<select disabled={ro} className={field} value={region?.slug ?? "__other"} onChange={(e) => pickRegion(e.target.value)}>{!region && <option value="__other">{d.city ? `${d.city} (not a configured region)` : "Choose a region"}</option>}{regions.map((r) => <option key={r.slug} value={r.slug}>{r.name}{r.published ? "" : " (hidden)"}</option>)}</select></label>
+          {inp("Title", "title")}{inp("Web address ending", "slug")}{inp("Reference", "ref")}
+          <div className="space-y-1">
+            <label className="text-sm">Region / City
+              <select disabled={ro} className={field} value={customCityMode || !region ? "__custom" : region.slug} onChange={(e) => pickRegion(e.target.value)}>
+                {regions.map((r) => <option key={r.slug} value={r.slug}>{r.name}{r.published ? "" : " (hidden)"}</option>)}
+                <option value="__custom">{d.city && !region ? `${d.city} (Custom city)` : "+ Other / Custom City..."}</option>
+              </select>
+            </label>
+            {(customCityMode || !region) && (
+              <label className="block text-xs text-muted-foreground mt-1">
+                City name
+                <input disabled={ro} className={field + " mt-0.5"} placeholder="e.g. Antalya, Bodrum, Ankara, Izmir" value={d.city || ""} onChange={(e) => f("city", e.target.value)} />
+              </label>
+            )}
+            <Link to="/admin/regions" className="text-[11px] text-brass-text hover:underline block pt-0.5">
+              Manage cities & regions &rarr;
+            </Link>
+          </div>
           <label className="text-sm">District<input disabled={ro} list="region-districts" className={field} value={d.district ?? ""} onChange={(e) => f("district", e.target.value)} /><datalist id="region-districts">{(region?.districts ?? []).map((x) => <option key={x} value={x} />)}</datalist></label>{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}
           <label className="text-sm">Development name<select disabled={ro} className={field} value={d.project} onChange={e=>f("project",e.target.value)}><option value="">Not assigned</option>{projects.map(project=><option key={String(project["id"])} value={String(project["name"])}>{String(project["name"])}</option>)}</select></label>
           {!DEMO_ENABLED&&<div className="sm:col-span-2 rounded border p-3"><label className="block text-sm">Registered apartment<select disabled={ro} className={field} value={unitId||String(rawRecord("properties",id)?.["physical_unit_id"]||"")} onChange={e=>setUnitId(e.target.value)}><option value="">No identified unit</option>{units.map(unit=><option key={String(unit["id"])} value={String(unit["id"])}>{String(unit["unit_number"])} · {String(unit["layout_label"]||"")}</option>)}</select></label><button disabled={ro||!unitId} className={btnGhost+" mt-2"} onClick={async()=>{try{if(JSON.stringify(d)!==JSON.stringify(saved))throw new Error("Save your listing changes before linking an apartment.");await linkUnit(id,unitId,Number(rawRecord("properties",id)?.["version"]));const row=rawRecord("properties",id);if(row)setD(decode("properties",{...row,project_name:d.project}));toast.success("Apartment linked");}catch(error){toast.error((error as Error).message);}}}>Link apartment</button><p className="mt-2 text-xs text-muted-foreground">Add the apartment number under Registered apartments before reserving this listing. Packages and unit types cannot be reserved as individual units.</p></div>}
