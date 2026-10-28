@@ -3,13 +3,13 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Eye, EyeOff, MapPin, Plus, Trash2, Upload, X } from "lucide-react";
 import { btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { uploadImage } from "@/admin/store";
-import { REGION_SLUG_RE, slugifyRegion, type Region } from "@/data/regions";
+import { REGION_PRESETS, REGION_SLUG_RE, slugifyRegion, type Region } from "@/data/regions";
 
 type Props = { regions: Region[]; onChange: (next: Region[]) => void; disabled?: boolean };
 
 const blank = (order: number): Region => ({
   slug: "", name: "", country: "Türkiye", summary: "", heroImage: "", districts: [], hasSides: false,
-  published: false, sortOrder: order, seoTitle: "", seoDescription: "",
+  published: true, sortOrder: order, seoTitle: "", seoDescription: "",
 });
 
 /** Staff-facing regions manager. New regions start unpublished so a half-written region never goes live. */
@@ -25,6 +25,17 @@ export function RegionsEditor({ regions, onChange, disabled }: Props) {
     const next = blank(regions.length);
     emit([...regions, next]);
     setOpen(regions.length);
+  };
+
+  const addPreset = (preset: (typeof REGION_PRESETS)[number]) => {
+    if (regions.some((r) => r.slug === preset.slug || slugifyRegion(r.name) === preset.slug)) {
+      toast.error(`${preset.name} is already in the regions list`);
+      return;
+    }
+    const next: Region = { ...preset, sortOrder: regions.length };
+    emit([...regions, next]);
+    setOpen(regions.length);
+    toast.success(`Added ${preset.name}. Save website settings to apply.`);
   };
 
   const move = (index: number, dir: -1 | 1) => {
@@ -82,8 +93,29 @@ export function RegionsEditor({ regions, onChange, disabled }: Props) {
           </div>
           <button type="button" disabled={disabled} onClick={add} className={btnPrimary + " gap-1.5 whitespace-nowrap"}>
             <Plus className="h-3.5 w-3.5" />
-            <span>Add region</span>
+            <span>Add custom region</span>
           </button>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quick-add major cities:</span>
+          {REGION_PRESETS.map((preset) => {
+            const exists = regions.some((r) => r.slug === preset.slug || slugifyRegion(r.name) === preset.slug);
+            return (
+              <button
+                key={preset.slug}
+                type="button"
+                disabled={disabled || exists}
+                onClick={() => addPreset(preset)}
+                className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all ${
+                  exists
+                    ? "opacity-40 cursor-not-allowed bg-muted text-muted-foreground"
+                    : "bg-background hover:bg-muted text-foreground hover:border-brass"
+                }`}
+              >
+                + {preset.name}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -104,7 +136,7 @@ export function RegionsEditor({ regions, onChange, disabled }: Props) {
               <button type="button" disabled={disabled || index === 0} onClick={() => move(index, -1)} className={btnGhost + " !px-2"} aria-label={`Move ${r.name || "region"} up`}><ArrowUp className="h-3.5 w-3.5" /></button>
               <button type="button" disabled={disabled || index === regions.length - 1} onClick={() => move(index, 1)} className={btnGhost + " !px-2"} aria-label={`Move ${r.name || "region"} down`}><ArrowDown className="h-3.5 w-3.5" /></button>
               <button type="button" disabled={disabled} onClick={() => patch(index, { published: !r.published })} className={btnGhost + " !px-2"} aria-label={r.published ? "Hide region" : "Publish region"}>
-                {r.published ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                {r.published ? <Eye className="h-3.5 w-3.5 text-emerald-600" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
               </button>
               <button type="button" disabled={disabled} onClick={() => remove(index)} className={btnGhost + " !px-2 text-destructive"} aria-label={`Remove ${r.name || "region"}`}><Trash2 className="h-3.5 w-3.5" /></button>
             </div>
@@ -125,10 +157,18 @@ export function RegionsEditor({ regions, onChange, disabled }: Props) {
                 <label className="block text-sm">Country
                   <input className={field} value={r.country} disabled={disabled} onChange={(e) => patch(index, { country: e.target.value })} />
                 </label>
-                <label className="flex items-center gap-2 pt-6 text-sm">
-                  <input type="checkbox" checked={r.hasSides} disabled={disabled} onChange={(e) => patch(index, { hasSides: e.target.checked })} />
-                  Has European / Asian sides (Istanbul only)
-                </label>
+                <div className="flex flex-col justify-center gap-2 pt-2 text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer font-medium">
+                    <input type="checkbox" checked={r.published} disabled={disabled} onChange={(e) => patch(index, { published: e.target.checked })} className="rounded border" />
+                    <span className={r.published ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground"}>
+                      {r.published ? "Published & Visible on website (Live)" : "Hidden from visitors (Draft)"}
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input type="checkbox" checked={r.hasSides} disabled={disabled} onChange={(e) => patch(index, { hasSides: e.target.checked })} />
+                    Has European / Asian sides (Istanbul only)
+                  </label>
+                </div>
                 <label className="block text-sm md:col-span-2">Short description
                   <textarea className={field + " h-24"} value={r.summary} disabled={disabled} maxLength={1000}
                     placeholder="Two or three sentences about living and investing here."

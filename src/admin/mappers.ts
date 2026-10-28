@@ -1,5 +1,5 @@
 import { DEFAULT_SITE_SETTINGS, type DB, type SiteSettings } from "./demo";
-import { normalizeRegions } from "@/data/regions";
+import { allDistricts, normalizeRegions } from "@/data/regions";
 export type Row = Record<string, unknown>;
 export const TABLES = {properties:"marketing_offers",contacts:"contacts",leads:"leads",tasks:"tasks",viewings:"viewings",deals:"deals",inquiries:"enquiries"} as const;
 export type Collection = keyof typeof TABLES;
@@ -48,7 +48,11 @@ export function decodeSettings(row:Row):SiteSettings {
   return fallback;
  };
  s.districts=array(s.districts,DEFAULT_SITE_SETTINGS.districts);
- s.regions=normalizeRegions(row["regions"],s.districts);
+ const rawRegions = row["regions"] ?? (Array.isArray(row["districts"]) && row["districts"].some((x: unknown) => typeof x === "object" && x !== null && "name" in x) ? row["districts"] : undefined);
+ if (Array.isArray(s.districts) && s.districts.some((x: unknown) => typeof x === "object")) {
+  s.districts = allDistricts(normalizeRegions(rawRegions));
+ }
+ s.regions=normalizeRegions(rawRegions,s.districts);
  s.layouts=array(s.layouts,DEFAULT_SITE_SETTINGS.layouts);
  s.budgetRanges=array(s.budgetRanges,DEFAULT_SITE_SETTINGS.budgetRanges);
  s.websiteDesign=s.websiteDesign&&typeof s.websiteDesign==="object"&&!Array.isArray(s.websiteDesign)?s.websiteDesign:{};

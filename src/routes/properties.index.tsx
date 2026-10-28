@@ -38,7 +38,7 @@ import { PageIntro } from "@/components/site/Chrome";
 import { ImageFallback,PropertyCard } from "@/components/site/PropertyCard";
 import { meta } from "@/components/site/TextPage";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
-import { allDistricts, publicRegions, regionForCity } from "@/data/regions";
+import { allDistricts, publicRegions, regionForCity, sameCity, slugifyRegion, type Region } from "@/data/regions";
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
 const bool = (v: unknown) => (v === "true" || v === true ? true : undefined);
@@ -70,7 +70,24 @@ function Catalog() {
   const catalogue = useCatalogue();
   const properties = catalogue.properties;
   const settings = useSiteSettings();
-  const regions = publicRegions(settings.regions);
+  const rawRegions = publicRegions(settings.regions);
+  const propertyCities = Array.from(new Set(properties.map((p) => p.city).filter(Boolean)));
+  const extraRegions: Region[] = propertyCities
+    .filter((cityName) => !regionForCity(cityName, rawRegions))
+    .map((cityName) => ({
+      slug: slugifyRegion(cityName),
+      name: cityName,
+      country: "Türkiye",
+      summary: "",
+      heroImage: "",
+      districts: Array.from(new Set(properties.filter((p) => sameCity(p.city, cityName)).map((p) => p.location_label).filter((x): x is string => Boolean(x)))),
+      hasSides: false,
+      published: true,
+      sortOrder: 99,
+      seoTitle: "",
+      seoDescription: "",
+    }));
+  const regions = [...rawRegions, ...extraRegions];
   const f = Route.useSearch();
   const selectedRegion = regions.find((x) => x.slug === f.region);
   // Listings in scope decide which source-supplied district labels (e.g. "Şişli–Feriköy") are selectable.

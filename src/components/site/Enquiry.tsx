@@ -1,10 +1,27 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { MessageSquare, CheckCircle2 } from "lucide-react";
 import { DEMO_MODE } from "@/lib/supabase";
 import { useServices, useCatalogue } from "@/data/live";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { recordPublicEnquiry } from "@/admin/store";
 import { useLanguage } from "@/hooks/useLanguage";
 import { EnquiryError } from "@/lib/public-enquiry";
+
+export function formatWhatsAppLink(base: string, text: string) {
+  try {
+    const raw = (base || "").trim() || "https://wa.me/905459248042";
+    const normalized = raw.startsWith("http://") || raw.startsWith("https://")
+      ? raw
+      : /^\+?\d+$/.test(raw.replace(/\s+/g, ""))
+        ? `https://wa.me/${raw.replace(/\D/g, "")}`
+        : `https://${raw}`;
+    const url = new URL(normalized);
+    url.searchParams.set("text", text);
+    return url.toString();
+  } catch {
+    return `https://wa.me/905459248042?text=${encodeURIComponent(text)}`;
+  }
+}
 
 const SERVICES = [
   "General consultation",
@@ -20,6 +37,31 @@ const SERVICES = [
   "International Investor Support",
   "Investment catalog request",
 ];
+
+export function buildWhatsAppEnquiryMessage(v: {
+  name: string;
+  topic: string;
+  budget?: string;
+  message: string;
+  email?: string;
+  phone?: string;
+  receipt?: string;
+}) {
+  const parts: string[] = [
+    `*Avrasya Properties - New Consultation Enquiry*`,
+    v.receipt ? `*Ref:* ${v.receipt}` : "",
+    "",
+    `*Client:* ${v.name.trim()}`,
+    v.phone?.trim() ? `*Phone:* ${v.phone.trim()}` : "",
+    v.email?.trim() ? `*Email:* ${v.email.trim()}` : "",
+    `*Topic / Interest:* ${v.topic.trim()}`,
+    v.budget?.trim() ? `*Budget:* ${v.budget.trim()}` : "",
+    "",
+    `*Enquiry Message:*`,
+    v.message.trim(),
+  ];
+  return parts.filter((x): x is string => typeof x === "string" && x !== "").join("\n");
+}
 
 export function buildMessage(v: {
   name: string;
@@ -96,6 +138,15 @@ export function Enquiry({
   const [err, setErr] = useState<string | null>(null);
   const [invalid, setInvalid] = useState<FieldKey[]>([]);
   const [receipt, setReceipt] = useState("");
+  const [savedData, setSavedData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    topic: string;
+    budget: string;
+    message: string;
+    receipt: string;
+  } | null>(null);
 
   const fieldMessage: Record<FieldKey, string> = {
     name: t.enquiry.errName,
@@ -112,6 +163,7 @@ export function Enquiry({
       // Any edit is a new submission; an unchanged retry keeps the same key so it cannot duplicate.
       submission.current = null;
       setReceipt("");
+      setSavedData(null);
       if (invalid.includes(key as FieldKey)) setInvalid(invalid.filter((k) => k !== key));
     };
 
@@ -156,6 +208,26 @@ export function Enquiry({
         ...(resolvedSlug ? { propertySlug: resolvedSlug } : {}),
       });
       setReceipt(res.receipt);
+      setSavedData({ ...v, receipt: res.receipt });
+
+      const waMsg = buildWhatsAppEnquiryMessage({
+        receipt: res.receipt,
+        name: v.name,
+        email: v.email,
+        phone: v.phone,
+        topic: v.topic,
+        budget: v.budget,
+        message: v.message,
+      });
+      const waUrl = formatWhatsAppLink(contact.whatsapp, waMsg);
+
+      try {
+        if (typeof window !== "undefined" && process.env["NODE_ENV"] !== "test") {
+          window.open(waUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        /* popup blocker handling */
+      }
     } catch (error) {
       const kind = error instanceof EnquiryError ? error.kind : undefined;
       setErr(kind === "timeout" ? t.enquiry.errTimeout : kind === "network" ? t.enquiry.errNetwork : (error as Error).message || t.enquiry.errorDesc);
@@ -179,26 +251,71 @@ export function Enquiry({
     ) : null;
 
   if (receipt) {
+    const waMsg = buildWhatsAppEnquiryMessage({
+      receipt,
+      name: savedData?.name || v.name,
+      email: savedData?.email || v.email,
+      phone: savedData?.phone || v.phone,
+      topic: savedData?.topic || v.topic,
+      budget: savedData?.budget || v.budget,
+      message: savedData?.message || v.message,
+    });
+    const waUrl = formatWhatsAppLink(contact.whatsapp, waMsg);
+
     return (
-      <div ref={successRef} tabIndex={-1} role="status" className="border border-brass/60 bg-secondary/60 p-5 text-sm text-foreground outline-none">
-        <p className="kicker text-brass-text">{t.enquiry.successTitle}</p>
-        <p className="mt-3 leading-relaxed">
-          {t.enquiry.propertyReference} <strong className="font-mono text-base tracking-wide">{receipt}</strong>
+      <div ref={successRef} tabIndex={-1} role="status" className="border border-brass/60 bg-secondary/60 p-5 text-sm text-foreground outline-none space-y-4">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+          <p className="kicker text-brass-text">{t.enquiry.successTitle}</p>
+        </div>
+        <p className="leading-relaxed">
+          {t.enquiry.propertyReference} <strong className="font-mono text-base tracking-wide text-brass-text">{receipt}</strong>
         </p>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.enquiry.successNext}</p>
-        <div className="mt-5 flex flex-wrap items-center gap-2">
+        <p className="text-xs leading-relaxed text-muted-foreground">{t.enquiry.successNext}</p>
+
+        {/* Message Summary Card */}
+        <div className="rounded border border-border/60 bg-background/60 p-3 text-xs space-y-1.5">
+          <div className="flex justify-between text-muted-foreground">
+            <span>Client:</span>
+            <span className="font-medium text-foreground">{savedData?.name || v.name}</span>
+          </div>
+          {(savedData?.phone || v.phone) && (
+            <div className="flex justify-between text-muted-foreground">
+              <span>Phone / WhatsApp:</span>
+              <span className="font-medium text-foreground">{savedData?.phone || v.phone}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-muted-foreground">
+            <span>Topic:</span>
+            <span className="font-medium text-foreground">{savedData?.topic || v.topic}</span>
+          </div>
+          {(savedData?.budget || v.budget) && (
+            <div className="flex justify-between text-muted-foreground">
+              <span>Budget:</span>
+              <span className="font-medium text-foreground">{savedData?.budget || v.budget}</span>
+            </div>
+          )}
+          <div className="pt-1.5 text-muted-foreground border-t border-border/40">
+            <span className="block font-medium text-foreground mb-0.5">Enquiry message present in inbox:</span>
+            <p className="italic line-clamp-3 text-foreground/90">"{savedData?.message || v.message}"</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 pt-1">
           <a
-            href={contact.whatsapp + "?text=" + encodeURIComponent(`Hello Avrasya Advisory, my enquiry reference is ${receipt}.`)}
+            href={waUrl}
             target="_blank"
             rel="noreferrer"
-            className="btn btn-primary text-xs"
+            className="btn btn-primary inline-flex items-center gap-2 text-xs bg-emerald-600 hover:bg-emerald-500 text-white"
           >
-            {t.enquiry.directWhatsappBtn}
+            <MessageSquare className="h-4 w-4" />
+            <span>Chat on WhatsApp with Enquiry</span>
           </a>
           <button
             type="button"
             onClick={() => {
               setReceipt("");
+              setSavedData(null);
               submission.current = null;
               setConsent(false);
               setV({ name: "", email: "", phone: "", topic: defaultTopic || "General consultation", budget: "", message: "", website: "" });
@@ -310,7 +427,7 @@ export function Enquiry({
         </button>
         <p className="text-xs leading-relaxed text-muted-foreground">
           {t.enquiry.whatsappAlternative}{" "}
-          <a className="underline underline-offset-2" href={contact.whatsapp + "?text=" + encodeURIComponent(buildMessage(v))} target="_blank" rel="noreferrer">
+          <a className="underline underline-offset-2" href={formatWhatsAppLink(contact.whatsapp, buildWhatsAppEnquiryMessage(v))} target="_blank" rel="noreferrer">
             WhatsApp
           </a>
           ,{" "}

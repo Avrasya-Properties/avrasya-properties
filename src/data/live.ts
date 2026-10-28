@@ -15,25 +15,54 @@ export async function loadCatalogue():Promise<PropertyRecord[]>{
          if(Array.isArray(parsed?.properties)){
            const demoProps=parsed.properties as {slug:string;publication?:string;title?:string;district?:string;city?:string;layout?:string;amount?:number|null;currency?:string|null}[];
            const map=new Map(demoProps.map(p=>[p.slug,p]));
-           return source.filter(s=>{
-             const dp=map.get(s.slug);
-             return dp?dp.publication==="Published":true;
-           }).map(s=>{
-             const dp=map.get(s.slug);
-             if(!dp)return s;
-             return {
-               ...s,
-               marketing_title:dp.title||s.marketing_title,
-               location_label:dp.district||s.location_label,
-               city:dp.city||s.city,
-               layout_label:dp.layout||s.layout_label,
-               price:{
-                 ...s.price,
-                 amount:dp.amount!==undefined?dp.amount:s.price.amount,
-                 currency:(dp.currency as any)||s.price.currency,
-               },
-             };
-           });
+           const sourceSlugs = new Set(source.map((item) => item.slug));
+            const mapped = source.filter((item) => {
+              const dp = map.get(item.slug);
+              return dp ? dp.publication === "Published" : true;
+            }).map((item) => {
+              const dp = map.get(item.slug);
+              if (!dp) return item;
+              return {
+                ...item,
+                marketing_title: dp.title || item.marketing_title,
+                location_label: dp.district || item.location_label,
+                city: dp.city || item.city,
+                layout_label: dp.layout || item.layout_label,
+                price: {
+                  ...item.price,
+                  amount: dp.amount !== undefined ? dp.amount : item.price.amount,
+                  currency: (dp.currency as any) || item.price.currency,
+                },
+              };
+            });
+            const extra = demoProps
+              .filter((dp) => dp.publication === "Published" && !sourceSlugs.has(dp.slug))
+              .map((dp) => ({
+                id: (dp as any).id || dp.slug,
+                ref: (dp as any).ref || "AVR-" + dp.slug.slice(0, 4),
+                slug: dp.slug,
+                marketing_title: dp.title || "Untitled Property",
+                city: dp.city || "Istanbul",
+                location_label: dp.district || null,
+                side: ((dp as any).side as any) || "unknown",
+                record_type: (((dp as any).type?.replace(" ", "_") || "unit_offer") as any),
+                mode: ((dp as any).mode || "sale") as any,
+                layout_label: dp.layout || null,
+                bathrooms: (dp as any).bathrooms || null,
+                price: {
+                  currency: (dp.currency as any) || "USD",
+                  amount: dp.amount ?? null,
+                  basis: (dp as any).priceBasis || "fixed",
+                  status: "staff-published",
+                },
+                areas: (dp as any).grossM2 ? [{ value_m2: (dp as any).grossM2, basis: "gross" as const }] : [],
+                source_ids: [],
+                availability_verified: (dp as any).availability === "Available",
+                cover: (dp as any).cover || "/images/properties/hero-main.jpg",
+                availability: (dp as any).availability || "Available",
+                details: { note: (dp as any).description || "" },
+              } as unknown as PropertyRecord));
+            return [...mapped, ...extra];
          }
        }
      }catch{}
