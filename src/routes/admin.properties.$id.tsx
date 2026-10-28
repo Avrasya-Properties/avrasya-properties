@@ -68,8 +68,8 @@ function Editor() {
                 <input disabled={ro} className={field + " mt-0.5"} placeholder="e.g. Antalya, Bodrum, Ankara, Izmir" value={d.city || ""} onChange={(e) => f("city", e.target.value)} />
               </label>
             )}
-            <Link to="/admin/settings" className="text-[11px] text-brass-text hover:underline block pt-0.5">
-              Manage regions in Settings &rarr;
+            <Link to="/admin/regions" className="text-[11px] text-brass-text hover:underline block pt-0.5">
+              Manage cities & regions &rarr;
             </Link>
           </div>
           <label className="text-sm">District<input disabled={ro} list="region-districts" className={field} value={d.district ?? ""} onChange={(e) => f("district", e.target.value)} /><datalist id="region-districts">{(region?.districts ?? []).map((x) => <option key={x} value={x} />)}</datalist></label>{inp("Layout (e.g. 2+1)", "layout")}{inp("Bathrooms", "bathrooms", "number")}

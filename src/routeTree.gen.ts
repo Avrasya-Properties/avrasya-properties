@@ -33,6 +33,7 @@ import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
 import { Route as AdminRecoverRouteImport } from './routes/admin.recover'
+import { Route as AdminRegionsRouteImport } from './routes/admin.regions'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTasksRouteImport } from './routes/admin.tasks'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
@@ -165,6 +166,11 @@ const AdminRecoverRoute = AdminRecoverRouteImport.update({
   path: '/recover',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRegionsRoute = AdminRegionsRouteImport.update({
+  id: '/regions',
+  path: '/regions',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/recover': typeof AdminRecoverRoute
+  '/admin/regions': typeof AdminRegionsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/recover': typeof AdminRecoverRoute
+  '/admin/regions': typeof AdminRegionsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/recover': typeof AdminRecoverRoute
+  '/admin/regions': typeof AdminRegionsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tasks': typeof AdminTasksRoute
   '/properties/$slug': typeof PropertiesSlugRoute
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/manage'
     | '/admin/recover'
+    | '/admin/regions'
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
@@ -394,6 +404,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/manage'
     | '/admin/recover'
+    | '/admin/regions'
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/manage'
     | '/admin/recover'
+    | '/admin/regions'
     | '/admin/settings'
     | '/admin/tasks'
     | '/properties/$slug'
@@ -636,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRecoverRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/regions': {
+      id: '/admin/regions'
+      path: '/regions'
+      fullPath: '/admin/regions'
+      preLoaderRoute: typeof AdminRegionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -725,6 +744,7 @@ interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManageRoute: typeof AdminManageRoute
   AdminRecoverRoute: typeof AdminRecoverRoute
+  AdminRegionsRoute: typeof AdminRegionsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTasksRoute: typeof AdminTasksRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -745,6 +765,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminManageRoute: AdminManageRoute,
   AdminRecoverRoute: AdminRecoverRoute,
+  AdminRegionsRoute: AdminRegionsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTasksRoute: AdminTasksRoute,
   AdminIndexRoute: AdminIndexRoute,

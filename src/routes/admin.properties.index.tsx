@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { MapPin } from "lucide-react";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import { AVAIL, PUBL, bulkPublication, can, fmtDate, fmtMoney, upsert, useDB, useSession, userName, type Property } from "@/admin/store";
 
@@ -30,7 +31,7 @@ function Inventory() {
 
   return (
     <>
-      <PageHead title="Properties" crumbs="Inventory" action={editInv && <button className={btnPrimary} onClick={async () => { try { const p = await upsert<Property>("properties", { ref: `AVR-${Math.max(1000, ...db.properties.map((p) => Number(p.ref.replace(/^AVR-/, ""))).filter(Number.isFinite)) + 1}`, slug: `new-listing-${crypto.randomUUID()}`, title: "Untitled property", district: "", city: db.siteSettings.regions?.[0]?.name ?? "Istanbul", type: "unit offer", layout: null, bathrooms: null, grossM2: null, netM2: null, areaM2: null, amount: null, currency: "USD", mode: "sale", priceType: "on-request", availability: "Unknown", publication: "Draft", agentId: user!.id, cover: null, project: "", description: "", updatedAt: new Date().toISOString() }); nav({ to: "/admin/properties/$id", params: { id: p.id } }); } catch (error) { toast.error((error as Error).message); } }}>New property</button>} />
+      <PageHead title="Properties" crumbs="Inventory" action={<div className="flex items-center gap-2"><Link to="/admin/regions" className={btnGhost}><MapPin className="h-3.5 w-3.5 text-brass" /><span>Cities & Regions</span></Link>{editInv && <button className={btnPrimary} onClick={async () => { try { const p = await upsert<Property>("properties", { ref: `AVR-${Math.max(1000, ...db.properties.map((p) => Number(p.ref.replace(/^AVR-/, ""))).filter(Number.isFinite)) + 1}`, slug: `new-listing-${crypto.randomUUID()}`, title: "Untitled property", district: "", city: db.siteSettings.regions?.[0]?.name ?? "Istanbul", type: "unit offer", layout: null, bathrooms: null, grossM2: null, netM2: null, areaM2: null, amount: null, currency: "USD", mode: "sale", priceType: "on-request", availability: "Unknown", publication: "Draft", agentId: user!.id, cover: null, project: "", description: "", updatedAt: new Date().toISOString() }); nav({ to: "/admin/properties/$id", params: { id: p.id } }); } catch (error) { toast.error((error as Error).message); } }}>New property</button>}</div>} />
       <div className="mb-3 flex flex-wrap gap-2">
         <input className={`${field} max-w-xs`} placeholder="Search title, ref, district" defaultValue={s.q} onChange={(e) => set({ q: e.target.value || undefined })} />
         <select className={`${field} w-40`} value={s.avail ?? ""} onChange={(e) => set({ avail: e.target.value || undefined })}><option value="">Any availability</option>{AVAIL.map((a) => <option key={a}>{a}</option>)}</select>

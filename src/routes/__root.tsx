@@ -214,7 +214,7 @@ function RootComponent() {
     () =>
       watchWebsiteChanges(() => {
         void queryClient.invalidateQueries({
-          predicate: (q) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
+          predicate: (q: any) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
         });
         void router.invalidate();
       },{poll:!isAdmin&&!DEMO_MODE}),

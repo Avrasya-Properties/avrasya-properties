@@ -68,7 +68,7 @@ function Detail(){
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
     name: record.marketing_title,
-    description: `${record.layout_label ?? TYPE_LABEL[record.record_type]} in ${locationText(record)}. ${priceDisplay(record.price).main}.`,
+    description: `${record.layout_label ?? TYPE_LABEL[record.record_type as keyof typeof TYPE_LABEL]} in ${locationText(record)}. ${priceDisplay(record.price).main}.`,
     url: `https://avrasyaproperties.com/properties/${record.slug}`,
     image: media.cover || "https://avrasyaproperties.com/images/properties/hero-main.jpg",
     offers: {

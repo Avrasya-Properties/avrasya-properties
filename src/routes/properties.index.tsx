@@ -111,7 +111,7 @@ function Catalog() {
 
   const set = (k: keyof (Filters & { savedOnly?: boolean | undefined }), v: unknown) =>
     navigate({
-      search: (p) => ({ ...p, [k]: v || undefined }),
+      search: (p: any) => ({ ...p, [k]: v || undefined }),
       replace: true,
       resetScroll: false,
     });
@@ -172,7 +172,7 @@ function Catalog() {
             {regions.length > 1 && (
               <label className="block">
                 <span className={lbl}>{t.properties.filterRegion}</span>
-                <select className="field text-xs md:text-sm" value={f.region ?? ""} onChange={(e) => navigate({ search: (p) => ({ ...p, region: e.target.value || undefined, loc: undefined, side: undefined }), replace: true, resetScroll: false })}>
+                <select className="field text-xs md:text-sm" value={f.region ?? ""} onChange={(e) => navigate({ search: (p: any) => ({ ...p, region: e.target.value || undefined, loc: undefined, side: undefined }), replace: true, resetScroll: false })}>
                   <option value="">{t.properties.allRegions}</option>
                   {regions.map((x) => <option key={x.slug} value={x.slug}>{x.name}</option>)}
                 </select>

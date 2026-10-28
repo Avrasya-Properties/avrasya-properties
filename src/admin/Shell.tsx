@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2 } from "lucide-react";
+import { Bell, Building2, CalendarDays, CheckSquare, Contact2, Handshake, LayoutDashboard, LogOut, Menu, Search, Users, ExternalLink, Layers, Clock, ShieldCheck, Inbox, BarChart3, Settings2, MapPin } from "lucide-react";
 import { DEMO_ENABLED, fmtDate, logout, markRead, useDB, useSession, useBackendStatus,refreshBackend } from "./store";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -20,6 +20,7 @@ const NAV = [
     items: [
       { to: "/admin/properties", label: "Properties", icon: Building2 },
       { to: "/admin/projects", label: "Developments", icon: Layers },
+      { to: "/admin/regions", label: "Cities & Regions", icon: MapPin },
     ],
   },
   {
