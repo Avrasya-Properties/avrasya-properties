@@ -89,7 +89,10 @@ try {
         ? "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
         : "/usr/bin/google-chrome"),
     headless: true,
-    args: ["--no-sandbox", "--disable-dev-shm-usage"],
+    pipe: true,
+    args: process.env.AVRASYA_BROWSER_ARGS
+      ? JSON.parse(process.env.AVRASYA_BROWSER_ARGS)
+      : ["--no-sandbox", "--disable-dev-shm-usage"],
   });
   page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 1000 });
