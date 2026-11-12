@@ -24,7 +24,7 @@ export const Route = createFileRoute("/contact")({
     meta(
       "Contact & Private Consultation · Avrasya Properties",
       "Schedule a private property consultation in Istanbul or via encrypted video conference. WhatsApp, phone, and office visiting directions.",
-      "/contact"
+      "/contact",
     ),
   component: ContactPage,
 });
@@ -65,9 +65,7 @@ export function ContactPage() {
               <h2 className="font-display text-2xl font-bold text-foreground">
                 {t.contact.scheduleMeeting}
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t.enquiry.subtitle}
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{t.enquiry.subtitle}</p>
             </div>
 
             <div className="mb-6">
@@ -92,7 +90,12 @@ export function ContactPage() {
               </div>
             </div>
 
-            <Enquiry key={selectedTopic} defaultTopic={topics.find((item) => item.id === selectedTopic)?.label || "General consultation"} />
+            <Enquiry
+              key={selectedTopic}
+              defaultTopic={
+                topics.find((item) => item.id === selectedTopic)?.label || "General consultation"
+              }
+            />
           </div>
 
           {/* Direct Office & Desk Info */}
@@ -105,9 +108,7 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{t.contact.whatsappLabel}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    &lt; 15 mins
-                  </p>
+                  <p className="text-xs text-muted-foreground">&lt; 15 mins</p>
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
@@ -126,13 +127,17 @@ export function ContactPage() {
 
             {/* Direct Coordinates */}
             <div className="rounded-2xl border bg-card p-6 space-y-4">
-              <h3 className="font-display text-lg font-bold text-foreground">{t.contact.officeVisiting}</h3>
+              <h3 className="font-display text-lg font-bold text-foreground">
+                {t.contact.officeVisiting}
+              </h3>
 
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-3">
                   <MapPin className="h-4 w-4 text-brass shrink-0 mt-1" />
                   <div>
-                    <span className="font-medium text-foreground block">{t.contact.addressLabel}:</span>
+                    <span className="font-medium text-foreground block">
+                      {t.contact.addressLabel}:
+                    </span>
                     <span className="text-muted-foreground">{contact.address}</span>
                   </div>
                 </div>
@@ -140,7 +145,9 @@ export function ContactPage() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-4 w-4 text-brass shrink-0" />
                   <div>
-                    <span className="font-medium text-foreground block">{t.contact.phoneLabel}:</span>
+                    <span className="font-medium text-foreground block">
+                      {t.contact.phoneLabel}:
+                    </span>
                     <a
                       href={contact.phoneHref}
                       className="text-muted-foreground hover:text-foreground"
@@ -153,7 +160,9 @@ export function ContactPage() {
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-brass shrink-0" />
                   <div>
-                    <span className="font-medium text-foreground block">{t.contact.emailLabel}:</span>
+                    <span className="font-medium text-foreground block">
+                      {t.contact.emailLabel}:
+                    </span>
                     <a
                       href={`mailto:${contact.email}`}
                       className="text-muted-foreground hover:text-foreground break-all"
@@ -166,8 +175,12 @@ export function ContactPage() {
                 <div className="flex items-center gap-3">
                   <Clock className="h-4 w-4 text-brass shrink-0" />
                   <div>
-                    <span className="font-medium text-foreground block">{t.contact.hoursLabel}:</span>
-                    <span className="text-muted-foreground">{t.contact.hoursValue || contact.advisoryHours}</span>
+                    <span className="font-medium text-foreground block">
+                      {t.contact.hoursLabel}:
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t.contact.hoursValue || contact.advisoryHours}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -189,4 +202,3 @@ export function ContactPage() {
     </>
   );
 }
-

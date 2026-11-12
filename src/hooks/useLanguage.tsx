@@ -1,4 +1,12 @@
-import { useState, useEffect, useCallback, createContext, useContext, useMemo, type ReactNode } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from "react";
 import {
   DEFAULT_LOCALE,
   LOCALES,
@@ -27,7 +35,7 @@ function getInitialLocale(): Locale {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
   try {
     const saved = localStorage.getItem(LANGUAGE_KEY) as Locale;
-    if (saved && ["en", "tr", "ar", "ru", "fa"].includes(saved)) {
+    if (saved && ["en", "tr", "ar", "ru", "fa", "zh", "bn"].includes(saved)) {
       return saved;
     }
     // Optional: detect browser language
@@ -36,6 +44,8 @@ function getInitialLocale(): Locale {
     if (navLang.startsWith("ar")) return "ar";
     if (navLang.startsWith("ru")) return "ru";
     if (navLang.startsWith("fa")) return "fa";
+    if (navLang.startsWith("zh")) return "zh";
+    if (navLang.startsWith("bn")) return "bn";
   } catch {
     /* ignore storage errors */
   }
@@ -55,7 +65,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const link = document.createElement("link");
         link.id = "rtl-fonts";
         link.rel = "stylesheet";
-        link.href = "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap";
+        link.href =
+          "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap";
         document.head.appendChild(link);
       }
       if (isRtl) {
@@ -74,7 +85,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const onStorage = (e: StorageEvent) => {
       if (e.key === LANGUAGE_KEY && e.newValue) {
         const next = e.newValue as Locale;
-        if (["en", "tr", "ar", "ru", "fa"].includes(next)) {
+        if (["en", "tr", "ar", "ru", "fa", "zh", "bn"].includes(next)) {
           setLocaleState(next);
         }
       }
@@ -83,7 +94,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const onCustomChange = () => {
       try {
         const current = localStorage.getItem(LANGUAGE_KEY) as Locale;
-        if (["en", "tr", "ar", "ru", "fa"].includes(current)) {
+        if (["en", "tr", "ar", "ru", "fa", "zh", "bn"].includes(current)) {
           setLocaleState(current);
         }
       } catch {

@@ -1,4 +1,4 @@
-export type Locale = "en" | "tr" | "ar" | "ru" | "fa";
+export type Locale = "en" | "tr" | "ar" | "ru" | "fa" | "zh" | "bn";
 
 export type Direction = "ltr" | "rtl";
 
@@ -479,11 +479,29 @@ export interface CalculatorTranslations {
   holding5YearDesc: string;
 }
 
+export interface TimelineStep {
+  stepNumber: string; // e.g. "01", "02" ... "09"
+  title: string;
+  description: string;
+  termNote?: string; // e.g. "Tapu [Title Deed]", "DAB [Currency Exchange Certificate]"
+  legalTag?: string; // Lawyer review flag
+}
+
+export interface TimelinePart {
+  partNumber: string; // e.g. "PART 1", "PART 2"
+  title: string; // e.g. "CHOOSE", "BUY", "CITIZENSHIP", "AFTER CITIZENSHIP (OPTIONAL)"
+  steps: TimelineStep[];
+}
+
 export interface ServicesTranslations {
   eyebrow: string;
   title: string;
   titleEm: string;
+  subtitle: string;
   description: string;
+  closingLine: string;
+  legalDisclaimer: string;
+  parts: TimelinePart[];
   coreServicesEyebrow: string;
   coreServicesTitle: string;
   deliverablesLabel: string;

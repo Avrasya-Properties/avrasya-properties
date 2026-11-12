@@ -22,6 +22,11 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 300_000,
   });
 
-  setupRouterSsrQueryIntegration({router,queryClient,wrapQueryClient:false,dehydrateOptions:{shouldDehydrateQuery:()=>true,shouldRedactErrors:()=>true}});
+  setupRouterSsrQueryIntegration({
+    router,
+    queryClient,
+    wrapQueryClient: false,
+    dehydrateOptions: { shouldDehydrateQuery: () => true, shouldRedactErrors: () => true },
+  });
   return router;
 };

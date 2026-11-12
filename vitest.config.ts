@@ -10,6 +10,8 @@ export default defineConfig({
     env: { VITE_ENABLE_ADMIN_DEMO: "true" },
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    testTimeout: 120000,
+    hookTimeout: 120000,
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },

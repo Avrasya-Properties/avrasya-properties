@@ -239,7 +239,9 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
   const selectCorridor = (id: string) => {
     setSelectedId(id);
     if (typeof window !== "undefined" && window.matchMedia?.("(max-width: 1023px)").matches) {
-      requestAnimationFrame(() => dossier.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      requestAnimationFrame(() =>
+        dossier.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      );
     }
   };
 
@@ -297,9 +299,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
       ) : (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border/70 pb-4">
           <div className="flex items-center gap-2">
-            <span className="kicker text-muted-foreground">
-              {t.whyTurkiye.eyebrow}
-            </span>
+            <span className="kicker text-muted-foreground">{t.whyTurkiye.eyebrow}</span>
           </div>
 
           {/* Side Switcher (Europe vs Asia) */}
@@ -337,204 +337,209 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
         </div>
       )}
 
-        {/* Interactive Main Body: District Selectors & Deep Intelligence Card */}
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.6fr] items-start">
-          {/* Corridor Selection List */}
-          <div className="space-y-3" role="tablist" aria-label="District Corridors">
-            <p className="text-[0.68rem] font-mono uppercase tracking-widest text-muted-foreground mb-1">
-              Choose a Neighborhood ({filteredCorridors.length} Areas)
-            </p>
+      {/* Interactive Main Body: District Selectors & Deep Intelligence Card */}
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.6fr] items-start">
+        {/* Corridor Selection List */}
+        <div className="space-y-3" role="tablist" aria-label="District Corridors">
+          <p className="text-[0.68rem] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+            Choose a Neighborhood ({filteredCorridors.length} Areas)
+          </p>
 
-            {filteredCorridors.map((c, i) => {
-              const isSelected = c.id === active.id;
-              return (
-                <button
-                  key={c.id}
-                  role="tab"
-                  aria-selected={isSelected}
-                  aria-controls="district-dossier"
-                  onClick={() => selectCorridor(c.id)}
-                  className={`card-elevate group relative flex w-full flex-col overflow-hidden rounded-xs border p-4 text-left transition-all duration-300 ${
-                    isSelected
-                      ? "border-brass bg-card shadow-md border-l-4 border-l-brass -translate-y-0.5"
-                      : "border-border/70 bg-card/60 hover:border-brass/60 hover:bg-card"
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[11px] font-semibold tracking-wider text-brass uppercase">
-                      Area 0{i + 1} · {c.side} Side
-                    </span>
-                    <span className="text-[11px] text-muted-foreground font-medium">
-                      {c.locParam}
-                    </span>
-                  </div>
-
-                  <h3 className="font-display text-lg font-semibold text-foreground mt-1 group-hover:text-brass transition-colors">
-                    {c.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">{c.subName}</p>
-
-                  <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-2.5 text-xs">
-                    <span className="font-sans font-medium text-foreground">
-                      {c.priceM2} <span className="text-[10px] text-muted-foreground">/ m²</span>
-                    </span>
-                    <span className="text-[11px] font-semibold text-brass">
-                      Return: {c.yieldRate}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Deep Architectural Intelligence Dossier for Active District */}
-          <div ref={dossier} id="district-dossier" role="tabpanel" className="scroll-mt-24">
-            <div className="card-elevate rounded-xs border border-border/80 bg-card shadow-lg p-6 sm:p-8 flex flex-col justify-between">
-              {/* Top Registration Info */}
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
-                      District Overview
-                    </span>
-                    <span className="text-[11px] text-muted-foreground font-medium">
-                      Ref: {active.id.toUpperCase()}-IST
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-brass font-medium">
-                    <MapPin className="h-3.5 w-3.5" />
-                    <span>
-                      {active.side} Istanbul · {active.locParam}
-                    </span>
-                  </div>
+          {filteredCorridors.map((c, i) => {
+            const isSelected = c.id === active.id;
+            return (
+              <button
+                key={c.id}
+                role="tab"
+                aria-selected={isSelected}
+                aria-controls="district-dossier"
+                onClick={() => selectCorridor(c.id)}
+                className={`card-elevate group relative flex w-full flex-col overflow-hidden rounded-xs border p-4 text-left transition-all duration-300 ${
+                  isSelected
+                    ? "border-brass bg-card shadow-md border-l-4 border-l-brass -translate-y-0.5"
+                    : "border-border/70 bg-card/60 hover:border-brass/60 hover:bg-card"
+                }`}
+              >
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[11px] font-semibold tracking-wider text-brass uppercase">
+                    Area 0{i + 1} · {c.side} Side
+                  </span>
+                  <span className="text-[11px] text-muted-foreground font-medium">
+                    {c.locParam}
+                  </span>
                 </div>
 
-                {/* District Hero Title & Photo Banner */}
-                <div className="mt-6 grid gap-6 md:grid-cols-[1.2fr_1fr]">
-                  <div>
-                    <h3 className="font-display text-2xl sm:text-3xl font-semibold text-foreground">
-                      {active.name}
-                    </h3>
-                    <p className="text-xs font-medium text-brass mt-0.5 uppercase tracking-wider">
-                      {active.subName} · {active.side} Side
-                    </p>
-                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                      {active.tagline}
-                    </p>
-                  </div>
+                <h3 className="font-display text-lg font-semibold text-foreground mt-1 group-hover:text-brass transition-colors">
+                  {c.name}
+                </h3>
+                <p className="text-xs text-muted-foreground">{c.subName}</p>
 
-                  <div className="img-zoom-container relative aspect-[16/10] overflow-hidden rounded-xs border border-border/70 bg-muted group">
-                    <img
-                      src={active.image}
-                      alt={active.name}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                    <span className="glass-pill-dark absolute bottom-2 left-2 rounded px-2.5 py-1 text-[10px] font-mono text-brass shadow-sm">
-                      {active.yieldRate} Expected Return
-                    </span>
-                  </div>
+                <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-2.5 text-xs">
+                  <span className="font-sans font-medium text-foreground">
+                    {c.priceM2} <span className="text-[10px] text-muted-foreground">/ m²</span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-brass">
+                    Return: {c.yieldRate}
+                  </span>
                 </div>
+              </button>
+            );
+          })}
+        </div>
 
-                {/* Financial & Statutory Key Metrics Grid */}
-                <div className="mt-8 grid grid-cols-2 gap-4 border-y border-border/70 py-5 sm:grid-cols-4 bg-secondary/30 -mx-6 sm:-mx-8 px-6 sm:px-8">
-                  <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                      Price Range
-                    </p>
-                    <p className="font-display text-lg font-semibold text-foreground mt-0.5">
-                      {active.priceM2}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">per m² USD</p>
-                  </div>
-                  <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                      Expected Rental Return
-                    </p>
-                    <p className="font-display text-lg font-semibold text-brass mt-0.5">
-                      {active.yieldRate}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">USD indexed contracts</p>
-                  </div>
-                  <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                      Airport Travel
-                    </p>
-                    <p className="font-sans text-xs font-semibold text-foreground mt-1 flex items-center gap-1">
-                      <Plane className="h-3 w-3 text-brass" /> {active.airportTime}
-                    </p>
-                  </div>
-                  <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                      Value Growth
-                    </p>
-                    <p className="font-sans text-xs font-semibold text-emerald-700 mt-1 flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" /> {active.appreciation}
-                    </p>
-                  </div>
+        {/* Deep Architectural Intelligence Dossier for Active District */}
+        <div ref={dossier} id="district-dossier" role="tabpanel" className="scroll-mt-24">
+          <div className="card-elevate rounded-xs border border-border/80 bg-card shadow-lg p-6 sm:p-8 flex flex-col justify-between">
+            {/* Top Registration Info */}
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-4">
+                <div className="flex items-center gap-2">
+                  <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
+                    District Overview
+                  </span>
+                  <span className="text-[11px] text-muted-foreground font-medium">
+                    Ref: {active.id.toUpperCase()}-IST
+                  </span>
                 </div>
-
-                <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-                  Market figures are indicative notes from our advisory team, not offers, valuations or guarantees of return. Ask us for current, verified numbers before you decide.
-                </p>
-
-                {/* Due Diligence Checklist Highlights */}
-                <div className="mt-6 space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-brass" />
-                    <span>Why You'll Love This Neighborhood</span>
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {active.keyStrengths.map((str, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-xs border border-border/70 bg-card p-3 text-xs text-muted-foreground leading-relaxed flex flex-col justify-between hover:border-brass/50 transition-colors"
-                      >
-                        <span className="font-mono text-[9px] text-brass mb-1">0{idx + 1}</span>
-                        <span>{str}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Title Deed & Tenancy Footnote */}
-                <div className="mt-4 rounded-xs border border-border/80 bg-secondary/40 p-3.5 text-xs text-muted-foreground space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] font-semibold text-primary uppercase">
-                      Title Deed:
-                    </span>
-                    <span className="text-foreground font-medium">{active.titleDeedStatus}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] font-semibold text-primary uppercase">
-                      Tenant Profile:
-                    </span>
-                    <span>{active.tenantProfile}</span>
-                  </div>
+                <div className="flex items-center gap-1.5 text-xs text-brass font-medium">
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span>
+                    {active.side} Istanbul · {active.locParam}
+                  </span>
                 </div>
               </div>
 
-              {/* Direct Action CTAs */}
-              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-5">
-                <button
-                  onClick={() => navigate({ to: "/properties", search: { q: active.locParam } })}
-                  className="btn btn-primary shadow-xs gap-2 btn-shimmer"
-                >
-                  <span>{t.whyTurkiye.viewPropertiesInDistrict}: {active.name}</span>
-                  <ArrowRight className="h-3.5 w-3.5 rtl-flip" />
-                </button>
+              {/* District Hero Title & Photo Banner */}
+              <div className="mt-6 grid gap-6 md:grid-cols-[1.2fr_1fr]">
+                <div>
+                  <h3 className="font-display text-2xl sm:text-3xl font-semibold text-foreground">
+                    {active.name}
+                  </h3>
+                  <p className="text-xs font-medium text-brass mt-0.5 uppercase tracking-wider">
+                    {active.subName} · {active.side} Side
+                  </p>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    {active.tagline}
+                  </p>
+                </div>
 
-                <a
-                  href={waLink(
-                    `Hello Avrasya Properties, I am exploring homes in ${active.name} on your website. I would love to see available properties in this area.`,
-                  )}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-outline gap-2 hover:border-brass hover:text-brass transition-colors"
-                >
-                  <MessageSquare className="h-3.5 w-3.5 text-brass" />
-                  <span>{t.cta.whatsappDirect} ({active.locParam})</span>
-                </a>
+                <div className="img-zoom-container relative aspect-[16/10] overflow-hidden rounded-xs border border-border/70 bg-muted group">
+                  <img
+                    src={active.image}
+                    alt={active.name}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                  <span className="glass-pill-dark absolute bottom-2 left-2 rounded px-2.5 py-1 text-[10px] font-mono text-brass shadow-sm">
+                    {active.yieldRate} Expected Return
+                  </span>
+                </div>
+              </div>
+
+              {/* Financial & Statutory Key Metrics Grid */}
+              <div className="mt-8 grid grid-cols-2 gap-4 border-y border-border/70 py-5 sm:grid-cols-4 bg-secondary/30 -mx-6 sm:-mx-8 px-6 sm:px-8">
+                <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Price Range
+                  </p>
+                  <p className="font-display text-lg font-semibold text-foreground mt-0.5">
+                    {active.priceM2}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">per m² USD</p>
+                </div>
+                <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Expected Rental Return
+                  </p>
+                  <p className="font-display text-lg font-semibold text-brass mt-0.5">
+                    {active.yieldRate}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">USD indexed contracts</p>
+                </div>
+                <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Airport Travel
+                  </p>
+                  <p className="font-sans text-xs font-semibold text-foreground mt-1 flex items-center gap-1">
+                    <Plane className="h-3 w-3 text-brass" /> {active.airportTime}
+                  </p>
+                </div>
+                <div className="rounded-xs border border-border/60 bg-card/80 p-3 transition-transform duration-300 hover:-translate-y-0.5 shadow-xs">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Value Growth
+                  </p>
+                  <p className="font-sans text-xs font-semibold text-emerald-700 mt-1 flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" /> {active.appreciation}
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+                Market figures are indicative notes from our advisory team, not offers, valuations
+                or guarantees of return. Ask us for current, verified numbers before you decide.
+              </p>
+
+              {/* Due Diligence Checklist Highlights */}
+              <div className="mt-6 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4 text-brass" />
+                  <span>Why You'll Love This Neighborhood</span>
+                </p>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {active.keyStrengths.map((str, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-xs border border-border/70 bg-card p-3 text-xs text-muted-foreground leading-relaxed flex flex-col justify-between hover:border-brass/50 transition-colors"
+                    >
+                      <span className="font-mono text-[9px] text-brass mb-1">0{idx + 1}</span>
+                      <span>{str}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Title Deed & Tenancy Footnote */}
+              <div className="mt-4 rounded-xs border border-border/80 bg-secondary/40 p-3.5 text-xs text-muted-foreground space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] font-semibold text-primary uppercase">
+                    Title Deed:
+                  </span>
+                  <span className="text-foreground font-medium">{active.titleDeedStatus}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] font-semibold text-primary uppercase">
+                    Tenant Profile:
+                  </span>
+                  <span>{active.tenantProfile}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Action CTAs */}
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-5">
+              <button
+                onClick={() => navigate({ to: "/properties", search: { q: active.locParam } })}
+                className="btn btn-primary shadow-xs gap-2 btn-shimmer"
+              >
+                <span>
+                  {t.whyTurkiye.viewPropertiesInDistrict}: {active.name}
+                </span>
+                <ArrowRight className="h-3.5 w-3.5 rtl-flip" />
+              </button>
+
+              <a
+                href={waLink(
+                  `Hello Avrasya Properties, I am exploring homes in ${active.name} on your website. I would love to see available properties in this area.`,
+                )}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline gap-2 hover:border-brass hover:text-brass transition-colors"
+              >
+                <MessageSquare className="h-3.5 w-3.5 text-brass" />
+                <span>
+                  {t.cta.whatsappDirect} ({active.locParam})
+                </span>
+              </a>
             </div>
           </div>
         </div>
@@ -548,9 +553,7 @@ export function BosphorusNavigator({ embedded = false }: { embedded?: boolean } 
 
   return (
     <section className="relative border-y border-border/80 bg-background py-16 md:py-24 overflow-hidden">
-      <div className="container-site relative z-10">
-        {content}
-      </div>
+      <div className="container-site relative z-10">{content}</div>
     </section>
   );
 }

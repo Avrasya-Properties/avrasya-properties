@@ -14,11 +14,20 @@ export function HeroBackdrop({ image }: { image: string }) {
       if (prefersReducedMotion()) return;
       const mm = gsap.matchMedia();
       mm.add("(min-width: 768px)", () => {
-        gsap.fromTo(".hero-photo", { scale: 1.16 }, { scale: 1.04, duration: 2.4, ease: "power3.out" });
+        gsap.fromTo(
+          ".hero-photo",
+          { scale: 1.16 },
+          { scale: 1.04, duration: 2.4, ease: "power3.out" },
+        );
         gsap.to(".hero-photo", {
           yPercent: 14,
           ease: "none",
-          scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
         });
       });
       mm.add("(max-width: 767px)", () => {

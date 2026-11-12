@@ -5,13 +5,13 @@ import { MapPin, Plus, Save, ExternalLink, Sparkles, Building2, Globe } from "lu
 import { PageHead, btnGhost, btnPrimary } from "@/admin/Shell";
 import { RegionsEditor } from "@/admin/RegionsEditor";
 import { allDistricts, normalizeRegions, type Region } from "@/data/regions";
-import { 
-  can, 
-  DEMO_ENABLED, 
-  settingsRevision, 
-  updateSiteSettings, 
-  useDB, 
-  useSession 
+import {
+  can,
+  DEMO_ENABLED,
+  settingsRevision,
+  updateSiteSettings,
+  useDB,
+  useSession,
 } from "@/admin/store";
 
 export const Route = createFileRoute("/admin/regions")({
@@ -104,7 +104,10 @@ export function AdminRegionsPage() {
             <div>
               <p className="text-xs text-muted-foreground font-medium">Configured Cities</p>
               <h3 className="font-display text-xl font-bold text-foreground">
-                {regions.length} <span className="text-xs font-normal text-muted-foreground">({publishedCount} live)</span>
+                {regions.length}{" "}
+                <span className="text-xs font-normal text-muted-foreground">
+                  ({publishedCount} live)
+                </span>
               </h3>
             </div>
           </div>
@@ -118,7 +121,8 @@ export function AdminRegionsPage() {
             <div>
               <p className="text-xs text-muted-foreground font-medium">Total Districts</p>
               <h3 className="font-display text-xl font-bold text-foreground">
-                {totalDistricts} <span className="text-xs font-normal text-muted-foreground">across Türkiye</span>
+                {totalDistricts}{" "}
+                <span className="text-xs font-normal text-muted-foreground">across Türkiye</span>
               </h3>
             </div>
           </div>
@@ -147,9 +151,10 @@ export function AdminRegionsPage() {
             Managing Turkish Investment Cities & Regional Markets
           </strong>
           <p className="text-muted-foreground">
-            Add any city in Türkiye (e.g. Istanbul, Antalya, Bodrum, Izmir, Ankara, Fethiye).
-            Each region automatically powers website search filters, property assignment dropdowns, and regional portfolio pages.
-            Use the preset buttons below for instant 1-click additions with pre-configured districts.
+            Add any city in Türkiye (e.g. Istanbul, Antalya, Bodrum, Izmir, Ankara, Fethiye). Each
+            region automatically powers website search filters, property assignment dropdowns, and
+            regional portfolio pages. Use the preset buttons below for instant 1-click additions
+            with pre-configured districts.
           </p>
         </div>
       </div>
@@ -158,6 +163,7 @@ export function AdminRegionsPage() {
       <div className="rounded-xl border bg-card p-5">
         <RegionsEditor
           regions={regions}
+          properties={db.properties}
           disabled={!editable}
           onChange={(next) => {
             setDirty(true);
@@ -185,11 +191,7 @@ export function AdminRegionsPage() {
             >
               Discard
             </button>
-            <button
-              onClick={() => handleSave()}
-              disabled={saving}
-              className={btnPrimary}
-            >
+            <button onClick={() => handleSave()} disabled={saving} className={btnPrimary}>
               <Save className="h-3.5 w-3.5" />
               <span>{saving ? "Publishing..." : "Publish to website"}</span>
             </button>

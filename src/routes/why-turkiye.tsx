@@ -3,19 +3,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "@/hooks/useLanguage";
 import {
-  Building,
-  Compass,
   GraduationCap,
   HeartHandshake,
-  MapPin,
   Plane,
   Scale,
   ShieldCheck,
   Train,
   TrendingUp,
-  Waves,
 } from "lucide-react";
-import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
+import { PageIntro } from "@/components/site/Chrome";
 import { meta } from "@/components/site/TextPage";
 
 export const Route = createFileRoute("/why-turkiye")({
@@ -23,9 +19,13 @@ export const Route = createFileRoute("/why-turkiye")({
     meta(
       "Why Istanbul Real Estate · Avrasya Properties",
       "Neighborhood guides, lifestyle insights, and freehold property rights in Istanbul for international home buyers and families.",
-      "/why-turkiye"
+      { canonical: "https://avrasyaproperties.com/why-turkiye" },
     ),
-  component: () => <ManagedPage slug="why-turkiye"><WhyTurkiye /></ManagedPage>,
+  component: () => (
+    <ManagedPage slug="why-turkiye">
+      <WhyTurkiye />
+    </ManagedPage>
+  ),
 });
 
 type DistrictProfile = {
@@ -135,16 +135,14 @@ export function WhyTurkiye() {
       {/* 4 Core Pillars */}
       <section className="border-b bg-card py-16">
         <div className="container-site">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
             <p className="eyebrow">{t.whyTurkiye.macroEyebrow}</p>
-            <h2 className="font-display text-3xl font-semibold">
-              {t.whyTurkiye.macroTitle}
-            </h2>
+            <h2 className="font-display text-3xl font-semibold">{t.whyTurkiye.macroTitle}</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
-              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-brass/50">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xs bg-brass/10 text-brass">
                 <Scale className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
@@ -155,8 +153,8 @@ export function WhyTurkiye() {
               </p>
             </div>
 
-            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
-              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-brass/50">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xs bg-brass/10 text-brass">
                 <Plane className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
@@ -167,8 +165,8 @@ export function WhyTurkiye() {
               </p>
             </div>
 
-            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
-              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-brass/50">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xs bg-brass/10 text-brass">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
@@ -179,8 +177,8 @@ export function WhyTurkiye() {
               </p>
             </div>
 
-            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs hover:-translate-y-1 hover:border-brass/50 transition-all">
-              <div className="h-10 w-10 rounded-xs bg-brass/10 text-brass flex items-center justify-center mb-4">
+            <div className="card-elevate rounded-xs border border-border/80 bg-background p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-brass/50">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xs bg-brass/10 text-brass">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <h3 className="font-display text-xl font-semibold text-foreground">
@@ -194,9 +192,9 @@ export function WhyTurkiye() {
         </div>
       </section>
 
-      {/* District Intelligence Explorer */}
+      {/* Neighborhood Guides */}
       <section className="container-site py-20">
-        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end mb-10">
+        <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="eyebrow">{t.whyTurkiye.districtsEyebrow}</p>
             <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
@@ -207,19 +205,22 @@ export function WhyTurkiye() {
             </p>
           </div>
 
-          {/* Filter Pills */}
-          <div className="inline-flex rounded-xs border border-border/80 bg-card p-1 text-xs shadow-xs">
+          <div className="flex gap-2 rounded-xs border border-border/80 bg-background p-1 text-xs">
             {(["All", "European", "Asian"] as const).map((side) => (
               <button
                 key={side}
                 onClick={() => setActiveSide(side)}
-                className={`rounded-xs px-4 py-2 font-medium transition-all duration-200 ${
+                className={`rounded-xs px-3 py-1.5 font-medium transition-colors ${
                   activeSide === side
-                    ? "bg-primary text-on-dark shadow-xs font-semibold"
+                    ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {side === "All" ? t.properties.allDistricts : side === "European" ? t.whyTurkiye.filterEuropean : t.whyTurkiye.filterAsian}
+                {side === "All"
+                  ? t.properties.allDistricts
+                  : side === "European"
+                    ? t.whyTurkiye.filterEuropean
+                    : t.whyTurkiye.filterAsian}
               </button>
             ))}
           </div>
@@ -229,7 +230,7 @@ export function WhyTurkiye() {
           {filteredDistricts.map((d) => (
             <div
               key={d.name}
-              className="card-elevate group overflow-hidden rounded-xs border border-border/80 bg-card transition-all hover:border-brass/70 hover:shadow-lg"
+              className="card-elevate group flex flex-col overflow-hidden rounded-xs border border-border/80 bg-card shadow-xs transition-all hover:border-border/70 hover:shadow-lg"
             >
               <div className="img-zoom-container relative aspect-[16/10] overflow-hidden bg-muted">
                 <img
@@ -248,13 +249,13 @@ export function WhyTurkiye() {
 
                 <div className="mt-5 grid grid-cols-2 gap-3 rounded-xs border border-border/60 bg-secondary/30 p-3 text-xs">
                   <div>
-                    <span className="text-muted-foreground block text-[10px] uppercase tracking-wider">
+                    <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
                       {t.whyTurkiye.pricePerM2}
                     </span>
                     <span className="font-mono font-bold text-foreground">{d.pricePerM2}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground block text-[10px] uppercase tracking-wider">
+                    <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
                       {t.whyTurkiye.targetYield}
                     </span>
                     <span className="font-mono font-bold text-brass">{d.yieldRange}</span>
@@ -276,64 +277,63 @@ export function WhyTurkiye() {
       </section>
 
       {/* Global Lifestyle & Family Integration */}
-      <section className="border-t bg-ink text-on-dark py-20">
+      <section className="border-t bg-ink py-20 text-on-dark">
         <div className="container-site">
-          <div className="max-w-2xl mb-12">
+          <div className="mb-12 max-w-2xl">
             <p className="eyebrow text-brass">Life in Istanbul</p>
-            <h2 className="font-display text-3xl font-semibold md:text-4xl text-on-dark">
-              A Wonderful Place to Live & Raise a Family
+            <h2 className="font-display text-3xl font-semibold text-on-dark md:text-4xl">
+              A Wonderful Place to Live &amp; Raise a Family
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              From renowned English-language schools and top-tier hospitals to seamless metro
-              lines, Istanbul offers an exceptional quality of life for international families.
+              From renowned English-language schools and top-tier hospitals to seamless metro lines,
+              Istanbul offers an exceptional quality of life for international families.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <GraduationCap className="h-6 w-6 text-brass mb-3" />
+              <GraduationCap className="mb-3 h-6 w-6 text-brass" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
                 40+ International Schools
               </h3>
-              <p className="mt-2 text-sm text-on-dark-muted leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">
                 British curriculum, American high schools (Robert College), and International
                 Baccalaureate (IB) academies teach in English, French, and German.
               </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <HeartHandshake className="h-6 w-6 text-brass mb-3" />
+              <HeartHandshake className="mb-3 h-6 w-6 text-brass" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
                 World-Class Healthcare
               </h3>
-              <p className="mt-2 text-sm text-on-dark-muted leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">
                 Hospital groups such as Acıbadem, Memorial, and Koç University Hospital are renowned
                 globally for medical excellence and multilingual patient care.
               </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <Train className="h-6 w-6 text-brass mb-3" />
+              <Train className="mb-3 h-6 w-6 text-brass" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
                 Seamless Modern Transit
               </h3>
-              <p className="mt-2 text-sm text-on-dark-muted leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">
                 Marmaray connects Europe and Asia under the Bosphorus in 4 minutes; the M11 metro
-                line speeds between Kagıthane and Istanbul Airport in under 24 minutes.
+                line speeds between Kağıthane and Istanbul Airport in under 24 minutes.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="container-site py-12 flex justify-center">
-        <Link to="/properties" className="btn btn-primary text-base px-8 py-3">
+      <div className="container-site flex justify-center py-12">
+        <Link to="/properties" className="btn btn-primary px-8 py-3 text-base">
           Explore Available Homes
         </Link>
       </div>
-
-      <CtaBand />
     </>
   );
 }
 
+export default WhyTurkiye;

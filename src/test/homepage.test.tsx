@@ -7,10 +7,19 @@ const state = vi.hoisted(() => ({
   isPending: false,
   isError: false,
   refetch: vi.fn(),
-  page:null as null|{published:boolean;title:string;sections:{title:string;content_json:Record<string,unknown>}[]},
+  page: null as null | {
+    published: boolean;
+    title: string;
+    sections: { title: string; content_json: Record<string, unknown> }[];
+  },
 }));
-vi.mock("@/lib/supabase",()=>({DEMO_MODE:false}));
-vi.mock("@/data/live", () => ({ useCatalogue: () => state,useManagedPage:()=>({data:state.page,isError:false}) }));
+vi.mock("@/lib/supabase", () => ({ DEMO_MODE: false }));
+vi.mock("@/data/live", () => ({
+  useCatalogue: () => state,
+  useManagedPage: () => ({ data: state.page, isError: false }),
+  useServices: () => ({ data: undefined, isPending: false }),
+  useFaqs: () => ({ data: undefined, isPending: false }),
+}));
 vi.mock("@/admin/store", () => ({
   useSiteSettings: () => ({
     heroHeadline: "Find your place in Istanbul.",
@@ -53,28 +62,61 @@ vi.mock("@/components/site/Motion", () => ({
   Marquee: () => null,
   MotionRoot: () => null,
 }));
+vi.mock("@/components/site/BildoraAboutSection", () => ({
+  BildoraAboutSection: () => <section data-testid="bildora-about">About</section>,
+}));
+vi.mock("@/components/site/BildoraServicesTimeline", () => ({
+  BildoraServicesTimeline: () => <section data-testid="bildora-services">Services</section>,
+}));
+vi.mock("@/components/site/BildoraProjectsShowcase", () => ({
+  BildoraProjectsShowcase: () => <section data-testid="bildora-projects">Projects</section>,
+}));
+vi.mock("@/components/site/PartnersSection", () => ({
+  PartnersSection: () => <section data-testid="partners">Partners</section>,
+}));
 import { Route } from "@/routes/index";
 const Home = Route.options.component as ComponentType;
 afterEach(cleanup);
 beforeEach(() => {
   state.properties = [];
-  state.page=null;
+  state.page = null;
   state.isPending = false;
   state.isError = false;
   state.refetch.mockClear();
 });
 describe("Homepage remains the homepage", () => {
-  it("shows published managed homepage sections and preserves property search",()=>{state.page={published:true,title:"Managed introduction",sections:[{title:"Our approach",content_json:{paragraphs:["A real managed paragraph."]}}]};render(<Home/>);expect(screen.getByText("A real managed paragraph.")).toBeInTheDocument();expect(screen.getByRole("heading",{level:1})).toHaveTextContent("Find your place in Istanbul.");expect(screen.getByRole("button",{name:"Search Listings"})).toBeInTheDocument();});
-  it("does not show unpublished managed homepage sections",()=>{state.page={published:false,title:"Draft",sections:[{title:"Hidden",content_json:{paragraphs:["Unpublished draft text"]}}]};render(<Home/>);expect(screen.queryByText("Unpublished draft text")).toBeNull();});
+  it("shows published managed homepage sections and preserves region showcase", () => {
+    state.page = {
+      published: true,
+      title: "Managed introduction",
+      sections: [
+        { title: "Our approach", content_json: { paragraphs: ["A real managed paragraph."] } },
+      ],
+    };
+    render(<Home />);
+    expect(screen.getByText("A real managed paragraph.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Find your place in Istanbul.",
+    );
+    expect(screen.getByText("Choose your region")).toBeInTheDocument();
+  });
+  it("does not show unpublished managed homepage sections", () => {
+    state.page = {
+      published: false,
+      title: "Draft",
+      sections: [{ title: "Hidden", content_json: { paragraphs: ["Unpublished draft text"] } }],
+    };
+    render(<Home />);
+    expect(screen.queryByText("Unpublished draft text")).toBeNull();
+  });
 
-  it("keeps the main hero, search and sections when no listings are published", () => {
+  it("keeps the main hero, regions showcase and sections when no listings are published", () => {
     const { container } = render(<Home />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Find your place in Istanbul.",
     );
-    expect(screen.getByRole("button", { name: "Search Listings" })).toBeInTheDocument();
-    expect(screen.getByText("No properties match your filter criteria")).toBeInTheDocument();
-    expect(screen.getByText("Explore Istanbul districts")).toBeInTheDocument();
+    expect(screen.getByText("Choose your region")).toBeInTheDocument();
+    expect(screen.getAllByText(/Istanbul/i).length).toBeGreaterThan(0);
     expect(container.querySelector('input[autocomplete="name"]')).toBeNull();
   });
   it("loads the collection inside the main page instead of replacing the whole page", () => {

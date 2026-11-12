@@ -77,7 +77,7 @@ export const en: AppTranslations = {
     investmentDisclaimer: "Investment Disclaimer",
     tagline: "Your Future Starts with the Right Investment.",
     description:
-      "Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and independent legal peace of mind.",
+      "Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and in-house legal peace of mind.",
     realEstateAdvisoryBadge: "Istanbul Real Estate Advisory",
   },
   cta: {
@@ -99,7 +99,7 @@ export const en: AppTranslations = {
     heroTitle: "Find your ideal home and investment in",
     heroTitleEm: "Istanbul.",
     heroSubtitle:
-      "Explore handpicked residential projects, verified Turkish citizenship portfolios, and secure independent legal guidance for international home buyers.",
+      "Explore handpicked residential projects, verified Turkish citizenship portfolios, and secure in-house legal guidance for international home buyers.",
     browseProperties: "Explore All Properties",
     exploreByArea: "Explore by Corridor",
     filterDistrict: "District",
@@ -120,13 +120,17 @@ export const en: AppTranslations = {
     regionsOpen: "Open region",
     heroCta: "Book a consultation",
     stat1Title: "100% Freehold Title Deeds",
-    stat1Desc: "Full private ownership under Turkish property law with independent registry checks.",
+    stat1Desc:
+      "Full private ownership under Turkish property law with independent registry checks.",
     stat2Title: "Central Bank DAB Security",
-    stat2Desc: "Official currency exchange certificates guaranteeing clear, documented foreign transfers.",
+    stat2Desc:
+      "Official currency exchange certificates guaranteeing clear, documented foreign transfers.",
     stat3Title: "0% Foreigner VAT Exemption",
-    stat3Desc: "Complete legal application for Law No. 3065 saving up to 20% on brand-new acquisitions.",
-    stat4Title: "Independent Legal Review",
-    stat4Desc: "Every project screened by certified bar attorneys with zero developer bias.",
+    stat3Desc:
+      "Complete legal application for Law No. 3065 saving up to 20% on brand-new acquisitions.",
+    stat4Title: "In-House Legal Review",
+    stat4Desc:
+      "Every project screened by Avrasya's in-house attorney with full title verification.",
     editorialEyebrow: "Curated Collection · Handpicked Developments",
     editorialTitle: "Featured",
     editorialTitleEm: "Residences & Penthouses",
@@ -144,13 +148,17 @@ export const en: AppTranslations = {
     cbiSubtitle:
       "Obtain Turkish citizenship and world-class healthcare, education, and visa-free travel privileges through qualifying prime real estate in Istanbul.",
     cbiPillar1Title: "Whole Family Inclusion",
-    cbiPillar1Desc: "Spouse and dependent children under 18 receive full citizenship with equal constitutional rights.",
+    cbiPillar1Desc:
+      "Spouse and dependent children under 18 receive full citizenship with equal constitutional rights.",
     cbiPillar2Title: "No Residency Required",
-    cbiPillar2Desc: "No minimum stay or language test requirements during or after the application process.",
+    cbiPillar2Desc:
+      "No minimum stay or language test requirements during or after the application process.",
     cbiPillar3Title: "Safe 3-Year Resale",
-    cbiPillar3Desc: "Hold the property for 3 years, then sell freely while maintaining full citizenship status.",
+    cbiPillar3Desc:
+      "Hold the property for 3 years, then sell freely while maintaining full citizenship status.",
     cbiPillar4Title: "Full Rental Freedom",
-    cbiPillar4Desc: "Collect premium monthly rental yields in foreign currencies while holding the title deed.",
+    cbiPillar4Desc:
+      "Collect premium monthly rental yields in foreign currencies while holding the title deed.",
     cbiExploreRoadmap: "Explore 5-Stage Citizenship Roadmap",
     cbiCheckQualifications: "Check Your Qualification",
     calcEyebrow: "Interactive Statutory Modeling",
@@ -165,13 +173,17 @@ export const en: AppTranslations = {
     whySubtitle:
       "Bridging Europe and Asia, Istanbul offers unprecedented infrastructure, dynamic population growth, and high-yielding freehold property assets.",
     whyPillar1Title: "Global Connectivity Hub",
-    whyPillar1Desc: "Istanbul Airport connects directly to over 340 international destinations within 4 hours flight.",
+    whyPillar1Desc:
+      "Istanbul Airport connects directly to over 340 international destinations within 4 hours flight.",
     whyPillar2Title: "Dynamic Rental Demand",
-    whyPillar2Desc: "High corporate, diplomatic, and student rental demand in central financial and coastal districts.",
+    whyPillar2Desc:
+      "High corporate, diplomatic, and student rental demand in central financial and coastal districts.",
     whyPillar3Title: "World-Class Healthcare & Schools",
-    whyPillar3Desc: "Internationally accredited JCI hospitals and prestigious international IB baccalaureate schools.",
+    whyPillar3Desc:
+      "Internationally accredited JCI hospitals and prestigious international IB baccalaureate schools.",
     whyPillar4Title: "Generous Capital Appreciation",
-    whyPillar4Desc: "Consistent long-term asset value growth driven by mega infrastructure and central scarcity.",
+    whyPillar4Desc:
+      "Consistent long-term asset value growth driven by mega infrastructure and central scarcity.",
   },
   properties: {
     eyebrow: "Verified Listings · Live Availability",
@@ -185,7 +197,8 @@ export const en: AppTranslations = {
     filterRegion: "Region",
     regionViewListings: "View listings in this region",
     regionDistrictsTitle: "Districts we cover",
-    regionEmpty: "No published listings in this region yet. Tell us what you are looking for and we will source it.",
+    regionEmpty:
+      "No published listings in this region yet. Tell us what you are looking for and we will source it.",
     regionListingsLabel: "listings",
     allSides: "All Sides",
     sideEurope: "European Side",
@@ -203,7 +216,8 @@ export const en: AppTranslations = {
     clearSavedFilter: "Clear saved filter",
     showingCount: "properties found",
     noResultsTitle: "No properties match your filter criteria",
-    noResultsDesc: "Try adjusting your filters, clearing the search term, or browsing our full collection.",
+    noResultsDesc:
+      "Try adjusting your filters, clearing the search term, or browsing our full collection.",
     viewingGrid: "Grid view",
     viewingList: "List view",
   },
@@ -273,7 +287,7 @@ export const en: AppTranslations = {
       "Funds transferred and converted through Turkish Central Bank with formal exchange certificate.",
     titleDeedClean: "Encumbrance-Free Title (Kat Mülkiyeti)",
     titleDeedCleanDesc:
-      "Title deed checked for mortgages, liens, or developer tax claims by independent certified counsel.",
+      "Title deed checked for mortgages, liens, or developer tax claims by Avrasya's in-house attorney.",
     bookViewing: "Schedule Private Consultation & Viewing",
     bookViewingDesc:
       "Speak directly with our Istanbul advisory desk to verify live availability, schedule an in-person viewing or arrange a live video walkthrough.",
@@ -343,7 +357,8 @@ export const en: AppTranslations = {
     includeSpouse: "Include Spouse in application",
     childrenCountLabel: "Dependent Children (Under 18)",
     vatExemptLabel: "Apply Foreigner 0% VAT Exemption (Law No. 3065)",
-    vatExemptNote: "Saves up to 1% to 20% VAT on first-hand brand new properties for foreign buyers.",
+    vatExemptNote:
+      "Saves up to 1% to 20% VAT on first-hand brand new properties for foreign buyers.",
     breakdownTitle: "Estimated Investment Outlay Breakdown",
     breakdownPropertyPrice: "Qualifying Property Price",
     breakdownTapuFee: "Title Deed Transfer Fee (2% / 4% Tapu)",
@@ -379,13 +394,17 @@ export const en: AppTranslations = {
     keyRequirementsEyebrow: "Official Legal Safeguards",
     keyRequirementsTitle: "Four mandatory criteria under Turkish CBI law",
     req1Title: "Clean Title Deed (Kat Mülkiyeti / Kat İrtifakı)",
-    req1Desc: "Property must have a clear title deed free of encumbrances, unpaid contractor debt, or legal disputes.",
+    req1Desc:
+      "Property must have a clear title deed free of encumbrances, unpaid contractor debt, or legal disputes.",
     req2Title: "Official Bank DAB Conversion",
-    req2Desc: "Purchase funds must be transferred in foreign currency and exchanged officially through the Central Bank.",
+    req2Desc:
+      "Purchase funds must be transferred in foreign currency and exchanged officially through the Central Bank.",
     req3Title: "Licensed SPK Valuation Report",
-    req3Desc: "Appraisal report must certify the property's market value at or above $400,000 on the day of purchase.",
+    req3Desc:
+      "Appraisal report must certify the property's market value at or above $400,000 on the day of purchase.",
     req4Title: "3-Year Ownership Holding Pledge",
-    req4Desc: "Title deed carries a formal 3-year holding pledge. After 3 years, you can sell freely while keeping citizenship.",
+    req4Desc:
+      "Title deed carries a formal 3-year holding pledge. After 3 years, you can sell freely while keeping citizenship.",
     startCbiConsultation: "Start Your Citizenship Consultation",
   },
   whyTurkiye: {
@@ -424,7 +443,8 @@ export const en: AppTranslations = {
     freeholdPoint1: "Perpetual freehold deed passed to heirs under standard inheritance laws.",
     freeholdPoint2: "Full freedom to lease to tenants in international currencies.",
     freeholdPoint3: "Equal protection under Turkish constitutional and civil property courts.",
-    freeholdPoint4: "Freedom to repatriate all rental earnings and sale capital abroad with zero restrictions.",
+    freeholdPoint4:
+      "Freedom to repatriate all rental earnings and sale capital abroad with zero restrictions.",
   },
   investment: {
     eyebrow: "Investor's Step-by-Step Playbook · Strategic Acquisitions",
@@ -461,33 +481,45 @@ export const en: AppTranslations = {
     stepsEyebrow: "Acquisition Pathway",
     stepsTitle: "Step-by-step acquisition journey for international buyers",
     step1Title: "Strategy & Objective Setting",
-    step1Desc: "Clarify whether your focus is citizenship ($400k+), high rental yields, or lifestyle living.",
+    step1Desc:
+      "Clarify whether your focus is citizenship ($400k+), high rental yields, or lifestyle living.",
     step2Title: "Tax Number & Bank Account Setup",
-    step2Desc: "We obtain your Turkish Tax Number (Vergi No) and open your personal multicurrency bank account in 24 hours.",
+    step2Desc:
+      "We obtain your Turkish Tax Number (Vergi No) and open your personal multicurrency bank account in 24 hours.",
     step3Title: "Shortlist Curation & Guided Viewings",
-    step3Desc: "Tour handpicked properties in person or via high-definition live video walkthroughs.",
-    step4Title: "Independent Legal Due Diligence",
-    step4Desc: "Certified attorneys review the Land Registry to ensure clean title deeds with zero liens or encumbrances.",
+    step3Desc:
+      "Tour handpicked properties in person or via high-definition live video walkthroughs.",
+    step4Title: "In-House Legal Due Diligence",
+    step4Desc:
+      "Avrasya's in-house attorney reviews the Land Registry to ensure clean title deeds with zero liens or encumbrances.",
     step5Title: "Official DAB Currency Exchange",
-    step5Desc: "Funds are transferred safely and converted through the Central Bank of Türkiye for official certification.",
+    step5Desc:
+      "Funds are transferred safely and converted through the Central Bank of Türkiye for official certification.",
     step6Title: "Title Deed Transfer (Tapu Delivery)",
-    step6Desc: "Sign at the Land Registry office and receive your official title deed registered in your name.",
+    step6Desc:
+      "Sign at the Land Registry office and receive your official title deed registered in your name.",
     taxesEyebrow: "Statutory Cost Transparency",
     taxesTitle: "Taxes, closing fees, and government charges explained",
     tax1Title: "Title Deed Transfer Tax (Tapu Harcı)",
-    tax1Desc: "Standard 4% tax split 2% buyer / 2% seller in standard transactions based on official declared value.",
+    tax1Desc:
+      "Standard 4% tax split 2% buyer / 2% seller in standard transactions based on official declared value.",
     tax2Title: "Foreigner 0% VAT Exemption (Law No. 3065)",
-    tax2Desc: "International buyers pay 0% VAT on first-hand new properties purchased with foreign currency.",
+    tax2Desc:
+      "International buyers pay 0% VAT on first-hand new properties purchased with foreign currency.",
     tax3Title: "5-Year Capital Gains Exemption",
-    tax3Desc: "Profits from the sale of residential real estate held for more than 5 years are 100% exempt from income tax.",
+    tax3Desc:
+      "Profits from the sale of residential real estate held for more than 5 years are 100% exempt from income tax.",
     redFlagsEyebrow: "Buyer Protections",
     redFlagsTitle: "Red flags to avoid when buying in Istanbul",
     redFlag1Title: "Unlicensed Middlemen & Inflated Appraisals",
-    redFlag1Desc: "Never work with unregistered brokers. Always require an independent SPK valuation report.",
+    redFlag1Desc:
+      "Never work with unregistered brokers. Always require an independent SPK valuation report.",
     redFlag2Title: "Incomplete Development Licenses (İmar)",
-    redFlag2Desc: "Ensure the project holds full construction and building permits before paying deposits.",
+    redFlag2Desc:
+      "Ensure the project holds full construction and building permits before paying deposits.",
     redFlag3Title: "Unchecked Developer Debt on Land Titles",
-    redFlag3Desc: "Independent attorneys must check the title deed to confirm zero developer mortgages or liens.",
+    redFlag3Desc:
+      "Independent attorneys must check the title deed to confirm zero developer mortgages or liens.",
   },
   calculator: {
     eyebrow: "Statutory Investment Modeling · Real-Time FX",
@@ -503,7 +535,8 @@ export const en: AppTranslations = {
     tapuShareFull: "Full 4% Deed Tax (Common in new builds)",
     tapuShareSplit: "Split 2% Buyer / 2% Developer",
     vatExemptLabel: "Apply Foreigner 0% VAT Exemption (Law No. 3065)",
-    vatExemptSub: "Saves standard 1% to 20% VAT on qualifying first-hand purchases for non-residents.",
+    vatExemptSub:
+      "Saves standard 1% to 20% VAT on qualifying first-hand purchases for non-residents.",
     summaryTitle: "Acquisition Cost Summary",
     totalAcquisitionCost: "All-in Acquisition Outlay",
     closingCostsTotal: "Total Statutory Closing Costs",
@@ -512,7 +545,7 @@ export const en: AppTranslations = {
     vatTax: "Value Added Tax (KDV)",
     spkValuation: "SPK Statutory Appraisal Report",
     notaryDab: "DAB Exchange & Notary Registry",
-    legalReview: "Independent Attorney Due Diligence",
+    legalReview: "In-House Attorney Due Diligence",
     cbiEligibilityStatus: "Citizenship Eligibility Status",
     cbiExceeds: "Meets $400,000 Citizenship Threshold",
     cbiShortfall: "Shortfall to Reach $400,000 Threshold",
@@ -536,8 +569,91 @@ export const en: AppTranslations = {
   },
   services: {
     eyebrow: "Private Advisory Services · End-to-End Care",
-    title: "Comprehensive property advisory services in",
-    titleEm: "Istanbul.",
+    title: "One team. Every step. From first call to your passport and beyond.",
+    titleEm: "",
+    subtitle: "Our own lawyer handles the paperwork. You always know what happens next.",
+    closingLine: "One lawyer. One team. One process.",
+    legalDisclaimer:
+      "Regulatory Notice & Legal Representation: Avrasya Properties coordinates all transaction due diligence and dossier filings exclusively through independent attorneys admitted to the Istanbul Bar Association. In accordance with Turkish Citizenship Law No. 5901, sovereign naturalization decisions reside solely with the Republic of Türkiye Ministry of Interior Directorate General of Migration Management.",
+    parts: [
+      {
+        partNumber: "PART 1",
+        title: "CHOOSE",
+        steps: [
+          {
+            stepNumber: "01",
+            title: "Free Consultation",
+            description: "Tell us your budget and goals. We explain the process.",
+          },
+          {
+            stepNumber: "02",
+            title: "Property Search and Checks",
+            description:
+              "We show you checked properties. Our lawyer reviews the title deed (Tapu).",
+            termNote: "Title deed (Tapu)",
+          },
+        ],
+      },
+      {
+        partNumber: "PART 2",
+        title: "BUY",
+        steps: [
+          {
+            stepNumber: "03",
+            title: "Tax Number and Bank Account",
+            description: "We open your account and handle the currency exchange certificate (DAB).",
+            termNote: "Currency exchange certificate (DAB)",
+          },
+          {
+            stepNumber: "04",
+            title: "Purchase and Title Deed",
+            description: "We prepare the contract. The property is registered in your name.",
+          },
+        ],
+      },
+      {
+        partNumber: "PART 3",
+        title: "CITIZENSHIP",
+        steps: [
+          {
+            stepNumber: "05",
+            title: "Application",
+            description:
+              "Our lawyer files the application for you, your spouse, and your children.",
+            legalTag: "Law No. 5901 scope: spouse & minor children (<18)",
+          },
+          {
+            stepNumber: "06",
+            title: "Document Follow-up",
+            description: "We track your file and book your appointments. You get regular updates.",
+          },
+          {
+            stepNumber: "07",
+            title: "Passports in Your Hands",
+            description:
+              "Your citizenship is approved. We help you collect your passports. Process complete.",
+            legalTag:
+              "Sovereign discretion: Ministry of Interior Directorate General of Migration Management",
+          },
+        ],
+      },
+      {
+        partNumber: "PART 4",
+        title: "AFTER CITIZENSHIP (OPTIONAL)",
+        steps: [
+          {
+            stepNumber: "08",
+            title: "Rent Your Property",
+            description: "We find tenants, handle contracts, and send you rental reports.",
+          },
+          {
+            stepNumber: "09",
+            title: "Sell When You Are Ready",
+            description: "We value your property, find buyers, and manage the sale.",
+          },
+        ],
+      },
+    ],
     description:
       "From strategic property search and independent title due diligence to Turkish citizenship filing, interior design, and tenant management, we handle every detail.",
     coreServicesEyebrow: "Our Practice Areas",
@@ -550,61 +666,101 @@ export const en: AppTranslations = {
         title: "Personalized Property Advisory",
         category: "Planning",
         desc: "We sit down with you to understand your lifestyle, budget, and family goals, recommending the best Istanbul neighborhoods that match what you're looking for.",
-        deliverables: ["Neighborhood price guides", "Expected rental returns", "Clear cost breakdowns"],
+        deliverables: [
+          "Neighborhood price guides",
+          "Expected rental returns",
+          "Clear cost breakdowns",
+        ],
       },
       {
         title: "Handpicked Homes & Guided Tours",
         category: "Viewing",
         desc: "Explore handpicked homes that match your criteria. We accompany you on private, comfortable viewings across Istanbul or host live, high-definition video walkthroughs.",
-        deliverables: ["Shortlist of vetted homes", "Chauffeured private tours", "Live interactive video tours"],
+        deliverables: [
+          "Shortlist of vetted homes",
+          "Chauffeured private tours",
+          "Live interactive video tours",
+        ],
       },
       {
-        title: "Independent Legal Due Diligence",
+        title: "In-House Legal Due Diligence",
         category: "Legal",
-        desc: "Certified independent attorneys check the Land Registry to verify clean title deeds with zero liens, mortgages, or developer disputes.",
-        deliverables: ["Official Land Registry report", "Title deed status verification", "Encumbrance-free legal certificate"],
+        desc: "Avrasya's in-house attorney checks the Land Registry to verify clean title deeds with zero liens, mortgages, or developer disputes.",
+        deliverables: [
+          "Official Land Registry report",
+          "Title deed status verification",
+          "Encumbrance-free legal review",
+        ],
       },
       {
         title: "Turkish Citizenship by Investment ($400k)",
         category: "Citizenship",
         desc: "Full legal guidance from initial qualifying property selection through official SPK valuation, DAB currency certification, and passport issuance.",
-        deliverables: ["CBI eligibility certificate", "Investor residence permits", "Turkish passports for whole family"],
+        deliverables: [
+          "CBI eligibility certificate",
+          "Investor residence permits",
+          "Turkish passports for whole family",
+        ],
       },
       {
         title: "Central Bank DAB Currency Certificate",
         category: "Banking",
         desc: "We coordinate with Turkish banks and the Central Bank to ensure purchase currency is converted at official rates with certified DAB documentation.",
-        deliverables: ["Bank account opening", "Official DAB certificate", "Proof of foreign currency transfer"],
+        deliverables: [
+          "Bank account opening",
+          "Official DAB certificate",
+          "Proof of foreign currency transfer",
+        ],
       },
       {
         title: "Title Deed Transfer & Registration (Tapu)",
         category: "Closing",
         desc: "We accompany you to the Land Registry office (Tapu Müdürlüğü) to ensure smooth, secure title transfer directly into your name.",
-        deliverables: ["Official title deed document", "Municipality registration", "DASK earthquake insurance setup"],
+        deliverables: [
+          "Official title deed document",
+          "Municipality registration",
+          "DASK earthquake insurance setup",
+        ],
       },
       {
         title: "Foreigner 0% VAT Exemption (Law 3065)",
         category: "Tax Optimization",
         desc: "We prepare and submit your application for Law No. 3065, saving foreign buyers up to 20% VAT on first-hand brand-new properties.",
-        deliverables: ["Tax exemption certificate", "Direct developer VAT discount", "Tax office clearance documentation"],
+        deliverables: [
+          "Tax exemption certificate",
+          "Direct developer VAT discount",
+          "Tax office clearance documentation",
+        ],
       },
       {
         title: "Turnkey Interior Design & Furnishing",
         category: "Move-In",
         desc: "Our interior design partners furnish and style your property to high international standards, making it immediately rentable or livable.",
-        deliverables: ["Custom furniture packages", "Appliance delivery & installation", "Curtains, lighting & decor setup"],
+        deliverables: [
+          "Custom furniture packages",
+          "Appliance delivery & installation",
+          "Curtains, lighting & decor setup",
+        ],
       },
       {
         title: "Full-Service Rental & Tenant Management",
         category: "Management",
         desc: "We screen quality tenants, collect rental payments in your preferred currency, and handle all maintenance and tenant communication.",
-        deliverables: ["Strict tenant background checks", "Rental contracts drafted by legal counsel", "Monthly accounting & income remittances"],
+        deliverables: [
+          "Strict tenant background checks",
+          "Rental contracts drafted by legal counsel",
+          "Monthly accounting & income remittances",
+        ],
       },
       {
         title: "Strategic Resale & Capital Exit",
         category: "Exit",
         desc: "When you decide to sell after the 3-year citizenship holding period or 5-year tax-free horizon, we market your property internationally for maximum return.",
-        deliverables: ["Comparative market valuation", "International marketing campaign", "Closing negotiation & funds repatriation"],
+        deliverables: [
+          "Comparative market valuation",
+          "International marketing campaign",
+          "Closing negotiation & funds repatriation",
+        ],
       },
     ],
     faqs: [
@@ -733,7 +889,8 @@ export const en: AppTranslations = {
   },
   enquiry: {
     title: "Request Private Consultation",
-    subtitle: "Direct advisory with our senior property advisors. No pressure, completely confidential.",
+    subtitle:
+      "Direct advisory with our senior property advisors. No pressure, completely confidential.",
     fullName: "Full Name",
     fullNamePlaceholder: "e.g. Alexander Vance",
     email: "Email Address",
@@ -744,7 +901,8 @@ export const en: AppTranslations = {
     budget: "Budget Range (USD)",
     budgetPlaceholder: "e.g. $450,000",
     message: "Your Message or Questions",
-    messagePlaceholder: "Tell us about your timeline, preferred areas, or specific property questions...",
+    messagePlaceholder:
+      "Tell us about your timeline, preferred areas, or specific property questions...",
     submitBtn: "Send Private Enquiry",
     submitting: "Sending Enquiry...",
     successTitle: "Enquiry Received",
@@ -753,7 +911,8 @@ export const en: AppTranslations = {
     errorDesc: "Unable to submit enquiry. Please try again or reach out directly on WhatsApp.",
     whatsappAlternative: "Prefer immediate contact?",
     directWhatsappBtn: "Chat Directly on WhatsApp",
-    termsConsent: "By submitting, you agree to our privacy policy and consent to confidential advisory communication.",
+    termsConsent:
+      "By submitting, you agree to our privacy policy and consent to confidential advisory communication.",
     propertyReference: "Your reference:",
     errName: "Please enter your full name.",
     errEmail: "Please enter a valid email address, e.g. name@example.com.",
@@ -761,20 +920,25 @@ export const en: AppTranslations = {
     errMessage: "Please write a short message (at least 5 characters).",
     errConsent: "Please tick the box so we may contact you about this enquiry.",
     errFix: "Please correct the highlighted fields.",
-    errTimeout: "The connection timed out. Your enquiry may not have been sent. Please try again: retrying will not create a duplicate.",
-    errNetwork: "We could not reach our server. Please check your connection and try again, or contact us on WhatsApp.",
-    successNext: "An advisor will reply by email or phone within one business day. Keep this reference for your records.",
+    errTimeout:
+      "The connection timed out. Your enquiry may not have been sent. Please try again: retrying will not create a duplicate.",
+    errNetwork:
+      "We could not reach our server. Please check your connection and try again, or contact us on WhatsApp.",
+    successNext:
+      "An advisor will reply by email or phone within one business day. Keep this reference for your records.",
     newEnquiry: "Send another enquiry",
   },
   legalDraft: {
     eyebrow: "Legal · Draft pending approval",
-    statusWarning: "Status: pending approved text. Nothing on this page should be read as a finalised policy.",
+    statusWarning:
+      "Status: pending approved text. Nothing on this page should be read as a finalised policy.",
     approvedCovers: "The approved version is expected to cover",
     questionsPrompt: "Questions in the meantime?",
     contactLink: "Contact our team",
     unapproved:
       "This document has not yet been approved by Avrasya Properties. Final wording will be published after legal review.",
-    status: "Status: pending approved text. Nothing on this page should be read as a finalised policy.",
+    status:
+      "Status: pending approved text. Nothing on this page should be read as a finalised policy.",
     expected: "The approved version is expected to cover",
     questions: "Questions in the meantime?",
     contactTeam: "Contact our team",

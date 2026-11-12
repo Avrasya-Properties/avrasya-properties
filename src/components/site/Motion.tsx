@@ -52,7 +52,9 @@ export function MotionRoot() {
       // 1. Reveal [data-reveal] elements with smooth 18px translation and 0.55s duration
       const initReveals = () => {
         // The bound marker stops a re-run from stacking a second tween on the same element.
-        const unrevealed = document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in):not([data-reveal-bound])");
+        const unrevealed = document.querySelectorAll<HTMLElement>(
+          "[data-reveal]:not(.is-in):not([data-reveal-bound])",
+        );
         unrevealed.forEach((el) => {
           el.dataset["revealBound"] = "1";
           const delayMs = parseFloat(el.style.getPropertyValue("--d") || "0");
@@ -74,7 +76,7 @@ export function MotionRoot() {
                   once: true,
                   onEnter: () => el.classList.add("is-in"),
                 },
-              }
+              },
             );
           } else {
             gsap.fromTo(
@@ -92,7 +94,7 @@ export function MotionRoot() {
                   once: true,
                   onEnter: () => el.classList.add("is-in"),
                 },
-              }
+              },
             );
           }
         });
@@ -102,11 +104,21 @@ export function MotionRoot() {
       // left alone, so nothing visible ever flashes out and back in.
       const autoReveal = () => {
         if (document.querySelector("[data-home-page]")) return;
-        document.querySelectorAll<HTMLElement>("main section h2:not([data-reveal]):not([data-auto-revealed])").forEach((el) => {
-          el.dataset["autoRevealed"] = "1";
-          if (el.getBoundingClientRect().top < window.innerHeight) return;
-          gsap.from(el, { opacity: 0, y: 16, duration: 0.6, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
-        });
+        document
+          .querySelectorAll<HTMLElement>(
+            "main section h2:not([data-reveal]):not([data-auto-revealed])",
+          )
+          .forEach((el) => {
+            el.dataset["autoRevealed"] = "1";
+            if (el.getBoundingClientRect().top < window.innerHeight) return;
+            gsap.from(el, {
+              opacity: 0,
+              y: 16,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: { trigger: el, start: "top 92%", once: true },
+            });
+          });
       };
 
       initReveals();
@@ -149,7 +161,7 @@ export function MotionRoot() {
               end: "max",
               scrub: 0.15,
             },
-          }
+          },
         );
       }
 
@@ -173,7 +185,7 @@ export function MotionRoot() {
                 once: true,
                 onEnter: () => cards.forEach((c) => c.classList.add("is-in")),
               },
-            }
+            },
           );
         }
       });
@@ -192,8 +204,12 @@ export function MotionRoot() {
     return () => {
       observer.disconnect();
       bindLateContent = null;
-      document.querySelectorAll<HTMLElement>("[data-reveal-bound]").forEach((el) => delete el.dataset["revealBound"]);
-      document.querySelectorAll<HTMLElement>("[data-auto-revealed]").forEach((el) => delete el.dataset["autoRevealed"]);
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal-bound]")
+        .forEach((el) => delete el.dataset["revealBound"]);
+      document
+        .querySelectorAll<HTMLElement>("[data-auto-revealed]")
+        .forEach((el) => delete el.dataset["autoRevealed"]);
       mm.revert();
       document.documentElement.classList.remove("js-motion");
     };
@@ -255,24 +271,35 @@ export function Magnetic({ children }: { children: ReactNode }) {
   useEffect(() => {
     const el = ref.current;
     if (!el || isReduced() || !window.matchMedia("(pointer: fine)").matches) return;
+    const xTo = gsap.quickTo(el, "x", { duration: 0.35, ease: "power3.out" });
+    const yTo = gsap.quickTo(el, "y", { duration: 0.35, ease: "power3.out" });
+    let rect: DOMRect | null = null;
+    const enter = () => {
+      rect = el.getBoundingClientRect();
+    };
     const move = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      const dx = (e.clientX - r.left - r.width / 2) * 0.18;
-      const dy = (e.clientY - r.top - r.height / 2) * 0.25;
-      gsap.to(el, { x: dx, y: dy, duration: 0.2, ease: "power1.out" });
+      const r = rect || el.getBoundingClientRect();
+      const dx = Math.max(-10, Math.min(10, (e.clientX - r.left - r.width / 2) * 0.12));
+      const dy = Math.max(-8, Math.min(8, (e.clientY - r.top - r.height / 2) * 0.16));
+      xTo(dx);
+      yTo(dy);
     };
     const leave = () => {
-      gsap.to(el, { x: 0, y: 0, duration: 0.35, ease: "power2.out" });
+      rect = null;
+      xTo(0);
+      yTo(0);
     };
+    el.addEventListener("pointerenter", enter);
     el.addEventListener("pointermove", move);
     el.addEventListener("pointerleave", leave);
     return () => {
+      el.removeEventListener("pointerenter", enter);
       el.removeEventListener("pointermove", move);
       el.removeEventListener("pointerleave", leave);
     };
   }, []);
   return (
-    <span ref={ref} className="inline-block">
+    <span ref={ref} className="inline-block will-change-transform">
       {children}
     </span>
   );

@@ -7,18 +7,19 @@ export const Route = createFileRoute("/cookie-policy")({
     ...meta(
       "Cookie Policy · Avrasya Properties",
       "Draft Cookie Policy for Avrasya Properties — approved text pending legal review.",
-      "/cookie-policy"
+      "/cookie-policy",
     ),
   }),
   component: () => (
-    <ManagedPage slug="cookie-policy"><LegalDraft
-      title="Cookie Policy"
-      topics={[
-        "Cookies and similar technologies used",
-        "Analytics and preferences",
-        "How to manage cookies",
-      ]}
-    /></ManagedPage>
+    <ManagedPage slug="cookie-policy">
+      <LegalDraft
+        title="Cookie Policy"
+        topics={[
+          "Cookies and similar technologies used",
+          "Analytics and preferences",
+          "How to manage cookies",
+        ]}
+      />
+    </ManagedPage>
   ),
 });
-

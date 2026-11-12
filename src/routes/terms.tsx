@@ -7,18 +7,19 @@ export const Route = createFileRoute("/terms")({
     ...meta(
       "Terms & Conditions · Avrasya Properties",
       "Draft Terms & Conditions for Avrasya Properties — approved text pending legal review.",
-      "/terms"
+      "/terms",
     ),
   }),
   component: () => (
-    <ManagedPage slug="terms"><LegalDraft
-      title="Terms & Conditions"
-      topics={[
-        "Use of this website",
-        "Nature of the information provided",
-        "Limitation of liability",
-      ]}
-    /></ManagedPage>
+    <ManagedPage slug="terms">
+      <LegalDraft
+        title="Terms & Conditions"
+        topics={[
+          "Use of this website",
+          "Nature of the information provided",
+          "Limitation of liability",
+        ]}
+      />
+    </ManagedPage>
   ),
 });
-

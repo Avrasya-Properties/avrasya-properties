@@ -18,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import { CtaBand, Margin, PageIntro } from "@/components/site/Chrome";
+import { LazyPassportCanvas } from "@/components/3d";
 import { meta } from "@/components/site/TextPage";
 
 export const Route = createFileRoute("/citizenship")({
@@ -25,9 +26,13 @@ export const Route = createFileRoute("/citizenship")({
     meta(
       "Turkish Citizenship by Investment ($400,000) · Avrasya Properties",
       "Clear, comprehensive guide and interactive cost calculator for obtaining Turkish citizenship through qualifying Istanbul real estate. Step-by-step roadmap and cost breakdowns.",
-      "/citizenship"
+      "/citizenship",
     ),
-  component: () => <ManagedPage slug="citizenship"><CitizenshipPage /></ManagedPage>,
+  component: () => (
+    <ManagedPage slug="citizenship">
+      <CitizenshipPage />
+    </ManagedPage>
+  ),
 });
 
 export function CitizenshipPage() {
@@ -61,7 +66,7 @@ export function CitizenshipPage() {
     { title: t.citizenship.req4Title, desc: t.citizenship.req4Desc },
   ];
 
-  const faqs = t.services.faqs.map(f => [f.q, f.a] as [string, string]);
+  const faqs = t.services.faqs.map((f) => [f.q, f.a] as [string, string]);
 
   const steps = [
     {
@@ -118,7 +123,9 @@ export function CitizenshipPage() {
       <section className="border-b bg-card py-6">
         <div className="container-site grid grid-cols-2 gap-6 md:grid-cols-4">
           <div className="border-l-2 border-brass pl-4">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t.home.cbiEyebrow.split("·")[0] || "CBI"}</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {t.home.cbiEyebrow.split("·")[0] || "CBI"}
+            </p>
             <p className="font-display text-2xl font-bold text-foreground">$400,000 USD</p>
             <p className="text-xs text-muted-foreground">{t.home.cbiPillar3Title}</p>
           </div>
@@ -128,14 +135,52 @@ export function CitizenshipPage() {
             <p className="text-xs text-muted-foreground">{t.citizenship.step5Duration}</p>
           </div>
           <div className="border-l-2 border-brass pl-4">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t.home.cbiPillar1Title}</p>
-            <p className="font-display text-2xl font-bold text-foreground">{t.home.cbiPillar1Title}</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {t.home.cbiPillar1Title}
+            </p>
+            <p className="font-display text-2xl font-bold text-foreground">
+              {t.home.cbiPillar1Title}
+            </p>
             <p className="text-xs text-muted-foreground">{t.home.cbiPillar1Desc}</p>
           </div>
           <div className="border-l-2 border-brass pl-4">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t.home.cbiPillar3Title}</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {t.home.cbiPillar3Title}
+            </p>
             <p className="font-display text-2xl font-bold text-foreground">3 Years</p>
             <p className="text-xs text-muted-foreground">{t.home.cbiPillar3Desc}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3D Sovereign Turkish Passport Experience Banner */}
+      <section className="border-b bg-[#163038] text-on-dark py-12 relative overflow-hidden">
+        <div className="container-site grid gap-8 lg:grid-cols-12 items-center">
+          <div className="lg:col-span-7">
+            <span className="font-mono text-xs uppercase tracking-widest text-brass">
+              Official Naturalization Pathway · Law No. 5901
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-on-dark mt-2">
+              Sovereign Citizenship & Passport Delivery
+            </h2>
+            <p className="mt-3 text-sm sm:text-base leading-relaxed text-on-dark-muted max-w-xl">
+              Qualify for Turkish citizenship through a $400,000 real estate acquisition. Your full
+              family—spouse and children under 18—obtains full citizenship and biometric passports
+              with complete bar-certified legal oversight.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-4 text-xs font-mono">
+              <div className="rounded-xs border border-brass/30 bg-brass/10 px-3 py-1.5 text-brass">
+                ✓ Visa-free travel to 110+ destinations
+              </div>
+              <div className="rounded-xs border border-white/20 bg-white/5 px-3 py-1.5 text-on-dark-muted">
+                ✓ Full dual citizenship rights
+              </div>
+            </div>
+          </div>
+          <div className="lg:col-span-5 flex justify-center">
+            <div className="w-full max-w-[340px] h-[340px] sm:h-[380px]">
+              <LazyPassportCanvas className="w-full h-full" interactive={true} />
+            </div>
           </div>
         </div>
       </section>
@@ -147,9 +192,7 @@ export function CitizenshipPage() {
           <h2 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
             {t.citizenship.calcTitle}
           </h2>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            {t.citizenship.calcSubtitle}
-          </p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{t.citizenship.calcSubtitle}</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12">
@@ -160,7 +203,9 @@ export function CitizenshipPage() {
             {/* Slider */}
             <div>
               <div className="flex justify-between items-center text-sm">
-                <label className="font-medium text-foreground">{t.citizenship.propertyPriceLabel}</label>
+                <label className="font-medium text-foreground">
+                  {t.citizenship.propertyPriceLabel}
+                </label>
                 <span className="font-mono text-lg font-bold text-brass">
                   ${new Intl.NumberFormat("en-US").format(propertyPrice)} USD
                 </span>
@@ -198,7 +243,9 @@ export function CitizenshipPage() {
               </div>
 
               <div className="flex items-center justify-between rounded-lg border bg-background p-3">
-                <span className="text-sm">{t.citizenship.childrenCountLabel} ({childrenCount})</span>
+                <span className="text-sm">
+                  {t.citizenship.childrenCountLabel} ({childrenCount})
+                </span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -222,9 +269,7 @@ export function CitizenshipPage() {
 
               <div className="flex items-center justify-between rounded-lg border bg-background p-3">
                 <div>
-                  <span className="text-sm block">
-                    {t.citizenship.vatExemptLabel}
-                  </span>
+                  <span className="text-sm block">{t.citizenship.vatExemptLabel}</span>
                   <span className="text-[11px] text-muted-foreground">
                     {t.citizenship.vatExemptNote}
                   </span>
@@ -259,41 +304,31 @@ export function CitizenshipPage() {
                   </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">
-                    {t.citizenship.breakdownTapuFee}
-                  </dt>
+                  <dt className="text-muted-foreground">{t.citizenship.breakdownTapuFee}</dt>
                   <dd className="font-mono font-medium text-foreground">
                     ${new Intl.NumberFormat("en-US").format(tapuTransferFee)}
                   </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">
-                    {t.citizenship.breakdownSpk}
-                  </dt>
+                  <dt className="text-muted-foreground">{t.citizenship.breakdownSpk}</dt>
                   <dd className="font-mono font-medium text-foreground">
                     ${new Intl.NumberFormat("en-US").format(spkAppraisalFee)}
                   </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">
-                    {t.citizenship.breakdownDabNotary}
-                  </dt>
+                  <dt className="text-muted-foreground">{t.citizenship.breakdownDabNotary}</dt>
                   <dd className="font-mono font-medium text-foreground">
                     ${new Intl.NumberFormat("en-US").format(dabAndNotary)}
                   </dd>
                 </div>
                 <div className="flex justify-between py-1">
-                  <dt className="text-muted-foreground">
-                    {t.citizenship.breakdownLegal}
-                  </dt>
+                  <dt className="text-muted-foreground">{t.citizenship.breakdownLegal}</dt>
                   <dd className="font-mono font-medium text-foreground">
                     ${new Intl.NumberFormat("en-US").format(legalRepresentation)}
                   </dd>
                 </div>
                 <div className="flex justify-between py-1 border-b pb-3">
-                  <dt className="text-muted-foreground">
-                    {t.citizenship.breakdownGovtFiling}
-                  </dt>
+                  <dt className="text-muted-foreground">{t.citizenship.breakdownGovtFiling}</dt>
                   <dd className="font-mono font-medium text-foreground">
                     ${new Intl.NumberFormat("en-US").format(totalGovtFiling)}
                   </dd>
@@ -327,7 +362,10 @@ export function CitizenshipPage() {
                 >
                   {t.citizenship.cbiQualifiedTag}
                 </Link>
-                <Link to="/contact" className="btn btn-outline flex-1 justify-center hover:border-brass/70 hover:text-brass transition-colors">
+                <Link
+                  to="/contact"
+                  className="btn btn-outline flex-1 justify-center hover:border-brass/70 hover:text-brass transition-colors"
+                >
                   {t.citizenship.startCbiConsultation}
                 </Link>
               </div>
@@ -345,8 +383,8 @@ export function CitizenshipPage() {
               {t.citizenship.stepsTitle}
             </h2>
             <p className="mt-3 text-on-dark-muted">
-              Every step is handled with independent legal oversight to make your application smooth,
-              safe, and completely predictable.
+              Every step is handled with independent legal oversight to make your application
+              smooth, safe, and completely predictable.
             </p>
           </div>
 
@@ -413,15 +451,13 @@ export function CitizenshipPage() {
       {/* Strict Compliance Disclaimer */}
       <Margin label="Important Notice">
         <div className="rounded-xl border-l-4 border-brass bg-card p-6 text-sm leading-relaxed text-muted-foreground">
-          <p className="font-semibold text-foreground mb-1">
-            Regulatory & Compliance Notice
-          </p>
+          <p className="font-semibold text-foreground mb-1">Regulatory & Compliance Notice</p>
           <p>
             Avrasya Properties provides dedicated property advisory and transaction support. Final
-            citizenship approval is granted by the Republic of Türkiye Ministry of Interior Directorate
-            of Migration Management. Every property in our collection is independently appraised by
-            licensed experts, and all legal filings are handled by certified members of the Istanbul
-            Bar Association.
+            citizenship approval is granted by the Republic of Türkiye Ministry of Interior
+            Directorate of Migration Management. Every property in our collection is independently
+            appraised by licensed experts, and all legal filings are handled by certified members of
+            the Istanbul Bar Association.
           </p>
         </div>
       </Margin>

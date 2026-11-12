@@ -6,7 +6,11 @@ const key = "sb_publishable_vmlTaa9tPFNuR3z_ADhOfA_XeH4oHUx";
 const headers = { apikey: key, "Content-Type": "application/json" };
 const checks = [];
 async function request(path, options = {}) {
-  return fetch(base + path, { ...options, headers: { ...headers, ...options.headers }, signal: AbortSignal.timeout(15000) });
+  return fetch(base + path, {
+    ...options,
+    headers: { ...headers, ...options.headers },
+    signal: AbortSignal.timeout(15000),
+  });
 }
 let response = await request("/rest/v1/rpc/published_catalogue", { method: "POST", body: "{}" });
 assert.equal(response.status, 200, "Published catalogue RPC must be available");
@@ -42,10 +46,21 @@ const endpoint = await response.json();
 assert.equal(typeof endpoint.error, "string");
 checks.push("Deployed enquiry endpoint rejects unconfigured/originless requests");
 
-response = await request("/functions/v1/staff-accounts", {method:"POST",body:"{}"});
-assert.equal(response.status,401,"Anonymous users cannot create staff accounts");
+response = await request("/functions/v1/staff-accounts", { method: "POST", body: "{}" });
+assert.equal(response.status, 401, "Anonymous users cannot create staff accounts");
 checks.push("Hosted team-account endpoint denies anonymous creation");
-response = await request("/functions/v1/initial-admin-setup",{method:"POST",body:"{}"});
-assert.ok([401,410].includes(response.status),"One-time account setup is disabled");
+response = await request("/functions/v1/initial-admin-setup", { method: "POST", body: "{}" });
+assert.ok([401, 410].includes(response.status), "One-time account setup is disabled");
 checks.push("Initial account setup is disabled");
-console.log(JSON.stringify({ hostedReadOnlyChecks: checks, publicOffers: offers.length, enquiryStatus: endpoint.error, writesPerformed: 0 }, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      hostedReadOnlyChecks: checks,
+      publicOffers: offers.length,
+      enquiryStatus: endpoint.error,
+      writesPerformed: 0,
+    },
+    null,
+    2,
+  ),
+);

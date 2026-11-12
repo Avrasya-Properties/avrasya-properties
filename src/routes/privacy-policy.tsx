@@ -7,18 +7,19 @@ export const Route = createFileRoute("/privacy-policy")({
     ...meta(
       "Privacy Policy · Avrasya Properties",
       "Draft Privacy Policy for Avrasya Properties — approved text pending legal review.",
-      "/privacy-policy"
+      "/privacy-policy",
     ),
   }),
   component: () => (
-    <ManagedPage slug="privacy-policy"><LegalDraft
-      title="Privacy Policy"
-      topics={[
-        "What personal data is collected through enquiries",
-        "How enquiry data is used and stored",
-        "Your rights and how to contact us",
-      ]}
-    /></ManagedPage>
+    <ManagedPage slug="privacy-policy">
+      <LegalDraft
+        title="Privacy Policy"
+        topics={[
+          "What personal data is collected through enquiries",
+          "How enquiry data is used and stored",
+          "Your rights and how to contact us",
+        ]}
+      />
+    </ManagedPage>
   ),
 });
-

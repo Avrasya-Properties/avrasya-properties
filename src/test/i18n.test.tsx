@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import { LOCALES, getLocaleConfig, isRtlLocale } from "@/i18n";
+import { LOCALES, TRANSLATIONS, getLocaleConfig, isRtlLocale, type Locale } from "@/i18n";
 import { en } from "@/i18n/locales/en";
 import { tr } from "@/i18n/locales/tr";
 import { ar } from "@/i18n/locales/ar";
 import { ru } from "@/i18n/locales/ru";
 import { fa } from "@/i18n/locales/fa";
+import { zh } from "@/i18n/locales/zh";
+import { bn } from "@/i18n/locales/bn";
 import { LanguageProvider, useLanguage, useTranslation } from "@/hooks/useLanguage";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 
@@ -15,10 +17,12 @@ describe("i18n Locales & Structural Parity", () => {
     { code: "ar", data: ar },
     { code: "ru", data: ru },
     { code: "fa", data: fa },
+    { code: "zh", data: zh },
+    { code: "bn", data: bn },
   ];
 
-  it("defines all 5 target languages correctly", () => {
-    expect(LOCALES.map((l) => l.code)).toEqual(["en", "tr", "ar", "ru", "fa"]);
+  it("defines all 7 target languages correctly", () => {
+    expect(LOCALES.map((l) => l.code)).toEqual(["en", "tr", "ar", "ru", "fa", "zh", "bn"]);
   });
 
   it("correctly identifies RTL locales", () => {
@@ -27,6 +31,8 @@ describe("i18n Locales & Structural Parity", () => {
     expect(isRtlLocale("ru")).toBe(false);
     expect(isRtlLocale("ar")).toBe(true);
     expect(isRtlLocale("fa")).toBe(true);
+    expect(isRtlLocale("zh")).toBe(false);
+    expect(isRtlLocale("bn")).toBe(false);
   });
 
   it("returns proper locale configs", () => {
@@ -35,6 +41,8 @@ describe("i18n Locales & Structural Parity", () => {
     expect(getLocaleConfig("tr").dir).toBe("ltr");
     expect(getLocaleConfig("ru").dir).toBe("ltr");
     expect(getLocaleConfig("en").dir).toBe("ltr");
+    expect(getLocaleConfig("zh").dir).toBe("ltr");
+    expect(getLocaleConfig("bn").dir).toBe("ltr");
   });
 
   function getKeys(obj: Record<string, unknown>, prefix = ""): string[] {
@@ -58,6 +66,47 @@ describe("i18n Locales & Structural Parity", () => {
       const currentKeys = getKeys(data as unknown as Record<string, unknown>);
       const missingKeys = enKeys.filter((k) => !currentKeys.includes(k));
       expect(missingKeys).toEqual([]);
+    });
+  });
+
+  it("verifies 4-part 9-step services timeline in all 7 languages", () => {
+    const allLocales: Locale[] = ["en", "tr", "ar", "ru", "fa", "zh", "bn"];
+    allLocales.forEach((code) => {
+      const dict = TRANSLATIONS[code];
+      expect(dict.services.parts).toBeDefined();
+      expect(dict.services.parts).toHaveLength(4);
+
+      const allSteps = dict.services.parts.flatMap((p) => p.steps);
+      expect(allSteps).toHaveLength(9);
+
+      // Verify step 01 to 09 numbers
+      expect(allSteps.map((s) => s.stepNumber)).toEqual([
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+      ]);
+
+      // Verify title, subtitle, closingLine and legalDisclaimer exist and are non-empty
+      expect(dict.services.title.trim().length).toBeGreaterThan(0);
+      expect(dict.services.subtitle.trim().length).toBeGreaterThan(0);
+      expect(dict.services.closingLine.trim().length).toBeGreaterThan(0);
+      expect(dict.services.legalDisclaimer.trim().length).toBeGreaterThan(0);
+
+      // Verify Step 02 contains "Tapu"
+      const step2 = allSteps[1];
+      expect(step2).toBeDefined();
+      expect(step2!.description).toContain("Tapu");
+
+      // Verify Step 03 contains "DAB"
+      const step3 = allSteps[2];
+      expect(step3).toBeDefined();
+      expect(step3!.description).toContain("DAB");
     });
   });
 });
@@ -84,6 +133,8 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
         <button onClick={() => setLocale("tr")}>Switch to Turkish</button>
         <button onClick={() => setLocale("ru")}>Switch to Russian</button>
         <button onClick={() => setLocale("fa")}>Switch to Persian</button>
+        <button onClick={() => setLocale("zh")}>Switch to Chinese</button>
+        <button onClick={() => setLocale("bn")}>Switch to Bengali</button>
       </div>
     );
   }
@@ -93,7 +144,7 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     render(
       <LanguageProvider>
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
     expect(screen.getByTestId("current-locale")).toHaveTextContent("en");
@@ -107,7 +158,7 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     render(
       <LanguageProvider>
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
     fireEvent.click(screen.getByText("Switch to Arabic"));
@@ -126,7 +177,7 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     render(
       <LanguageProvider>
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
     fireEvent.click(screen.getByText("Switch to Persian"));
@@ -145,7 +196,7 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     render(
       <LanguageProvider>
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
     fireEvent.click(screen.getByText("Switch to Turkish"));
@@ -164,7 +215,7 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     render(
       <LanguageProvider>
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
     fireEvent.click(screen.getByText("Switch to Russian"));
@@ -178,12 +229,50 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     expect(document.documentElement.lang).toBe("ru");
   });
 
-  it("interactive LanguageSwitcher dropdown renders all 5 options", () => {
+  it("switches to Chinese and applies LTR direction and Chinese translation", () => {
     localStorage.setItem("avrasya_preferred_language", "en");
     render(
       <LanguageProvider>
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
+    );
+
+    fireEvent.click(screen.getByText("Switch to Chinese"));
+
+    expect(screen.getByTestId("current-locale")).toHaveTextContent("zh");
+    expect(screen.getByTestId("current-dir")).toHaveTextContent("ltr");
+    expect(screen.getByTestId("current-is-rtl")).toHaveTextContent("no");
+    expect(screen.getByTestId("translated-home")).toHaveTextContent(zh.home.filterDistrict);
+    expect(localStorage.getItem("avrasya_preferred_language")).toBe("zh");
+    expect(document.documentElement.dir).toBe("ltr");
+    expect(document.documentElement.lang).toBe("zh");
+  });
+
+  it("switches to Bengali and applies LTR direction and Bengali translation", () => {
+    localStorage.setItem("avrasya_preferred_language", "en");
+    render(
+      <LanguageProvider>
+        <TestConsumer />
+      </LanguageProvider>,
+    );
+
+    fireEvent.click(screen.getByText("Switch to Bengali"));
+
+    expect(screen.getByTestId("current-locale")).toHaveTextContent("bn");
+    expect(screen.getByTestId("current-dir")).toHaveTextContent("ltr");
+    expect(screen.getByTestId("current-is-rtl")).toHaveTextContent("no");
+    expect(screen.getByTestId("translated-home")).toHaveTextContent(bn.home.filterDistrict);
+    expect(localStorage.getItem("avrasya_preferred_language")).toBe("bn");
+    expect(document.documentElement.dir).toBe("ltr");
+    expect(document.documentElement.lang).toBe("bn");
+  });
+
+  it("interactive LanguageSwitcher dropdown renders all 7 options", () => {
+    localStorage.setItem("avrasya_preferred_language", "en");
+    render(
+      <LanguageProvider>
+        <TestConsumer />
+      </LanguageProvider>,
     );
 
     const toggleBtn = screen.getByRole("button", { name: /change language/i });
@@ -195,5 +284,7 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     expect(screen.getByRole("option", { name: /العربية/i })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: /Русский/i })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: /فارسی/i })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /中文/i })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /বাংলা/i })).toBeInTheDocument();
   });
 });

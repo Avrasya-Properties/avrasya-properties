@@ -14,7 +14,9 @@ export function LazySkylineScene({ className = "" }: { className?: string }) {
     const wide = window.matchMedia("(min-width: 1024px)").matches;
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const calm = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const saver = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    const saver =
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData ===
+      true;
     if (!(wide && fine && calm) || saver) return;
     try {
       const canvas = document.createElement("canvas");
@@ -23,7 +25,8 @@ export function LazySkylineScene({ className = "" }: { className?: string }) {
       return;
     }
     // Defer past first paint so the 3D chunk never competes with the hero photograph.
-    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number })
+      .requestIdleCallback;
     const id = idle ? idle(() => setEnabled(true)) : window.setTimeout(() => setEnabled(true), 600);
     return () => {
       if (!idle) window.clearTimeout(id);

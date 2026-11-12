@@ -12,27 +12,34 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { watchWebsiteChanges,PUBLIC_QUERY_KEYS } from "@/lib/website-sync";
+import { watchWebsiteChanges, PUBLIC_QUERY_KEYS } from "@/lib/website-sync";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { MotionRoot } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
-import {loadCatalogue,loadPublicSettings} from "@/data/live";
+import { loadCatalogue, loadPublicSettings } from "@/data/live";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import type { SiteSettings } from "@/admin/demo";
-import {DEMO_MODE,SUPABASE_URL} from "@/lib/supabase";
+import { DEMO_MODE, SUPABASE_URL } from "@/lib/supabase";
+import { useSmoothScroll, getLenis } from "@/lib/animation/lenis";
 
 function NotFoundComponent() {
   return (
-    <div className="container-site py-24">
+    <div
+      className="container-site py-24 flex flex-col items-center justify-center"
+      aria-hidden="false"
+    >
       <p className="eyebrow eyebrow-mark">404 · Page not found</p>
-      <h1 className="display-hero mt-3">This address isn't on our map.</h1>
-      <p className="mt-4 max-w-xl text-muted-foreground">
-        The page may have moved. These are good places to continue:
+      <h1 className="display-hero mt-3 text-center">This address isn&apos;t on our map.</h1>
+      <p className="mt-4 max-w-xl text-center text-muted-foreground">
+        The page may have moved. Use the buttons below to navigate.
       </p>
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/properties" className="btn btn-primary">
-          Offers & projects
+      <div className="mt-8 flex flex-wrap gap-3 justify-center">
+        <Link to="/" className="btn btn-primary">
+          Home
+        </Link>
+        <Link to="/properties" className="btn btn-outline">
+          Offers &amp; projects
         </Link>
         <Link to="/services" className="btn btn-outline">
           Services
@@ -40,10 +47,13 @@ function NotFoundComponent() {
         <Link to="/contact" className="btn btn-outline">
           Contact
         </Link>
-        <Link to="/" className="btn btn-outline">
-          Home
-        </Link>
       </div>
+      {/* Optional illustration */}
+      <img
+        src="/images/media_1794440389807_5dfb60a4.png"
+        alt="Not found illustration"
+        className="mt-8 max-w-full h-auto"
+      />
     </div>
   );
 }
@@ -77,39 +87,81 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  beforeLoad:async({context,location})=>{
-    if(location.pathname.startsWith("/admin"))return;
+  beforeLoad: async ({ context, location }) => {
+    if (location.pathname.startsWith("/admin")) return;
     // Load critical public data before rendering, then hydrate the same cache.
     // A failed catalogue read is displayed inside the homepage, not as a redirect.
     await Promise.allSettled([
-      context.queryClient.ensureQueryData({queryKey:["site-settings"],queryFn:loadPublicSettings,staleTime:15000,retry:false}),
-      context.queryClient.ensureQueryData({queryKey:["published-catalogue"],queryFn:loadCatalogue,staleTime:15000,retry:false}),
+      context.queryClient.ensureQueryData({
+        queryKey: ["site-settings"],
+        queryFn: loadPublicSettings,
+        staleTime: 15000,
+        retry: false,
+      }),
+      context.queryClient.ensureQueryData({
+        queryKey: ["published-catalogue"],
+        queryFn: loadCatalogue,
+        staleTime: 15000,
+        retry: false,
+      }),
     ]);
   },
   // Hand the already-fetched public settings to head() so admin SEO switches apply to every public page.
   loader: ({ context, location }) =>
-    location.pathname.startsWith("/admin") ? { settings: null } : { settings: context.queryClient.getQueryData<SiteSettings>(["site-settings"]) ?? null },
+    location.pathname.startsWith("/admin")
+      ? { settings: null }
+      : { settings: context.queryClient.getQueryData<SiteSettings>(["site-settings"]) ?? null },
   head: ({ loaderData }) => ({
     meta: [
-      ...(loaderData?.settings?.indexingEnabled === false ? [{ name: "robots", content: "noindex, nofollow" }] : []),
-      ...(loaderData?.settings?.googleVerification?.trim() ? [{ name: "google-site-verification", content: loaderData.settings.googleVerification.trim() }] : []),
+      ...(loaderData?.settings?.indexingEnabled === false
+        ? [{ name: "robots", content: "noindex, nofollow" }]
+        : []),
+      ...(loaderData?.settings?.googleVerification?.trim()
+        ? [
+            {
+              name: "google-site-verification",
+              content: loaderData.settings.googleVerification.trim(),
+            },
+          ]
+        : []),
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },
       {
         name: "description",
-        content: "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment.",
+        content:
+          "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment.",
       },
       { property: "og:site_name", content: "Avrasya Properties" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },
-      { property: "og:description", content: "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment." },
-      { property: "og:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
+      {
+        property: "og:title",
+        content: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory",
+      },
+      {
+        property: "og:description",
+        content:
+          "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment.",
+      },
+      {
+        property: "og:image",
+        content: "https://avrasyaproperties.com/images/properties/hero-main.jpg",
+      },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory" },
-      { name: "twitter:description", content: "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment." },
-      { name: "twitter:image", content: "https://avrasyaproperties.com/images/properties/hero-main.jpg" },
-      { name: "avrasya-data-mode", content: DEMO_MODE?"demo":"live" },
+      {
+        name: "twitter:title",
+        content: "Avrasya Properties — Türkiye Luxury Real Estate & Investment Advisory",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Property advisory for international buyers across Türkiye, from Istanbul to the coast. Explore verified properties, independent legal review, and Turkish citizenship by investment.",
+      },
+      {
+        name: "twitter:image",
+        content: "https://avrasyaproperties.com/images/properties/hero-main.jpg",
+      },
+      { name: "avrasya-data-mode", content: DEMO_MODE ? "demo" : "live" },
       { name: "avrasya-database", content: new URL(SUPABASE_URL).hostname },
     ],
     links: [
@@ -117,7 +169,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap",
       },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -155,7 +207,8 @@ function RootShell({ children }: { children: ReactNode }) {
     url: "https://avrasyaproperties.com",
     logo: "https://avrasyaproperties.com/favicon.svg",
     image: "https://avrasyaproperties.com/images/properties/hero-main.jpg",
-    description: "Premier Istanbul luxury real estate and investment advisory firm assisting international investors with prime residential acquisitions and Turkish Citizenship by Investment.",
+    description:
+      "Premier Istanbul luxury real estate and investment advisory firm assisting international investors with prime residential acquisitions and Turkish Citizenship by Investment.",
     telephone: "+90 545 924 80 42",
     email: "info@avrasyaproperties.com",
     priceRange: "$$$$",
@@ -210,15 +263,27 @@ function RootComponent() {
   const router = useRouter();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = path.startsWith("/admin");
+  useSmoothScroll(!isAdmin);
+
+  useEffect(() => {
+    if (isAdmin || typeof window === "undefined") return;
+    const lenis = getLenis();
+    if (lenis && !window.location.hash) {
+      lenis.scrollTo(0, { immediate: true });
+    }
+  }, [path, isAdmin]);
   useEffect(
     () =>
-      watchWebsiteChanges(() => {
-        void queryClient.invalidateQueries({
-          predicate: (q: any) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
-        });
-        void router.invalidate();
-      },{poll:!isAdmin&&!DEMO_MODE}),
-    [queryClient, router,isAdmin],
+      watchWebsiteChanges(
+        () => {
+          void queryClient.invalidateQueries({
+            predicate: (q: any) => PUBLIC_QUERY_KEYS.has(String(q.queryKey[0])),
+          });
+          void router.invalidate();
+        },
+        { poll: !isAdmin && !DEMO_MODE },
+      ),
+    [queryClient, router, isAdmin],
   );
   if (isAdmin)
     return (
@@ -233,7 +298,8 @@ function RootComponent() {
           Skip to content
         </a>
         <Preloader />
-        {path!=="/"&&<MotionRoot />}
+        <div className="star-bg" aria-hidden="true" />
+        {path !== "/" && <MotionRoot />}
         <Header />
         <main id="main">
           <Outlet />
@@ -243,4 +309,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-

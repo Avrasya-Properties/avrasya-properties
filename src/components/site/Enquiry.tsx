@@ -1,5 +1,14 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { MessageSquare, CheckCircle2, ShieldCheck, Sparkles, MapPin, Phone, Mail, ArrowRight } from "lucide-react";
+import {
+  MessageSquare,
+  CheckCircle2,
+  ShieldCheck,
+  Sparkles,
+  MapPin,
+  Phone,
+  Mail,
+  ArrowRight,
+} from "lucide-react";
 import { DEMO_MODE } from "@/lib/supabase";
 import { useServices, useCatalogue } from "@/data/live";
 import { useLiveContact } from "@/hooks/useLiveContact";
@@ -11,11 +20,12 @@ import { EnquiryError } from "@/lib/public-enquiry";
 export function formatWhatsAppLink(base: string, text: string) {
   try {
     const raw = (base || "").trim() || "https://wa.me/905459248042";
-    const normalized = raw.startsWith("http://") || raw.startsWith("https://")
-      ? raw
-      : /^\+?\d+$/.test(raw.replace(/\s+/g, ""))
-        ? `https://wa.me/${raw.replace(/\D/g, "")}`
-        : `https://${raw}`;
+    const normalized =
+      raw.startsWith("http://") || raw.startsWith("https://")
+        ? raw
+        : /^\+?\d+$/.test(raw.replace(/\s+/g, ""))
+          ? `https://wa.me/${raw.replace(/\D/g, "")}`
+          : `https://${raw}`;
     const url = new URL(normalized);
     url.searchParams.set("text", text);
     return url.toString();
@@ -37,10 +47,30 @@ const SERVICES = [
 ];
 
 const LUXURY_TOPIC_PILLS = [
-  { id: "cbi", label: "Turkish Citizenship ($400k+)", full: "Citizenship by Investment ($400k+)", icon: "🏛️" },
-  { id: "res", label: "Prime Istanbul Residences", full: "Prime Residential & Penthouses", icon: "🏢" },
-  { id: "villas", label: "Coastal Villas (Bodrum/Antalya)", full: "Coastal Villas & Estates", icon: "🏖️" },
-  { id: "commercial", label: "Commercial & High-Yield", full: "Commercial Real Estate", icon: "📈" },
+  {
+    id: "cbi",
+    label: "Turkish Citizenship ($400k+)",
+    full: "Citizenship by Investment ($400k+)",
+    icon: "🏛️",
+  },
+  {
+    id: "res",
+    label: "Prime Istanbul Residences",
+    full: "Prime Residential & Penthouses",
+    icon: "🏢",
+  },
+  {
+    id: "villas",
+    label: "Coastal Villas (Bodrum/Antalya)",
+    full: "Coastal Villas & Estates",
+    icon: "🏖️",
+  },
+  {
+    id: "commercial",
+    label: "Commercial & High-Yield",
+    full: "Commercial Real Estate",
+    icon: "📈",
+  },
   { id: "general", label: "Private Portfolio Mandate", full: "General consultation", icon: "💼" },
 ];
 
@@ -91,12 +121,7 @@ export function buildWhatsAppEnquiryMessage(v: {
   return parts.filter((x): x is string => typeof x === "string" && x !== "").join("\n");
 }
 
-export function buildMessage(v: {
-  name: string;
-  topic: string;
-  budget: string;
-  message: string;
-}) {
+export function buildMessage(v: { name: string; topic: string; budget: string; message: string }) {
   return [
     `Hello Avrasya Properties, my name is ${v.name.trim()}.`,
     `Enquiry: ${v.topic}`,
@@ -120,7 +145,8 @@ export function validateEnquiry(
   const name = v.name.trim();
   if (name.length < 2 || name.length > 200) bad.push("name");
   if (!demo) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim()) || v.email.trim().length > 254) bad.push("email");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim()) || v.email.trim().length > 254)
+      bad.push("email");
     const digits = v.phone.replace(/\D/g, "").length;
     if (digits < 7 || digits > 18) bad.push("phone");
   }
@@ -143,11 +169,14 @@ export function Enquiry({
 }) {
   const { t } = useLanguage();
   const servicesQuery = useServices();
-  
+
   const services = DEMO_MODE
     ? SERVICES
-    : ["General consultation", ...(servicesQuery.data || []).map((s: { title: string }) => s.title)];
-  
+    : [
+        "General consultation",
+        ...(servicesQuery.data || []).map((s: { title: string }) => s.title),
+      ];
+
   const previousTopic = useRef(defaultTopic);
   const contact = useLiveContact();
   const catalogue = useCatalogue();
@@ -212,7 +241,9 @@ export function Enquiry({
 
   useEffect(() => {
     const old = previousTopic.current;
-    setV((curr) => (curr.topic === old ? { ...curr, topic: defaultTopic || "General consultation" } : curr));
+    setV((curr) =>
+      curr.topic === old ? { ...curr, topic: defaultTopic || "General consultation" } : curr,
+    );
     previousTopic.current = defaultTopic;
   }, [defaultTopic]);
 
@@ -237,12 +268,16 @@ export function Enquiry({
       submission.current ??= crypto.randomUUID();
       const property = catalogue.properties.find((r) => r.marketing_title === v.topic);
       const resolvedSlug = propertySlug || property?.slug;
-      
+
       const combinedMessage = [
         v.message.trim(),
-        selectedRegion && selectedRegion !== "Istanbul" ? `Preferred Destination: ${selectedRegion}` : "",
+        selectedRegion && selectedRegion !== "Istanbul"
+          ? `Preferred Destination: ${selectedRegion}`
+          : "",
         preferredMethod ? `Preferred Contact: ${preferredMethod}` : "",
-      ].filter(Boolean).join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
 
       let res: { receipt: string };
       try {
@@ -306,7 +341,13 @@ export function Enquiry({
       }
     } catch (error) {
       const kind = error instanceof EnquiryError ? error.kind : undefined;
-      setErr(kind === "timeout" ? t.enquiry.errTimeout : kind === "network" ? t.enquiry.errNetwork : (error as Error).message || t.enquiry.errorDesc);
+      setErr(
+        kind === "timeout"
+          ? t.enquiry.errTimeout
+          : kind === "network"
+            ? t.enquiry.errNetwork
+            : (error as Error).message || t.enquiry.errorDesc,
+      );
     } finally {
       setBusy(false);
     }
@@ -341,7 +382,12 @@ export function Enquiry({
     const waUrl = formatWhatsAppLink(contact.whatsapp, waMsg);
 
     return (
-      <div ref={successRef} tabIndex={-1} role="status" className="rounded-xl border border-brass/60 bg-secondary/80 p-6 text-sm text-foreground outline-none space-y-5 shadow-lg">
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        role="status"
+        className="rounded-xl border border-brass/60 bg-secondary/80 p-6 text-sm text-foreground outline-none space-y-5 shadow-lg"
+      >
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500">
             <CheckCircle2 className="h-6 w-6" />
@@ -355,15 +401,19 @@ export function Enquiry({
         <div className="rounded-lg bg-background/80 p-3.5 border border-border/60">
           <p className="text-xs text-muted-foreground mb-1">Official Inquiry Reference Number:</p>
           <div className="flex items-center justify-between">
-            <strong className="font-mono text-lg font-bold tracking-wider text-brass-text">{receipt}</strong>
+            <strong className="font-mono text-lg font-bold tracking-wider text-brass-text">
+              {receipt}
+            </strong>
             <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Delivered to Inbox
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Delivered
+              to Inbox
             </span>
           </div>
         </div>
 
         <p className="text-xs leading-relaxed text-muted-foreground">
-          {t.enquiry.successNext} An advisor will review your brief and initiate private communications according to your preference.
+          {t.enquiry.successNext} An advisor will review your brief and initiate private
+          communications according to your preference.
         </p>
 
         {/* Message Summary Card */}
@@ -389,7 +439,9 @@ export function Enquiry({
             </div>
           )}
           <div className="pt-2 text-muted-foreground border-t border-border/40">
-            <span className="block font-medium text-foreground mb-1">Consultation Message in Inbox:</span>
+            <span className="block font-medium text-foreground mb-1">
+              Consultation Message in Inbox:
+            </span>
             <p className="italic line-clamp-3 text-foreground/90 bg-muted/40 p-2 rounded">
               "{savedData?.message || v.message}"
             </p>
@@ -413,7 +465,15 @@ export function Enquiry({
               setSavedData(null);
               submission.current = null;
               setConsent(false);
-              setV({ name: "", email: "", phone: "", topic: defaultTopic || "General consultation", budget: "", message: "", website: "" });
+              setV({
+                name: "",
+                email: "",
+                phone: "",
+                topic: defaultTopic || "General consultation",
+                budget: "",
+                message: "",
+                website: "",
+              });
             }}
             className="btn btn-outline text-xs py-3"
           >
@@ -489,7 +549,7 @@ export function Enquiry({
           <label htmlFor={`${id}-topic`} className={label}>
             {t.enquiry.topic}
           </label>
-          
+
           {!compact && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2.5">
               {LUXURY_TOPIC_PILLS.map((pill) => {
@@ -566,7 +626,7 @@ export function Enquiry({
           <label htmlFor={`${id}-budget`} className={label}>
             {t.enquiry.budget}
           </label>
-          
+
           {!compact && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
               {BUDGET_PRESETS.map((b) => {
@@ -610,7 +670,9 @@ export function Enquiry({
 
           {!compact && (
             <div className="mb-2">
-              <p className="text-[11px] text-muted-foreground mb-1.5">Quick requirement tags (click to add):</p>
+              <p className="text-[11px] text-muted-foreground mb-1.5">
+                Quick requirement tags (click to add):
+              </p>
               <div className="flex flex-wrap gap-1.5">
                 {REQUIREMENT_TAGS.map((tag) => (
                   <button
@@ -643,7 +705,12 @@ export function Enquiry({
             <div className="hidden" aria-hidden="true">
               <label>
                 Website
-                <input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} />
+                <input
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={v.website}
+                  onChange={set("website")}
+                />
               </label>
             </div>
             <div>
@@ -655,7 +722,8 @@ export function Enquiry({
                   checked={consent}
                   onChange={(e) => {
                     setConsent(e.target.checked);
-                    if (invalid.includes("consent")) setInvalid(invalid.filter((k) => k !== "consent"));
+                    if (invalid.includes("consent"))
+                      setInvalid(invalid.filter((k) => k !== "consent"));
                   }}
                 />
                 <span>{t.enquiry.termsConsent}</span>
@@ -669,7 +737,8 @@ export function Enquiry({
         <div className="rounded-lg border border-border/40 bg-muted/20 p-3 text-[11px] text-muted-foreground flex items-center gap-2.5">
           <ShieldCheck className="h-4 w-4 text-brass shrink-0" />
           <span>
-            Strictly confidential client advisory. Direct developer pricing, zero buyer agency fees, and full SPK valuation compliance.
+            Strictly confidential client advisory. Direct developer pricing, zero buyer agency fees,
+            and full SPK valuation compliance.
           </span>
         </div>
 
@@ -685,25 +754,37 @@ export function Enquiry({
           className="btn btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
         >
           <MessageSquare className="h-4 w-4" />
-          <span>{busy ? t.enquiry.submitting : (t.enquiry.submitBtn || "Send Private Enquiry")} & Connect on WhatsApp</span>
+          <span>
+            {busy ? t.enquiry.submitting : t.enquiry.submitBtn || "Send Private Enquiry"} & Connect
+            on WhatsApp
+          </span>
         </button>
 
         <p className="text-xs leading-relaxed text-muted-foreground text-center">
           {t.enquiry.whatsappAlternative}{" "}
           <a
             className="underline underline-offset-2 font-medium text-foreground hover:text-brass"
-            href={formatWhatsAppLink(contact.whatsapp, buildWhatsAppEnquiryMessage({ ...v, region: selectedRegion, preferredMethod }))}
+            href={formatWhatsAppLink(
+              contact.whatsapp,
+              buildWhatsAppEnquiryMessage({ ...v, region: selectedRegion, preferredMethod }),
+            )}
             target="_blank"
             rel="noreferrer"
           >
             WhatsApp
           </a>
           ,{" "}
-          <a className="underline underline-offset-2 font-medium text-foreground hover:text-brass" href={"mailto:" + contact.email}>
+          <a
+            className="underline underline-offset-2 font-medium text-foreground hover:text-brass"
+            href={"mailto:" + contact.email}
+          >
             {contact.email}
           </a>{" "}
           or{" "}
-          <a className="underline underline-offset-2 font-medium text-foreground hover:text-brass" href={contact.phoneHref}>
+          <a
+            className="underline underline-offset-2 font-medium text-foreground hover:text-brass"
+            href={contact.phoneHref}
+          >
             {contact.phone}
           </a>
           .

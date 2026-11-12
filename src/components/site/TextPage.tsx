@@ -13,9 +13,7 @@ export function LegalDraft({ title, topics }: { title: string; topics: string[] 
         <p className="rounded-sm border border-brass bg-warn-bg p-4 text-sm">
           {t.legalDraft.status}
         </p>
-        <h2 className="mt-10 font-sans text-lg font-semibold">
-          {t.legalDraft.expected}
-        </h2>
+        <h2 className="mt-10 font-sans text-lg font-semibold">{t.legalDraft.expected}</h2>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           {topics.map((t) => (
             <li key={t}>{t}</li>
@@ -54,12 +52,16 @@ export function Faq({ items }: { items: [string, string][] }) {
 export const meta = (
   title: string,
   description: string,
-  optionsOrPath?: string | { canonical?: string; image?: string; noindex?: boolean; path?: string }
+  optionsOrPath?: string | { canonical?: string; image?: string; noindex?: boolean; path?: string },
 ) => {
   const options = typeof optionsOrPath === "string" ? { path: optionsOrPath } : optionsOrPath;
   const fullTitle = title.includes("Avrasya Properties") ? title : `${title} — Avrasya Properties`;
   const path = options?.path;
-  const canonical = options?.canonical || (path !== undefined ? `https://avrasyaproperties.com${path.startsWith("/") ? "" : "/"}${path}` : "https://avrasyaproperties.com");
+  const canonical =
+    options?.canonical ||
+    (path !== undefined
+      ? `https://avrasyaproperties.com${path.startsWith("/") ? "" : "/"}${path}`
+      : "https://avrasyaproperties.com");
   const image = options?.image || "https://avrasyaproperties.com/images/properties/hero-main.jpg";
   return {
     meta: [
@@ -82,4 +84,3 @@ export const meta = (
     links: [{ rel: "canonical", href: canonical }],
   };
 };
-

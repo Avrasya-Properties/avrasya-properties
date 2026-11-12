@@ -19,19 +19,23 @@ import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as InvestmentCatalogRouteImport } from './routes/investment-catalog'
 import { Route as InvestmentDisclaimerRouteImport } from './routes/investment-disclaimer'
 import { Route as InvestmentInTurkiyeRouteImport } from './routes/investment-in-turkiye'
+import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WhyTurkiyeRouteImport } from './routes/why-turkiye'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminCalendarRouteImport } from './routes/admin.calendar'
+import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AdminContactsRouteImport } from './routes/admin.contacts'
 import { Route as AdminDealsRouteImport } from './routes/admin.deals'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
+import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminRecoverRouteImport } from './routes/admin.recover'
 import { Route as AdminRegionsRouteImport } from './routes/admin.regions'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -96,6 +100,11 @@ const InvestmentInTurkiyeRoute = InvestmentInTurkiyeRouteImport.update({
   path: '/investment-in-turkiye',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocationsRoute = LocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
@@ -126,6 +135,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -134,6 +148,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
 const AdminCalendarRoute = AdminCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCmsRoute = AdminCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminContactsRoute = AdminContactsRouteImport.update({
@@ -159,6 +178,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const AdminManageRoute = AdminManageRouteImport.update({
   id: '/manage',
   path: '/manage',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMediaRoute = AdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminRecoverRoute = AdminRecoverRouteImport.update({
@@ -238,18 +262,22 @@ export interface FileRoutesByFullPath {
   '/investment-catalog': typeof InvestmentCatalogRoute
   '/investment-disclaimer': typeof InvestmentDisclaimerRoute
   '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
+  '/locations': typeof LocationsRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/cms': typeof AdminCmsRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/manage': typeof AdminManageRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/recover': typeof AdminRecoverRoute
   '/admin/regions': typeof AdminRegionsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -275,18 +303,22 @@ export interface FileRoutesByTo {
   '/investment-catalog': typeof InvestmentCatalogRoute
   '/investment-disclaimer': typeof InvestmentDisclaimerRoute
   '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
+  '/locations': typeof LocationsRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/cms': typeof AdminCmsRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/manage': typeof AdminManageRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/recover': typeof AdminRecoverRoute
   '/admin/regions': typeof AdminRegionsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -314,18 +346,22 @@ export interface FileRoutesById {
   '/investment-catalog': typeof InvestmentCatalogRoute
   '/investment-disclaimer': typeof InvestmentDisclaimerRoute
   '/investment-in-turkiye': typeof InvestmentInTurkiyeRoute
+  '/locations': typeof LocationsRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/why-turkiye': typeof WhyTurkiyeRoute
+  '/admin/activity': typeof AdminActivityRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/cms': typeof AdminCmsRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/deals': typeof AdminDealsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/manage': typeof AdminManageRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/recover': typeof AdminRecoverRoute
   '/admin/regions': typeof AdminRegionsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -354,18 +390,22 @@ export interface FileRouteTypes {
     | '/investment-catalog'
     | '/investment-disclaimer'
     | '/investment-in-turkiye'
+    | '/locations'
     | '/privacy-policy'
     | '/services'
     | '/sitemap.xml'
     | '/terms'
     | '/why-turkiye'
+    | '/admin/activity'
     | '/admin/analytics'
     | '/admin/calendar'
+    | '/admin/cms'
     | '/admin/contacts'
     | '/admin/deals'
     | '/admin/inquiries'
     | '/admin/login'
     | '/admin/manage'
+    | '/admin/media'
     | '/admin/recover'
     | '/admin/regions'
     | '/admin/settings'
@@ -391,18 +431,22 @@ export interface FileRouteTypes {
     | '/investment-catalog'
     | '/investment-disclaimer'
     | '/investment-in-turkiye'
+    | '/locations'
     | '/privacy-policy'
     | '/services'
     | '/sitemap.xml'
     | '/terms'
     | '/why-turkiye'
+    | '/admin/activity'
     | '/admin/analytics'
     | '/admin/calendar'
+    | '/admin/cms'
     | '/admin/contacts'
     | '/admin/deals'
     | '/admin/inquiries'
     | '/admin/login'
     | '/admin/manage'
+    | '/admin/media'
     | '/admin/recover'
     | '/admin/regions'
     | '/admin/settings'
@@ -429,18 +473,22 @@ export interface FileRouteTypes {
     | '/investment-catalog'
     | '/investment-disclaimer'
     | '/investment-in-turkiye'
+    | '/locations'
     | '/privacy-policy'
     | '/services'
     | '/sitemap.xml'
     | '/terms'
     | '/why-turkiye'
+    | '/admin/activity'
     | '/admin/analytics'
     | '/admin/calendar'
+    | '/admin/cms'
     | '/admin/contacts'
     | '/admin/deals'
     | '/admin/inquiries'
     | '/admin/login'
     | '/admin/manage'
+    | '/admin/media'
     | '/admin/recover'
     | '/admin/regions'
     | '/admin/settings'
@@ -468,6 +516,7 @@ export interface RootRouteChildren {
   InvestmentCatalogRoute: typeof InvestmentCatalogRoute
   InvestmentDisclaimerRoute: typeof InvestmentDisclaimerRoute
   InvestmentInTurkiyeRoute: typeof InvestmentInTurkiyeRoute
+  LocationsRoute: typeof LocationsRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -550,6 +599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestmentInTurkiyeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations': {
+      id: '/locations'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy-policy': {
       id: '/privacy-policy'
       path: '/privacy-policy'
@@ -592,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -604,6 +667,13 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/admin/calendar'
       preLoaderRoute: typeof AdminCalendarRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cms': {
+      id: '/admin/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AdminCmsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/contacts': {
@@ -639,6 +709,13 @@ declare module '@tanstack/react-router' {
       path: '/manage'
       fullPath: '/admin/manage'
       preLoaderRoute: typeof AdminManageRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/media': {
+      id: '/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AdminMediaRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/recover': {
@@ -736,13 +813,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminActivityRoute: typeof AdminActivityRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCalendarRoute: typeof AdminCalendarRoute
+  AdminCmsRoute: typeof AdminCmsRoute
   AdminContactsRoute: typeof AdminContactsRoute
   AdminDealsRoute: typeof AdminDealsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManageRoute: typeof AdminManageRoute
+  AdminMediaRoute: typeof AdminMediaRoute
   AdminRecoverRoute: typeof AdminRecoverRoute
   AdminRegionsRoute: typeof AdminRegionsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -757,13 +837,16 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivityRoute: AdminActivityRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCalendarRoute: AdminCalendarRoute,
+  AdminCmsRoute: AdminCmsRoute,
   AdminContactsRoute: AdminContactsRoute,
   AdminDealsRoute: AdminDealsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminManageRoute: AdminManageRoute,
+  AdminMediaRoute: AdminMediaRoute,
   AdminRecoverRoute: AdminRecoverRoute,
   AdminRegionsRoute: AdminRegionsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -790,6 +873,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvestmentCatalogRoute: InvestmentCatalogRoute,
   InvestmentDisclaimerRoute: InvestmentDisclaimerRoute,
   InvestmentInTurkiyeRoute: InvestmentInTurkiyeRoute,
+  LocationsRoute: LocationsRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

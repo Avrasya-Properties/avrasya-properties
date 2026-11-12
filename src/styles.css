@@ -45,42 +45,102 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-emerald: var(--emerald);
+  --color-glow: var(--glow);
+  --color-overlay: var(--overlay);
+  --color-navbar-cream: var(--navbar-cream);
+  --color-logo-petrol: var(--logo-petrol);
+  --color-olive-gold: var(--olive-gold);
 }
 
 :root {
   --radius: 0.25rem;
-  --background: oklch(0.973 0.006 95); /* canvas #F7F6F2 */
-  --foreground: oklch(0.27 0.03 225); /* ink #172B33 */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.27 0.03 225);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.27 0.03 225);
-  --primary: oklch(0.32 0.045 235); /* brand #17384A */
-  --primary-foreground: oklch(0.973 0.006 95);
-  --secondary: oklch(0.94 0.008 100); /* surface-muted #EEEDE7 */
-  --secondary-foreground: oklch(0.27 0.03 225);
-  --muted: oklch(0.94 0.008 100);
-  --muted-foreground: oklch(0.47 0.02 230); /* #52616A */
-  --accent: oklch(0.94 0.008 100);
-  --accent-foreground: oklch(0.27 0.03 225);
-  --brass: oklch(0.67 0.09 75); /* #B78C4D */
-  --brass-text: oklch(0.47 0.08 70); /* #785728 */
+  --background: #f9f8f5; /* Warm Ivory */
+  --foreground: #163038; /* Deep Forest Petrol */
+  --card: #ffffff;
+  --card-foreground: #163038;
+  --popover: #ffffff;
+  --popover-foreground: #163038;
+  --primary: #163038; /* Deep Forest Petrol */
+  --primary-foreground: #ffffff;
+  --secondary: #f7f6f2; /* Navbar Cream Tint */
+  --secondary-foreground: #163038;
+  --muted: #f7f6f2;
+  --muted-foreground: #5c6f73; /* Muted Petrol-Slate Text */
+  --accent: #f7f6f2;
+  --accent-foreground: #163038;
+  --brass: #c5a059; /* Metallic Luxury Gold */
+  --brass-text: #c5a059;
   --brass-light: #e5c378;
-  --night: #07191e;
-  --night-2: #0c1e23;
-  --teal: #14444c;
-  --stone: #eeede7;
-  --ink: oklch(0.27 0.03 225);
-  --on-dark: oklch(0.973 0.006 95);
-  --on-dark-muted: oklch(0.84 0.01 210);
-  --control: oklch(0.6 0.02 200); /* #7B898B */
+  --gold: #c5a059;
+  --olive-gold: #989681; /* Warm Olive-Gold / Sage Brass */
+  --emerald: #10785f; /* Emerald Green */
+  --glow: #2dd4bf; /* Bosphorus Cyan-Teal Glow */
+  --night: #163038;
+  --night-2: #0e2228; /* Deep Petrol Overlay */
+  --teal: #17384a; /* Logo Dark Petrol-Teal */
+  --logo-petrol: #17384a;
+  --navbar-cream: #f7f6f2;
+  --stone: #f9f8f5;
+  --ink: #163038;
+  --on-dark: #ffffff;
+  --on-dark-muted: rgba(255, 255, 255, 0.75);
+  --control: #dee0dd;
   --warn: oklch(0.5 0.15 35);
   --warn-bg: oklch(0.96 0.03 80);
   --destructive: oklch(0.55 0.2 27);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.885 0.006 150); /* line #D9DDD9 */
-  --input: oklch(0.6 0.02 200);
-  --ring: oklch(0.67 0.09 75);
+  --border: #dee0dd; /* Soft Sage-Gray Border */
+  --input: #dee0dd;
+  --ring: #c5a059;
+  --overlay: #0e2228;
+}
+
+/* Minimal Modern Architectural Grid & Ambient Atmosphere — Inspired by Caldren & Bildora */
+.star-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: transparent;
+}
+.star-bg-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.star-bg::before,
+.star-bg-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Ultra-subtle Cauldron/Bildora architectural hairline grid */
+  background-image:
+    linear-gradient(to right, rgba(22, 48, 56, 0.032) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(22, 48, 56, 0.032) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 25%, #000 35%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 25%, #000 35%, transparent 100%);
+}
+.star-bg-layer::before {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+.star-bg::after,
+.star-bg-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 75% 45% at 50% 0%,
+    rgba(16, 120, 95, 0.07) 0%,
+    transparent 70%
+  );
 }
 
 @layer base {
@@ -89,12 +149,15 @@
   }
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   h1,
   h2,
@@ -450,7 +513,9 @@ details[open] .faq-body {
   cursor: pointer;
   border: 3px solid #fff;
   box-shadow: 0 4px 14px rgba(183, 140, 77, 0.5);
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms ease;
 }
 .range-luxury::-webkit-slider-thumb:hover {
   transform: scale(1.18);
@@ -464,7 +529,9 @@ details[open] .faq-body {
   cursor: pointer;
   border: 3px solid #fff;
   box-shadow: 0 4px 14px rgba(183, 140, 77, 0.5);
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease;
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms ease;
 }
 .range-luxury::-moz-range-thumb:hover {
   transform: scale(1.18);
@@ -472,47 +539,138 @@ details[open] .faq-body {
 }
 
 /* The navy/cream editorial hierarchy follows the supplied Avrasya reference. */
-.site-page-intro .text-muted-foreground { color: var(--on-dark-muted); }
-.site-page-intro .text-foreground { color: var(--on-dark); }
-.site-page-intro .eyebrow { color: #e5c378; }
-.home-hero > .container-site > div:first-child .text-foreground { color: var(--on-dark); }
-.home-hero > .container-site > div:first-child .text-muted-foreground { color: var(--on-dark-muted); }
-.home-hero > .container-site > div:first-child .eyebrow { color: #e5c378; }
-[data-page-actions] > div { display: flex; flex-wrap: wrap; gap: .5rem; }
-main, main .grid > *, main .flex > * { min-width: 0; }
-main h1, main h2, main h3, main p, footer a, footer li { overflow-wrap: break-word; }
-.property-contact-bar { padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
-.property-card-body { container-type: inline-size; }
+.site-page-intro .text-muted-foreground {
+  color: var(--on-dark-muted);
+}
+.site-page-intro .text-foreground {
+  color: var(--on-dark);
+}
+.site-page-intro .eyebrow {
+  color: #e5c378;
+}
+.home-hero > .container-site > div:first-child .text-foreground {
+  color: var(--on-dark);
+}
+.home-hero > .container-site > div:first-child .text-muted-foreground {
+  color: var(--on-dark-muted);
+}
+.home-hero > .container-site > div:first-child .eyebrow {
+  color: #e5c378;
+}
+[data-page-actions] > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+main,
+main .grid > *,
+main .flex > * {
+  min-width: 0;
+}
+main h1,
+main h2,
+main h3,
+main p,
+footer a,
+footer li {
+  overflow-wrap: break-word;
+}
+.property-contact-bar {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.property-card-body {
+  container-type: inline-size;
+}
 @container (max-width: 300px) {
-  .property-card-price { flex-direction: column; align-items: stretch; }
-  .property-card-actions { justify-content: flex-end; }
-  .property-card-actions .btn { flex: 1; }
+  .property-card-price {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .property-card-actions {
+    justify-content: flex-end;
+  }
+  .property-card-actions .btn {
+    flex: 1;
+  }
 }
 
 @media (max-width: 767px) {
-  .display-hero { font-size: clamp(2rem, 8.5vw, 2.75rem); line-height: 1.14; }
-  .home-hero .display-hero { max-width: 17ch; }
-  [data-home-page] > section:not([data-home-hero]) { padding-block: 2.5rem; }
+  .display-hero {
+    font-size: clamp(2rem, 8.5vw, 2.75rem);
+    line-height: 1.14;
+  }
+  .home-hero .display-hero {
+    max-width: 17ch;
+  }
+  [data-home-page] > section:not([data-home-hero]) {
+    padding-block: 2.5rem;
+  }
   main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
-  main select, main textarea, .site-header select { font-size: 16px !important; min-height: 44px; }
-  main .btn, main button.btn, main a.btn { min-height: 44px !important; line-height: 1.3; padding-block: .65rem; }
-  main button { min-height: 44px; }
-  main button[aria-label], main button[title], [data-property-detail] button { min-width: 44px; min-height: 44px; }
-  [data-property-detail] .container-site { padding-inline: 1rem; }
-  .property-detail-preview .container-site { padding-inline: .75rem; }
-  [data-property-detail] .space-y-10 > div { padding: 1rem; }
-  .admin-workspace main { padding: .75rem; }
-  .admin-workspace main button { min-height: 44px; }
+  main select,
+  main textarea,
+  .site-header select {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  main .btn,
+  main button.btn,
+  main a.btn {
+    min-height: 44px !important;
+    line-height: 1.3;
+    padding-block: 0.65rem;
+  }
+  main button {
+    min-height: 44px;
+  }
+  main button[aria-label],
+  main button[title],
+  [data-property-detail] button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  [data-property-detail] .container-site {
+    padding-inline: 1rem;
+  }
+  .property-detail-preview .container-site {
+    padding-inline: 0.75rem;
+  }
+  [data-property-detail] .space-y-10 > div {
+    padding: 1rem;
+  }
+  .admin-workspace main {
+    padding: 0.75rem;
+  }
+  .admin-workspace main button {
+    min-height: 44px;
+  }
 }
 @media (max-width: 1023px) {
-  body:has(.property-contact-bar) footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
-  .property-detail-page { padding-bottom: 1rem; }
+  body:has(.property-contact-bar) footer {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+  .property-detail-page {
+    padding-bottom: 1rem;
+  }
 }
 
 /* Decorative loading must never permanently block a usable server-rendered page. */
-.avrasya-preloader { animation: preloaderSafety 3s step-end forwards; }
-@keyframes preloaderSafety { to { visibility: hidden; pointer-events: none; } }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .avrasya-preloader { display: none; } }
+.avrasya-preloader {
+  animation: preloaderSafety 3s step-end forwards;
+}
+@keyframes preloaderSafety {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .avrasya-preloader {
+    display: none;
+  }
+}
 
 /* =====================================================================
    Design layer v2 - "quiet architectural monograph"
@@ -688,10 +846,52 @@ main h1, main h2, main h3, main p, footer a, footer li { overflow-wrap: break-wo
   }
 }
 
-/* House rule: no frosted glass. Any leftover backdrop blur utilities render as plain solid surfaces. */
-header [class*="backdrop-blur"],
-main [class*="backdrop-blur"],
-footer [class*="backdrop-blur"] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
+/* Glassmorphism & backdrop blur enabled for premium modern spatial depth */
+.backdrop-blur-luxury {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Lenis Smooth Scroll Engine */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Kinetic Typography & 3D Spatial Transforms */
+.split-char {
+  display: inline-block;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.split-line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.split-line {
+  display: inline-block;
+  will-change: transform, opacity;
 }

@@ -7,18 +7,19 @@ export const Route = createFileRoute("/investment-disclaimer")({
     ...meta(
       "Investment Disclaimer · Avrasya Properties",
       "Draft Investment Disclaimer for Avrasya Properties — approved text pending legal review.",
-      "/investment-disclaimer"
+      "/investment-disclaimer",
     ),
   }),
   component: () => (
-    <ManagedPage slug="investment-disclaimer"><LegalDraft
-      title="Investment Disclaimer"
-      topics={[
-        "Source-advertised prices and availability",
-        "No legal financial or tax advice",
-        "Citizenship and residence eligibility",
-      ]}
-    /></ManagedPage>
+    <ManagedPage slug="investment-disclaimer">
+      <LegalDraft
+        title="Investment Disclaimer"
+        topics={[
+          "Source-advertised prices and availability",
+          "No legal financial or tax advice",
+          "Citizenship and residence eligibility",
+        ]}
+      />
+    </ManagedPage>
   ),
 });
-

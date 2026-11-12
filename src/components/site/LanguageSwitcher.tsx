@@ -47,7 +47,11 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
                 ? "Выбор языка"
                 : locale === "fa"
                   ? "انتخاب زبان"
-                  : "Select Language"}
+                  : locale === "zh"
+                    ? "选择语言"
+                    : locale === "bn"
+                      ? "ভাষা নির্বাচন করুন"
+                      : "Select Language"}
         </label>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {locales.map((loc) => {
@@ -169,7 +173,9 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
                     setOpen(false);
                   }}
                   className={`flex w-full items-center justify-between gap-2 rounded px-2.5 py-1.5 text-xs transition-colors ${
-                    active ? "bg-brass/25 text-white font-bold" : "text-white/70 hover:bg-white/10 hover:text-white"
+                    active
+                      ? "bg-brass/25 text-white font-bold"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   <span className="flex items-center gap-2">

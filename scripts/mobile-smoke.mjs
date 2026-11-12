@@ -130,7 +130,7 @@ const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 async function visit(path) {
   await page.goto(origin + path, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("main h1");
-  await page.waitForFunction(()=>document.documentElement.classList.contains("js-motion"));
+  await page.waitForFunction(() => document.documentElement.classList.contains("js-motion"));
   if (path.startsWith("/properties/")) await page.waitForSelector('[data-property-ready="true"]');
   await page.waitForFunction(
     () =>
@@ -372,7 +372,10 @@ try {
   await page.waitForSelector("[data-empty-collection]");
   await fits("Empty catalogue homepage");
   assert.ok(await page.$("[data-home-hero]"));
-  assert.ok(await page.$('main a[href="/calculator"]'),"The full homepage retains its calculator link");
+  assert.ok(
+    await page.$('main a[href="/calculator"]'),
+    "The full homepage retains its calculator link",
+  );
   assert.equal(await page.$('main input[autocomplete="name"]'), null);
   await screenshot("home-empty-390");
   results.push(
@@ -388,7 +391,13 @@ try {
   await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "no-preference" }]);
   await visit("/");
   await scrollAll();
-  await page.waitForFunction(()=>[...document.querySelectorAll("main [data-reveal]")].filter(e=>e.getBoundingClientRect().width>0&&e.getBoundingClientRect().height>0).every(e=>e.classList.contains("is-in")),{timeout:5000,polling:"mutation"});
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll("main [data-reveal]")]
+        .filter((e) => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().height > 0)
+        .every((e) => e.classList.contains("is-in")),
+    { timeout: 5000, polling: "mutation" },
+  );
   results.push("Scroll effects reveal asynchronously loaded sections");
   assert.deepEqual(pageErrors, []);
   await writeFile(

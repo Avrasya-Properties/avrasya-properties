@@ -14,15 +14,16 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).toBe("/");
   });
-  it("keeps Contact separate from the homepage",()=>{
-    const router=createRouter({routeTree,context:{queryClient:new QueryClient()}});
+  it("keeps Contact separate from the homepage", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
     expect(router.matchRoutes("/contact").at(-1)?.routeId).toBe("/contact");
   });
-  it("registers property details, management and account recovery",()=>{
-    const router=createRouter({routeTree,context:{queryClient:new QueryClient()}});
+  it("registers property details, management and account recovery", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
     expect(router.matchRoutes("/properties/example").at(-1)?.routeId).toBe("/properties/$slug");
     expect(router.matchRoutes("/calculator").at(-1)?.routeId).toBe("/calculator");
     expect(router.matchRoutes("/admin/manage").at(-1)?.routeId).toBe("/admin/manage");
     expect(router.matchRoutes("/admin/recover").at(-1)?.routeId).toBe("/admin/recover");
+    expect(router.matchRoutes("/admin/media").at(-1)?.routeId).toBe("/admin/media");
   });
 });

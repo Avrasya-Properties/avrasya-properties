@@ -27,7 +27,12 @@ export type Price = {
 };
 export type RecordType = "unit_offer" | "unit_type" | "package" | "project" | "ambiguous_offer";
 export type PropertyRecord = {
-  id?:string; ref?:string; mode?:"sale"|"rent"; bathrooms?:number|null; tapu_status?:string|null; source_note?:string|null;
+  id?: string;
+  ref?: string;
+  mode?: "sale" | "rent";
+  bathrooms?: number | null;
+  tapu_status?: string | null;
+  source_note?: string | null;
   slug: string;
   marketing_title: string;
   city: string;
@@ -80,7 +85,12 @@ export const TYPE_LABEL: Record<RecordType, string> = {
   ambiguous_offer: "Offer to confirm",
 };
 
-const fmt = (n:number,c="USD") => new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:0}).format(n);
+const fmt = (n: number, c = "USD") =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: c,
+    maximumFractionDigits: 0,
+  }).format(n);
 
 /** Human price headline + qualifier appropriate to the record's price basis. */
 export function priceDisplay(p: Price): { main: string; note: string } {
@@ -104,7 +114,10 @@ export function priceDisplay(p: Price): { main: string; note: string } {
     special_offer: "Special offer · source-advertised",
   };
   const extra = p.expenses_amount ? ` + ${fmt(p.expenses_amount)} stated expenses` : "";
-  return { main: (p.basis==="from"?"From ":"")+fmt(p.amount, c), note: (notes[p.basis] ?? "Source-advertised") + extra };
+  return {
+    main: (p.basis === "from" ? "From " : "") + fmt(p.amount, c),
+    note: (notes[p.basis] ?? "Source-advertised") + extra,
+  };
 }
 
 /** USD amount usable for sorting / budget matching; null when not comparable. */
@@ -129,11 +142,7 @@ export const locationText = (r: PropertyRecord) =>
   r.location_label ? `${r.location_label}, ${r.city}` : "Location to confirm";
 
 export const sideText = (r: PropertyRecord) =>
-  r.side === "Europe"
-    ? "European side"
-    : r.side === "Asia"
-      ? "Asian side"
-      : "Side to confirm";
+  r.side === "Europe" ? "European side" : r.side === "Asia" ? "Asian side" : "Side to confirm";
 
 export const LAYOUTS = ["1+1", "2+1", "Duplex"] as const;
 export function matchesLayout(r: PropertyRecord, l: string) {
@@ -170,15 +179,146 @@ export function convertUsdPrice(usdAmount: number | null, curr: SupportedCurrenc
   return `${symbol}${converted.toLocaleString("en-US")}`;
 }
 
+export const PROPERTY_CATEGORIES = [
+  "Apartment",
+  "Villa",
+  "Penthouse",
+  "Duplex",
+  "Studio",
+  "Commercial property",
+  "Office",
+  "Retail unit",
+  "Land",
+  "Residential development",
+] as const;
+
+export type PropertyCategory = (typeof PROPERTY_CATEGORIES)[number] | string;
+
+export const IMAGE_CATEGORIES = [
+  "Exterior",
+  "Interior",
+  "Living room",
+  "Bedroom",
+  "Kitchen",
+  "Bathroom",
+  "Balcony",
+  "Terrace",
+  "Garden",
+  "Swimming pool",
+  "Building facilities",
+  "Views",
+  "Neighborhood",
+  "Construction progress",
+] as const;
+
+export type ImageCategory = (typeof IMAGE_CATEGORIES)[number] | string;
+
+export const DEFAULT_AMENITY_CATALOG = [
+  "Swimming pool",
+  "Indoor pool",
+  "Gym / fitness center",
+  "Sauna / spa",
+  "Turkish bath (Hammam)",
+  "24/7 security",
+  "Smart home features",
+  "Concierge",
+  "Underground parking",
+  "Children's playground",
+  "Walking paths",
+  "Landscaped garden",
+  "Sea view",
+  "Bosphorus view",
+  "City view",
+  "Private terrace",
+  "EV charging station",
+  "Close to metro / public transport",
+] as const;
+
+export type GalleryItem = {
+  id: string;
+  url: string;
+  category: ImageCategory;
+  caption?: string | undefined;
+  alt?: string | undefined;
+  isPrimary?: boolean | undefined;
+  sortOrder?: number | undefined;
+  desktopUrl?: string | undefined;
+  mobileUrl?: string | undefined;
+};
+
+export type FloorPlanItem = {
+  id: string;
+  title: string;
+  unitType?: string | undefined;
+  imageUrl: string;
+  pdfUrl?: string | undefined;
+  areaM2?: number | null | undefined;
+  bedrooms?: number | null | undefined;
+  bathrooms?: number | null | undefined;
+};
+
+export type PropertyDocumentItem = {
+  id: string;
+  title: string;
+  category: string;
+  url: string;
+  fileType?: string | undefined;
+  isPublic: boolean;
+};
+
+export type PropertySpecs = {
+  floorNumber?: number | string | null | undefined;
+  totalFloors?: number | null | undefined;
+  balconyOrTerrace?: string | null | undefined;
+  gardenOrOutdoor?: string | null | undefined;
+  parking?: string | null | undefined;
+  furnishingStatus?: string | null | undefined;
+  constructionYear?: number | null | undefined;
+  completionStatus?: string | null | undefined;
+  propertyCondition?: string | null | undefined;
+  heatingSystem?: string | null | undefined;
+  buildingAge?: number | string | null | undefined;
+  viewType?: string | null | undefined;
+  orientation?: string | null | undefined;
+  energyClass?: string | null | undefined;
+};
+
+export type PropertyPaymentPlan = {
+  downPaymentPercent?: number | null | undefined;
+  downPaymentAmount?: number | null | undefined;
+  installmentMonths?: number | null | undefined;
+  installmentAmount?: number | null | undefined;
+  deliveryPaymentPercent?: number | null | undefined;
+  additionalFeesNote?: string | null | undefined;
+  rentalYieldNote?: string | null | undefined;
+  capitalGrowthNote?: string | null | undefined;
+  citizenshipNote?: string | null | undefined;
+  summary?: string | null | undefined;
+};
+
+export type PropertyTranslation = {
+  title?: string | undefined;
+  shortDescription?: string | undefined;
+  description?: string | undefined;
+  highlights?: string[] | undefined;
+  seoTitle?: string | undefined;
+  seoDescription?: string | undefined;
+};
+
 export type PropertyMediaInfo = {
   cover: string;
   gallery: string[];
-  floorPlan?: string;
+  galleryItems: GalleryItem[];
+  floorPlan?: string | undefined;
+  floorPlans: FloorPlanItem[];
+  documents: PropertyDocumentItem[];
   tags: string[];
   highlights: string[];
 };
 
-function originalPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
+function originalPropertyMedia(
+  r: PropertyRecord,
+): Omit<PropertyMediaInfo, "galleryItems" | "floorPlans" | "documents"> {
   const s = r.slug.toLowerCase();
   const isCbi = r.details["cbi_verified"] === true;
   // 1. RAMS Park House Maslak (1+1 XS 50m2, $270k)
@@ -617,10 +757,23 @@ export type Filters = {
   q?: string | undefined;
   region?: string | undefined;
   loc?: string | undefined;
+  neighborhood?: string | undefined;
   side?: string | undefined;
   layout?: string | undefined;
   type?: string | undefined;
+  category?: string | undefined;
+  project?: string | undefined;
   budget?: string | undefined;
+  minPrice?: number | undefined;
+  maxPrice?: number | undefined;
+  bedrooms?: number | undefined;
+  bathrooms?: number | undefined;
+  minArea?: number | undefined;
+  maxArea?: number | undefined;
+  availability?: string | undefined;
+  amenities?: string[] | undefined;
+  completionStatus?: string | undefined;
+  featuredOnly?: boolean | undefined;
   sort?: string | undefined;
   cbiOnly?: boolean | undefined;
 };
@@ -633,34 +786,107 @@ export function useLiveProperties(): PropertyRecord[] {
   return properties;
 }
 
-export function filterProperties(f: Filters, catalogue: PropertyRecord[] = properties,
+export function primaryAreaM2(r: PropertyRecord): number | null {
+  if (!r.areas || r.areas.length === 0) return null;
+  const gross = r.areas.find((a) => a.basis === "gross");
+  if (gross && Number.isFinite(gross.value_m2)) return gross.value_m2;
+  const first = r.areas[0];
+  return first && Number.isFinite(first.value_m2) ? first.value_m2 : null;
+}
+
+export function inferBedrooms(r: PropertyRecord): number | null {
+  const explicit = r.details["bedrooms"];
+  if (typeof explicit === "number" && Number.isFinite(explicit)) return explicit;
+  const layout = r.layout_label ?? "";
+  if (/studio/i.test(layout)) return 0;
+  const match = layout.match(/(\d+)\s*\+/);
+  return match ? Number(match[1]) : null;
+}
+
+export function filterProperties(
+  f: Filters,
+  catalogue: PropertyRecord[] = properties,
   budgets: readonly { id: string; min: number; max: number }[] = BUDGETS,
-  regions: readonly Region[] = []) {
+  regions: readonly Region[] = [],
+) {
   const wanted = f.region ? regions.find((x) => x.slug === f.region) : undefined;
   const q = f.q?.toLowerCase().trim();
   const b = budgets.find((x) => x.id === f.budget);
   let list = catalogue.filter((r) => {
+    const neighborhood = String(r.details["neighborhood"] ?? "");
+    const project = String(r.details["project"] ?? "");
+    const developer = String(r.details["developer"] ?? "");
+    const category = String(r.details["property_category"] ?? "");
+    const shortDesc = String(r.details["short_description"] ?? "");
     if (
       q &&
-      !`${r.marketing_title} ${r.location_label ?? ""} ${r.city ?? ""} ${r.layout_label ?? ""}`
+      !`${r.ref ?? ""} ${r.marketing_title} ${r.location_label ?? ""} ${neighborhood} ${r.city ?? ""} ${r.layout_label ?? ""} ${project} ${developer} ${category} ${shortDesc}`
         .toLowerCase()
         .includes(q)
     )
       return false;
-    if (f.region && !(wanted ? regionForCity(r.city, [wanted]) : slugifyRegion(r.city) === f.region)) return false;
+    if (
+      f.region &&
+      !(wanted ? regionForCity(r.city, [wanted]) : slugifyRegion(r.city) === f.region)
+    )
+      return false;
     if (f.loc && r.location_label !== f.loc) return false;
+    if (f.neighborhood && neighborhood.toLowerCase() !== f.neighborhood.toLowerCase()) return false;
+    if (f.project && project.toLowerCase() !== f.project.toLowerCase()) return false;
+    if (f.category && category.toLowerCase() !== f.category.toLowerCase()) return false;
     if (f.side && r.side !== f.side) return false;
     if (f.layout && !matchesLayout(r, f.layout)) return false;
     if (f.type && r.record_type !== f.type) return false;
+    if (f.availability && (r.availability || "Available") !== f.availability) return false;
+    if (f.featuredOnly && r.details["featured"] !== true) return false;
     if (f.cbiOnly) {
       if (r.details["cbi_verified"] !== true) return false;
+    }
+    if (f.bedrooms != null) {
+      const beds = inferBedrooms(r);
+      if (beds == null || beds !== f.bedrooms) return false;
+    }
+    if (f.bathrooms != null) {
+      const baths =
+        r.bathrooms ??
+        (typeof r.details["bathrooms"] === "number" ? (r.details["bathrooms"] as number) : null);
+      if (baths == null || baths < f.bathrooms) return false;
+    }
+    if (f.minArea != null || f.maxArea != null) {
+      const area = primaryAreaM2(r);
+      if (area == null) return false;
+      if (f.minArea != null && area < f.minArea) return false;
+      if (f.maxArea != null && area > f.maxArea) return false;
+    }
+    if (f.completionStatus) {
+      const specs = (r.details["specs"] as PropertySpecs | undefined) ?? {};
+      const comp = String(r.details["completion_status"] ?? specs.completionStatus ?? "");
+      if (comp.toLowerCase() !== f.completionStatus.toLowerCase()) return false;
+    }
+    if (f.amenities && f.amenities.length > 0) {
+      const media = getPropertyMedia(r);
+      const propAmenities = [
+        ...media.highlights,
+        ...(Array.isArray(r.details["amenities"]) ? (r.details["amenities"] as string[]) : []),
+      ].map((a) => String(a).toLowerCase());
+      const hasAll = f.amenities.every((wantedAmenity) =>
+        propAmenities.some((pa) => pa.includes(wantedAmenity.toLowerCase())),
+      );
+      if (!hasAll) return false;
     }
     if (b) {
       const v = comparableUsd(r.price);
       if (v == null || v < b.min || v >= b.max) return false;
     }
+    if (f.minPrice != null || f.maxPrice != null) {
+      const v = comparableUsd(r.price) ?? r.price.amount;
+      if (v == null) return false;
+      if (f.minPrice != null && v < f.minPrice) return false;
+      if (f.maxPrice != null && v > f.maxPrice) return false;
+    }
     return true;
   });
+
   if (f.sort === "price-asc" || f.sort === "price-desc") {
     const dir = f.sort === "price-asc" ? 1 : -1;
     list = list
@@ -674,6 +900,34 @@ export function filterProperties(f: Filters, catalogue: PropertyRecord[] = prope
               ? -1
               : (a.v - b.v) * dir || a.i - b.i,
       )
+      .map((x) => x.r);
+  } else if (f.sort === "area-asc" || f.sort === "area-desc") {
+    const dir = f.sort === "area-asc" ? 1 : -1;
+    list = list
+      .map((r, i) => ({ r, i, v: primaryAreaM2(r) }))
+      .sort((a, b) =>
+        a.v == null && b.v == null
+          ? a.i - b.i
+          : a.v == null
+            ? 1
+            : b.v == null
+              ? -1
+              : (a.v - b.v) * dir || a.i - b.i,
+      )
+      .map((x) => x.r);
+  } else if (f.sort === "featured") {
+    list = list
+      .map((r, i) => ({ r, i, feat: r.details["featured"] === true ? 1 : 0 }))
+      .sort((a, b) => b.feat - a.feat || a.i - b.i)
+      .map((x) => x.r);
+  } else if (f.sort === "newest" || f.sort === "oldest") {
+    const dir = f.sort === "newest" ? -1 : 1;
+    list = list
+      .map((r, i) => {
+        const ts = Date.parse(String(r.details["created_at"] ?? r.details["updated_at"] ?? ""));
+        return { r, i, ts: Number.isFinite(ts) ? ts : 0 };
+      })
+      .sort((a, b) => (a.ts - b.ts) * dir || a.i - b.i)
       .map((x) => x.r);
   }
   return list;
@@ -694,31 +948,124 @@ export const getProperty = (slug: string): PropertyRecord | undefined => {
 };
 
 export function getPropertyMedia(r: PropertyRecord): PropertyMediaInfo {
-  if (!r.id && !("gallery_images" in r.details)) return originalPropertyMedia(r);
-  const raw = r.details["gallery_images"];
-  const cover = r.cover || "";
-  const photos = Array.isArray(raw)
-    ? raw.filter((x): x is string => typeof x === "string" && !!x)
+  const fallback = originalPropertyMedia(r);
+  const rawGalleryItems = Array.isArray(r.details["gallery_items"])
+    ? (r.details["gallery_items"] as GalleryItem[]).filter(
+        (g) => g && typeof g === "object" && typeof g.url === "string" && g.url.trim().length > 0,
+      )
     : [];
-  const gallery = [...new Set([cover, ...photos].filter(Boolean))];
+  const rawFloorPlans = Array.isArray(r.details["floor_plans"])
+    ? (r.details["floor_plans"] as FloorPlanItem[]).filter(
+        (fp) =>
+          fp &&
+          typeof fp === "object" &&
+          typeof fp.imageUrl === "string" &&
+          fp.imageUrl.trim().length > 0,
+      )
+    : [];
+  const rawDocuments = Array.isArray(r.details["documents"])
+    ? (r.details["documents"] as PropertyDocumentItem[]).filter(
+        (d) =>
+          d &&
+          typeof d === "object" &&
+          typeof d.url === "string" &&
+          d.url.trim().length > 0 &&
+          d.isPublic !== false,
+      )
+    : [];
+
+  if (!r.id && !("gallery_images" in r.details) && rawGalleryItems.length === 0) {
+    const items: GalleryItem[] = fallback.gallery.map((url, idx) => ({
+      id: `${r.slug}-img-${idx + 1}`,
+      url,
+      category: idx === 0 ? "Exterior" : idx === 1 ? "Living room" : "Interior",
+      caption: `${r.marketing_title} — View ${idx + 1}`,
+      alt: `${r.marketing_title} image ${idx + 1}`,
+      isPrimary: idx === 0,
+      sortOrder: idx,
+    }));
+    const floorPlans: FloorPlanItem[] = fallback.floorPlan
+      ? [
+          {
+            id: `${r.slug}-fp-1`,
+            title: `${r.layout_label || "Standard"} Architectural Layout`,
+            unitType: r.layout_label || "Standard Residence",
+            imageUrl: fallback.floorPlan,
+            areaM2: primaryAreaM2(r),
+          },
+        ]
+      : [];
+    return {
+      ...fallback,
+      galleryItems: items,
+      floorPlans,
+      documents: rawDocuments,
+    };
+  }
+
+  const rawStrings = r.details["gallery_images"];
+  const photos = Array.isArray(rawStrings)
+    ? rawStrings.filter((x): x is string => typeof x === "string" && !!x)
+    : [];
+
+  const sortedItems =
+    rawGalleryItems.length > 0
+      ? [...rawGalleryItems].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      : [...new Set([r.cover || "", ...photos].filter(Boolean))].map((url, idx) => ({
+          id: `${r.slug || "prop"}-img-${idx + 1}`,
+          url,
+          category: idx === 0 ? "Exterior" : "Interior",
+          caption: `${r.marketing_title} — Image ${idx + 1}`,
+          alt: `${r.marketing_title} photo ${idx + 1}`,
+          isPrimary: idx === 0,
+          sortOrder: idx,
+        }));
+
+  const primaryItem = sortedItems.find((g) => g.isPrimary) ?? sortedItems[0];
+  const cover = primaryItem?.url || r.cover || "";
+  const gallery = [
+    ...new Set([cover, ...sortedItems.map((g) => g.url), ...photos].filter(Boolean)),
+  ];
+
   const highlights = Array.isArray(r.details["highlights"])
     ? r.details["highlights"].filter((x): x is string => typeof x === "string")
     : [];
-  const floorPlan =
+
+  const legacyFloorPlan =
     typeof r.details["floor_plan"] === "string" && r.details["floor_plan"]
       ? r.details["floor_plan"]
       : undefined;
+
+  const floorPlans: FloorPlanItem[] =
+    rawFloorPlans.length > 0
+      ? rawFloorPlans
+      : legacyFloorPlan
+        ? [
+            {
+              id: `${r.slug || "prop"}-fp-1`,
+              title: `${r.layout_label || "Architectural"} Floor Plan`,
+              unitType: r.layout_label || "Unit Layout",
+              imageUrl: legacyFloorPlan,
+              areaM2: primaryAreaM2(r),
+            },
+          ]
+        : [];
+
+  const floorPlan = floorPlans[0]?.imageUrl ?? legacyFloorPlan;
+
   return {
     cover,
     gallery,
+    galleryItems: sortedItems,
+    floorPlans,
+    documents: rawDocuments,
     highlights,
     tags: [
-      TYPE_LABEL[r.record_type],
-      ...(r.details["cbi_verified"] === true
-        ? ["Citizenship eligibility verified"]
-        : []),
+      ...(typeof r.details["property_category"] === "string" && r.details["property_category"]
+        ? [r.details["property_category"]]
+        : [TYPE_LABEL[r.record_type]]),
+      ...(r.details["cbi_verified"] === true ? ["Citizenship eligibility verified"] : []),
     ],
     ...(floorPlan ? { floorPlan } : {}),
   };
 }
-

@@ -1,7 +1,6 @@
-import { useWhatsAppLink } from "@/hooks/useLiveContact";
-import { useState,useEffect } from "react";
+import { useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { Heart, MapPin, MessageSquare, ArrowRight } from "lucide-react";
+import { ArrowUpRight, Heart, MessageSquare } from "lucide-react";
 import {
   areaText,
   comparableUsd,
@@ -9,153 +8,229 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
+  sideText,
+  TYPE_LABEL,
   type PropertyRecord,
 } from "@/data/properties";
-import { showsSide } from "@/data/regions";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
+import { useLiveContact } from "@/hooks/useLiveContact";
 import { useLanguage } from "@/hooks/useLanguage";
+import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
 
-export function ImageFallback({ r, className = "" }: { r: PropertyRecord; className?: string }) {
-  const { t } = useLanguage();
-  const media = getPropertyMedia(r);
-  const [imgSrc, setImgSrc] = useState(media.cover);
-  const [loaded, setLoaded] = useState(false);
-  useEffect(()=>{setImgSrc(media.cover);setLoaded(false);},[media.cover]);
-
-  return (
-    <div className={`relative h-full w-full overflow-hidden bg-[#0C1E23] ${className}`}>
-      {imgSrc?<img
-        src={imgSrc}
-        alt={r.marketing_title}
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
-        onError={() => setImgSrc("")}
-        className={`h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
-          loaded ? "opacity-100" : "opacity-90"
-        }`}
-      />
-      :<span className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-white/70">{t.propertyCard.photoNotSupplied}</span>}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
-    </div>
-  );
+export interface PropertyCardProps {
+  r: PropertyRecord;
+  index?: number;
 }
 
-export function PropertyCard({ r }: { r: PropertyRecord }) {
-  const waLink = useWhatsAppLink();
-  const p = priceDisplay(r.price);
-  const media = getPropertyMedia(r);
+/**
+ * Caldren-inspired Property Card (`ms0iib6H2.DjW300_u.mjs` `.framer-oddzss`)
+ * adapted to Avrasya's `PropertyRecord` schema, currency switcher,
+ * shortlist persistence, WhatsApp inquiry link, and PDF compliance rules.
+ */
+export function PropertyCard({ r, index }: PropertyCardProps) {
   const [currency] = useCurrency();
-  const { isSaved, toggle } = useShortlist();
-  const { t, isRtl } = useLanguage();
+  const { isSaved, toggle: toggleSave } = useShortlist();
+  const contact = useLiveContact();
+  const { t } = useLanguage();
+
   const saved = isSaved(r.slug);
+  const media = getPropertyMedia(r);
   const usdVal = comparableUsd(r.price);
-  const displayPrice = currency === "USD" || usdVal === null ? (p.main === "Price on request" ? t.common.priceOnRequest : p.main) : convertUsdPrice(usdVal, currency);
-  const isCbiEligible = r.details["cbi_verified"] === true;
+  const priceObj = priceDisplay(r.price);
 
-  const sideLabel =
-    r.side === "Europe"
-      ? t.common.sideEurope
-      : r.side === "Asia"
-        ? t.common.sideAsia
-        : t.common.sideUnknown;
+  const displayPrice =
+    currency !== "USD" && usdVal != null ? convertUsdPrice(usdVal, currency) : priceObj.main;
 
-  const typeLabel =
-    r.record_type === "unit_offer"
-      ? t.common.unitOffer
-      : r.record_type === "unit_type"
-        ? t.common.unitType
-        : r.record_type === "package"
-          ? t.common.multiApartmentPackage
-          : r.record_type === "project"
-            ? t.common.projectIntroduction
-            : t.common.offerToConfirm;
+  // PDF Compliance (Page 8): Never label a single property under $400,000 USD as Citizenship Eligible on its own.
+  const isCbiVerified = r.details["cbi_verified"] === true;
+  const qualifiesStandalone = isCbiVerified && (usdVal == null || usdVal >= 400_000);
+  const qualifiesViaBundle = isCbiVerified && usdVal != null && usdVal < 400_000;
+
+  const statusPillLabel =
+    r.record_type === "package"
+      ? "PORTFOLIO PACKAGE"
+      : qualifiesStandalone
+        ? t.propertyCard.cbiVerified.toUpperCase()
+        : r.mode === "rent"
+          ? t.propertyCard.forRent.toUpperCase()
+          : t.propertyCard.forSale.toUpperCase();
+
+  // Structured placeholder fallback when cover photo is absent
+  const fallbackSlot =
+    PLACEHOLDER_IMAGES.aboutArcGallery[(index ?? 0) % PLACEHOLDER_IMAGES.aboutArcGallery.length]!;
+  const imageSrc =
+    media.cover && media.cover.trim().length > 0
+      ? media.cover
+      : resolvePlaceholderSrc(fallbackSlot);
+
+  const locationStr = locationText(r);
+  const sideStr = sideText(r);
+  const areaStr = areaText(r);
+  const typeStr = TYPE_LABEL[r.record_type];
+
+  const waHref = `${contact.whatsapp}?text=${encodeURIComponent(
+    `Hello Avrasya Properties, I would like to inquire about "${r.marketing_title}" (${locationStr}).`,
+  )}`;
+
+  const cardRef = useRef<HTMLElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: -(y * 5), y: x * 5 });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
+  const formattedIndex = String((index ?? 0) + 1).padStart(2, "0");
 
   return (
-    <div className="h-full">
-      <article className="group relative flex h-full flex-col overflow-hidden border border-border bg-card card-elevate">
-        {/* Photograph */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-night img-zoom-container">
-          <Link to="/properties/$slug" params={{ slug: r.slug }} className="block h-full w-full" tabIndex={-1} aria-label={r.marketing_title}>
-            <ImageFallback r={r} />
-          </Link>
+    <article
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      data-framer-name="Property"
+      className="group relative flex h-[480px] w-full flex-col justify-between overflow-hidden rounded-[24px] border border-[#163038]/15 bg-[#0E2228] shadow-[0_20px_50px_rgba(14,34,40,0.18)] transition-all duration-500 will-change-transform hover:-translate-y-1 hover:border-[#C5A059]/60 hover:shadow-[0_28px_64px_rgba(14,34,40,0.32)] sm:h-[520px]"
+      style={{
+        fontFamily: '"Geist", "Inter", sans-serif',
+        transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+      }}
+    >
+      {/* Full-Bleed Architectural Media Container with Dark Gradient Scrim */}
+      <div className="absolute inset-0 overflow-hidden bg-[#142A30]">
+        <Link
+          to="/properties/$slug"
+          params={{ slug: r.slug }}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="block h-full w-full no-underline"
+        >
+          <img
+            src={imageSrc}
+            alt={r.marketing_title}
+            loading="lazy"
+            className="block h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-108"
+          />
+        </Link>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0E2228] via-[#0E2228]/55 to-black/20"
+        />
+      </div>
 
-          <div className="pointer-events-none absolute start-3 top-3 z-10 flex max-w-[calc(100%-5rem)] flex-wrap gap-1.5">
-            {r.layout_label && (
-              <span className="max-w-full truncate bg-night/90 px-2.5 py-1 text-[0.68rem] font-semibold tracking-wider text-white">{r.layout_label}</span>
-            )}
-            {isCbiEligible && (
-              <span className="bg-brass px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-night">{t.propertyCard.cbiVerified}</span>
-            )}
-          </div>
-
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggle(r.slug);
-            }}
-            aria-label={saved ? "Remove from saved shortlist" : "Save to shortlist"}
-            aria-pressed={saved}
-            className={`absolute end-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
-              saved ? "bg-destructive text-white" : "bg-white/90 text-night hover:bg-white"
-            }`}
-          >
-            <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} />
-          </button>
-
-          <p className="pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-center gap-1.5 text-[0.72rem] font-medium text-white">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-brass-light" />
-            <span className="truncate">
-              {r.location_label ?? r.city}
-              {showsSide(r.city, r.side) ? ` · ${sideLabel}` : ""}
+      {/* Top Card Bar: Status / CBI Badges Left + District & Shortlist Toggle Right */}
+      <div className="relative z-10 flex items-start justify-between gap-2 p-5 sm:p-6">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] font-medium uppercase leading-none tracking-[0.12em] text-[#C5A059] backdrop-blur-md transition-colors group-hover:border-[#C5A059]/50">
+            {statusPillLabel}
+          </span>
+          {qualifiesViaBundle && (
+            <span className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[#0E2228]/80 px-2.5 py-1 text-[9.5px] font-medium uppercase leading-none tracking-[0.1em] text-white backdrop-blur-md">
+              Combinable for $400k+
             </span>
-          </p>
+          )}
+          {r.ref && (
+            <span className="rounded-full bg-black/40 px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-white/85 backdrop-blur-md">
+              {r.ref}
+            </span>
+          )}
         </div>
 
-        {/* Details */}
-        <div className="property-card-body flex flex-1 flex-col p-5">
-          <div className="mb-2 flex items-center justify-between gap-3">
-            <span className="kicker !text-[0.62rem] text-brass-text">{typeLabel}</span>
-            <span className="truncate text-[0.62rem] font-medium uppercase tracking-wider text-muted-foreground">Ref {r.ref || r.slug}</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="hidden rounded-full bg-black/35 px-3 py-1 text-[11px] font-medium text-white/85 backdrop-blur-md sm:inline-block">
+            {locationStr}
+          </span>
+          <button
+            type="button"
+            onClick={() => toggleSave(r.slug)}
+            aria-label={saved ? t.propertyCard.saved : t.propertyCard.save}
+            aria-pressed={saved}
+            className={`flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 ${
+              saved
+                ? "border-[#C5A059] bg-[#C5A059] text-[#0E2228] shadow-sm"
+                : "border-white/20 bg-black/40 text-white backdrop-blur-md hover:border-[#C5A059] hover:bg-black/65"
+            }`}
+          >
+            <Heart className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />
+          </button>
+        </div>
+      </div>
 
-          <h3 className="font-display text-[1.45rem] font-medium leading-[1.15] text-foreground">
-            <Link to="/properties/$slug" params={{ slug: r.slug }} className="after:absolute after:inset-0 after:content-[''] hover:underline">
+      {/* Bottom Content Overlay Bar */}
+      <div className="relative z-10 flex flex-col gap-3 p-5 sm:p-6">
+        {/* Index Number + Converted Price Row */}
+        <div className="flex items-end justify-between gap-3">
+          <span className="font-serif text-[13px] font-semibold tracking-[0.16em] uppercase text-[#C5A059]">
+            {formattedIndex}
+          </span>
+          <div className="flex flex-col items-end text-right">
+            <span className="text-[18px] font-semibold leading-tight tracking-[-0.01em] text-white tabular-nums sm:text-[20px]">
+              {displayPrice}
+            </span>
+            {priceObj.note && (
+              <span className="mt-0.5 max-w-[180px] truncate text-[11px] font-normal text-[#C5A059]">
+                {priceObj.note}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Serif Residence Title & Location Subtitle */}
+        <div className="space-y-1.5">
+          <h3
+            className="m-0 font-serif text-[21px] font-light leading-[1.2] text-white sm:text-[24px]"
+            style={{ fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif' }}
+          >
+            <Link
+              to="/properties/$slug"
+              params={{ slug: r.slug }}
+              className="text-white no-underline transition-colors group-hover:text-[#C5A059]"
+            >
               {r.marketing_title}
             </Link>
           </h3>
-
-          {(r.areas.length > 0 || media.tags.length > 0) && (
-            <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
-              {[r.areas.length > 0 ? areaText(r) : "", ...media.tags.slice(0, 1)].filter(Boolean).join(" · ")}
-            </p>
-          )}
-
-          <div className="property-card-price mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
-            <div>
-              <p className="kicker !text-[0.6rem] text-muted-foreground">{r.mode === "rent" ? t.propertyCard.forRent : t.propertyCard.forSale}</p>
-              <p className="font-display mt-1 text-[1.7rem] font-medium leading-none text-foreground">{displayPrice}</p>
-              {currency !== "USD" && usdVal && <p className="mt-1 text-[0.68rem] font-medium text-muted-foreground">USD ${usdVal.toLocaleString("en-US")}</p>}
-            </div>
-
-            <div className="property-card-actions relative z-20 flex items-center gap-2">
-              <a
-                href={waLink(`Hello Avrasya, I would like to inquire about: ${r.marketing_title} (${r.slug})`)}
-                target="_blank"
-                rel="noreferrer"
-                className="flex h-11 w-11 items-center justify-center border border-border bg-card transition-colors hover:border-brass hover:text-brass"
-                title={t.propertyCard.inquireWhatsApp}
-                aria-label={t.propertyCard.inquireWhatsApp}
-              >
-                <MessageSquare className="h-4 w-4" />
-              </a>
-              <Link to="/properties/$slug" params={{ slug: r.slug }} className="btn btn-outline shrink-0 gap-1.5 !px-3.5 !text-[0.72rem]">
-                <span>{t.propertyCard.viewDetails}</span> <ArrowRight className="arrow h-3 w-3 rtl-flip" />
-              </Link>
-            </div>
-          </div>
+          <p className="m-0 line-clamp-2 text-[12.5px] leading-[1.45] text-white/75">
+            {r.marketing_title} in {locationStr}.
+          </p>
         </div>
-      </article>
-    </div>
+
+        {/* Compact Specs Strip */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/12 pt-2.5 text-[11.5px] font-normal text-white/75">
+          {r.layout_label && <span className="font-medium text-white/90">{r.layout_label}</span>}
+          <span>{sideStr}</span>
+          <span className="max-w-[160px] truncate">{areaStr}</span>
+          <span>{typeStr}</span>
+        </div>
+
+        {/* Bottom Interactive Pill CTA + WhatsApp Action */}
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <Link
+            to="/properties/$slug"
+            params={{ slug: r.slug }}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[12px] font-medium text-white no-underline backdrop-blur-sm transition-all duration-300 hover:border-[#C5A059] hover:bg-[#C5A059] hover:text-[#0E2228]"
+          >
+            <span>View Residence</span>
+            <span aria-hidden="true">&rarr;</span>
+          </Link>
+
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${t.propertyCard.inquireWhatsApp}: ${r.marketing_title}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/35 px-3.5 py-2 text-[11.5px] font-medium text-white/85 no-underline backdrop-blur-sm transition-colors hover:border-[#C5A059] hover:text-[#C5A059]"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>WhatsApp</span>
+            <ArrowUpRight className="h-3 w-3 opacity-70" />
+          </a>
+        </div>
+      </div>
+    </article>
   );
 }

@@ -21,12 +21,21 @@ export default function SkylineScene({ className = "" }: { className?: string })
   const mount = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      (typeof navigator !== "undefined" && navigator.userAgent.includes("jsdom"))
+    )
+      return;
     const el = mount.current;
     if (!el) return;
 
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "low-power",
+      });
     } catch {
       return; // WebGL unavailable: the photograph behind it carries the hero on its own.
     }
@@ -43,10 +52,28 @@ export default function SkylineScene({ className = "" }: { className?: string })
     const world = new THREE.Group();
     scene.add(world);
 
-    const faceMat = new THREE.MeshBasicMaterial({ color: 0x0f3a43, transparent: true, opacity: 0.34, depthWrite: false });
-    const heroFaceMat = new THREE.MeshBasicMaterial({ color: 0x1b6270, transparent: true, opacity: 0.5, depthWrite: false });
-    const edgeMat = new THREE.LineBasicMaterial({ color: 0xcaa261, transparent: true, opacity: 0.8 });
-    const heroEdgeMat = new THREE.LineBasicMaterial({ color: 0xf0d08a, transparent: true, opacity: 1 });
+    const faceMat = new THREE.MeshBasicMaterial({
+      color: 0x0f3a43,
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false,
+    });
+    const heroFaceMat = new THREE.MeshBasicMaterial({
+      color: 0x1b6270,
+      transparent: true,
+      opacity: 0.5,
+      depthWrite: false,
+    });
+    const edgeMat = new THREE.LineBasicMaterial({
+      color: 0xcaa261,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const heroEdgeMat = new THREE.LineBasicMaterial({
+      color: 0xf0d08a,
+      transparent: true,
+      opacity: 1,
+    });
 
     const rand = mulberry32(11);
     const towers: { group: THREE.Group; delay: number }[] = [];
@@ -60,7 +87,9 @@ export default function SkylineScene({ className = "" }: { className?: string })
         const d = Math.hypot(x, z);
         const isHero = ix === 4 && iz === 4;
         if (!isHero && (rand() < 0.28 || d > 5.4)) continue;
-        const h = isHero ? 7.4 : Math.max(0.5, (4.6 - d * 0.62) * (0.55 + rand() * 0.75) + rand() * 0.6);
+        const h = isHero
+          ? 7.4
+          : Math.max(0.5, (4.6 - d * 0.62) * (0.55 + rand() * 0.75) + rand() * 0.6);
         const w = isHero ? 0.82 : 0.62 + rand() * 0.34;
         const geo = new THREE.BoxGeometry(w, h, w * (0.8 + rand() * 0.4));
         geo.translate(0, h / 2, 0);
