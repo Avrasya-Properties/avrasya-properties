@@ -1,9 +1,11 @@
 <!-- Updated: 2026-03-02 -->
+
 # Blog Post SEO Strategy Template
 
 ## Content Structure & Best Practices
 
 ### Essential Elements
+
 - **Title Tag**: 50-60 characters, front-load main keyword, include numbers/brackets (e.g., "[2026 Guide]")
 - **Meta Description**: 140-160 characters, natural language, clear value proposition
 - **H1 Heading**: Only ONE per page, closely matching title tag
@@ -12,6 +14,7 @@
 - **Conclusion**: Summarize key points, clear Call To Action (CTA)
 
 ### Minimum Requirements
+
 - **Word Count**: 1,200+ words (longer for competitive keywords)
 - **Paragraph Length**: 2-4 sentences max for scanability
 - **Images**: At least 1 hero image + 1 image per 400 words

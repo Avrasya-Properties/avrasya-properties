@@ -151,7 +151,10 @@ describe("regions", () => {
   });
 
   it("round-trips regions through the settings mapper", () => {
-    const custom = { ...DEFAULT_SITE_SETTINGS, regions: [...defaultRegions(), antalya] };
+    const custom = {
+      ...DEFAULT_SITE_SETTINGS,
+      regions: normalizeRegions([...defaultRegions(), antalya]),
+    };
     expect(decodeSettings(encodeSettings(custom)).regions).toEqual(custom.regions);
   });
 

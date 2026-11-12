@@ -12,12 +12,14 @@ description: >
 ## Process
 
 ### 1. Discovery
+
 - Business type, target audience, competitors, goals
 - Current site assessment (if exists)
 - Budget and timeline constraints
 - Key performance indicators (KPIs)
 
 ### 2. Competitive Analysis
+
 - Identify top 5 competitors
 - Analyze their content strategy, schema usage, technical setup
 - Identify keyword gaps and content opportunities
@@ -25,6 +27,7 @@ description: >
 - Estimate their domain authority
 
 ### 3. Architecture Design
+
 - Load industry template from `resources/templates/`
 - Design URL hierarchy and content pillars
 - Plan internal linking strategy
@@ -32,6 +35,7 @@ description: >
 - Information architecture for user journeys
 
 ### 4. Content Strategy
+
 - Content gaps vs competitors — use `scripts/competitor_gap.py` for data-driven analysis
 - Page types and estimated counts
 - Blog/resource topics and publishing cadence
@@ -53,6 +57,7 @@ description: >
 ```
 
 #### Pillar Page Requirements
+
 - **Word count**: 3,000-5,000 words (comprehensive overview)
 - **Structure**: Covers all major subtopics at surface level, links to each cluster article for depth
 - **Target keyword**: Head term (e.g., "cobalt strike beacon")
@@ -60,12 +65,14 @@ description: >
 - **Schema**: Add `Article` or `WebPage` schema with `about` and `mentions` properties
 
 #### Cluster Article Requirements
+
 - **Word count**: 1,500-3,000 words (deep dive on one aspect)
 - **Target keyword**: Long-tail variant (e.g., "cobalt strike beacon sleep mask")
 - **Internal links**: Must link back to pillar page + 2-3 sibling cluster articles
 - **Freshness**: Update cluster articles when new information becomes available
 
 #### Planning Process
+
 1. **Identify 3-5 pillar topics** from your core competencies or target keywords
 2. **Generate 8-15 cluster topics** per pillar using:
    - Google Autocomplete / People Also Ask
@@ -77,14 +84,15 @@ description: >
 
 #### Industry Cluster Templates
 
-| Industry | Example Pillar | Cluster Topics (sample) |
-|----------|---------------|------------------------|
-| Cybersecurity | Penetration Testing | OSINT, Web App Testing, Network Pentesting, Reporting, Tools, Methodology, Compliance |
-| SaaS | Product Documentation | Getting Started, API Reference, Integrations, Troubleshooting, Best Practices, Migration |
-| E-commerce | Product Category | Buying Guide, Comparison, Care Guide, Reviews, FAQ, Accessories |
-| Local Service | Service Area | City-specific pages, Service FAQ, Pricing, Before/After, Testimonials |
+| Industry      | Example Pillar        | Cluster Topics (sample)                                                                  |
+| ------------- | --------------------- | ---------------------------------------------------------------------------------------- |
+| Cybersecurity | Penetration Testing   | OSINT, Web App Testing, Network Pentesting, Reporting, Tools, Methodology, Compliance    |
+| SaaS          | Product Documentation | Getting Started, API Reference, Integrations, Troubleshooting, Best Practices, Migration |
+| E-commerce    | Product Category      | Buying Guide, Comparison, Care Guide, Reviews, FAQ, Accessories                          |
+| Local Service | Service Area          | City-specific pages, Service FAQ, Pricing, Before/After, Testimonials                    |
 
 ### 5. Technical Foundation
+
 - Hosting and performance requirements
 - Schema markup plan per page type
 - Core Web Vitals baseline targets
@@ -94,24 +102,28 @@ description: >
 ### 6. Implementation Roadmap (4 phases)
 
 #### Phase 1 — Foundation (weeks 1-4)
+
 - Technical setup and infrastructure
 - Core pages (home, about, contact, main services)
 - Essential schema implementation
 - Analytics and tracking setup
 
 #### Phase 2 — Expansion (weeks 5-12)
+
 - Content creation for primary pages
 - Blog launch with initial posts
 - Internal linking structure
 - Local SEO setup (if applicable)
 
 #### Phase 3 — Scale (weeks 13-24)
+
 - Advanced content development
 - Link building and outreach
 - GEO optimization
 - Performance optimization
 
 #### Phase 4 — Authority (months 7-12)
+
 - Thought leadership content
 - PR and media mentions
 - Advanced schema implementation
@@ -120,6 +132,7 @@ description: >
 ## Industry Templates
 
 Load from `resources/templates/`:
+
 - `saas.md` — SaaS/software companies
 - `local-service.md` — Local service businesses
 - `ecommerce.md` — E-commerce stores
@@ -130,6 +143,7 @@ Load from `resources/templates/`:
 ## Output
 
 ### Deliverables
+
 - `SEO-STRATEGY.md` — Complete strategic plan
 - `COMPETITOR-ANALYSIS.md` — Competitive insights
 - `CONTENT-CALENDAR.md` — Content roadmap
@@ -138,18 +152,19 @@ Load from `resources/templates/`:
 - `TOPIC-CLUSTERS.md` — Pillar/cluster mapping with internal link plan
 
 ### KPI Targets
-| Metric | Baseline | 3 Month | 6 Month | 12 Month |
-|--------|----------|---------|---------|----------|
-| Organic Traffic | ... | ... | ... | ... |
-| Keyword Rankings | ... | ... | ... | ... |
-| Domain Authority | ... | ... | ... | ... |
-| Indexed Pages | ... | ... | ... | ... |
-| Core Web Vitals | ... | ... | ... | ... |
-| Topical Coverage % | ... | ... | ... | ... |
+
+| Metric             | Baseline | 3 Month | 6 Month | 12 Month |
+| ------------------ | -------- | ------- | ------- | -------- |
+| Organic Traffic    | ...      | ...     | ...     | ...      |
+| Keyword Rankings   | ...      | ...     | ...     | ...      |
+| Domain Authority   | ...      | ...     | ...     | ...      |
+| Indexed Pages      | ...      | ...     | ...     | ...      |
+| Core Web Vitals    | ...      | ...     | ...     | ...      |
+| Topical Coverage % | ...      | ...     | ...     | ...      |
 
 ### Success Criteria
+
 - Clear, measurable goals per phase
 - Resource requirements defined
 - Dependencies identified
 - Risk mitigation strategies
-

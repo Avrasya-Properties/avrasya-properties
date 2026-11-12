@@ -18,44 +18,48 @@ When working with sitemaps:
 
 ## Available Scripts
 
-| Script | Purpose | Command |
-|--------|---------|---------|
-| `parse_html.py` | Extract page metadata and canonicals | `python3 parse_html.py --url <url> --json` |
-| `broken_links.py` | Verify URL status codes | `python3 broken_links.py <url> --json` |
-| `duplicate_content.py` | Detect thin/duplicate content | `python3 duplicate_content.py <url> --json` |
+| Script                 | Purpose                              | Command                                     |
+| ---------------------- | ------------------------------------ | ------------------------------------------- |
+| `parse_html.py`        | Extract page metadata and canonicals | `python3 parse_html.py --url <url> --json`  |
+| `broken_links.py`      | Verify URL status codes              | `python3 broken_links.py <url> --json`      |
+| `duplicate_content.py` | Detect thin/duplicate content        | `python3 duplicate_content.py <url> --json` |
 
 ## Sitemap Validation Checks
 
-| Check | Severity | Action |
-|-------|----------|--------|
-| Invalid XML syntax | Critical | Fix syntax errors |
-| >50,000 URLs in single file | Critical | Split with sitemap index |
-| Uncompressed file >50MB | Critical | Compress with gzip or split |
-| Non-200 status URLs | High | Remove or fix broken URLs |
-| Noindexed URLs in sitemap | High | Remove — conflicting signals |
-| Canonicalized URLs (pointing elsewhere) | High | Remove non-canonical URLs |
-| Redirected URLs (301/302) | Medium | Update to final destination |
-| Missing `lastmod` dates | Medium | Add real modification dates |
-| All identical `lastmod` dates | Low | Use actual per-page dates |
-| `priority` / `changefreq` present | Info | Can remove (Google ignores) |
-| >100 sitemaps in index | Info | Functional but unusual |
+| Check                                   | Severity | Action                       |
+| --------------------------------------- | -------- | ---------------------------- |
+| Invalid XML syntax                      | Critical | Fix syntax errors            |
+| >50,000 URLs in single file             | Critical | Split with sitemap index     |
+| Uncompressed file >50MB                 | Critical | Compress with gzip or split  |
+| Non-200 status URLs                     | High     | Remove or fix broken URLs    |
+| Noindexed URLs in sitemap               | High     | Remove — conflicting signals |
+| Canonicalized URLs (pointing elsewhere) | High     | Remove non-canonical URLs    |
+| Redirected URLs (301/302)               | Medium   | Update to final destination  |
+| Missing `lastmod` dates                 | Medium   | Add real modification dates  |
+| All identical `lastmod` dates           | Low      | Use actual per-page dates    |
+| `priority` / `changefreq` present       | Info     | Can remove (Google ignores)  |
+| >100 sitemaps in index                  | Info     | Functional but unusual       |
 
 ## Quality Gates
 
 ### Location Page Thresholds
+
 - ⚠️ **WARNING** at 30+ location pages: require 60%+ unique content per page
 - 🛑 **HARD STOP** at 50+ location pages: require explicit user justification
 
 ### Why This Matters
+
 Google's doorway page algorithm penalizes programmatic location pages with thin/duplicate content. Each location page must provide genuinely unique value.
 
 ### Safe at Scale ✅
+
 - Integration pages (with real setup documentation)
 - Glossary pages (200+ word definitions)
 - Product pages (unique specs, reviews, UGC)
 - API documentation pages
 
 ### Penalty Risk ❌
+
 - Location pages with only city name swapped
 - "Best [tool] for [industry]" without substantive content
 - AI-generated mass content without human editorial review
@@ -64,6 +68,7 @@ Google's doorway page algorithm penalizes programmatic location pages with thin/
 ## Sitemap Formats
 
 ### Standard Sitemap
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -75,6 +80,7 @@ Google's doorway page algorithm penalizes programmatic location pages with thin/
 ```
 
 ### Sitemap Index
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -90,6 +96,7 @@ Google's doorway page algorithm penalizes programmatic location pages with thin/
 ```
 
 ### Hreflang Sitemap (international)
+
 ```xml
 <url>
   <loc>https://example.com/page</loc>
@@ -100,6 +107,7 @@ Google's doorway page algorithm penalizes programmatic location pages with thin/
 ```
 
 ### Image Sitemap Extension
+
 ```xml
 <url>
   <loc>https://example.com/page</loc>
@@ -113,6 +121,7 @@ Google's doorway page algorithm penalizes programmatic location pages with thin/
 ## Sitemap Discovery Methods
 
 Ensure your sitemap is discoverable:
+
 1. **robots.txt**: `Sitemap: https://example.com/sitemap.xml`
 2. **Search Console**: Submit directly in GSC
 3. **IndexNow**: Auto-submit new URLs via `indexnow_checker.py`
@@ -120,6 +129,7 @@ Ensure your sitemap is discoverable:
 ## Output Format
 
 Provide:
+
 - Validation report with pass/fail per check
 - Missing pages (in crawl but not sitemap)
 - Extra pages (in sitemap but 404 or redirected)

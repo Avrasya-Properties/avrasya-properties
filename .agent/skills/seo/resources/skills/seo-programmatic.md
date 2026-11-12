@@ -16,6 +16,7 @@ Enforces quality gates to prevent thin content penalties and index bloat.
 ## Data Source Assessment
 
 Evaluate the data powering programmatic pages:
+
 - **CSV/JSON files**: Row count, column uniqueness, missing values
 - **API endpoints**: Response structure, data freshness, rate limits
 - **Database queries**: Record count, field completeness, update frequency
@@ -27,6 +28,7 @@ Evaluate the data powering programmatic pages:
 ## Template Engine Planning
 
 Design templates that produce unique, valuable pages:
+
 - **Variable injection points**: Title, H1, body sections, meta description, schema
 - **Content blocks**: Static (shared across pages) vs dynamic (unique per page)
 - **Conditional logic**: Show/hide sections based on data availability
@@ -39,6 +41,7 @@ Design templates that produce unique, valuable pages:
 ## URL Pattern Strategy
 
 ### Common Patterns
+
 - `/tools/[tool-name]` — Tool/product directory pages
 - `/[city]/[service]` — Location + service pages
 - `/integrations/[platform]` — Integration landing pages
@@ -46,6 +49,7 @@ Design templates that produce unique, valuable pages:
 - `/templates/[template-name]` — Downloadable template pages
 
 ### URL Rules
+
 - Lowercase, hyphenated slugs derived from data
 - Logical hierarchy reflecting site architecture
 - No duplicate slugs — enforce uniqueness at generation time
@@ -66,12 +70,12 @@ Design templates that produce unique, valuable pages:
 
 ### Quality Gates
 
-| Metric | Threshold | Action |
-|--------|-----------|--------|
-| Pages without content review | 100+ | ⚠️ WARNING — require content audit before publishing |
-| Pages without justification | 500+ | 🛑 HARD STOP — require explicit user approval and thin content audit |
-| Unique content per page | <40% | ❌ Flag as thin content — likely penalty risk |
-| Word count per page | <300 | ⚠️ Flag for review — may lack sufficient value |
+| Metric                       | Threshold | Action                                                               |
+| ---------------------------- | --------- | -------------------------------------------------------------------- |
+| Pages without content review | 100+      | ⚠️ WARNING — require content audit before publishing                 |
+| Pages without justification  | 500+      | 🛑 HARD STOP — require explicit user approval and thin content audit |
+| Unique content per page      | <40%      | ❌ Flag as thin content — likely penalty risk                        |
+| Word count per page          | <300      | ⚠️ Flag for review — may lack sufficient value                       |
 
 ### Scaled Content Abuse — Enforcement Context (2025-2026)
 
@@ -82,6 +86,7 @@ Google's Scaled Content Abuse policy (introduced March 2024) saw major enforceme
 - **Result:** Google reported 45% reduction in low-quality, unoriginal content in search results post-March 2024 enforcement
 
 **Enhanced quality gates for programmatic pages:**
+
 - **Content differentiation:** ≥30-40% of content must be genuinely unique between any two programmatic pages (not just city/keyword string replacement)
 - **Human review:** Minimum 5-10% sample review of generated pages before publishing
 - **Progressive rollout:** Publish in batches of 50-100 pages. Monitor indexing and rankings for 2-4 weeks before expanding. Never publish 500+ programmatic pages simultaneously without explicit quality review.
@@ -91,6 +96,7 @@ Google's Scaled Content Abuse policy (introduced March 2024) saw major enforceme
 > **Recommendation:** The WARNING gate at `<40% unique content` remains appropriate. Consider a HARD STOP at `<30%` unique content to prevent scaled content abuse risk.
 
 ### Safe Programmatic Pages (OK at scale)
+
 ✅ Integration pages (with real setup docs, API details, screenshots)
 ✅ Template/tool pages (with downloadable content, usage instructions)
 ✅ Glossary pages (200+ word definitions with examples, related terms)
@@ -98,6 +104,7 @@ Google's Scaled Content Abuse policy (introduced March 2024) saw major enforceme
 ✅ Data-driven pages (unique statistics, charts, analysis per record)
 
 ### Penalty Risk (avoid at scale)
+
 ❌ Location pages with only city name swapped in identical text
 ❌ "Best [tool] for [industry]" without industry-specific value
 ❌ "[Competitor] alternative" without real comparison data
@@ -105,6 +112,7 @@ Google's Scaled Content Abuse policy (introduced March 2024) saw major enforceme
 ❌ Pages where >60% of content is shared template boilerplate
 
 ### Uniqueness Calculation
+
 Unique content % = (words unique to this page) / (total words on page) × 100
 
 Measure against all other pages in the programmatic set. Shared headers, footers, and navigation are excluded from the calculation. Template boilerplate text IS included.
@@ -141,21 +149,26 @@ Measure against all other pages in the programmatic set. Shared headers, footers
 ### Programmatic SEO Score: XX/100
 
 ### Assessment Summary
-| Category | Status | Score |
-|----------|--------|-------|
-| Data Quality | ✅/⚠️/❌ | XX/100 |
+
+| Category            | Status   | Score  |
+| ------------------- | -------- | ------ |
+| Data Quality        | ✅/⚠️/❌ | XX/100 |
 | Template Uniqueness | ✅/⚠️/❌ | XX/100 |
-| URL Structure | ✅/⚠️/❌ | XX/100 |
-| Internal Linking | ✅/⚠️/❌ | XX/100 |
-| Thin Content Risk | ✅/⚠️/❌ | XX/100 |
-| Index Management | ✅/⚠️/❌ | XX/100 |
+| URL Structure       | ✅/⚠️/❌ | XX/100 |
+| Internal Linking    | ✅/⚠️/❌ | XX/100 |
+| Thin Content Risk   | ✅/⚠️/❌ | XX/100 |
+| Index Management    | ✅/⚠️/❌ | XX/100 |
 
 ### Critical Issues (fix immediately)
+
 ### High Priority (fix within 1 week)
+
 ### Medium Priority (fix within 1 month)
+
 ### Low Priority (backlog)
 
 ### Recommendations
+
 - Data source improvements
 - Template modifications
 - URL pattern adjustments

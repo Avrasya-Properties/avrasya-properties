@@ -1,9 +1,11 @@
 <!-- Updated: 2026-03-02 -->
+
 # Technical Article & Tutorial SEO Strategy Template
 
 ## Content Structure & Best Practices
 
 ### Essential Elements
+
 - **Title Tag**: Clear, specific, and often includes the target audience or difficulty level (e.g., "Advanced Guide", "for Beginners").
 - **Table of Contents**: Essential for long technical articles. Use jump links (anchor tags).
 - **Prerequisites**: Clearly state what the user needs before starting (e.g., software versions, basic knowledge).
@@ -11,6 +13,7 @@
 - **Code Blocks**: Formatted correctly with syntax highlighting. Easily copyable.
 
 ### Minimum Requirements
+
 - **Comprehensive Coverage**: Technical articles often need to be 2,000+ words to thoroughly explain concepts.
 - **Visuals**: Use diagrams, architecture charts, and screenshots of terminal outputs or UI steps.
 - **Troubleshooting**: Include a "Common Errors" or "FAQs" section at the end.
@@ -36,6 +39,7 @@
 Use `TechArticle` or `HowTo` schema depending on the format.
 
 ### HowTo Schema Example
+
 ```json
 {
   "@context": "https://schema.org/",

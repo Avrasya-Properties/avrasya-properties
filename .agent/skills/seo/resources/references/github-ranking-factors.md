@@ -1,4 +1,5 @@
 <!-- Updated: 2026-03-08 -->
+
 # GitHub Repository Discoverability Factors (Practical Reference)
 
 This reference captures empirically useful factors for GitHub repository

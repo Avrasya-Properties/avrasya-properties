@@ -1,4 +1,5 @@
 # Backend audit and implemented controls
+
 See [deployment/status](BACKEND_DEPLOYMENT.md) for the live activation blocker and first-admin setup.
 
 The original website used static supplier JSON and a fictional localStorage CRM. The review branch adds Supabase Auth and protected staff membership; RLS-scoped contacts/leads/tasks/viewings/inquiries; shared CMS settings; published-only snapshots; safe supplier provenance; optimistic edits; guarded, atomic conversion/publication/deal operations; verified physical-unit links; Storage cover/gallery/floor-plan uploads; plain-text website editing, services/questions/brochures, administrator-only Auth account creation, source review and lease/maintenance management; append-only server audit events; persistent notification receipts and administrator application-data export.

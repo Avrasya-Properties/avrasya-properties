@@ -12,6 +12,7 @@ description: >
 ## Categories
 
 ### 1. Crawlability
+
 - robots.txt: exists, valid, not blocking important resources
 - XML sitemap: exists, referenced in robots.txt, valid format
 - Noindex tags: intentional vs accidental
@@ -25,22 +26,24 @@ As of 2025-2026, AI companies actively crawl the web to train models and power A
 
 **Known AI crawlers:**
 
-| Crawler | Company | robots.txt token | Purpose |
-|---------|---------|-----------------|---------|
-| GPTBot | OpenAI | `GPTBot` | Model training |
-| ChatGPT-User | OpenAI | `ChatGPT-User` | Real-time browsing |
-| ClaudeBot | Anthropic | `ClaudeBot` | Model training |
-| PerplexityBot | Perplexity | `PerplexityBot` | Search index + training |
-| Bytespider | ByteDance | `Bytespider` | Model training |
-| Google-Extended | Google | `Google-Extended` | Gemini training (NOT search) |
-| CCBot | Common Crawl | `CCBot` | Open dataset |
+| Crawler         | Company      | robots.txt token  | Purpose                      |
+| --------------- | ------------ | ----------------- | ---------------------------- |
+| GPTBot          | OpenAI       | `GPTBot`          | Model training               |
+| ChatGPT-User    | OpenAI       | `ChatGPT-User`    | Real-time browsing           |
+| ClaudeBot       | Anthropic    | `ClaudeBot`       | Model training               |
+| PerplexityBot   | Perplexity   | `PerplexityBot`   | Search index + training      |
+| Bytespider      | ByteDance    | `Bytespider`      | Model training               |
+| Google-Extended | Google       | `Google-Extended` | Gemini training (NOT search) |
+| CCBot           | Common Crawl | `CCBot`           | Open dataset                 |
 
 **Key distinctions:**
+
 - Blocking `Google-Extended` prevents Gemini training use but does NOT affect Google Search indexing or AI Overviews (those use `Googlebot`)
 - Blocking `GPTBot` prevents OpenAI training but does NOT prevent ChatGPT from citing your content via browsing (`ChatGPT-User`)
 - ~3-5% of websites now use AI-specific robots.txt rules
 
 **Example — selective AI crawler blocking:**
+
 ```
 # Allow search indexing, block AI training crawlers
 User-agent: GPTBot
@@ -60,6 +63,7 @@ Allow: /
 **Recommendation:** Consider your AI visibility strategy before blocking. Being cited by AI systems drives brand awareness and referral traffic. Cross-reference the `seo-geo` skill for full AI visibility optimization.
 
 ### 2. Indexability
+
 - Canonical tags: self-referencing, no conflicts with noindex
 - Duplicate content: near-duplicates, parameter URLs, www vs non-www
 - Thin content: pages below minimum word counts per type
@@ -68,6 +72,7 @@ Allow: /
 - Index bloat: unnecessary pages consuming crawl budget
 
 ### 3. Security
+
 - HTTPS: enforced, valid SSL certificate, no mixed content
 - Security headers:
   - Content-Security-Policy (CSP)
@@ -78,6 +83,7 @@ Allow: /
 - HSTS preload: check preload list inclusion for high-security sites
 
 ### 4. URL Structure
+
 - Clean URLs: descriptive, hyphenated, no query parameters for content
 - Hierarchy: logical folder structure reflecting site architecture
 - Redirects: no chains (max 1 hop), 301 for permanent moves
@@ -85,6 +91,7 @@ Allow: /
 - Trailing slashes: consistent usage
 
 ### 5. Mobile Optimization
+
 - Responsive design: viewport meta tag, responsive CSS
 - Touch targets: minimum 48x48px with 8px spacing
 - Font size: minimum 16px base
@@ -92,6 +99,7 @@ Allow: /
 - Mobile-first indexing: Google indexes mobile version. **Mobile-first indexing is 100% complete as of July 5, 2024.** Google now crawls and indexes ALL websites exclusively with the mobile Googlebot user-agent.
 
 ### 6. Core Web Vitals
+
 - **LCP** (Largest Contentful Paint): target <2.5s
 - **INP** (Interaction to Next Paint): target <200ms
   - INP replaced FID on March 12, 2024. FID was fully removed from all Chrome tools (CrUX API, PageSpeed Insights, Lighthouse) on September 9, 2024. Do NOT reference FID anywhere.
@@ -100,11 +108,13 @@ Allow: /
 - Use PageSpeed Insights API or CrUX data if MCP available
 
 ### 7. Structured Data
+
 - Detection: JSON-LD (preferred), Microdata, RDFa
 - Validation against Google's supported types
 - See seo-schema skill for full analysis
 
 ### 8. JavaScript Rendering
+
 - Check if content visible in initial HTML vs requires JS
 - Identify client-side rendered (CSR) vs server-side rendered (SSR)
 - Flag SPA frameworks (React, Vue, Angular) that may cause indexing issues
@@ -122,6 +132,7 @@ Google updated its JavaScript SEO documentation in December 2025 with critical c
 **Best practice:** Serve critical SEO elements (canonical, meta robots, structured data, title, meta description) in the initial server-rendered HTML rather than relying on JavaScript injection.
 
 ### 9. IndexNow Protocol
+
 - Check if site supports IndexNow for Bing, Yandex, Naver
 - Supported by search engines other than Google
 - Recommend implementation for faster indexing on non-Google engines
@@ -131,20 +142,24 @@ Google updated its JavaScript SEO documentation in December 2025 with critical c
 ### Technical Score: XX/100
 
 ### Category Breakdown
-| Category | Status | Score |
-|----------|--------|-------|
-| Crawlability | ✅/⚠️/❌ | XX/100 |
-| Indexability | ✅/⚠️/❌ | XX/100 |
-| Security | ✅/⚠️/❌ | XX/100 |
-| URL Structure | ✅/⚠️/❌ | XX/100 |
-| Mobile | ✅/⚠️/❌ | XX/100 |
+
+| Category        | Status   | Score  |
+| --------------- | -------- | ------ |
+| Crawlability    | ✅/⚠️/❌ | XX/100 |
+| Indexability    | ✅/⚠️/❌ | XX/100 |
+| Security        | ✅/⚠️/❌ | XX/100 |
+| URL Structure   | ✅/⚠️/❌ | XX/100 |
+| Mobile          | ✅/⚠️/❌ | XX/100 |
 | Core Web Vitals | ✅/⚠️/❌ | XX/100 |
 | Structured Data | ✅/⚠️/❌ | XX/100 |
-| JS Rendering | ✅/⚠️/❌ | XX/100 |
+| JS Rendering    | ✅/⚠️/❌ | XX/100 |
 
 ### Critical Issues (fix immediately)
+
 ### High Priority (fix within 1 week)
+
 ### Medium Priority (fix within 1 month)
+
 ### Low Priority (backlog)
 
 ---
@@ -154,6 +169,7 @@ Google updated its JavaScript SEO documentation in December 2025 with critical c
 Voice search (Google Assistant, Siri, Alexa, Cortana) selects answers primarily from **Featured Snippets** and requires specific optimization signals.
 
 ### Key Facts
+
 - 90%+ of voice answers are read directly from Featured Snippets
 - 46% of voice searches have local intent
 - Voice results strongly favor pages with TTFB < 2s
@@ -161,17 +177,18 @@ Voice search (Google Assistant, Siri, Alexa, Cortana) selects answers primarily 
 
 ### Checklist
 
-| Check | Requirement | Pass Threshold |
-|-------|-------------|----------------|
-| Page speed | TTFB < 2s (critical — voice results heavily favor fast pages) | < 2000ms |
-| HTTPS | Required for voice results | Must be HTTPS |
-| Featured Snippet | Direct answer in first 40-55 words after H-tag | Present |
-| FAQ phrasing | H2/H3 phrased as natural language questions | ≥ 3 question H-tags |
-| Local schema | LocalBusiness with address, phone, hours (local intent queries) | If local business |
-| `speakable` schema | Marks top answer paragraphs for Google Assistant | Recommended |
-| Mobile accessibility | 100% accessible on mobile | Required |
+| Check                | Requirement                                                     | Pass Threshold      |
+| -------------------- | --------------------------------------------------------------- | ------------------- |
+| Page speed           | TTFB < 2s (critical — voice results heavily favor fast pages)   | < 2000ms            |
+| HTTPS                | Required for voice results                                      | Must be HTTPS       |
+| Featured Snippet     | Direct answer in first 40-55 words after H-tag                  | Present             |
+| FAQ phrasing         | H2/H3 phrased as natural language questions                     | ≥ 3 question H-tags |
+| Local schema         | LocalBusiness with address, phone, hours (local intent queries) | If local business   |
+| `speakable` schema   | Marks top answer paragraphs for Google Assistant                | Recommended         |
+| Mobile accessibility | 100% accessible on mobile                                       | Required            |
 
 ### `speakable` Schema Implementation
+
 ```json
 {
   "@context": "https://schema.org",
@@ -185,18 +202,19 @@ Voice search (Google Assistant, Siri, Alexa, Cortana) selects answers primarily 
 
 ### Voice Search by Platform
 
-| Platform | Index Source | Primary Optimization |
-|----------|-------------|---------------------|
-| **Google Assistant** | Google index | Featured Snippet ownership, TTFB < 2s, `speakable` |
-| **Siri** | Bing (Apple) | Bing Webmaster Tools submission, Featured Snippet on Bing |
-| **Alexa** | Bing | Featured Snippet, Bing indexed content |
-| **Cortana** | Bing | Featured Snippet, Bing Webmaster Tools |
+| Platform             | Index Source | Primary Optimization                                      |
+| -------------------- | ------------ | --------------------------------------------------------- |
+| **Google Assistant** | Google index | Featured Snippet ownership, TTFB < 2s, `speakable`        |
+| **Siri**             | Bing (Apple) | Bing Webmaster Tools submission, Featured Snippet on Bing |
+| **Alexa**            | Bing         | Featured Snippet, Bing indexed content                    |
+| **Cortana**          | Bing         | Featured Snippet, Bing Webmaster Tools                    |
 
 > **Note**: For Siri and Alexa, submit your site via **Bing Webmaster Tools** (separate from Google Search Console). Bing still powers major voice engines.
 
 ## Execution Plan
 
 When invoked as an agent, execute these steps:
+
 1. Run `scripts/robots_checker.py "$URL" --json` for crawlability and AI crawler rules.
 2. Run `scripts/security_headers.py "$URL" --json` for security posture.
 3. Run `scripts/redirect_checker.py "$URL" --json` to verify redirect chains.

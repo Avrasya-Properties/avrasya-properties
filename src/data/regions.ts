@@ -85,6 +85,7 @@ export const ISTANBUL_DISTRICTS = [
   "Göktürk",
   "Bomonti",
   "Zekeriyaköy",
+  "Ümraniye",
 ];
 
 export const DEFAULT_ISTANBUL_DISTRICT_DETAILS: DistrictDetail[] = [
@@ -129,14 +130,14 @@ export const DEFAULT_ISTANBUL_DISTRICT_DETAILS: DistrictDetail[] = [
     lifestyleInfo: "High-rise executive residences, international schools, modern parks",
   },
   {
-    name: "Ümraniye",
+    name: "Üsküdar",
     description:
-      "Rapidly appreciating Asian-side commercial and residential corridor bordering Ataşehir and Beykoz.",
-    neighborhoods: ["Çakmak", "Yamanevler", "Küçüksu", "Altınşehir", "Finanskent"],
-    coordinates: { lat: 41.0256, lng: 29.1164 },
-    nearbyFacilities: ["Oryapark", "Akyaka Park", "Buyaka Mall", "Çamlıca Hill"],
-    transportInfo: "M5 Driverless Metro, Şile Highway, FSM Bridge connection",
-    lifestyleInfo: "Gated family compounds, twin-tower residences, strong corporate rental yield",
+      "Historic Asian-side Bosphorus shoreline and hilltops featuring Çamlıca, Kandilli, and Kuzguncuk.",
+    neighborhoods: ["Çengelköy", "Kandilli", "Kuzguncuk", "Altunizade", "Çamlıca"],
+    coordinates: { lat: 41.0256, lng: 29.0153 },
+    nearbyFacilities: ["Çamlıca Tower", "Emaar Square Mall", "Capitol", "Kız Kulesi"],
+    transportInfo: "M5 Driverless Metro, Marmaray hub, 15 July Martyrs Bridge, Bosphorus ferries",
+    lifestyleInfo: "Bosphorus mansions, panoramic hilltop estates, historic waterfront villages",
   },
   {
     name: "Bakırköy",
@@ -287,6 +288,10 @@ export const REGION_PRESETS: Omit<Region, "sortOrder">[] = [
 ];
 
 export function defaultRegions(districts: readonly string[] = ISTANBUL_DISTRICTS): Region[] {
+  const details =
+    districts === ISTANBUL_DISTRICTS
+      ? DEFAULT_ISTANBUL_DISTRICT_DETAILS
+      : DEFAULT_ISTANBUL_DISTRICT_DETAILS.filter((d) => districts.includes(d.name));
   return [
     {
       slug: "istanbul",
@@ -298,7 +303,7 @@ export function defaultRegions(districts: readonly string[] = ISTANBUL_DISTRICTS
       heroImage: "",
       featured: true,
       districts: [...districts],
-      districtDetails: DEFAULT_ISTANBUL_DISTRICT_DETAILS,
+      ...(details.length ? { districtDetails: details } : {}),
       hasSides: true,
       published: true,
       sortOrder: 0,
@@ -400,7 +405,7 @@ export function normalizeRegions(value: unknown, legacyDistricts?: readonly stri
         ? (r["districts"] as unknown[]).map((d) => text(d, 80)).filter(Boolean)
         : [];
       const districts = [
-        ...new Set([...rawDistricts, ...districtDetails.map((d) => d.name)]),
+        ...new Set(rawDistricts.length > 0 ? rawDistricts : districtDetails.map((d) => d.name)),
       ].slice(0, 200);
 
       let coordinates: { lat: number; lng: number } | undefined = undefined;
@@ -449,11 +454,7 @@ export function normalizeRegions(value: unknown, legacyDistricts?: readonly stri
         ...(gallery?.length ? { gallery } : {}),
         ...(featured !== undefined ? { featured } : {}),
         districts,
-        ...(districtDetails.length
-          ? { districtDetails }
-          : slug === "istanbul"
-            ? { districtDetails: DEFAULT_ISTANBUL_DISTRICT_DETAILS }
-            : {}),
+        ...(districtDetails.length ? { districtDetails } : {}),
         hasSides: r["hasSides"] === true,
         published: r["published"] !== false,
         sortOrder: Number.isFinite(Number(r["sortOrder"])) ? Number(r["sortOrder"]) : out.length,

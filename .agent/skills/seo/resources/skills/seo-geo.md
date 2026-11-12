@@ -14,26 +14,26 @@ description: >
 
 ## Key Statistics
 
-| Metric | Value | Source |
-|--------|-------|--------|
-| AI Overviews reach | 1.5 billion users/month across 200+ countries | Google |
-| AI Overviews query coverage | 50%+ of all queries | Industry data |
-| AI-referred sessions growth | 527% (Jan-May 2025) | SparkToro |
-| ChatGPT weekly active users | 900 million | OpenAI |
-| Perplexity monthly queries | 500+ million | Perplexity |
+| Metric                      | Value                                         | Source        |
+| --------------------------- | --------------------------------------------- | ------------- |
+| AI Overviews reach          | 1.5 billion users/month across 200+ countries | Google        |
+| AI Overviews query coverage | 50%+ of all queries                           | Industry data |
+| AI-referred sessions growth | 527% (Jan-May 2025)                           | SparkToro     |
+| ChatGPT weekly active users | 900 million                                   | OpenAI        |
+| Perplexity monthly queries  | 500+ million                                  | Perplexity    |
 
 ## Critical Insight: Brand Mentions > Backlinks
 
 **Brand mentions correlate 3× more strongly with AI visibility than backlinks.**
 (Ahrefs December 2025 study of 75,000 brands)
 
-| Signal | Correlation with AI Citations |
-|--------|------------------------------|
-| YouTube mentions | ~0.737 (strongest) |
-| Reddit mentions | High |
-| Wikipedia presence | High |
-| LinkedIn presence | Moderate |
-| Domain Rating (backlinks) | ~0.266 (weak) |
+| Signal                    | Correlation with AI Citations |
+| ------------------------- | ----------------------------- |
+| YouTube mentions          | ~0.737 (strongest)            |
+| Reddit mentions           | High                          |
+| Wikipedia presence        | High                          |
+| LinkedIn presence         | Moderate                      |
+| Domain Rating (backlinks) | ~0.266 (weak)                 |
 
 **Only 11% of domains** are cited by both ChatGPT and Google AI Overviews for the same query — platform-specific optimization is essential.
 
@@ -46,6 +46,7 @@ description: >
 **Optimal passage length: 134-167 words** for AI citation.
 
 **Strong signals:**
+
 - Clear, quotable sentences with specific facts/statistics
 - Self-contained answer blocks (can be extracted without context)
 - Direct answer in first 40-60 words of section
@@ -54,6 +55,7 @@ description: >
 - Unique data points not found elsewhere
 
 **Weak signals:**
+
 - Vague, general statements
 - Opinion without evidence
 - Buried conclusions
@@ -64,6 +66,7 @@ description: >
 **92% of AI Overview citations come from top-10 ranking pages**, but 47% come from pages ranking below position 5 — demonstrating different selection logic.
 
 **Strong signals:**
+
 - Clean H1→H2→H3 heading hierarchy
 - Question-based headings (matches query patterns)
 - Short paragraphs (2-4 sentences)
@@ -72,6 +75,7 @@ description: >
 - FAQ sections with clear Q&A format
 
 **Weak signals:**
+
 - Wall of text with no structure
 - Inconsistent heading hierarchy
 - No lists or tables
@@ -82,6 +86,7 @@ description: >
 Content with multi-modal elements sees **156% higher selection rates**.
 
 **Check for:**
+
 - Text + relevant images
 - Video content (embedded or linked)
 - Infographics and charts
@@ -91,6 +96,7 @@ Content with multi-modal elements sees **156% higher selection rates**.
 ### 4. Authority & Brand Signals (20%)
 
 **Strong signals:**
+
 - Author byline with credentials
 - Publication date and last-updated date
 - Citations to primary sources (studies, official docs, data)
@@ -100,6 +106,7 @@ Content with multi-modal elements sees **156% higher selection rates**.
 - Mentions on Reddit, YouTube, LinkedIn
 
 **Weak signals:**
+
 - Anonymous authorship
 - No dates
 - No sources cited
@@ -110,6 +117,7 @@ Content with multi-modal elements sees **156% higher selection rates**.
 **AI crawlers do NOT execute JavaScript** — server-side rendering is critical.
 
 **Check for:**
+
 - Server-side rendering (SSR) vs client-only content
 - AI crawler access in robots.txt
 - llms.txt file presence and configuration
@@ -121,17 +129,17 @@ Content with multi-modal elements sees **156% higher selection rates**.
 
 Check `robots.txt` for these AI crawlers:
 
-| Crawler | Owner | Purpose |
-|---------|-------|---------|
-| GPTBot | OpenAI | ChatGPT web search |
-| OAI-SearchBot | OpenAI | OpenAI search features |
-| ChatGPT-User | OpenAI | ChatGPT browsing |
-| ClaudeBot | Anthropic | Claude web features |
-| PerplexityBot | Perplexity | Perplexity AI search |
-| CCBot | Common Crawl | Training data (often blocked) |
-| anthropic-ai | Anthropic | Claude training |
-| Bytespider | ByteDance | TikTok/Douyin AI |
-| cohere-ai | Cohere | Cohere models |
+| Crawler       | Owner        | Purpose                       |
+| ------------- | ------------ | ----------------------------- |
+| GPTBot        | OpenAI       | ChatGPT web search            |
+| OAI-SearchBot | OpenAI       | OpenAI search features        |
+| ChatGPT-User  | OpenAI       | ChatGPT browsing              |
+| ClaudeBot     | Anthropic    | Claude web features           |
+| PerplexityBot | Perplexity   | Perplexity AI search          |
+| CCBot         | Common Crawl | Training data (often blocked) |
+| anthropic-ai  | Anthropic    | Claude training               |
+| Bytespider    | ByteDance    | TikTok/Douyin AI              |
+| cohere-ai     | Cohere       | Cohere models                 |
 
 **Recommendation:** Allow GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot for AI search visibility. Block CCBot and training crawlers if desired.
 
@@ -144,6 +152,7 @@ The emerging **llms.txt** standard provides AI crawlers with structured content 
 **Location:** `/llms.txt` (root of domain)
 
 **Format:**
+
 ```
 # Title of site
 > Brief description
@@ -158,6 +167,7 @@ The emerging **llms.txt** standard provides AI crawlers with structured content 
 ```
 
 **Check for:**
+
 - Presence of `/llms.txt`
 - Structured content guidance
 - Key page highlights
@@ -177,12 +187,12 @@ New standard (December 2025) for machine-readable AI licensing terms.
 
 ## Platform-Specific Optimization
 
-| Platform | Key Citation Sources | Optimization Focus |
-|----------|---------------------|-------------------|
-| **Google AI Overviews** | Top-10 ranking pages (92%) | Traditional SEO + passage optimization |
-| **ChatGPT** | Wikipedia (47.9%), Reddit (11.3%) | Entity presence, authoritative sources |
-| **Perplexity** | Reddit (46.7%), Wikipedia | Community validation, discussions |
-| **Bing Copilot** | Bing index, authoritative sites | Bing SEO, IndexNow |
+| Platform                | Key Citation Sources              | Optimization Focus                     |
+| ----------------------- | --------------------------------- | -------------------------------------- |
+| **Google AI Overviews** | Top-10 ranking pages (92%)        | Traditional SEO + passage optimization |
+| **ChatGPT**             | Wikipedia (47.9%), Reddit (11.3%) | Entity presence, authoritative sources |
+| **Perplexity**          | Reddit (46.7%), Wikipedia         | Community validation, discussions      |
+| **Bing Copilot**        | Bing index, authoritative sites   | Bing SEO, IndexNow                     |
 
 ---
 
@@ -208,6 +218,7 @@ Generate `GEO-ANALYSIS.md` with:
 Google Passage Indexing (active since 2021) ranks individual passages independently from the full page. This is critical for long-form content and pairs well with GEO citability.
 
 ### Rules for Passage-Optimized Content
+
 1. **Self-contained sections**: Each H2 block should fully answer one clear question without requiring context from other sections
 2. **Optimal passage length**: 100-200 words per block (sweet spot for both passage indexing and AI citation)
 3. **Question-answer structure**: Use question-phrased H2/H3 followed by a direct answer in the first sentence
@@ -228,11 +239,11 @@ Google Passage Indexing (active since 2021) ranks individual passages independen
 
 ### Passage vs Full-Page Ranking
 
-| Scenario | Google Behavior |
-|----------|----------------|
-| Strong overall page, weak section | Full page ranks |
+| Scenario                                 | Google Behavior                                |
+| ---------------------------------------- | ---------------------------------------------- |
+| Strong overall page, weak section        | Full page ranks                                |
 | Weak overall page, one excellent section | That **passage** can rank for specific queries |
-| Long FAQ page with 20 questions | Individual Q&A passages rank independently |
+| Long FAQ page with 20 questions          | Individual Q&A passages rank independently     |
 
 ---
 

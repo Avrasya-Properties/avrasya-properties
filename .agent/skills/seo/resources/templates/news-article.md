@@ -1,9 +1,11 @@
 <!-- Updated: 2026-03-02 -->
+
 # News Article SEO Strategy Template
 
 ## Content Structure & Best Practices
 
 ### Essential Elements
+
 - **Headline**: Needs to be highly engaging and click-worthy. Focus on timeliness and relevance. Include primary keyword.
 - **Standfirst / Summary**: A short summary paragraph just below the headline.
 - **Lede**: The first paragraph must contain the most critical information (Who, what, when, where, why).
@@ -11,6 +13,7 @@
 - **Date/Time**: Extremely visible timestamps for when the article was published and last updated.
 
 ### Google News Specifics
+
 - **Timeliness**: Content must be fresh.
 - **Transparency**: Clear author bylines, contact info, and publication details.
 - **Originality**: Focus on original reporting, not syndication.
@@ -46,13 +49,15 @@ Must use `NewsArticle` schema. Highly recommended to use `Speakable` schema for 
     "https://example.com/photos/1x1/photo.jpg",
     "https://example.com/photos/4x3/photo.jpg",
     "https://example.com/photos/16x9/photo.jpg"
-   ],
+  ],
   "datePublished": "2026-03-02T08:00:00+08:00",
   "dateModified": "2026-03-02T09:30:00+08:00",
-  "author": [{
+  "author": [
+    {
       "@type": "Person",
       "name": "Jane Journalist",
       "url": "https://example.com/profile/jane-journalist"
-    }]
+    }
+  ]
 }
 ```

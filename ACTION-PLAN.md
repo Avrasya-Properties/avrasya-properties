@@ -51,22 +51,29 @@
    - Evidence: PageSpeed API returned an error, so CWV recommendations are less reliable.
    - Fix: Set `PAGESPEED_API_KEY` in your environment or `.env` file (see `.env.example`), then rerun. The CLI also accepts `--api-key`. Prioritize LCP/INP/CLS fixes from that output.
 10. **Missing sameAs link to Wikipedia (Primary KG signal).**
-   - Priority: `Info`
-   - Area: `sameAs`
-   - Evidence: See audit output.
-   - Fix: Add the existing official 'wikipedia.org' URL to sameAs; do not create this profile solely for SEO.
+
+- Priority: `Info`
+- Area: `sameAs`
+- Evidence: See audit output.
+- Fix: Add the existing official 'wikipedia.org' URL to sameAs; do not create this profile solely for SEO.
+
 11. **Missing sameAs link to Wikidata (Primary KG signal).**
-   - Priority: `Info`
-   - Area: `sameAs`
-   - Evidence: See audit output.
-   - Fix: Add the existing official 'wikidata.org' URL to sameAs; do not create this profile solely for SEO.
+
+- Priority: `Info`
+- Area: `sameAs`
+- Evidence: See audit output.
+- Fix: Add the existing official 'wikidata.org' URL to sameAs; do not create this profile solely for SEO.
+
 12. **Missing sameAs link to LinkedIn (Strong KG signal).**
-   - Priority: `Info`
-   - Area: `sameAs`
-   - Evidence: See audit output.
-   - Fix: Add 'linkedin.com' profile URL to sameAs array in your entity schema.
+
+- Priority: `Info`
+- Area: `sameAs`
+- Evidence: See audit output.
+- Fix: Add 'linkedin.com' profile URL to sameAs array in your entity schema.
+
 13. **Missing sameAs link to Twitter/X (Strong KG signal).**
-   - Priority: `Info`
-   - Area: `sameAs`
-   - Evidence: See audit output.
-   - Fix: Add 'x.com' profile URL to sameAs array in your entity schema.
+
+- Priority: `Info`
+- Area: `sameAs`
+- Evidence: See audit output.
+- Fix: Add 'x.com' profile URL to sameAs array in your entity schema.

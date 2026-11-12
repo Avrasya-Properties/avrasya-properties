@@ -48,58 +48,66 @@ Delay between requests: 1 second
 
 > **Source of truth**: `SKILL.md` Step 7. Update weights there first, then mirror here.
 
-| Category | Weight |
-|----------|--------|
-| Technical SEO | 25% |
-| Content Quality | 20% |
-| On-Page SEO | 15% |
-| Schema / Structured Data | 15% |
-| Performance (CWV) | 10% |
-| Images | 10% |
-| AI Search Readiness | 5% |
+| Category                 | Weight |
+| ------------------------ | ------ |
+| Technical SEO            | 25%    |
+| Content Quality          | 20%    |
+| On-Page SEO              | 15%    |
+| Schema / Structured Data | 15%    |
+| Performance (CWV)        | 10%    |
+| Images                   | 10%    |
+| AI Search Readiness      | 5%     |
 
 ## Report Structure
 
 ### Executive Summary
+
 - Overall SEO Health Score (0-100)
 - Business type detected
 - Top 5 critical issues
 - Top 5 quick wins
 
 ### Technical SEO
+
 - Crawlability issues
 - Indexability problems
 - Security concerns
 - Core Web Vitals status
 
 ### Content Quality
+
 - E-E-A-T assessment
 - Thin content pages
 - Duplicate content issues
 - Readability scores
 
 ### On-Page SEO
+
 - Title tag issues
 - Meta description problems
 - Heading structure
 - Internal linking gaps
 
 ### Schema & Structured Data
+
 - Current implementation
 - Validation errors
 - Missing opportunities
 
 ### Performance
+
 - LCP, INP, CLS scores
 - Resource optimization needs
 - Third-party script impact
 
 ### Images
+
 - Missing alt text
 - Oversized images
 - Format recommendations
 
 ### AI Search Readiness
+
 - Citability score
 - Structural improvements
 - Authority signals

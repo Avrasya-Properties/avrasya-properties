@@ -60,4 +60,3 @@ Curated, legally-verified Turkish luxury real estate paired with an end-to-end c
 - WCAG AA contrast standards across dark and neutral luxury palettes.
 - Multilingual readiness for international investor clientele.
 - Full keyboard navigation and ARIA semantics across custom interactive widgets (viewing scheduler, calculators, unit tables, and modals).
-

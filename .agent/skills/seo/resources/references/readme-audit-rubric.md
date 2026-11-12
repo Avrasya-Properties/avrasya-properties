@@ -1,4 +1,5 @@
 <!-- Updated: 2026-03-08 -->
+
 # README Audit Rubric (GitHub SEO + Conversion)
 
 Use this rubric to grade repository README quality for discoverability,
@@ -6,14 +7,14 @@ comprehension, and conversion.
 
 ## Scoring Categories (100 points)
 
-| Category | Weight | What Good Looks Like |
-|----------|--------|----------------------|
-| Opening Clarity | 20 | First section explains value, audience, and use case quickly |
-| Information Architecture | 20 | Logical headings, no major section gaps, easy scan flow |
-| Install + Quickstart | 20 | Minimal runnable path, explicit prerequisites, copy-paste steps |
-| Proof + Credibility | 15 | Examples, outputs, screenshots, constraints, version context |
-| CTA + Community | 15 | Contribute/report/support guidance and clear next actions |
-| Readability + Accessibility | 10 | Clean heading hierarchy, descriptive links, image alt text |
+| Category                    | Weight | What Good Looks Like                                            |
+| --------------------------- | ------ | --------------------------------------------------------------- |
+| Opening Clarity             | 20     | First section explains value, audience, and use case quickly    |
+| Information Architecture    | 20     | Logical headings, no major section gaps, easy scan flow         |
+| Install + Quickstart        | 20     | Minimal runnable path, explicit prerequisites, copy-paste steps |
+| Proof + Credibility         | 15     | Examples, outputs, screenshots, constraints, version context    |
+| CTA + Community             | 15     | Contribute/report/support guidance and clear next actions       |
+| Readability + Accessibility | 10     | Clean heading hierarchy, descriptive links, image alt text      |
 
 ## Mandatory Checks
 

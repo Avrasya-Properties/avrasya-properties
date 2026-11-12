@@ -148,10 +148,7 @@
           "name": "[Author Name]",
           "url": "[Profile URL]",
           "description": "[Author bio and expertise summary]",
-          "sameAs": [
-            "[Twitter URL]",
-            "[LinkedIn URL]"
-          ]
+          "sameAs": ["[Twitter URL]", "[LinkedIn URL]"]
         }
       }
     },
@@ -286,12 +283,7 @@
           "contactType": "customer service",
           "availableLanguage": ["English"]
         },
-        "sameAs": [
-          "[Facebook URL]",
-          "[Twitter URL]",
-          "[LinkedIn URL]",
-          "[Instagram URL]"
-        ]
+        "sameAs": ["[Facebook URL]", "[Twitter URL]", "[LinkedIn URL]", "[Instagram URL]"]
       }
     },
     {

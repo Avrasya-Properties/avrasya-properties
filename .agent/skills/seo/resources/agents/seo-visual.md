@@ -16,10 +16,10 @@ pip install playwright && playwright install chromium
 
 ## Available Scripts
 
-| Script | Purpose | Command |
-|--------|---------|---------|
+| Script                  | Purpose                                | Command                               |
+| ----------------------- | -------------------------------------- | ------------------------------------- |
 | `capture_screenshot.py` | Browser screenshots (desktop + mobile) | `python3 capture_screenshot.py <url>` |
-| `analyze_visual.py` | Visual + DOM comparison analysis | `python3 analyze_visual.py <url>` |
+| `analyze_visual.py`     | Visual + DOM comparison analysis       | `python3 analyze_visual.py <url>`     |
 
 ## When Analyzing Pages
 
@@ -32,26 +32,26 @@ pip install playwright && playwright install chromium
 
 ## Viewports to Test
 
-| Device | Width | Height | Use Case |
-|--------|-------|--------|----------|
-| Desktop (Full HD) | 1920 | 1080 | Standard desktop |
-| Laptop | 1366 | 768 | Most common laptop |
-| Tablet (Portrait) | 768 | 1024 | iPad |
-| Tablet (Landscape) | 1024 | 768 | iPad landscape |
-| Mobile (iPhone) | 375 | 812 | iPhone X/11/12/13/14 |
-| Mobile (Android) | 360 | 800 | Most Android devices |
+| Device             | Width | Height | Use Case             |
+| ------------------ | ----- | ------ | -------------------- |
+| Desktop (Full HD)  | 1920  | 1080   | Standard desktop     |
+| Laptop             | 1366  | 768    | Most common laptop   |
+| Tablet (Portrait)  | 768   | 1024   | iPad                 |
+| Tablet (Landscape) | 1024  | 768    | iPad landscape       |
+| Mobile (iPhone)    | 375   | 812    | iPhone X/11/12/13/14 |
+| Mobile (Android)   | 360   | 800    | Most Android devices |
 
 ## Above-the-Fold Analysis
 
 ### Critical Elements (must be visible without scrolling)
 
-| Element | Why | Check |
-|---------|-----|-------|
-| H1 heading | First impression + keyword signal | Visible in first viewport |
-| Primary CTA | Conversion path | Visible and actionable |
-| Hero image/content | Visual engagement | Loaded, not placeholder |
-| Navigation | Usability | Accessible (visible or hamburger) |
-| Brand/logo | Trust signal | Visible, properly sized |
+| Element            | Why                               | Check                             |
+| ------------------ | --------------------------------- | --------------------------------- |
+| H1 heading         | First impression + keyword signal | Visible in first viewport         |
+| Primary CTA        | Conversion path                   | Visible and actionable            |
+| Hero image/content | Visual engagement                 | Loaded, not placeholder           |
+| Navigation         | Usability                         | Accessible (visible or hamburger) |
+| Brand/logo         | Trust signal                      | Visible, properly sized           |
 
 ### Above-Fold Anti-patterns
 
@@ -75,22 +75,24 @@ pip install playwright && playwright install chromium
 ## Visual Issues to Flag
 
 ### Layout Problems
-| Issue | Severity | Impact |
-|-------|----------|--------|
-| Overlapping elements | High | Content unreadable |
-| Text overflow/cutoff | High | Content loss |
-| Broken grid layout | Medium | Poor UX |
-| Images not scaling | Medium | Display issues |
-| White space gaps | Low | Aesthetic |
+
+| Issue                | Severity | Impact             |
+| -------------------- | -------- | ------------------ |
+| Overlapping elements | High     | Content unreadable |
+| Text overflow/cutoff | High     | Content loss       |
+| Broken grid layout   | Medium   | Poor UX            |
+| Images not scaling   | Medium   | Display issues     |
+| White space gaps     | Low      | Aesthetic          |
 
 ### Image SEO Checks
-| Check | Requirement | SEO Impact |
-|-------|-------------|------------|
-| Format | WebP or AVIF preferred | Page speed |
-| Alt text | Descriptive, keyword-relevant | Accessibility + image search |
-| Dimensions | Explicit `width`/`height` | CLS prevention |
-| Lazy loading | `loading="lazy"` for below-fold | LCP improvement |
-| Responsive | `srcset` for multiple sizes | Mobile performance |
+
+| Check        | Requirement                     | SEO Impact                   |
+| ------------ | ------------------------------- | ---------------------------- |
+| Format       | WebP or AVIF preferred          | Page speed                   |
+| Alt text     | Descriptive, keyword-relevant   | Accessibility + image search |
+| Dimensions   | Explicit `width`/`height`       | CLS prevention               |
+| Lazy loading | `loading="lazy"` for below-fold | LCP improvement              |
+| Responsive   | `srcset` for multiple sizes     | Mobile performance           |
 
 ## SSR vs CSR DOM Diff
 
@@ -106,11 +108,11 @@ For JavaScript rendering audit:
    - JSON-LD schema — present in source?
    - Main content text — visible in raw HTML?
 
-| Result | Severity | Action |
-|--------|----------|--------|
-| Critical SEO elements JS-only | Critical | Implement SSR/SSG |
-| Content partially JS-dependent | Warning | Add `<noscript>` fallbacks |
-| All elements in source HTML | Pass | No action needed |
+| Result                         | Severity | Action                     |
+| ------------------------------ | -------- | -------------------------- |
+| Critical SEO elements JS-only  | Critical | Implement SSR/SSG          |
+| Content partially JS-dependent | Warning  | Add `<noscript>` fallbacks |
+| All elements in source HTML    | Pass     | No action needed           |
 
 ## Screenshot Workflow
 
@@ -129,6 +131,7 @@ def capture(url, output_path, width=1920, height=1080):
 ## Output Format
 
 Provide:
+
 - Screenshots saved to `screenshots/` directory
 - Visual analysis summary with pass/fail per viewport
 - Mobile responsiveness assessment
