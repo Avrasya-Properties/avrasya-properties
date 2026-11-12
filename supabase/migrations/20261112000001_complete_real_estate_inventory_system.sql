@@ -246,6 +246,9 @@ begin
     if jsonb_typeof(p_data->'gallery_images') <> 'array' or jsonb_array_length(p_data->'gallery_images') > 60 then
       raise exception 'Use up to 60 gallery photos';
     end if;
+    if exists(select 1 from jsonb_array_elements_text(p_data->'gallery_images') value where length(value) > 2048 or value !~ '^(https://|/images/)[^[:space:]]+$') then
+      raise exception 'Use valid image links';
+    end if;
     r.source_record = jsonb_set(
       coalesce(r.source_record, '{}'),
       '{details}',
@@ -254,6 +257,9 @@ begin
   end if;
 
   if p_data ? 'floor_plan' then
+    if p_data->>'floor_plan' is not null and (length(p_data->>'floor_plan') > 2048 or p_data->>'floor_plan' !~ '^(https://|/images/)[^[:space:]]+$') then
+      raise exception 'Use a valid floor plan image link';
+    end if;
     r.source_record = jsonb_set(
       coalesce(r.source_record, '{}'),
       '{details}',
@@ -264,6 +270,9 @@ begin
   if p_data ? 'highlights' then
     if jsonb_typeof(p_data->'highlights') <> 'array' or jsonb_array_length(p_data->'highlights') > 50 then
       raise exception 'Use up to 50 property highlights';
+    end if;
+    if exists(select 1 from jsonb_array_elements(p_data->'highlights') value where jsonb_typeof(value) <> 'string' or length(value#>>'{}') > 300) then
+      raise exception 'Use text highlights under 300 characters';
     end if;
     r.source_record = jsonb_set(
       coalesce(r.source_record, '{}'),

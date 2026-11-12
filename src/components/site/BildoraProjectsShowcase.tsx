@@ -8,6 +8,7 @@ import { useCatalogue } from "@/data/live";
 
 export interface BildoraProjectsShowcaseProps {
   properties?: PropertyRecord[];
+  collectionHeading?: string | undefined;
 }
 
 export interface ShowcaseProject {
@@ -70,6 +71,7 @@ const DEFAULT_SHOWCASE_PROJECTS: ShowcaseProject[] = [
 
 export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = ({
   properties: propProperties,
+  collectionHeading,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIdxRef = useRef(0);
@@ -324,7 +326,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
           className="flex w-full flex-col items-center justify-center gap-[16px]"
         >
           <h2 className="max-w-[780px] text-[28px] font-normal leading-[1.1] tracking-[0em] text-white sm:text-[36px] lg:text-[44px]">
-            {renderHeaderWords("Built with Purpose. Made to Last.")}
+            {renderHeaderWords(collectionHeading || "Built with Purpose. Made to Last.")}
           </h2>
           <p className="max-w-[564px] text-[14px] font-normal leading-[1.45] text-white/85 sm:text-[15px]">
             {renderHeaderWords(

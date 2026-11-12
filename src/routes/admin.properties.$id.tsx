@@ -858,7 +858,7 @@ function Editor() {
                         <button
                           type="button"
                           key={preset.url}
-                          onClick={() => f("cover", preset.url)}
+                          onClick={() => setCover(preset.url)}
                           className={`group relative overflow-hidden rounded-md border text-left transition-all ${
                             d.cover === preset.url
                               ? "ring-2 ring-brass border-brass"

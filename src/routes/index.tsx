@@ -1,5 +1,5 @@
 import { ManagedPage } from "@/components/site/ManagedPage";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "@/hooks/useLanguage";
 import { type PropertyRecord } from "@/data/properties";
 import { MotionRoot } from "@/components/site/Motion";
@@ -142,28 +142,48 @@ function HomeCollection({
         showActionButtons={true}
       />
 
-      {/* Network Loading / Error Handling */}
-      {loading ? (
-        <div
-          role="status"
-          className="container-site py-8 text-center text-sm text-muted-foreground"
-        >
-          {t.common.loading}
-        </div>
-      ) : unavailable ? (
-        <div role="alert" className="container-site py-8 text-center">
-          <p className="text-sm text-foreground">{t.common.error}</p>
-          <button onClick={retry} className="btn btn-outline mt-3 text-xs">
-            {t.common.retry}
-          </button>
-        </div>
-      ) : null}
-
       {/* REGIONS SECTION (Restored: Istanbul, Antalya, Bodrum, Sakarya with sticky interactive photo preview) */}
       <RegionShowcase regions={regions} properties={properties} />
 
       {/* REFERENCE 3 – SECTION BEFORE THE FOOTER (Bildora Dark Projects Pinned Scroll Showcase) */}
-      <BildoraProjectsShowcase properties={properties} />
+      <div data-home-collection>
+        {loading ? (
+          <div
+            role="status"
+            className="container-site py-8 text-center text-sm text-muted-foreground"
+          >
+            {t.common.loading}
+          </div>
+        ) : unavailable ? (
+          <div role="alert" className="container-site py-8 text-center">
+            <p className="text-sm text-foreground">{t.common.error}</p>
+            <button onClick={retry} className="btn btn-outline mt-3 text-xs">
+              {t.common.retry}
+            </button>
+          </div>
+        ) : properties.length === 0 ? (
+          <div
+            data-empty-collection
+            className="container-site py-6 text-center text-xs text-muted-foreground"
+          >
+            Curated property listings are being updated.
+          </div>
+        ) : null}
+
+        <BildoraProjectsShowcase
+          properties={properties}
+          collectionHeading={
+            typeof settings.websiteDesign?.["collectionHeading"] === "string" &&
+            settings.websiteDesign["collectionHeading"].trim()
+              ? (settings.websiteDesign["collectionHeading"] as string)
+              : undefined
+          }
+        />
+
+        <Link to="/calculator" className="sr-only">
+          Investment Calculator
+        </Link>
+      </div>
 
       {/* PARTNERS & REFERENCES SECTION (White logos cycling left on primary Avrasya green background) */}
       <PartnersSection partners={settings.partners} />

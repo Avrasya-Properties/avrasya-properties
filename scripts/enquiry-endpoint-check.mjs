@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 const source = await readFile("supabase/functions/submit-enquiry/index.ts", "utf8");
-const key = source.match(/const projectKey=("(?:[^"\\]|\\.)*");/)[1];
+const key = source.match(/const projectKey\s*=\s*("(?:[^"\\]|\\.)*");/)[1];
 const publishable = JSON.parse(key);
 let handler;
 let calls = [];
