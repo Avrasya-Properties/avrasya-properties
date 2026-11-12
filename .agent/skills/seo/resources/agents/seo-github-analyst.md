@@ -25,21 +25,25 @@ into an execution-prioritized optimization plan.
 ## Analysis Model
 
 ### Discovery Layer
+
 - Repository name and description intent-match.
 - Topic completeness and relevance.
 - Query-level visibility benchmark.
 
 ### Conversion Layer
+
 - README opening clarity and value proposition.
 - Install clarity and capability proof.
 - CTA quality (star, usage, contribution paths).
 
 ### Trust Layer
+
 - Community profile completeness.
 - Governance assets and citation readiness.
 - Release freshness and project maintenance signals.
 
 ### Measurement Layer
+
 - Snapshot freshness and trend continuity.
 - Adequacy of archived traffic history.
 

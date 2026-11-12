@@ -4,6 +4,8 @@ import { tr } from "./locales/tr";
 import { ar } from "./locales/ar";
 import { ru } from "./locales/ru";
 import { fa } from "./locales/fa";
+import { zh } from "./locales/zh";
+import { bn } from "./locales/bn";
 
 export * from "./types";
 
@@ -13,6 +15,8 @@ export const LOCALES: LocaleConfig[] = [
   { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦", dir: "rtl" },
   { code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺", dir: "ltr" },
   { code: "fa", name: "Persian", nativeName: "فارسی", flag: "🇮🇷", dir: "rtl" },
+  { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳", dir: "ltr" },
+  { code: "bn", name: "Bengali", nativeName: "বাংলা", flag: "🇧🇩", dir: "ltr" },
 ];
 
 export const TRANSLATIONS: Record<Locale, AppTranslations> = {
@@ -21,6 +25,8 @@ export const TRANSLATIONS: Record<Locale, AppTranslations> = {
   ar,
   ru,
   fa,
+  zh,
+  bn,
 };
 
 export const DEFAULT_LOCALE: Locale = "en";

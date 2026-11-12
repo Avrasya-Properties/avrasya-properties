@@ -1,4 +1,5 @@
 <!-- Updated: 2026-02-07 -->
+
 # Google SEO Quick Reference (February 2026)
 
 Concise reference guide for subagents. Summarizes key Google Search concepts,
@@ -18,12 +19,14 @@ Google Search operates in three stages: **Crawling** (Googlebot discovers pages 
 Formerly known as "Webmaster Guidelines." Key requirements:
 
 ### Technical Requirements
+
 - Pages must be accessible to Googlebot (not blocked by robots.txt or noindex)
 - Pages must return HTTP 200 status for indexable content
 - Content must be in a format Google can process (HTML preferred, JS-rendered content supported but slower)
 - Pages must be served over HTTPS
 
 ### Spam Policies
+
 - No cloaking (showing different content to Googlebot vs users)
 - No doorway pages (pages created solely to rank for specific queries)
 - No hidden text or links
@@ -34,6 +37,7 @@ Formerly known as "Webmaster Guidelines." Key requirements:
 - No thin affiliate pages
 
 ### Key Best Practices
+
 - Create content for users, not search engines
 - Make your site easy to navigate with a clear hierarchy
 - Use descriptive, unique titles and meta descriptions per page
@@ -65,19 +69,21 @@ Google evaluates content quality through the E-E-A-T framework:
 
 Measured at the 75th percentile of real user data (field data).
 
-| Metric | Good | Needs Improvement | Poor |
-|--------|------|-------------------|------|
-| **LCP** (Largest Contentful Paint) | ≤ 2.5s | 2.5s – 4.0s | > 4.0s |
-| **INP** (Interaction to Next Paint) | ≤ 200ms | 200ms – 500ms | > 500ms |
-| **CLS** (Cumulative Layout Shift) | ≤ 0.1 | 0.1 – 0.25 | > 0.25 |
+| Metric                              | Good    | Needs Improvement | Poor    |
+| ----------------------------------- | ------- | ----------------- | ------- |
+| **LCP** (Largest Contentful Paint)  | ≤ 2.5s  | 2.5s – 4.0s       | > 4.0s  |
+| **INP** (Interaction to Next Paint) | ≤ 200ms | 200ms – 500ms     | > 500ms |
+| **CLS** (Cumulative Layout Shift)   | ≤ 0.1   | 0.1 – 0.25        | > 0.25  |
 
 **Key facts:**
+
 - INP replaced FID (First Input Delay) on March 12, 2024. FID was fully removed from all Chrome tools (CrUX API, PageSpeed Insights, Lighthouse) on September 9, 2024. Do NOT reference FID.
 - Core Web Vitals are a confirmed ranking signal (since June 2021)
 - Field data (CrUX) is preferred over lab data (Lighthouse) for assessment
 - Passing all three metrics at "Good" is the target
 
 **Measurement tools:**
+
 - Google PageSpeed Insights (field + lab data)
 - Chrome User Experience Report (CrUX) — field data
 - Lighthouse (lab data only)
@@ -98,6 +104,7 @@ Measured at the 75th percentile of real user data (field data).
 - Keep schema current — update when page content changes
 
 ### Deprecated/Restricted Types (as of Feb 2026)
+
 - **HowTo**: Rich results removed (September 2023)
 - **FAQ**: Restricted to government and healthcare authority sites (August 2023)
 - **SpecialAnnouncement**: Deprecated (July 31, 2025)
@@ -110,7 +117,9 @@ Measured at the 75th percentile of real user data (field data).
 ## Common Penalties & How to Avoid Them
 
 ### Manual Actions
+
 Google Search Console notifications for violations. Common causes:
+
 - **Unnatural links** (buying/selling links): Disavow bad links, request reconsideration
 - **Thin content**: Add substantial unique value to affected pages
 - **Cloaking/sneaky redirects**: Remove deceptive serving, request reconsideration
@@ -118,13 +127,16 @@ Google Search Console notifications for violations. Common causes:
 - **Structured data issues**: Fix misleading or spam markup
 
 ### Algorithmic Demotions
+
 No manual notification — detected through ranking drops. Common causes:
+
 - **Helpful Content System**: Merged into Google's core ranking in March 2024 — no longer a standalone system. Helpfulness signals are now evaluated within every core update. Low-value, AI-generated, or unhelpful content at scale still triggers demotions via core updates.
 - **Core Updates**: Broad quality reassessment across all signals
 - **Spam Updates**: Automated detection of spam patterns
 - **Link Spam Updates**: Devaluation of manipulative link patterns
 
 ### Recovery Steps
+
 1. Identify the issue (Search Console, ranking timeline analysis)
 2. Fix the root cause (remove spam, improve content, clean links)
 3. For manual actions: submit reconsideration request via Search Console

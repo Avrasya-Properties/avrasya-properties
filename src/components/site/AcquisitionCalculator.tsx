@@ -16,8 +16,8 @@ import {
   ShieldCheck,
   TrendingUp,
 } from "lucide-react";
-import {useSiteSettings} from "@/admin/store";
-import { useCurrency,useLiveRates } from "@/hooks/usePreferences";
+import { useSiteSettings } from "@/admin/store";
+import { useCurrency, useLiveRates } from "@/hooks/usePreferences";
 
 export function AcquisitionCalculator() {
   const { t } = useTranslation();
@@ -28,7 +28,8 @@ export function AcquisitionCalculator() {
   const [copied, setCopied] = useState<boolean>(false);
   const [currency] = useCurrency();
 
-  const {rates}=useLiveRates();const settings=useSiteSettings();
+  const { rates } = useLiveRates();
+  const settings = useSiteSettings();
   const currentRate = rates[currency] || 1;
   const currencySymbol =
     currency === "USD" ? "$" : currency === "EUR" ? "€" : currency === "TRY" ? "₺" : "£";
@@ -69,7 +70,7 @@ Title Deed Tax (Tapu Harcı ${tapuRate * 100}%): $${tapuFeeUsd.toLocaleString()}
 VAT Exemption (Law No. 3065): ${vatExempt ? "0% (Exempt)" : "1% ($" + vatUsd.toLocaleString() + " USD)"}
 SPK Valuation & Appraisal: $${spkValuationUsd.toLocaleString()} USD
 Notary & DAB Certificate: $${notaryDabUsd.toLocaleString()} USD
-Independent Legal Due Diligence: $${legalFeeUsd.toLocaleString()} USD
+In-House Attorney Due Diligence: $${legalFeeUsd.toLocaleString()} USD
 TOTAL ALL-IN CAPITAL: $${allInAcquisitionUsd.toLocaleString()} USD
 Citizenship advisory target: ${isCbiQualified ? "Target reached; eligibility unverified" : "Deficit: $" + cbiDeficitUsd.toLocaleString() + " USD"}
 Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${monthlyRentalUsd.toLocaleString()}/mo)`;
@@ -282,9 +283,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
 
               <div className="mt-3 text-xs leading-relaxed">
                 {isCbiQualified ? (
-                  <p className="text-emerald-900 font-medium">
-                    {t.calculator.cbiExceeds}
-                  </p>
+                  <p className="text-emerald-900 font-medium">{t.calculator.cbiExceeds}</p>
                 ) : (
                   <p className="text-muted-foreground">
                     {t.calculator.cbiShortfall}: ${cbiDeficitUsd.toLocaleString("en-US")} USD
@@ -305,7 +304,9 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               <div className="mt-4 divide-y divide-border/60 text-sm">
                 {/* 1. Base Price */}
                 <div className="py-2.5 flex items-center justify-between">
-                  <span className="font-medium text-foreground">{t.calculator.propertyPriceLabel}</span>
+                  <span className="font-medium text-foreground">
+                    {t.calculator.propertyPriceLabel}
+                  </span>
                   <span className="font-mono font-semibold text-foreground">
                     ${priceUsd.toLocaleString("en-US")}
                   </span>
@@ -315,9 +316,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 <div className="py-2.5 flex items-center justify-between">
                   <div>
                     <p className="text-foreground">{t.calculator.tapuDeedTax}</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">
-                      {tapuRate * 100}%
-                    </p>
+                    <p className="text-[10px] text-muted-foreground font-mono">{tapuRate * 100}%</p>
                   </div>
                   <span className="font-mono font-semibold text-foreground">
                     ${tapuFeeUsd.toLocaleString("en-US")}
@@ -411,9 +410,15 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                     {t.calculator.estimatedNetRentAnnual}
                   </p>
                   <p className="font-mono text-base font-semibold text-brass mt-0.5">
-                    ${threeYearRentalUsd.toLocaleString("en-US")}
+                    ${annualRentalUsd.toLocaleString("en-US")}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">3-Yr Cumulative</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Per Year · 3-Yr: ${threeYearRentalUsd.toLocaleString("en-US")}
+                  </p>
+                  <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
+                    Estimates only, based on the assumptions shown. Not an offer, valuation or
+                    guarantee of return.
+                  </p>
                 </div>
               </div>
             </div>

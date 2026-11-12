@@ -20,11 +20,11 @@ Email sending was confirmed unconfigured by the owner. Do not claim that any liv
 
 Configure these **Supabase Edge Function secrets**, never frontend VITE variables or Git:
 
-| Secret | Value |
-| --- | --- |
-| RESEND_API_KEY | Key for the application's email provider |
+| Secret          | Value                                      |
+| --------------- | ------------------------------------------ |
+| RESEND_API_KEY  | Key for the application's email provider   |
 | ADMIN_MAIL_FROM | Sender address verified with that provider |
-| ADMIN_SITE_URL | Exact published HTTPS website URL |
+| ADMIN_SITE_URL  | Exact published HTTPS website URL          |
 
 The owner selected “Custom domain” but did not provide its address. Never infer the domain from the admin email. Recovery returns a clear setup error until all three values exist. If another provider is preferred, replace the small server-side `send` adapter before configuring it.
 

@@ -18,24 +18,25 @@ When given content to analyze:
 
 ## Available Scripts
 
-| Script | Purpose | Command |
-|--------|---------|---------|
-| `article_seo.py` | Article extraction, readability, SEO issues | `python3 article_seo.py <url> --json` |
-| `entity_checker.py` | Entity presence, sameAs, Knowledge Graph | `python3 entity_checker.py <url> --json` |
-| `competitor_gap.py` | Content gap analysis vs competitors | `python3 competitor_gap.py <url> --competitor <url> --json` |
+| Script              | Purpose                                     | Command                                                     |
+| ------------------- | ------------------------------------------- | ----------------------------------------------------------- |
+| `article_seo.py`    | Article extraction, readability, SEO issues | `python3 article_seo.py <url> --json`                       |
+| `entity_checker.py` | Entity presence, sameAs, Knowledge Graph    | `python3 entity_checker.py <url> --json`                    |
+| `competitor_gap.py` | Content gap analysis vs competitors         | `python3 competitor_gap.py <url> --competitor <url> --json` |
 
 ## E-E-A-T Scoring
 
-| Factor | Weight | What to Look For |
-|--------|--------|-----------------|
-| Experience | 20% | First-hand signals, original content, case studies, screenshots, personal anecdotes |
-| Expertise | 25% | Author credentials, technical accuracy, depth of explanation, citations |
-| Authoritativeness | 25% | External recognition, citations from others, publication reputation, awards |
-| Trustworthiness | 30% | Contact info, about page, privacy policy, HTTPS, editorial standards disclosure |
+| Factor            | Weight | What to Look For                                                                    |
+| ----------------- | ------ | ----------------------------------------------------------------------------------- |
+| Experience        | 20%    | First-hand signals, original content, case studies, screenshots, personal anecdotes |
+| Expertise         | 25%    | Author credentials, technical accuracy, depth of explanation, citations             |
+| Authoritativeness | 25%    | External recognition, citations from others, publication reputation, awards         |
+| Trustworthiness   | 30%    | Contact info, about page, privacy policy, HTTPS, editorial standards disclosure     |
 
 ### E-E-A-T Evidence Signals (what to check)
 
 **Experience (20%)**
+
 - [ ] Author byline with real name
 - [ ] First-person language ("I tested...", "In my experience...")
 - [ ] Original screenshots, photos, or data
@@ -43,6 +44,7 @@ When given content to analyze:
 - [ ] Author bio page with credentials linked
 
 **Expertise (25%)**
+
 - [ ] Technical claims are accurate and current
 - [ ] Citations to primary sources (not just other blogs)
 - [ ] Appropriate depth for the topic
@@ -50,6 +52,7 @@ When given content to analyze:
 - [ ] Content demonstrates practical knowledge
 
 **Authoritativeness (25%)**
+
 - [ ] Site is recognized in its niche
 - [ ] External sites link to/cite this content
 - [ ] Author is published elsewhere in the field
@@ -57,6 +60,7 @@ When given content to analyze:
 - [ ] Social proof present (testimonials, press mentions)
 
 **Trustworthiness (30%)**
+
 - [ ] Contact information visible and valid
 - [ ] About page with real people and company info
 - [ ] Privacy policy and terms of service present
@@ -66,27 +70,28 @@ When given content to analyze:
 
 ## Content Minimums
 
-| Page Type | Min Words | Notes |
-|-----------|-----------|-------|
-| Homepage | 500 | Hero + value proposition + key content |
-| Service page | 800 | Description + process + benefits + FAQ |
-| Blog post | 1,500 | Deep topical coverage |
-| Product page | 300+ | 400+ for complex products, UGC helps |
-| Location page | 500-600 | Unique local content required |
-| Pillar page | 3,000-5,000 | Comprehensive topic overview |
+| Page Type     | Min Words   | Notes                                  |
+| ------------- | ----------- | -------------------------------------- |
+| Homepage      | 500         | Hero + value proposition + key content |
+| Service page  | 800         | Description + process + benefits + FAQ |
+| Blog post     | 1,500       | Deep topical coverage                  |
+| Product page  | 300+        | 400+ for complex products, UGC helps   |
+| Location page | 500-600     | Unique local content required          |
+| Pillar page   | 3,000-5,000 | Comprehensive topic overview           |
 
 > **Note:** These are topical coverage floors, not targets. Google confirms word count is NOT a direct ranking factor. The goal is comprehensive topical coverage.
 
 ## Readability Targets
 
-| Metric | Target | Tool |
-|--------|--------|------|
-| Flesch Reading Ease | 60-70 (standard) | `article_seo.py --json` |
+| Metric               | Target            | Tool                    |
+| -------------------- | ----------------- | ----------------------- |
+| Flesch Reading Ease  | 60-70 (standard)  | `article_seo.py --json` |
 | Flesch-Kincaid Grade | 7-9 (high school) | `article_seo.py --json` |
-| Sentence length | <25 words avg | Manual check |
-| Paragraph length | <4 sentences | Visual inspection |
+| Sentence length      | <25 words avg     | Manual check            |
+| Paragraph length     | <4 sentences      | Visual inspection       |
 
 Adjust targets by audience:
+
 - Academic/technical: FK Grade 10-12 acceptable
 - Consumer/general: FK Grade 6-8 ideal
 - Children/education: FK Grade 4-6
@@ -94,6 +99,7 @@ Adjust targets by audience:
 ## AI Content Assessment (Sept 2025 QRG)
 
 AI content is acceptable IF it demonstrates genuine E-E-A-T. Flag these markers of low-quality AI content:
+
 - Generic phrasing, lack of specificity
 - No original insight or unique perspective
 - No first-hand experience signals
@@ -107,6 +113,7 @@ AI content is acceptable IF it demonstrates genuine E-E-A-T. Flag these markers 
 ## AEO Content Requirements
 
 For Answer Engine Optimization (Featured Snippets, PAA):
+
 - Direct answer in first 40-55 words after matching H2/H3
 - Question-phrased H2/H3 tags for PAA targeting
 - `<ol>`/`<ul>` lists with 5-9 items for list snippets
@@ -116,6 +123,7 @@ For Answer Engine Optimization (Featured Snippets, PAA):
 ## GEO Content Requirements
 
 For AI citation and AI Overview inclusion:
+
 - Clear, quotable factual statements (not opinions)
 - Structured data (`Article`, `FAQPage` if eligible, `speakable`)
 - Brand mentions with consistent entity naming
@@ -130,6 +138,7 @@ For AI citation and AI Overview inclusion:
 ## Output Format
 
 Provide:
+
 - Content quality score (0-100) using chain-of-thought scoring from `llm-audit-rubric.md`
 - E-E-A-T breakdown with scores per factor
 - Readability metrics

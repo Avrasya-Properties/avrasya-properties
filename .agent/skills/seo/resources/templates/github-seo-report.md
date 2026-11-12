@@ -1,4 +1,5 @@
 <!-- Updated: 2026-03-08 -->
+
 # GitHub SEO Report Template
 
 ## 1) Audit Summary
@@ -11,19 +12,19 @@
 
 ## 2) KPI Snapshot
 
-| KPI | Current | Prior | Delta | Status |
-|-----|---------|-------|-------|--------|
-| Query visibility (core set) | | | | |
-| Views | | | | |
-| Unique visitors | | | | |
-| Clones | | | | |
-| Visitor -> Star rate | | | | |
-| Community completion | | | | |
+| KPI                         | Current | Prior | Delta | Status |
+| --------------------------- | ------- | ----- | ----- | ------ |
+| Query visibility (core set) |         |       |       |        |
+| Views                       |         |       |       |        |
+| Unique visitors             |         |       |       |        |
+| Clones                      |         |       |       |        |
+| Visitor -> Star rate        |         |       |       |        |
+| Community completion        |         |       |       |        |
 
 ## 3) Findings Table
 
 | Area | Severity | Confidence | Finding | Evidence | Fix |
-|------|----------|------------|---------|----------|-----|
+| ---- | -------- | ---------- | ------- | -------- | --- |
 
 ## 4) Prioritized Action Plan
 

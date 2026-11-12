@@ -7,7 +7,8 @@ export const tr: AppTranslations = {
     retry: "Tekrar dene",
     allRightsReserved: "Tüm hakları saklıdır.",
     pageNotFoundTitle: "Bu adres haritamızda bulunamadı.",
-    pageNotFoundDesc: "Sayfa taşınmış veya kaldırılmış olabilir. Şu sayfalardan devam edebilirsiniz:",
+    pageNotFoundDesc:
+      "Sayfa taşınmış veya kaldırılmış olabilir. Şu sayfalardan devam edebilirsiniz:",
     goHome: "Ana Sayfaya Dön",
     exploreOffers: "Portföy ve Projeler",
     skipToContent: "İçeriğe atla",
@@ -122,16 +123,18 @@ export const tr: AppTranslations = {
     stat1Title: "%100 Kat Mülkiyetli Tapu",
     stat1Desc: "Türk gayrimenkul hukuku kapsamında tam mülkiyet ve bağımsız tapu sicil denetimi.",
     stat2Title: "Merkez Bankası DAB Güvencesi",
-    stat2Desc: "Resmi döviz alım belgesi (DAB) ile yasal ve eksiksiz kayıt altına alınan yabancı para transferleri.",
+    stat2Desc:
+      "Resmi döviz alım belgesi (DAB) ile yasal ve eksiksiz kayıt altına alınan yabancı para transferleri.",
     stat3Title: "Yabancılara %0 KDV Muafiyeti",
-    stat3Desc: "3065 sayılı Kanun kapsamında yeni konut alımlarında %20'ye varan KDV tasarrufu başvurusu.",
+    stat3Desc:
+      "3065 sayılı Kanun kapsamında yeni konut alımlarında %20'ye varan KDV tasarrufu başvurusu.",
     stat4Title: "Bağımsız Hukuki İnceleme",
-    stat4Desc: "Baroya kayıtlı bağımsız avukatlar tarafından sıfır geliştirici baskısıyla incelenen projeler.",
+    stat4Desc:
+      "Baroya kayıtlı bağımsız avukatlar tarafından sıfır geliştirici baskısıyla incelenen projeler.",
     editorialEyebrow: "Özel Seçki · Öne Çıkan Geliştirmeler",
     editorialTitle: "Seçkin",
     editorialTitleEm: "Konutları ve Rezidansları",
-    editorialSubtitle:
-      "Katı hukuki ve mimari standartlarımızı karşılayan birinci sınıf projeler.",
+    editorialSubtitle: "Katı hukuki ve mimari standartlarımızı karşılayan birinci sınıf projeler.",
     viewAllOffers: "Tüm Fırsatları ve Projeleri Gör",
     bosphorusEyebrow: "İnteraktif Konum Rehberi · Stratejik Koridorlar",
     bosphorusTitle: "İstanbul'un Öncü",
@@ -144,13 +147,17 @@ export const tr: AppTranslations = {
     cbiSubtitle:
       "İstanbul'da yasal kriterlere uygun gayrimenkullerle Türk vatandaşlığı, birinci sınıf sağlık, eğitim ve vizesiz seyahat ayrıcalıklarına sahip olun.",
     cbiPillar1Title: "Tüm Aileyi Kapsar",
-    cbiPillar1Desc: "Eşiniz ve 18 yaş altı çocuklarınız anayasal olarak eşit haklarla Türk vatandaşlığı kazanır.",
+    cbiPillar1Desc:
+      "Eşiniz ve 18 yaş altı çocuklarınız anayasal olarak eşit haklarla Türk vatandaşlığı kazanır.",
     cbiPillar2Title: "İkamet Zorunluluğu Yok",
-    cbiPillar2Desc: "Başvuru sürecinde veya sonrasında Türkiye'de bulunma ya da dil sınavı şartı yoktur.",
+    cbiPillar2Desc:
+      "Başvuru sürecinde veya sonrasında Türkiye'de bulunma ya da dil sınavı şartı yoktur.",
     cbiPillar3Title: "3 Yıl Sonra Güvenli Satış",
-    cbiPillar3Desc: "Mülkü 3 yıl tuttuktan sonra vatandaşlığınızı koruyarak dilediğiniz gibi satabilirsiniz.",
+    cbiPillar3Desc:
+      "Mülkü 3 yıl tuttuktan sonra vatandaşlığınızı koruyarak dilediğiniz gibi satabilirsiniz.",
     cbiPillar4Title: "Kira Geliri Serbestisi",
-    cbiPillar4Desc: "Tapu süresi boyunca mülkünüzü döviz veya yerel para biriminde kiraya vererek düzenli getiri sağlayabilirsiniz.",
+    cbiPillar4Desc:
+      "Tapu süresi boyunca mülkünüzü döviz veya yerel para biriminde kiraya vererek düzenli getiri sağlayabilirsiniz.",
     cbiExploreRoadmap: "5 Aşamalı Vatandaşlık Yol Haritasını Görün",
     cbiCheckQualifications: "Uygunluğunuzu Test Edin",
     calcEyebrow: "İnteraktif Yasal Hesaplama Modeli",
@@ -165,13 +172,17 @@ export const tr: AppTranslations = {
     whySubtitle:
       "Avrupa ile Asya'yı birbirine bağlayan İstanbul; devasa altyapı yatırımları, dinamik nüfus artışı ve değer kazanan mülkiyet hakları sunar.",
     whyPillar1Title: "Küresel Ulaşım Merkezi",
-    whyPillar1Desc: "İstanbul Havalimanı, 4 saatlik uçuş mesafesinde 340'tan fazla uluslararası varış noktasına bağlanır.",
+    whyPillar1Desc:
+      "İstanbul Havalimanı, 4 saatlik uçuş mesafesinde 340'tan fazla uluslararası varış noktasına bağlanır.",
     whyPillar2Title: "Dinamik Kiralama Talebi",
-    whyPillar2Desc: "Finans merkezlerinde ve sahil akslarında kurumsal yöneticiler ve öğrencilerden gelen güçlü talep.",
+    whyPillar2Desc:
+      "Finans merkezlerinde ve sahil akslarında kurumsal yöneticiler ve öğrencilerden gelen güçlü talep.",
     whyPillar3Title: "Dünya Standartlarında Sağlık ve Eğitim",
-    whyPillar3Desc: "JCI akreditasyonlu modern hastaneler ve prestijli uluslararası IB bakalorya okulları.",
+    whyPillar3Desc:
+      "JCI akreditasyonlu modern hastaneler ve prestijli uluslararası IB bakalorya okulları.",
     whyPillar4Title: "Yüksek Sermaye Kazancı",
-    whyPillar4Desc: "Büyük ulaşım ağları ve merkezi arsa kısıtlılığı sayesinde istikrarlı uzun vadeli değer artışı.",
+    whyPillar4Desc:
+      "Büyük ulaşım ağları ve merkezi arsa kısıtlılığı sayesinde istikrarlı uzun vadeli değer artışı.",
   },
   properties: {
     eyebrow: "Doğrulanmış İlanlar · Güncel Müsaitlik",
@@ -185,7 +196,8 @@ export const tr: AppTranslations = {
     filterRegion: "Şehir / Bölge",
     regionViewListings: "Bu bölgedeki ilanları gör",
     regionDistrictsTitle: "Hizmet verdiğimiz semtler",
-    regionEmpty: "Bu bölgede henüz yayınlanmış ilan yok. Aradığınızı bize söyleyin, sizin için bulalım.",
+    regionEmpty:
+      "Bu bölgede henüz yayınlanmış ilan yok. Aradığınızı bize söyleyin, sizin için bulalım.",
     regionListingsLabel: "ilan",
     allSides: "Tüm Yakalar",
     sideEurope: "Avrupa Yakası",
@@ -203,7 +215,8 @@ export const tr: AppTranslations = {
     clearSavedFilter: "Kaydedilen filtresini kaldır",
     showingCount: "mülk listeleniyor",
     noResultsTitle: "Arama kriterlerinize uygun mülk bulunamadı",
-    noResultsDesc: "Filtreleri değiştirmeyi, arama kelimesini temizlemeyi veya tüm portföyü incelemeyi deneyin.",
+    noResultsDesc:
+      "Filtreleri değiştirmeyi, arama kelimesini temizlemeyi veya tüm portföyü incelemeyi deneyin.",
     viewingGrid: "Kılavuz görünümü",
     viewingList: "Liste görünümü",
   },
@@ -343,7 +356,8 @@ export const tr: AppTranslations = {
     includeSpouse: "Eşi başvuruya dahil et",
     childrenCountLabel: "18 Yaş Altı Çocuk Sayısı",
     vatExemptLabel: "Yabancılara %0 KDV Muafiyeti Uygula (3065 Sayılı Kanun)",
-    vatExemptNote: "Yurtdışında ikamet eden yabancıların ilk el konut alımlarında %1 ila %20 KDV tasarrufu sağlar.",
+    vatExemptNote:
+      "Yurtdışında ikamet eden yabancıların ilk el konut alımlarında %1 ila %20 KDV tasarrufu sağlar.",
     breakdownTitle: "Tahmini Yatırım Giderleri Dökümü",
     breakdownPropertyPrice: "Uygun Gayrimenkul Bedeli",
     breakdownTapuFee: "Tapu Devir Harcı (%2 / %4 Tapu)",
@@ -381,11 +395,13 @@ export const tr: AppTranslations = {
     req1Title: "Temiz ve Sorunsuz Mülkiyet (Kat İrtifakı / Mülkiyeti)",
     req1Desc: "Mülkün üzerinde ipotek, ihtiyati tedbir veya müteahhit borcu bulunmamalıdır.",
     req2Title: "Merkez Bankası Onaylı DAB Belgesi",
-    req2Desc: "Satın alma tutarı döviz olarak getirilmeli ve Merkez Bankası aracılığıyla TL'ye çevrilmelidir.",
+    req2Desc:
+      "Satın alma tutarı döviz olarak getirilmeli ve Merkez Bankası aracılığıyla TL'ye çevrilmelidir.",
     req3Title: "SPK Lisanslı Değerleme Raporu",
     req3Desc: "Rapor, mülkün değerinin satın alma gününde en az 400.000$ olduğunu teyit etmelidir.",
     req4Title: "3 Yıl Satmama Taahhüdü",
-    req4Desc: "Tapu kaydına 3 yıl satmama şerhi konur. 3 yıl sonra mülkünüzü satabilir, vatandaşlığınızı ömür boyu korursunuz.",
+    req4Desc:
+      "Tapu kaydına 3 yıl satmama şerhi konur. 3 yıl sonra mülkünüzü satabilir, vatandaşlığınızı ömür boyu korursunuz.",
     startCbiConsultation: "Vatandaşlık Danışmanlığı Başlatın",
   },
   whyTurkiye: {
@@ -424,7 +440,8 @@ export const tr: AppTranslations = {
     freeholdPoint1: "Miras hukuku kapsamında yasal mirasçılara engelsiz devredilen kalıcı tapu.",
     freeholdPoint2: "Mülkünüzü döviz veya yerel para üzerinden serbestçe kiralama özgürlüğü.",
     freeholdPoint3: "Türk adalet sistemi ve gayrimenkul mahkemeleri nezdinde tam anayasal koruma.",
-    freeholdPoint4: "Kira gelirini ve satış tutarını hiçbir kısıtlama olmaksızın yurtdışına transfer etme hakkı.",
+    freeholdPoint4:
+      "Kira gelirini ve satış tutarını hiçbir kısıtlama olmaksızın yurtdışına transfer etme hakkı.",
   },
   investment: {
     eyebrow: "Yatırımcının Adım Adım Rehberi · Stratejik Edinim",
@@ -440,8 +457,10 @@ export const tr: AppTranslations = {
     strat1Profile:
       "Maslak, Ataşehir ve Bomonti gibi merkezi akslarda kurumsal çalışanlar, profesyoneller ve aileler.",
     strat1Point1: "Standart 1 yıllık yenilenebilir sözleşmelerle istikrarlı ve düzenli kira akışı.",
-    strat1Point2: "Nitelikli yerli ve yabancı kiracılardan gelen yüksek talep ve düşük boşluk oranı.",
-    strat1Point3: "5 yıl elde tutulduktan sonra satıldığında değer artış kazancı vergisinden %100 muafiyet.",
+    strat1Point2:
+      "Nitelikli yerli ve yabancı kiracılardan gelen yüksek talep ve düşük boşluk oranı.",
+    strat1Point3:
+      "5 yıl elde tutulduktan sonra satıldığında değer artış kazancı vergisinden %100 muafiyet.",
     strat2Title: "Yönetilen Hizmetli ve Turizm Daireleri",
     strat2Yield: "%8.0 – %10.5",
     strat2Horizon: "3 – 5 Yıl",
@@ -457,37 +476,50 @@ export const tr: AppTranslations = {
       "Güvenilir büyük müteahhitlerin yeni başladığı konsept projelerde lansman öncesi daireler.",
     strat3Point1: "Temel atma aşamasında önemli fiyat avantajları ve lansman iskontoları.",
     strat3Point2: "Geliştirici bünyesinde faizsiz, vadeli esnek taksit imkanları.",
-    strat3Point3: "İnşaat tamamlanıp tapular teslim edildiğinde yüksek sermaye kazancıyla çıkış fırsatı.",
+    strat3Point3:
+      "İnşaat tamamlanıp tapular teslim edildiğinde yüksek sermaye kazancıyla çıkış fırsatı.",
     stepsEyebrow: "Satın Alma Süreci",
     stepsTitle: "Uluslararası alıcılar için adım adım işlem sıralaması",
     step1Title: "Hedef ve Strateji Belirleme",
-    step1Desc: "Önceliğin vatandaşlık ($400k+), yüksek kira getirisi veya yaşam amaçlı mı olduğunu netleştiririz.",
+    step1Desc:
+      "Önceliğin vatandaşlık ($400k+), yüksek kira getirisi veya yaşam amaçlı mı olduğunu netleştiririz.",
     step2Title: "Vergi Numarası ve Banka Hesabı",
-    step2Desc: "Potansiyel vergi numaranızı alır ve 24 saat içinde çoklu döviz banka hesabınızı açarız.",
+    step2Desc:
+      "Potansiyel vergi numaranızı alır ve 24 saat içinde çoklu döviz banka hesabınızı açarız.",
     step3Title: "Özel Portföy ve Canlı İncelemeler",
-    step3Desc: "Seçilen mülkleri bizzat yerinde gezebilir veya canlı yüksek çözünürlüklü video turlarla incelersiniz.",
+    step3Desc:
+      "Seçilen mülkleri bizzat yerinde gezebilir veya canlı yüksek çözünürlüklü video turlarla incelersiniz.",
     step4Title: "Bağımsız Hukuki İnceleme",
-    step4Desc: "Baro avukatları tapu sicilini denetleyerek ipotek, haciz veya şerh bulunmadığını yazılı belgeler.",
+    step4Desc:
+      "Baro avukatları tapu sicilini denetleyerek ipotek, haciz veya şerh bulunmadığını yazılı belgeler.",
     step5Title: "Merkez Bankası DAB Döviz İşlemi",
-    step5Desc: "Paranız güvenli biçimde aktarılır ve Merkez Bankası kuruyla çevrilerek DAB belgesi düzenlenir.",
+    step5Desc:
+      "Paranız güvenli biçimde aktarılır ve Merkez Bankası kuruyla çevrilerek DAB belgesi düzenlenir.",
     step6Title: "Tapu Devri ve Teslim",
-    step6Desc: "Tapu Müdürlüğü'nde imzanızı atarak mülkiyet belgenizi doğrudan adınıza teslim alırsınız.",
+    step6Desc:
+      "Tapu Müdürlüğü'nde imzanızı atarak mülkiyet belgenizi doğrudan adınıza teslim alırsınız.",
     taxesEyebrow: "Yasal Maliyet Şeffaflığı",
     taxesTitle: "Vergiler, tapu harçları ve yasal masrafların detayları",
     tax1Title: "Tapu Devir Harcı",
-    tax1Desc: "Yasal oranı %4 olup standart işlemlerde beyan edilen değer üzerinden %2 alıcı, %2 satıcı olarak paylaşılır.",
+    tax1Desc:
+      "Yasal oranı %4 olup standart işlemlerde beyan edilen değer üzerinden %2 alıcı, %2 satıcı olarak paylaşılır.",
     tax2Title: "Yabancılara %0 KDV Muafiyeti (3065 SK)",
-    tax2Desc: "Yurtdışından döviz getirerek ilk el konut alan yabancılar kanunen %0 KDV hakkına sahiptir.",
+    tax2Desc:
+      "Yurtdışından döviz getirerek ilk el konut alan yabancılar kanunen %0 KDV hakkına sahiptir.",
     tax3Title: "5 Yıl Sonrası Gelir Vergisi Muafiyeti",
-    tax3Desc: "Gerçek kişilerin en az 5 yıl elinde tuttuğu gayrimenkullerin satışından doğan kâr gelir vergisinden muaftır.",
+    tax3Desc:
+      "Gerçek kişilerin en az 5 yıl elinde tuttuğu gayrimenkullerin satışından doğan kâr gelir vergisinden muaftır.",
     redFlagsEyebrow: "Alıcı Güvenliği",
     redFlagsTitle: "İstanbul'da mülk alırken kaçınılması gereken riskler",
     redFlag1Title: "Yetkisiz Aracılar ve Şişirilmiş Raporlar",
-    redFlag1Desc: "Yetki belgesiz aracılarla çalışmayın. Daima bağımsız SPK lisanslı değerleme raporu talep edin.",
+    redFlag1Desc:
+      "Yetki belgesiz aracılarla çalışmayın. Daima bağımsız SPK lisanslı değerleme raporu talep edin.",
     redFlag2Title: "Eksik İmar ve Yapı Ruhsatı",
-    redFlag2Desc: "Ön ödeme yapmadan önce projenin tüm yasal inşaat ve iskan izinlerinin tam olduğunu doğrulayın.",
+    redFlag2Desc:
+      "Ön ödeme yapmadan önce projenin tüm yasal inşaat ve iskan izinlerinin tam olduğunu doğrulayın.",
     redFlag3Title: "Arsa Üzerinde Müteahhit Borcu veya İpotek",
-    redFlag3Desc: "Bağımsız bir avukat arsa üzerinde banka ipoteği veya müteahhit borcu olmadığını teyit etmelidir.",
+    redFlag3Desc:
+      "Bağımsız bir avukat arsa üzerinde banka ipoteği veya müteahhit borcu olmadığını teyit etmelidir.",
   },
   calculator: {
     eyebrow: "Yasal Hesaplama Modeli · Canlı Döviz Kurları",
@@ -503,7 +535,8 @@ export const tr: AppTranslations = {
     tapuShareFull: "%4 Tam Harç (Sıfır projelerde yaygın)",
     tapuShareSplit: "%2 Alıcı / %2 Geliştirici Paylaşımı",
     vatExemptLabel: "Yabancı %0 KDV Muafiyetini Dahil Et (3065 SK)",
-    vatExemptSub: "Yurtdışında yaşayan alıcılar için sıfır konutlarda %1 ila %20 KDV tasarrufu sağlar.",
+    vatExemptSub:
+      "Yurtdışında yaşayan alıcılar için sıfır konutlarda %1 ila %20 KDV tasarrufu sağlar.",
     summaryTitle: "Satın Alma Maliyet Özeti",
     totalAcquisitionCost: "Toplam Yatırım Maliyeti",
     closingCostsTotal: "Toplam Yasal Masraflar",
@@ -536,8 +569,91 @@ export const tr: AppTranslations = {
   },
   services: {
     eyebrow: "Özel Danışmanlık Hizmetleri · Uçtan Uca Destek",
-    title: "İstanbul'da eksiksiz gayrimenkul",
-    titleEm: "danışmanlık hizmetleri.",
+    title: "Tek ekip. Her adım. İlk telefon görüşmesinden pasaportunuza ve ötesine.",
+    titleEm: "",
+    subtitle:
+      "Tüm resmi evrakları kendi avukatımız yönetir. Bir sonraki adımda ne olacağını her an bilirsiniz.",
+    closingLine: "Tek avukat. Tek ekip. Tek süreç.",
+    legalDisclaimer:
+      "Yasal Uyarı ve Hukuki Temsil: Avrasya Properties, tüm işlem denetimlerini ve dosya başvurularını yalnızca İstanbul Barosu'na kayıtlı bağımsız avukatlar aracılığıyla yürütür. 5901 sayılı Türk Vatandaşlığı Kanunu uyarınca, vatandaşlık kararları münhasıran T.C. İçişleri Bakanlığı Göç İdaresi Başkanlığı'nın egemenlik yetkisindedir.",
+    parts: [
+      {
+        partNumber: "BÖLÜM 1",
+        title: "SEÇİN",
+        steps: [
+          {
+            stepNumber: "01",
+            title: "Ücretsiz Danışmanlık",
+            description: "Bütçenizi ve hedeflerinizi bize anlatın. Tüm süreci açıklayalım.",
+          },
+          {
+            stepNumber: "02",
+            title: "Mülk Arama ve İnceleme",
+            description:
+              "Size denetlenmiş mülkleri sunarız. Avukatımız mülkiyet belgesini (Tapu) inceler.",
+            termNote: "Mülkiyet belgesi (Tapu)",
+          },
+        ],
+      },
+      {
+        partNumber: "BÖLÜM 2",
+        title: "SATIN ALIN",
+        steps: [
+          {
+            stepNumber: "03",
+            title: "Vergi Numarası ve Banka Hesabı",
+            description: "Hesabınızı açar ve döviz alım belgesini (DAB) yönetiriz.",
+            termNote: "Döviz alım belgesi (DAB)",
+          },
+          {
+            stepNumber: "04",
+            title: "Satın Alma ve Mülkiyet Tescili",
+            description: "Sözleşmeyi hazırlarız. Mülk doğrudan adınıza tescil edilir.",
+          },
+        ],
+      },
+      {
+        partNumber: "BÖLÜM 3",
+        title: "VATANDAŞLIK",
+        steps: [
+          {
+            stepNumber: "05",
+            title: "Başvuru",
+            description: "Avukatımız sizin, eşiniz ve çocuklarınız adına başvuruyu yapar.",
+            legalTag: "5901 sayılı Kanun kapsamı: eş ve 18 yaş altı çocuklar",
+          },
+          {
+            stepNumber: "06",
+            title: "Evrak Takibi",
+            description:
+              "Dosyanızı takip eder, randevularınızı alırız. Düzenli bilgilendirilirsiniz.",
+          },
+          {
+            stepNumber: "07",
+            title: "Pasaportlarınız Elinizde",
+            description:
+              "Vatandaşlığınız onaylanır. Pasaportlarınızı teslim almanıza yardımcı oluruz. Süreç tamamlanır.",
+            legalTag: "Nihai yetki: T.C. İçişleri Bakanlığı Göç İdaresi Başkanlığı",
+          },
+        ],
+      },
+      {
+        partNumber: "BÖLÜM 4",
+        title: "VATANDAŞLIK SONRASI (İSTEĞE BAĞLI)",
+        steps: [
+          {
+            stepNumber: "08",
+            title: "Mülkünüzü Kiralayın",
+            description: "Kiracı bulur, sözleşmeleri düzenler ve kira raporlarınızı iletiriz.",
+          },
+          {
+            stepNumber: "09",
+            title: "Hazır Olduğunuzda Satın",
+            description: "Mülkünüze değer biçer, alıcı bulur ve satışı yönetiriz.",
+          },
+        ],
+      },
+    ],
     description:
       "Kişiye özel mülk seçiminden bağımsız hukuki denetime, Türk vatandaşlığı takibinden iç mimari ve kiracı yönetimine kadar tüm detayları sizin için yönetiyoruz.",
     coreServicesEyebrow: "Uzmanlık Alanlarımız",
@@ -556,19 +672,31 @@ export const tr: AppTranslations = {
         title: "Özel Seçilmiş Portföy ve Rehberli Turlar",
         category: "İnceleme",
         desc: "Kriterlerinize uygun konutları özel araçlı turlarla yerinde gezdiriyor veya canlı yüksek çözünürlüklü video turlar organize ediyoruz.",
-        deliverables: ["Ön elemeli mülk listesi", "Şoförlü özel semt turları", "Canlı interaktif video turlar"],
+        deliverables: [
+          "Ön elemeli mülk listesi",
+          "Şoförlü özel semt turları",
+          "Canlı interaktif video turlar",
+        ],
       },
       {
         title: "Bağımsız Hukuki ve Tapu Denetimi",
         category: "Hukuk",
         desc: "Baro avukatları Tapu Müdürlüğü kayıtlarını denetleyerek ipotek, haciz veya geliştirici borcu bulunmadığını yazılı olarak belgeler.",
-        deliverables: ["Resmi tapu sicil raporu", "Mülkiyet durumu onayı", "Sorunsuz tapu güvence belgesi"],
+        deliverables: [
+          "Resmi tapu sicil raporu",
+          "Mülkiyet durumu onayı",
+          "Sorunsuz tapu güvence belgesi",
+        ],
       },
       {
         title: "Yatırım Yoluyla Türk Vatandaşlığı ($400k)",
         category: "Vatandaşlık",
         desc: "Uygun mülk seçiminden SPK değerlemesine, DAB belgesinden ikamet izni ve pasaport teslimine kadar eksiksiz resmi süreç yönetimi.",
-        deliverables: ["Vatandaşlık uygunluk belgesi", "Yatırımcı ikamet kartları", "Tüm aile için Türk pasaportu"],
+        deliverables: [
+          "Vatandaşlık uygunluk belgesi",
+          "Yatırımcı ikamet kartları",
+          "Tüm aile için Türk pasaportu",
+        ],
       },
       {
         title: "Merkez Bankası Döviz Alım Belgesi (DAB)",
@@ -580,31 +708,51 @@ export const tr: AppTranslations = {
         title: "Tapu Devir ve Tescil İşlemleri",
         category: "Kapanış",
         desc: "Tapu Müdürlüğü'ndeki devir işlemlerine bizzat eşlik ederek tapunuzun adınıza güvenle ve eksiksiz tescil edilmesini sağlıyoruz.",
-        deliverables: ["Resmi tapu senedi", "Belediye beyan kaydı", "Zorunlu DASK deprem sigortası"],
+        deliverables: [
+          "Resmi tapu senedi",
+          "Belediye beyan kaydı",
+          "Zorunlu DASK deprem sigortası",
+        ],
       },
       {
         title: "Yabancılara %0 KDV Muafiyeti Başvurusu",
         category: "Vergi",
         desc: "3065 sayılı Kanun kapsamında yeni konut alımlarında %20'ye varan KDV muafiyet başvurusunu hazırlayıp vergi dairesinden onaylatıyoruz.",
-        deliverables: ["KDV muafiyet belgesi", "Doğrudan KDV indirimi", "Vergi dairesi onay yazısı"],
+        deliverables: [
+          "KDV muafiyet belgesi",
+          "Doğrudan KDV indirimi",
+          "Vergi dairesi onay yazısı",
+        ],
       },
       {
         title: "Anahtar Teslim İç Mimarlık ve Mobilya",
         category: "Taşınma",
         desc: "İç mimari ortaklarımızla mülkünüzü yüksek standartlarda döşeyerek oturuma veya yüksek gelirli kiralamaya hazır hale getiriyoruz.",
-        deliverables: ["Özel mobilya paketleri", "Beyaz eşya montajı", "Aydınlatma ve dekorasyon kurulumu"],
+        deliverables: [
+          "Özel mobilya paketleri",
+          "Beyaz eşya montajı",
+          "Aydınlatma ve dekorasyon kurulumu",
+        ],
       },
       {
         title: "Kapsamlı Kiralama ve Kiracı Yönetimi",
         category: "Yönetim",
         desc: "Güvenilir kiracıları seçiyor, kira tahsilatını dilediğiniz para biriminde yönetiyor ve tüm mülk bakımını üstleniyoruz.",
-        deliverables: ["Detaylı kiracı geçmiş kontrolü", "Avukat onaylı kira sözleşmesi", "Aylık gelir ve hesap raporlaması"],
+        deliverables: [
+          "Detaylı kiracı geçmiş kontrolü",
+          "Avukat onaylı kira sözleşmesi",
+          "Aylık gelir ve hesap raporlaması",
+        ],
       },
       {
         title: "Stratejik Yeniden Satış ve Çıkış",
         category: "Çıkış",
         desc: "3 yıllık vatandaşlık süresi veya 5 yıllık vergisiz dönem sonrasında mülkünüzü uluslararası kanallarda en yüksek değerle satışa sunuyoruz.",
-        deliverables: ["Piyasa değerleme analizi", "Uluslararası pazarlama kampanyası", "Satış müzakeresi ve fon transferi"],
+        deliverables: [
+          "Piyasa değerleme analizi",
+          "Uluslararası pazarlama kampanyası",
+          "Satış müzakeresi ve fon transferi",
+        ],
       },
     ],
     faqs: [
@@ -744,16 +892,19 @@ export const tr: AppTranslations = {
     budget: "Bütçe Aralığı (USD)",
     budgetPlaceholder: "Örn. 450.000$",
     message: "Mesajınız veya Sorularınız",
-    messagePlaceholder: "Zaman planınız, tercih ettiğiniz bölgeler veya mülkle ilgili sorularınızı yazın...",
+    messagePlaceholder:
+      "Zaman planınız, tercih ettiğiniz bölgeler veya mülkle ilgili sorularınızı yazın...",
     submitBtn: "Talebi Gönder",
     submitting: "Gönderiliyor...",
     successTitle: "Talebiniz Alındı",
     successDesc:
       "Bizimle iletişime geçtiğiniz için teşekkür ederiz. İstanbul ofisimizden kıdemli bir danışman bilgilerinizi inceleyerek en kısa sürede size ulaşacaktır.",
-    errorDesc: "Talep gönderilemedi. Lütfen tekrar deneyin veya doğrudan WhatsApp hattımızdan yazın.",
+    errorDesc:
+      "Talep gönderilemedi. Lütfen tekrar deneyin veya doğrudan WhatsApp hattımızdan yazın.",
     whatsappAlternative: "Hemen görüşmek mi istersiniz?",
     directWhatsappBtn: "WhatsApp'tan Doğrudan Yazın",
-    termsConsent: "Göndererek gizlilik politikamızı kabul etmiş ve gizli danışmanlık iletişimine onay vermiş olursunuz.",
+    termsConsent:
+      "Göndererek gizlilik politikamızı kabul etmiş ve gizli danışmanlık iletişimine onay vermiş olursunuz.",
     propertyReference: "Talep numaranız:",
     errName: "Lütfen adınızı ve soyadınızı girin.",
     errEmail: "Lütfen geçerli bir e-posta adresi girin, örn. ad@ornek.com.",
@@ -761,14 +912,18 @@ export const tr: AppTranslations = {
     errMessage: "Lütfen kısa bir mesaj yazın (en az 5 karakter).",
     errConsent: "Bu talep hakkında sizinle iletişime geçebilmemiz için lütfen kutuyu işaretleyin.",
     errFix: "Lütfen işaretli alanları düzeltin.",
-    errTimeout: "Bağlantı zaman aşımına uğradı. Talebiniz gönderilmemiş olabilir. Lütfen tekrar deneyin; tekrar denemek mükerrer kayıt oluşturmaz.",
-    errNetwork: "Sunucumuza ulaşılamadı. Lütfen bağlantınızı kontrol edip tekrar deneyin ya da WhatsApp üzerinden bize yazın.",
-    successNext: "Bir danışmanımız bir iş günü içinde e-posta veya telefonla size dönüş yapacak. Bu referans numarasını saklayın.",
+    errTimeout:
+      "Bağlantı zaman aşımına uğradı. Talebiniz gönderilmemiş olabilir. Lütfen tekrar deneyin; tekrar denemek mükerrer kayıt oluşturmaz.",
+    errNetwork:
+      "Sunucumuza ulaşılamadı. Lütfen bağlantınızı kontrol edip tekrar deneyin ya da WhatsApp üzerinden bize yazın.",
+    successNext:
+      "Bir danışmanımız bir iş günü içinde e-posta veya telefonla size dönüş yapacak. Bu referans numarasını saklayın.",
     newEnquiry: "Yeni talep gönder",
   },
   legalDraft: {
     eyebrow: "Yasal · Onay Bekleyen Taslak Metin",
-    statusWarning: "Durum: Hukuki incelemesi devam eden taslaktır. Bu sayfadaki hiçbir ifade nihai politika olarak yorumlanamaz.",
+    statusWarning:
+      "Durum: Hukuki incelemesi devam eden taslaktır. Bu sayfadaki hiçbir ifade nihai politika olarak yorumlanamaz.",
     approvedCovers: "Onaylanacak resmi metnin kapsamı",
     questionsPrompt: "Bu süreçte sorularınız mı var?",
     contactLink: "Ekibimizle İletişime Geçin",

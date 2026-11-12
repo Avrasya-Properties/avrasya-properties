@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSiteSettings } from "@/admin/store";
-import { useState, useEffect,useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import type { SupportedCurrency } from "@/data/properties";
 export type { SupportedCurrency } from "@/data/properties";
 import { EXCHANGE_RATES } from "@/data/properties";
@@ -37,7 +37,12 @@ export function useLiveRates() {
       )
         throw new Error("Invalid provider rates");
       return {
-        rates: { USD: 1, EUR: data.rates.EUR, TRY: data.rates.TRY, GBP: data.rates.GBP } as LiveRates,
+        rates: {
+          USD: 1,
+          EUR: data.rates.EUR,
+          TRY: data.rates.TRY,
+          GBP: data.rates.GBP,
+        } as LiveRates,
         date: String(data.date || ""),
       };
     },
@@ -69,8 +74,12 @@ export function useLiveRates() {
 export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => void] {
   useLiveRates();
   const [currency, setCurrencyState] = useState<SupportedCurrency>("USD");
-  const [,refreshRates]=useState(0);
-  useEffect(()=>{const update=()=>refreshRates(v=>v+1);window.addEventListener("rates-updated",update);return()=>window.removeEventListener("rates-updated",update);},[]);
+  const [, refreshRates] = useState(0);
+  useEffect(() => {
+    const update = () => refreshRates((v) => v + 1);
+    window.addEventListener("rates-updated", update);
+    return () => window.removeEventListener("rates-updated", update);
+  }, []);
 
   useEffect(() => {
     try {
@@ -83,8 +92,12 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
     }
 
     const onStorage = () => {
-      try{const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
-      if (["USD","EUR","TRY","GBP"].includes(current)) setCurrencyState(current);}catch{}
+      try {
+        const current = localStorage.getItem(CURRENCY_KEY) as SupportedCurrency;
+        if (["USD", "EUR", "TRY", "GBP"].includes(current)) setCurrencyState(current);
+      } catch {
+        /* intentionally ignored */
+      }
     };
     window.addEventListener("currency-change", onStorage);
     return () => window.removeEventListener("currency-change", onStorage);
@@ -103,21 +116,35 @@ export function useCurrency(): [SupportedCurrency, (c: SupportedCurrency) => voi
   return [currency, setCurrency];
 }
 
-const EMPTY_SHORTLIST:string[]=[];
-let shortlistRaw:string|null=null;
-let shortlistSnapshot:string[]=EMPTY_SHORTLIST;
-function readShortlist(){
- if(typeof window==="undefined")return EMPTY_SHORTLIST;
- try{
-  const raw=localStorage.getItem(SHORTLIST_KEY);
-  if(raw!==shortlistRaw){shortlistRaw=raw;const value=JSON.parse(raw||"[]");shortlistSnapshot=Array.isArray(value)?[...new Set(value.filter((item):item is string=>typeof item==="string"))]:EMPTY_SHORTLIST;}
- }catch{}
- return shortlistSnapshot;
+const EMPTY_SHORTLIST: string[] = [];
+let shortlistRaw: string | null = null;
+let shortlistSnapshot: string[] = EMPTY_SHORTLIST;
+function readShortlist() {
+  if (typeof window === "undefined") return EMPTY_SHORTLIST;
+  try {
+    const raw = localStorage.getItem(SHORTLIST_KEY);
+    if (raw !== shortlistRaw) {
+      shortlistRaw = raw;
+      const value = JSON.parse(raw || "[]");
+      shortlistSnapshot = Array.isArray(value)
+        ? [...new Set(value.filter((item): item is string => typeof item === "string"))]
+        : EMPTY_SHORTLIST;
+    }
+  } catch {
+    /* intentionally ignored */
+  }
+  return shortlistSnapshot;
 }
-function subscribeShortlist(listener:()=>void){
- const storage=(event:StorageEvent)=>{if(event.key===SHORTLIST_KEY||event.key===null)listener();};
- window.addEventListener("shortlist-change",listener);window.addEventListener("storage",storage);
- return()=>{window.removeEventListener("shortlist-change",listener);window.removeEventListener("storage",storage);};
+function subscribeShortlist(listener: () => void) {
+  const storage = (event: StorageEvent) => {
+    if (event.key === SHORTLIST_KEY || event.key === null) listener();
+  };
+  window.addEventListener("shortlist-change", listener);
+  window.addEventListener("storage", storage);
+  return () => {
+    window.removeEventListener("shortlist-change", listener);
+    window.removeEventListener("storage", storage);
+  };
 }
 export function useShortlist(): {
   shortlist: string[];
@@ -125,11 +152,17 @@ export function useShortlist(): {
   toggle: (slug: string) => void;
   count: number;
 } {
-  const shortlist=useSyncExternalStore(subscribeShortlist,readShortlist,()=>EMPTY_SHORTLIST);
+  const shortlist = useSyncExternalStore(subscribeShortlist, readShortlist, () => EMPTY_SHORTLIST);
   const toggle = (slug: string) => {
-    const current=readShortlist(),next=current.includes(slug)?current.filter(item=>item!==slug):[...current,slug];
-    shortlistSnapshot=next;
-    try{shortlistRaw=JSON.stringify(next);localStorage.setItem(SHORTLIST_KEY,shortlistRaw);}catch{shortlistRaw=null;}
+    const current = readShortlist(),
+      next = current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug];
+    shortlistSnapshot = next;
+    try {
+      shortlistRaw = JSON.stringify(next);
+      localStorage.setItem(SHORTLIST_KEY, shortlistRaw);
+    } catch {
+      shortlistRaw = null;
+    }
     window.dispatchEvent(new Event("shortlist-change"));
   };
 

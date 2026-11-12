@@ -1,6 +1,6 @@
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { usePublishedDocuments } from "@/data/live";
-import { DEMO_MODE,publicSupabase } from "@/lib/supabase";
+import { DEMO_MODE, publicSupabase } from "@/lib/supabase";
 import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "@/hooks/useLanguage";
@@ -24,9 +24,13 @@ export const Route = createFileRoute("/investment-catalog")({
     meta(
       "Avrasya Investment Catalog — Comprehensive Portfolio & Citizenship Guide",
       "Official 17-page Avrasya Properties Group Investment Catalog. Detailed six-phase acquisition pathway, verified 10-year financial projections, and Turkish Citizenship by Investment framework.",
-      "/investment-catalog"
+      "/investment-catalog",
     ),
-  component: () => <ManagedPage slug="investment-catalog"><Catalog /></ManagedPage>,
+  component: () => (
+    <ManagedPage slug="investment-catalog">
+      <Catalog />
+    </ManagedPage>
+  ),
 });
 
 function Catalog() {
@@ -37,10 +41,11 @@ function Catalog() {
   const PDF_DOWNLOAD_URL = DEMO_MODE
     ? "/downloads/Avrasya_Properties_Investment_Catalog.pdf"
     : doc?.storage_path?.startsWith("/")
-    ? doc.storage_path
-    : doc
-    ? publicSupabase.storage.from("public-marketing").getPublicUrl(doc.storage_path).data.publicUrl
-    : undefined;
+      ? doc.storage_path
+      : doc
+        ? publicSupabase.storage.from("public-marketing").getPublicUrl(doc.storage_path).data
+            .publicUrl
+        : undefined;
   const contact = useLiveContact();
 
   const PHASES = t.catalog.phases;
@@ -142,9 +147,7 @@ function Catalog() {
           <h3 className="font-display text-xl font-medium text-foreground">
             {t.footer.headquarters}
           </h3>
-          <p className="mt-2 text-sm text-muted-foreground max-w-xl">
-            {t.cta.description}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground max-w-xl">{t.cta.description}</p>
           <div className="mt-6 flex flex-wrap gap-4 text-sm font-medium">
             <a
               href={`mailto:${contact.email}`}
@@ -166,4 +169,3 @@ function Catalog() {
     </>
   );
 }
-

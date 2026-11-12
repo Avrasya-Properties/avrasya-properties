@@ -7,29 +7,87 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-.output
-.vinxi
+# Dependencies and Build Output
+node_modules/
+dist/
+dist-ssr/
+.output/
+.vinxi/
 .tanstack/**
-.nitro
-*.local
-supabase/.temp/
+.nitro/
 
-# Wrangler / Cloudflare
-.wrangler/
+# Environment and Secrets (CRITICAL)
+.env
+.env.*
+*.env
+*.local
+!.env.example
 .dev.vars
 
-# Editor directories and files
+# Certificates, Keys, and Service Accounts
+*.pem
+*.key
+*.cert
+*.crt
+service_account*.json
+credentials*.json
+
+# Binaries, Tools, and Executables
+*.exe
+cloudflared*
+tools/
+
+# Large Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+AVRASYA_SOURCE_ASSETS.zip
+
+# Python Bytecode and Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Scratch Files and Test/Report Dumps
+page.html
+SEO-REPORT.html
+*.html.dump
+*.dump
+*.bak
+*.tmp
+*.temp
+*.swp
+*.test_out*
+*_test_out*
+*.out.txt
+*.out
+m4_test_out.txt
+test-results/
+coverage/
+.nyc_output/
+playwright-report/
+supabase/.temp/
+
+# Cloudflare / Wrangler
+.wrangler/
+
+# IDE and Editor Files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-test-results/
+
+# Agent Metadata
+.agents/
+.impeccable/
+.claude/
 Agentic-SEO-Skill/

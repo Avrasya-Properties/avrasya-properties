@@ -1,33 +1,79 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { 
-  Building2, 
-  CheckCircle2, 
-  Clock, 
-  ExternalLink, 
-  Filter, 
-  Inbox, 
-  Mail, 
-  MessageSquare, 
-  Phone, 
-  Plus, 
-  Search, 
-  Trash2, 
-  UserPlus 
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  Download,
+  ExternalLink,
+  Filter,
+  Inbox,
+  Mail,
+  MessageSquare,
+  Phone,
+  Plus,
+  Save,
+  Search,
+  Trash2,
+  UserPlus,
 } from "lucide-react";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
-import { 
+import {
   can,
-  convertInquiryToLead, 
-  createInquiry, 
-  fmtDate, 
-  remove, 
-  upsert, 
-  useDB, 
-  useSession, 
-  type Inquiry 
+  convertInquiryToLead,
+  createInquiry,
+  fmtDate,
+  remove,
+  upsert,
+  useDB,
+  useSession,
+  type Inquiry,
 } from "@/admin/store";
+
+export const INQUIRY_STATUSES = [
+  "New",
+  "Contacted",
+  "In Progress",
+  "Completed",
+  "Archived",
+] as const;
+
+export function sanitizeCsvCell(value: unknown): string {
+  if (value === null || value === undefined) return '""';
+  const str = String(value);
+  // Neutralize formula injection triggers: =, +, -, @, \t, \r
+  const sanitized = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str;
+  return `"${sanitized.replace(/"/g, '""')}"`;
+}
+
+export function exportInquiriesCsv(inquiries: Inquiry[]): string {
+  const headers = [
+    "Date",
+    "Name",
+    "Email",
+    "Phone",
+    "Topic",
+    "Budget",
+    "Status",
+    "Source",
+    "Notes",
+    "Message",
+  ];
+  const rows = inquiries.map((inq) => [
+    sanitizeCsvCell(inq.createdAt ? inq.createdAt.slice(0, 10) : ""),
+    sanitizeCsvCell(inq.name),
+    sanitizeCsvCell(inq.email),
+    sanitizeCsvCell(inq.phone),
+    sanitizeCsvCell(inq.topic),
+    sanitizeCsvCell(inq.budget || ""),
+    sanitizeCsvCell(inq.status),
+    sanitizeCsvCell(inq.source),
+    sanitizeCsvCell(inq.notes || ""),
+    sanitizeCsvCell(inq.message || ""),
+  ]);
+  return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+}
 
 export const Route = createFileRoute("/admin/inquiries")({
   component: AdminInquiriesPage,
@@ -41,6 +87,8 @@ export function AdminInquiriesPage() {
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedInquiry = db.inquiries.find((q) => q.id === selectedId) ?? null;
+  const [internalNote, setInternalNote] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newForm, setNewForm] = useState({
     name: "",
@@ -51,6 +99,10 @@ export function AdminInquiriesPage() {
     message: "",
     source: "Website Consultation" as Inquiry["source"],
   });
+
+  useEffect(() => {
+    setInternalNote(selectedInquiry?.notes || "");
+  }, [selectedInquiry?.id, selectedInquiry?.notes]);
 
   const inquiries = db.inquiries || [];
 
@@ -71,7 +123,11 @@ export function AdminInquiriesPage() {
 
   const newCount = inquiries.filter((i) => i.status === "New").length;
   const contactedCount = inquiries.filter((i) => i.status === "Contacted").length;
-  const qualifiedCount = inquiries.filter((i) => Boolean(i.leadId)).length;
+  const inProgressCount = inquiries.filter((i) => i.status === "In Progress").length;
+  const completedCount = inquiries.filter((i) => i.status === "Completed").length;
+  const qualifiedCount = inquiries.filter(
+    (i) => Boolean(i.leadId) || i.status === "Qualified",
+  ).length;
 
   const handleStatusChange = async (id: string, newStatus: Inquiry["status"]) => {
     try {
@@ -80,6 +136,33 @@ export function AdminInquiriesPage() {
     } catch (e) {
       toast.error((e as Error).message);
     }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!selectedInquiry) return;
+    setSavingNote(true);
+    try {
+      await upsert<Inquiry>("inquiries", { id: selectedInquiry.id, notes: internalNote });
+      toast.success("Internal notes saved");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleExportCsv = () => {
+    const csvContent = exportInquiriesCsv(filtered);
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `inquiries-export-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${filtered.length} inquiries to CSV`);
   };
 
   const handleConvertToLead = async (id: string) => {
@@ -106,7 +189,10 @@ export function AdminInquiriesPage() {
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newForm.name.trim()) { toast.error("Client name is required"); return; }
+    if (!newForm.name.trim()) {
+      toast.error("Client name is required");
+      return;
+    }
     try {
       await createInquiry(newForm);
       toast.success("Inquiry registered in inbox");
@@ -133,6 +219,15 @@ export function AdminInquiriesPage() {
         action={
           <div className="flex items-center gap-2">
             <button
+              type="button"
+              onClick={handleExportCsv}
+              className={btnGhost}
+              title="Export filtered inquiries to CSV"
+            >
+              <Download className="h-3.5 w-3.5 text-brass" />
+              <span>Export CSV</span>
+            </button>
+            <button
               onClick={() => setIsAddOpen(true)}
               className={btnPrimary}
               disabled={!can(user, "edit-crm")}
@@ -145,26 +240,39 @@ export function AdminInquiriesPage() {
       />
 
       {/* Metrics Header */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Total Inquiries</p>
-          <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">{inquiries.length}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Recorded across channels</p>
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-5">
+        <div className="rounded-xl border bg-card p-3">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+            Total
+          </p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">{inquiries.length}</p>
+          <p className="text-[11px] text-muted-foreground">All inquiries</p>
         </div>
-        <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs uppercase tracking-wider text-brass font-semibold">New Pending</p>
-          <p className="mt-2 text-2xl font-bold tabular-nums text-brass">{newCount}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Awaiting advisor response</p>
+        <div className="rounded-xl border bg-card p-3">
+          <p className="text-[11px] uppercase tracking-wider text-brass font-semibold">New</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-brass">{newCount}</p>
+          <p className="text-[11px] text-muted-foreground">Awaiting reply</p>
         </div>
-        <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs uppercase tracking-wider text-blue-600 font-semibold">Contacted</p>
-          <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">{contactedCount}</p>
-          <p className="mt-1 text-xs text-muted-foreground">In active conversation</p>
+        <div className="rounded-xl border bg-card p-3">
+          <p className="text-[11px] uppercase tracking-wider text-blue-600 font-semibold">
+            Contacted
+          </p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">{contactedCount}</p>
+          <p className="text-[11px] text-muted-foreground">In discussion</p>
         </div>
-        <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs uppercase tracking-wider text-emerald-600 font-semibold">Converted Leads</p>
-          <p className="mt-2 text-2xl font-bold tabular-nums text-emerald-600">{qualifiedCount}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Linked to CRM leads</p>
+        <div className="rounded-xl border bg-card p-3">
+          <p className="text-[11px] uppercase tracking-wider text-amber-600 font-semibold">
+            In Progress
+          </p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-amber-600">{inProgressCount}</p>
+          <p className="text-[11px] text-muted-foreground">Active advisory</p>
+        </div>
+        <div className="rounded-xl border bg-card p-3 col-span-2 sm:col-span-1">
+          <p className="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">
+            Completed
+          </p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-emerald-600">{completedCount}</p>
+          <p className="text-[11px] text-muted-foreground">Resolved / Won</p>
         </div>
       </div>
 
@@ -180,13 +288,15 @@ export function AdminInquiriesPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex rounded-md border bg-card p-0.5">
-            {["All", "New", "Contacted", "Qualified", "Archived"].map((st) => (
+          <div className="flex flex-wrap rounded-md border bg-card p-0.5">
+            {["All", "New", "Contacted", "In Progress", "Completed", "Archived"].map((st) => (
               <button
                 key={st}
                 onClick={() => setFilter(st)}
                 className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                  filter === st ? "bg-brass text-primary-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
+                  filter === st
+                    ? "bg-brass text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {st}
@@ -264,7 +374,10 @@ export function AdminInquiriesPage() {
                           )}
                           {!inq.leadId && inq.status !== "Archived" && (
                             <button
-                              disabled={!can(user, "edit-crm", inq.agentId) || (user?.role === "agent" && inq.agentId !== user.id)}
+                              disabled={
+                                !can(user, "edit-crm", inq.agentId) ||
+                                (user?.role === "agent" && inq.agentId !== user.id)
+                              }
                               onClick={() => handleConvertToLead(inq.id)}
                               className="rounded p-1 text-brass hover:bg-brass/10"
                               title="Create buyer enquiry"
@@ -288,8 +401,12 @@ export function AdminInquiriesPage() {
             <div className="rounded-xl border bg-card p-5 space-y-4 sticky top-20">
               <div className="flex items-start justify-between border-b pb-3">
                 <div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{selectedInquiry.name}</h3>
-                  <p className="text-xs text-muted-foreground">Received {fmtDate(selectedInquiry.createdAt, true)}</p>
+                  <h3 className="font-display text-lg font-bold text-foreground">
+                    {selectedInquiry.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Received {fmtDate(selectedInquiry.createdAt, true)}
+                  </p>
                 </div>
                 <Status v={selectedInquiry.status} />
               </div>
@@ -297,11 +414,15 @@ export function AdminInquiriesPage() {
               <div className="space-y-2 text-xs">
                 <div className="flex items-center gap-2 text-foreground">
                   <Mail className="h-3.5 w-3.5 text-brass" />
-                  <a href={`mailto:${selectedInquiry.email}`} className="hover:underline">{selectedInquiry.email || "No email"}</a>
+                  <a href={`mailto:${selectedInquiry.email}`} className="hover:underline">
+                    {selectedInquiry.email || "No email"}
+                  </a>
                 </div>
                 <div className="flex items-center gap-2 text-foreground">
                   <Phone className="h-3.5 w-3.5 text-brass" />
-                  <a href={`tel:${selectedInquiry.phone}`} className="hover:underline">{selectedInquiry.phone || "No phone"}</a>
+                  <a href={`tel:${selectedInquiry.phone}`} className="hover:underline">
+                    {selectedInquiry.phone || "No phone"}
+                  </a>
                 </div>
                 <div className="flex items-center gap-2 text-foreground">
                   <Building2 className="h-3.5 w-3.5 text-brass" />
@@ -315,13 +436,17 @@ export function AdminInquiriesPage() {
               </div>
 
               <div className="rounded-lg bg-muted/40 p-3 text-xs leading-relaxed text-foreground">
-                <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">Client Message:</p>
+                <p className="font-semibold text-muted-foreground mb-1 uppercase tracking-wider text-[10px]">
+                  Client Message:
+                </p>
                 <p>{selectedInquiry.message || "No message body provided."}</p>
               </div>
 
               {selectedInquiry.propertySlug && (
                 <div className="rounded-lg border p-3 bg-card text-xs">
-                  <p className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">Attached Listing:</p>
+                  <p className="text-[10px] uppercase font-semibold text-muted-foreground mb-1">
+                    Attached Listing:
+                  </p>
                   <Link
                     to="/properties/$slug"
                     params={{ slug: selectedInquiry.propertySlug }}
@@ -334,29 +459,98 @@ export function AdminInquiriesPage() {
                 </div>
               )}
 
-              {/* Status Selector */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                  Change Status
+              {/* Status Transition Workflow */}
+              <div className="space-y-2 pt-2 border-t">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
+                  Workflow Status
                 </label>
                 <select
                   className={field}
-                  disabled={!can(user, "edit-crm", selectedInquiry.agentId) || (user?.role === "agent" && selectedInquiry.agentId !== user.id)}
+                  disabled={
+                    !can(user, "edit-crm", selectedInquiry.agentId) ||
+                    (user?.role === "agent" && selectedInquiry.agentId !== user.id)
+                  }
                   value={selectedInquiry.status}
-                  onChange={(e) => handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])}
+                  onChange={(e) =>
+                    handleStatusChange(selectedInquiry.id, e.target.value as Inquiry["status"])
+                  }
                 >
                   <option value="New">New</option>
                   <option value="Contacted">Contacted</option>
-                  <option value="Qualified">Qualified</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                  {selectedInquiry.status === "Qualified" && (
+                    <option value="Qualified">Qualified</option>
+                  )}
                   <option value="Archived">Archived</option>
                 </select>
+
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {INQUIRY_STATUSES.map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      disabled={
+                        selectedInquiry.status === st ||
+                        !can(user, "edit-crm", selectedInquiry.agentId) ||
+                        (user?.role === "agent" && selectedInquiry.agentId !== user.id)
+                      }
+                      onClick={() => handleStatusChange(selectedInquiry.id, st)}
+                      className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                        selectedInquiry.status === st
+                          ? "bg-brass/20 text-brass border border-brass font-semibold cursor-default"
+                          : "border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Internal Notes Editor */}
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
+                    Internal Notes
+                  </label>
+                  {selectedInquiry.notes !== internalNote && (
+                    <span className="text-[10px] text-brass font-medium">Unsaved</span>
+                  )}
+                </div>
+                <textarea
+                  className={`${field} h-24 text-xs py-2`}
+                  placeholder="Private administrative notes (e.g. client budget verification, phone consultation highlights, scheduling)..."
+                  value={internalNote}
+                  disabled={
+                    !can(user, "edit-crm", selectedInquiry.agentId) ||
+                    (user?.role === "agent" && selectedInquiry.agentId !== user.id)
+                  }
+                  onChange={(e) => setInternalNote(e.target.value)}
+                />
+                <button
+                  type="button"
+                  disabled={
+                    savingNote ||
+                    internalNote === (selectedInquiry.notes || "") ||
+                    !can(user, "edit-crm", selectedInquiry.agentId)
+                  }
+                  onClick={handleSaveNotes}
+                  className={`${btnGhost} text-xs !py-1.5 w-full justify-center gap-1.5 border border-dashed hover:border-solid`}
+                >
+                  <Save className="h-3 w-3" />
+                  <span>{savingNote ? "Saving notes..." : "Save internal notes"}</span>
+                </button>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-2 pt-2 border-t">
                 {!selectedInquiry.leadId && selectedInquiry.status !== "Archived" && (
                   <button
-                    disabled={!can(user, "edit-crm", selectedInquiry.agentId) || (user?.role === "agent" && selectedInquiry.agentId !== user.id)}
+                    disabled={
+                      !can(user, "edit-crm", selectedInquiry.agentId) ||
+                      (user?.role === "agent" && selectedInquiry.agentId !== user.id)
+                    }
                     onClick={() => handleConvertToLead(selectedInquiry.id)}
                     className={`${btnPrimary} w-full justify-center`}
                   >
@@ -388,7 +582,8 @@ export function AdminInquiriesPage() {
             </div>
           ) : (
             <div className="rounded-xl border border-dashed p-8 text-center text-xs text-muted-foreground">
-              Select an inquiry from the list to view complete details, message history, and direct conversion actions.
+              Select an inquiry from the list to view complete details, message history, and direct
+              conversion actions.
             </div>
           )}
         </div>
@@ -398,15 +593,17 @@ export function AdminInquiriesPage() {
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
           <div className="w-full max-w-lg rounded-xl border bg-card p-6 shadow-xl">
-            <h3 className="font-display text-lg font-bold text-foreground mb-4">
-              Add an enquiry
-            </h3>
+            <h3 className="font-display text-lg font-bold text-foreground mb-4">Add an enquiry</h3>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
-                <label htmlFor="inquiry-name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label
+                  htmlFor="inquiry-name"
+                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1"
+                >
                   Full Name *
                 </label>
-                <input id="inquiry-name"
+                <input
+                  id="inquiry-name"
                   required
                   className={field}
                   value={newForm.name}
@@ -416,10 +613,14 @@ export function AdminInquiriesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="inquiry-email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label
+                    htmlFor="inquiry-email"
+                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1"
+                  >
                     Email
                   </label>
-                <input id="inquiry-email"
+                  <input
+                    id="inquiry-email"
                     type="email"
                     className={field}
                     value={newForm.email}
@@ -428,10 +629,14 @@ export function AdminInquiriesPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="inquiry-phone" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label
+                    htmlFor="inquiry-phone"
+                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1"
+                  >
                     Phone / WhatsApp
                   </label>
-                <input id="inquiry-phone"
+                  <input
+                    id="inquiry-phone"
                     className={field}
                     value={newForm.phone}
                     onChange={(e) => setNewForm({ ...newForm, phone: e.target.value })}
@@ -457,10 +662,14 @@ export function AdminInquiriesPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="inquiry-budget" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  <label
+                    htmlFor="inquiry-budget"
+                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1"
+                  >
                     Stated Budget
                   </label>
-                <input id="inquiry-budget"
+                  <input
+                    id="inquiry-budget"
                     className={field}
                     value={newForm.budget}
                     onChange={(e) => setNewForm({ ...newForm, budget: e.target.value })}
@@ -469,10 +678,14 @@ export function AdminInquiriesPage() {
                 </div>
               </div>
               <div>
-                <label htmlFor="inquiry-message" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                <label
+                  htmlFor="inquiry-message"
+                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1"
+                >
                   Inquiry Details / Message
                 </label>
-                <textarea id="inquiry-message"
+                <textarea
+                  id="inquiry-message"
                   className={`${field} h-24 py-2`}
                   value={newForm.message}
                   onChange={(e) => setNewForm({ ...newForm, message: e.target.value })}

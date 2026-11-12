@@ -1,4 +1,5 @@
 <!-- Updated: 2026-03-08 -->
+
 # GitHub API Ops Guide (SEO Automation)
 
 Operational guidance for API-backed repository SEO scripts.

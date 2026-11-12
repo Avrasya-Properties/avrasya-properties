@@ -76,4 +76,3 @@ jobs:
           name: admin-smoke-failure
           path: test-results/
           if-no-files-found: ignore
-

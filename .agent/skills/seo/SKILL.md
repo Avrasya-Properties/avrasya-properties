@@ -26,24 +26,24 @@ For prompt reliability in Codex/agent IDEs, map common user wording to a fixed w
 
 ## Available Commands
 
-| Command | Sub-Skill | Description |
-|---------|-----------|-------------|
-| `seo audit <url>` | [seo-audit](resources/skills/seo-audit.md) | Full website audit with scoring |
-| `seo page <url>` | [seo-page](resources/skills/seo-page.md) | Deep single-page analysis |
-| `seo technical <url>` | [seo-technical](resources/skills/seo-technical.md) | Technical SEO checks |
-| `seo content <url>` | [seo-content](resources/skills/seo-content.md) | Content quality & E-E-A-T |
-| `seo schema <url>` | [seo-schema](resources/skills/seo-schema.md) | Schema detection/validation/generation |
-| `seo sitemap <url>` | [seo-sitemap](resources/skills/seo-sitemap.md) | Sitemap analysis & generation |
-| `seo images <url>` | [seo-images](resources/skills/seo-images.md) | Image optimization audit |
-| `seo geo <url>` | [seo-geo](resources/skills/seo-geo.md) | AI search optimization (GEO) |
-| `seo programmatic <url>` | [seo-programmatic](resources/skills/seo-programmatic.md) | Programmatic SEO safeguards |
-| `seo competitors <url>` | [seo-competitor-pages](resources/skills/seo-competitor-pages.md) | Comparison/alternatives pages |
-| `seo hreflang <url>` | [seo-hreflang](resources/skills/seo-hreflang.md) | International SEO validation |
-| `seo plan <url>` | [seo-plan](resources/skills/seo-plan.md) | Strategic SEO planning |
-| `seo github <repo_or_url>` | [seo-github](resources/skills/seo-github.md) | GitHub repository discoverability, README, topics, community health, and traffic archival |
-| `seo article <url>` | [seo-article](resources/skills/seo-article.md) | Article data extraction & LLM optimization |
-| `seo links <url>` | [seo-links](resources/skills/seo-links.md) | External backlink profile & link health |
-| `seo aeo <url>` | [seo-aeo](resources/skills/seo-aeo.md) | Answer Engine Optimization (Featured Snippets, PAA, Knowledge Panel) |
+| Command                    | Sub-Skill                                                        | Description                                                                               |
+| -------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `seo audit <url>`          | [seo-audit](resources/skills/seo-audit.md)                       | Full website audit with scoring                                                           |
+| `seo page <url>`           | [seo-page](resources/skills/seo-page.md)                         | Deep single-page analysis                                                                 |
+| `seo technical <url>`      | [seo-technical](resources/skills/seo-technical.md)               | Technical SEO checks                                                                      |
+| `seo content <url>`        | [seo-content](resources/skills/seo-content.md)                   | Content quality & E-E-A-T                                                                 |
+| `seo schema <url>`         | [seo-schema](resources/skills/seo-schema.md)                     | Schema detection/validation/generation                                                    |
+| `seo sitemap <url>`        | [seo-sitemap](resources/skills/seo-sitemap.md)                   | Sitemap analysis & generation                                                             |
+| `seo images <url>`         | [seo-images](resources/skills/seo-images.md)                     | Image optimization audit                                                                  |
+| `seo geo <url>`            | [seo-geo](resources/skills/seo-geo.md)                           | AI search optimization (GEO)                                                              |
+| `seo programmatic <url>`   | [seo-programmatic](resources/skills/seo-programmatic.md)         | Programmatic SEO safeguards                                                               |
+| `seo competitors <url>`    | [seo-competitor-pages](resources/skills/seo-competitor-pages.md) | Comparison/alternatives pages                                                             |
+| `seo hreflang <url>`       | [seo-hreflang](resources/skills/seo-hreflang.md)                 | International SEO validation                                                              |
+| `seo plan <url>`           | [seo-plan](resources/skills/seo-plan.md)                         | Strategic SEO planning                                                                    |
+| `seo github <repo_or_url>` | [seo-github](resources/skills/seo-github.md)                     | GitHub repository discoverability, README, topics, community health, and traffic archival |
+| `seo article <url>`        | [seo-article](resources/skills/seo-article.md)                   | Article data extraction & LLM optimization                                                |
+| `seo links <url>`          | [seo-links](resources/skills/seo-links.md)                       | External backlink profile & link health                                                   |
+| `seo aeo <url>`            | [seo-aeo](resources/skills/seo-aeo.md)                           | Answer Engine Optimization (Featured Snippets, PAA, Knowledge Panel)                      |
 
 ---
 
@@ -65,12 +65,15 @@ Parse the user's request to determine which sub-skill(s) to activate:
 ### Step 2 — Collect Evidence
 
 **Primary method (LLM-first)** — use the built-in `read_url_content` tool first:
+
 ```
 read_url_content(url)  →  returns parsed HTML content directly
 ```
+
 Use this as the baseline evidence for reasoning.
 
 **Deterministic verification (recommended when script execution is available)**:
+
 ```bash
 # Fetch/parse raw HTML for structured checks
 python3 <SKILL_DIR>/scripts/fetch_page.py <url> --output /tmp/page.html
@@ -157,6 +160,7 @@ python3 <SKILL_DIR>/scripts/github_seo_report.py --repo <owner/repo> --provider 
 ```
 
 If a check fails due network, DNS, permissions, or API rate limits:
+
 - Report it explicitly as an **environment limitation**, not a confirmed site issue.
 - Keep confidence as `Hypothesis` for impacted categories.
 - Continue with available evidence instead of stopping the audit.
@@ -164,6 +168,7 @@ If a check fails due network, DNS, permissions, or API rate limits:
 - Do not pivot into repeated web-search scraping loops for the same URL.
 
 **Visual analysis** (requires Playwright — use `conda activate pentest` if available):
+
 ```bash
 # Capture screenshots (desktop, laptop, tablet, mobile)
 python3 <SKILL_DIR>/scripts/capture_screenshot.py <url> --all
@@ -173,6 +178,7 @@ python3 <SKILL_DIR>/scripts/analyze_visual.py <url> --json
 ```
 
 **HTML Report Generator** — generates a self-contained interactive HTML dashboard:
+
 ```bash
 # Generate full SEO report (runs scripts automatically, saves HTML to PWD)
 python3 <SKILL_DIR>/scripts/generate_report.py <url>
@@ -183,15 +189,15 @@ python3 <SKILL_DIR>/scripts/generate_report.py <url> --output custom-report.html
 
 For comprehensive audits, read the relevant agent file from `resources/agents/` to adopt the specialist role:
 
-| Agent | File | Focus Area |
-|-------|------|------------|
-| Technical SEO | [seo-technical.md](resources/agents/seo-technical.md) | Crawlability, indexability, security, URLs, mobile, CWV, JS rendering |
-| Content Quality | [seo-content.md](resources/agents/seo-content.md) | E-E-A-T assessment, content metrics, AI content detection |
-| Performance | [seo-performance.md](resources/agents/seo-performance.md) | Core Web Vitals (LCP, INP, CLS), optimization recommendations |
-| Schema Markup | [seo-schema.md](resources/agents/seo-schema.md) | Detection, validation, generation of JSON-LD structured data |
-| Sitemap | [seo-sitemap.md](resources/agents/seo-sitemap.md) | XML sitemap validation, generation, quality gates |
-| Visual Analysis | [seo-visual.md](resources/agents/seo-visual.md) | Screenshots, above-the-fold, responsiveness, layout |
-| Verifier (global) | [seo-verifier.md](resources/agents/seo-verifier.md) | Deduplicate findings, suppress contradictions, and validate evidence relevance before final report |
+| Agent             | File                                                      | Focus Area                                                                                         |
+| ----------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Technical SEO     | [seo-technical.md](resources/agents/seo-technical.md)     | Crawlability, indexability, security, URLs, mobile, CWV, JS rendering                              |
+| Content Quality   | [seo-content.md](resources/agents/seo-content.md)         | E-E-A-T assessment, content metrics, AI content detection                                          |
+| Performance       | [seo-performance.md](resources/agents/seo-performance.md) | Core Web Vitals (LCP, INP, CLS), optimization recommendations                                      |
+| Schema Markup     | [seo-schema.md](resources/agents/seo-schema.md)           | Detection, validation, generation of JSON-LD structured data                                       |
+| Sitemap           | [seo-sitemap.md](resources/agents/seo-sitemap.md)         | XML sitemap validation, generation, quality gates                                                  |
+| Visual Analysis   | [seo-visual.md](resources/agents/seo-visual.md)           | Screenshots, above-the-fold, responsiveness, layout                                                |
+| Verifier (global) | [seo-verifier.md](resources/agents/seo-verifier.md)       | Deduplicate findings, suppress contradictions, and validate evidence relevance before final report |
 
 ### Step 6 — Apply Quality Gates
 
@@ -223,15 +229,15 @@ Use numeric scores as guidance, not as a replacement for evidence quality and ju
 > **Canonical source of truth** — These weights are defined here and in `resources/skills/seo-audit.md`.
 > Do not modify weights in individual sub-skill files; update only these two locations to keep scores consistent.
 
-| Category | Weight |
-|----------|--------|
-| Technical SEO | 25% |
-| Content Quality | 20% |
-| On-Page SEO | 15% |
-| Schema / Structured Data | 15% |
-| Performance (CWV) | 10% |
-| Image Optimization | 10% |
-| AI Search Readiness (GEO) | 5% |
+| Category                  | Weight |
+| ------------------------- | ------ |
+| Technical SEO             | 25%    |
+| Content Quality           | 20%    |
+| On-Page SEO               | 15%    |
+| Schema / Structured Data  | 15%    |
+| Performance (CWV)         | 10%    |
+| Image Optimization        | 10%    |
+| AI Search Readiness (GEO) | 5%     |
 
 > If using `scripts/generate_report.py`, the automated dashboard uses script-level category weights defined in that script. Keep the narrative audit LLM-first and evidence-first.
 
@@ -246,13 +252,14 @@ For `seo audit`, `seo page`, and generic `perform seo analysis on <url>` flows:
 5. If technical checks are blocked by environment limits, still write both markdown files and include an "Environment Limitations" section.
 
 #### Score Interpretation
-| Score | Rating |
-|-------|--------|
-| 90-100 | Excellent |
-| 70-89 | Good |
-| 50-69 | Needs Improvement |
-| 30-49 | Poor |
-| 0-29 | Critical |
+
+| Score  | Rating            |
+| ------ | ----------------- |
+| 90-100 | Excellent         |
+| 70-89  | Good              |
+| 50-69  | Needs Improvement |
+| 30-49  | Poor              |
+| 0-29   | Critical          |
 
 ---
 
@@ -260,16 +267,17 @@ For `seo audit`, `seo page`, and generic `perform seo analysis on <url>` flows:
 
 When running `seo plan`, detect the business type and load the matching template:
 
-| Industry | Template File |
-|----------|---------------|
-| SaaS / Software | [saas.md](resources/templates/saas.md) |
+| Industry               | Template File                                            |
+| ---------------------- | -------------------------------------------------------- |
+| SaaS / Software        | [saas.md](resources/templates/saas.md)                   |
 | Local Service Business | [local-service.md](resources/templates/local-service.md) |
-| E-commerce / Retail | [ecommerce.md](resources/templates/ecommerce.md) |
-| Publisher / Media | [publisher.md](resources/templates/publisher.md) |
-| Agency / Consultancy | [agency.md](resources/templates/agency.md) |
-| Other / Generic | [generic.md](resources/templates/generic.md) |
+| E-commerce / Retail    | [ecommerce.md](resources/templates/ecommerce.md)         |
+| Publisher / Media      | [publisher.md](resources/templates/publisher.md)         |
+| Agency / Consultancy   | [agency.md](resources/templates/agency.md)               |
+| Other / Generic        | [generic.md](resources/templates/generic.md)             |
 
 **Detection signals:**
+
 - SaaS: pricing page, feature pages, /docs, /api, trial/demo CTAs
 - Local: address, phone, Google Business Profile, service area pages
 - E-commerce: product pages, cart, checkout, /collections, /categories
@@ -281,6 +289,7 @@ When running `seo plan`, detect the business type and load the matching template
 ## Schema Templates
 
 Pre-built JSON-LD templates are available in [templates.json](resources/schema/templates.json) for:
+
 - **Common**: BlogPosting, Article, Organization, LocalBusiness, BreadcrumbList, WebSite (with SearchAction)
 - **Video**: VideoObject, BroadcastEvent, Clip, SeekToAction
 - **E-commerce**: ProductGroup (variants), OfferShippingDetails, Certification
@@ -293,27 +302,35 @@ Pre-built JSON-LD templates are available in [templates.json](resources/schema/t
 Two validation scripts are available for CI/CD integration:
 
 ### Pre-commit SEO Check
+
 ```bash
 bash <SKILL_DIR>/scripts/pre_commit_seo_check.sh
 ```
+
 Checks staged HTML files for: placeholder text in schema, title tag length, missing alt text, deprecated schema types, FID references (should be INP), meta description length.
 
 ### Schema Validator
+
 ```bash
 python3 <SKILL_DIR>/scripts/validate_schema.py <file_path>
 ```
+
 Validates JSON-LD blocks in HTML files: JSON syntax, @context/@type presence, placeholder text, deprecated/restricted types.
 
 ### Skill Inventory Validator
+
 ```bash
 python3 <SKILL_DIR>/scripts/validate_skill_inventory.py
 ```
+
 Validates documented sub-skill, agent, and script counts against files on disk. CI uses this to prevent README/SKILL inventory drift.
 
 ### Reference Freshness Validator
+
 ```bash
 python3 <SKILL_DIR>/scripts/reference_freshness.py <SKILL_DIR>/resources/references --max-age-days 90
 ```
+
 Checks that every reference file has a `<!-- Updated: YYYY-MM-DD -->` marker and flags references older than the configured freshness window.
 
 ---
@@ -321,12 +338,14 @@ Checks that every reference file has a `<!-- Updated: YYYY-MM-DD -->` marker and
 ## Output Format
 
 All sub-skill reports should use consistent severity levels:
+
 - 🔴 **Critical** — Directly impacts rankings or indexing (fix immediately)
 - ⚠️ **Warning** — Optimization opportunity (fix within 1 month)
 - ✅ **Pass** — Meets or exceeds standards
 - ℹ️ **Info** — Not applicable or informational only
 
 Structure reports as:
+
 1. Summary table with element, value, and severity
 2. Detailed findings grouped by category
 3. Actionable recommendations ordered by impact
@@ -354,6 +373,7 @@ Structure reports as:
 ## Dependencies
 
 ### Optional Script Dependencies
+
 - Python 3.8+
 - `requests` (for network analysis scripts)
 - `beautifulsoup4` (for HTML parsing scripts)
@@ -364,6 +384,7 @@ Structure reports as:
   Or if using conda: `conda activate pentest` (if Playwright is pre-installed)
 
 ### Install Script Dependencies
+
 ```bash
 pip install requests beautifulsoup4
 ```

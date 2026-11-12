@@ -33,9 +33,11 @@ description: >
 Read `references/schema-types.md` for the full list. Key rules:
 
 ### ACTIVE — recommend freely:
+
 Organization, LocalBusiness, SoftwareApplication, WebApplication, Product (with Certification markup as of April 2025), ProductGroup, Offer, Service, Article, BlogPosting, NewsArticle, Review, AggregateRating, BreadcrumbList, WebSite, WebPage, Person, ProfilePage, ContactPage, VideoObject, ImageObject, Event, JobPosting, Course, DiscussionForumPosting
 
 ### VIDEO & SPECIALIZED — recommend freely:
+
 BroadcastEvent, Clip, SeekToAction, SoftwareSourceCode
 
 See `schema/templates.json` for ready-to-use JSON-LD templates for these types.
@@ -43,9 +45,11 @@ See `schema/templates.json` for ready-to-use JSON-LD templates for these types.
 > **JSON-LD and JavaScript rendering:** Per Google's December 2025 JS SEO guidance, structured data injected via JavaScript may face delayed processing. For time-sensitive markup (especially Product, Offer), include JSON-LD in the initial server-rendered HTML.
 
 ### RESTRICTED — only for specific sites:
+
 - **FAQ**: ONLY for government and healthcare authority sites (restricted Aug 2023)
 
 ### DEPRECATED — never recommend:
+
 - **HowTo**: Rich results removed September 2023
 - **SpecialAnnouncement**: Deprecated July 31, 2025
 - **CourseInfo, EstimatedSalary, LearningVideo**: Retired June 2025
@@ -58,6 +62,7 @@ See `schema/templates.json` for ready-to-use JSON-LD templates for these types.
 ## Generation
 
 When generating schema for a page:
+
 1. Identify page type from content analysis
 2. Select appropriate schema type(s)
 3. Generate valid JSON-LD with all required + recommended properties
@@ -67,6 +72,7 @@ When generating schema for a page:
 ## Common Schema Templates
 
 ### Organization
+
 ```json
 {
   "@context": "https://schema.org",
@@ -79,15 +85,12 @@ When generating schema for a page:
     "telephone": "[Phone]",
     "contactType": "customer service"
   },
-  "sameAs": [
-    "[Facebook URL]",
-    "[LinkedIn URL]",
-    "[Twitter URL]"
-  ]
+  "sameAs": ["[Facebook URL]", "[LinkedIn URL]", "[Twitter URL]"]
 }
 ```
 
 ### LocalBusiness
+
 ```json
 {
   "@context": "https://schema.org",
@@ -112,6 +115,7 @@ When generating schema for a page:
 ```
 
 ### Article/BlogPosting
+
 ```json
 {
   "@context": "https://schema.org",
@@ -141,11 +145,13 @@ When generating schema for a page:
 - `generated-schema.json` — ready-to-use JSON-LD snippets
 
 ### Validation Results
-| Schema | Type | Status | Issues |
-|--------|------|--------|--------|
-| ... | ... | ✅/⚠️/❌ | ... |
+
+| Schema | Type | Status   | Issues |
+| ------ | ---- | -------- | ------ |
+| ...    | ...  | ✅/⚠️/❌ | ...    |
 
 ### Recommendations
+
 - Missing schema opportunities
 - Validation fixes needed
 - Generated code for implementation
@@ -153,6 +159,7 @@ When generating schema for a page:
 ## Execution Plan
 
 When invoked as an agent, execute these steps:
+
 1. Parse the page HTML to extract JSON-LD using `scripts/parse_html.py --fetch "$URL" --json`, or fetch first with `scripts/fetch_page.py "$URL" --output /tmp/page.html` and then run `scripts/parse_html.py /tmp/page.html --url "$URL" --json`.
 2. Extract the `schema` array from the output.
 3. Validate each schema object against rules in `resources/references/schema-types.md`.

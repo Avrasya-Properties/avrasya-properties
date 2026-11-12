@@ -1,6 +1,6 @@
 import { useWhatsAppLink } from "@/hooks/useLiveContact";
 import { Link } from "@tanstack/react-router";
-import { useState,useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import {
   ArrowRight,
@@ -34,6 +34,9 @@ import {
   priceDisplay,
   sideText,
   type PropertyRecord,
+  type PropertySpecs,
+  type PropertyDocumentItem,
+  type PropertyTranslation,
 } from "@/data/properties";
 import { sameCity, showsSide } from "@/data/regions";
 import { useCatalogue } from "@/data/live";
@@ -54,9 +57,19 @@ function Fact({ k, v }: { k: string; v: React.ReactNode }) {
   );
 }
 
-function GalleryImage({src,alt,className}:{src:string;alt:string;className:string}){
-  const [failed,setFailed]=useState(false);
-  return failed?<div role="img" aria-label={alt} className="flex h-full w-full items-center justify-center bg-muted p-4 text-center text-sm text-muted-foreground">This photo is temporarily unavailable.</div>:<img src={src} alt={alt} className={className} onError={()=>setFailed(true)}/>;
+function GalleryImage({ src, alt, className }: { src: string; alt: string; className: string }) {
+  const [failed, setFailed] = useState(false);
+  return failed ? (
+    <div
+      role="img"
+      aria-label={alt}
+      className="flex h-full w-full items-center justify-center bg-muted p-4 text-center text-sm text-muted-foreground"
+    >
+      This photo is temporarily unavailable.
+    </div>
+  ) : (
+    <img src={src} alt={alt} className={className} onError={() => setFailed(true)} />
+  );
 }
 
 const usd = (n: number) => "$" + n.toLocaleString("en-US");
@@ -66,19 +79,45 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
   const { t } = useLanguage();
   const p = r.price;
   const rows: [string, string][] = [];
-  if (p.previous_advertised_amount) rows.push(["Formerly Advertised", usd(p.previous_advertised_amount)]);
+  if (p.previous_advertised_amount)
+    rows.push(["Formerly Advertised", usd(p.previous_advertised_amount)]);
   if (p.list_price) rows.push(["Source List Price", usd(p.list_price)]);
   if (p.expenses_amount) rows.push(["Stated Transfer Expenses", usd(p.expenses_amount)]);
-  const inst = r.details.installment_offer as { total: number; down_payment_percent: number; months: number } | undefined;
-  if (inst) rows.push(["Developer Instalment Plan", `${usd(inst.total)} · ${inst.down_payment_percent}% down · ${inst.months} months`]);
+  const inst = r.details.installment_offer as
+    | { total: number; down_payment_percent: number; months: number }
+    | undefined;
+  if (inst)
+    rows.push([
+      "Developer Instalment Plan",
+      `${usd(inst.total)} · ${inst.down_payment_percent}% down · ${inst.months} months`,
+    ]);
   if (p.basis === "installment_schedule") {
-    const money=(n:number)=>`${p.currency||"TRY"} ${n.toLocaleString("en-US")}`;
-    if(typeof p.down_payment_amount==="number")rows.push([p.down_payment_percent!=null?`Down Payment (${p.down_payment_percent}%)`:"Down payment",money(p.down_payment_amount)]);
-    if(typeof p.delivery_payment_amount==="number")rows.push([p.delivery_payment_percent!=null?`At Delivery (${p.delivery_payment_percent}%)`:"At delivery",money(p.delivery_payment_amount)]);
-    if(typeof p.installment_amount==="number")rows.push(["Instalments",`${p.installment_count??"To confirm"} × ${money(p.installment_amount)}`]);
+    const money = (n: number) => `${p.currency || "TRY"} ${n.toLocaleString("en-US")}`;
+    if (typeof p.down_payment_amount === "number")
+      rows.push([
+        p.down_payment_percent != null
+          ? `Down Payment (${p.down_payment_percent}%)`
+          : "Down payment",
+        money(p.down_payment_amount),
+      ]);
+    if (typeof p.delivery_payment_amount === "number")
+      rows.push([
+        p.delivery_payment_percent != null
+          ? `At Delivery (${p.delivery_payment_percent}%)`
+          : "At delivery",
+        money(p.delivery_payment_amount),
+      ]);
+    if (typeof p.installment_amount === "number")
+      rows.push([
+        "Instalments",
+        `${p.installment_count ?? "To confirm"} × ${money(p.installment_amount)}`,
+      ]);
   }
   p.source_offers?.forEach((o, i) =>
-    rows.push([`Starting Offer ${i + 1}`, `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m² gross` : ""}`])
+    rows.push([
+      `Starting Offer ${i + 1}`,
+      `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m² gross` : ""}`,
+    ]),
   );
   if (!rows.length) return null;
   return (
@@ -96,24 +135,31 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
   );
 }
 
-export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boolean}) {
-  const waLink=useWhatsAppLink();
+export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; preview?: boolean }) {
+  const waLink = useWhatsAppLink();
   const media = getPropertyMedia(r);
   const p = priceDisplay(r.price);
   const contact = useLiveContact();
-  const { t, isRtl } = useLanguage();
+  const { t, locale, isRtl } = useLanguage();
   const [activeImg, setActiveImg] = useState(0);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [lightbox, setLightbox] = useState(false);
-  const [ready,setReady]=useState(false);
-  useEffect(()=>setReady(true),[]);
-  const galleryDialog=useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  useEffect(() => setReady(true), []);
+  const galleryDialog = useRef<HTMLDivElement>(null);
   const [currency] = useCurrency();
   const { isSaved, toggle } = useShortlist();
   const saved = isSaved(r.slug);
   const usdVal = comparableUsd(r.price);
-  const displayPrice = currency === "USD"||usdVal===null ? (p.main === "Price on request" ? t.common.priceOnRequest : p.main) : convertUsdPrice(usdVal, currency);
-  const settings=useSiteSettings();
-  const isCbi = r.details["cbi_verified"]===true;
+  const displayPrice =
+    currency === "USD" || usdVal === null
+      ? p.main === "Price on request"
+        ? t.common.priceOnRequest
+        : p.main
+      : convertUsdPrice(usdVal, currency);
+  const settings = useSiteSettings();
+  const isCbi = r.details["cbi_verified"] === true;
 
   const sideLabel =
     r.side === "Europe"
@@ -134,56 +180,181 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             : t.common.offerToConfirm;
 
   const d = r.details;
+  const translations = (d["translations"] as Record<string, PropertyTranslation> | undefined) ?? {};
+  const localized = translations[locale] ?? {};
+  const displayTitle = localized.title?.trim() || r.marketing_title;
+  const displayShortDesc =
+    localized.shortDescription?.trim() ||
+    (typeof d["short_description"] === "string" ? d["short_description"] : "");
+  const displayDescription =
+    localized.description?.trim() || (typeof d.note === "string" ? d.note : "");
+  const neighborhood = typeof d["neighborhood"] === "string" ? d["neighborhood"].trim() : "";
+  const propertyCategory =
+    typeof d["property_category"] === "string" ? d["property_category"].trim() : "";
+  const specs = (d["specs"] as PropertySpecs | undefined) ?? {};
+  const coordinates = d["coordinates"] as { lat?: number; lng?: number } | null | undefined;
+  const publicDocuments: PropertyDocumentItem[] = media.documents;
+  const virtualTourUrl =
+    typeof d["virtual_tour_url"] === "string" ? d["virtual_tour_url"].trim() : "";
+  const videoUrl = typeof d["video_url"] === "string" ? d["video_url"].trim() : "";
+  const model3dUrl = typeof d["model_3d_url"] === "string" ? d["model_3d_url"].trim() : "";
+
   // Only curated, buyer-facing keys are printed; unknown supplier fields stay private.
-  const PUBLIC_FACT_KEYS = ["developer","delivery","block","floor","unit","delivery_source","developer_source","status_source","title_deed_source","kitchen_source","promotion_source"];
+  const PUBLIC_FACT_KEYS = [
+    "developer",
+    "delivery",
+    "block",
+    "floor",
+    "unit",
+    "delivery_source",
+    "developer_source",
+    "status_source",
+    "title_deed_source",
+    "kitchen_source",
+    "promotion_source",
+  ];
   const facts = Object.entries(d).filter(
-    ([k, v]) => typeof v === "string" && v.trim() !== "" && PUBLIC_FACT_KEYS.includes(k)
+    ([k, v]) => typeof v === "string" && v.trim() !== "" && PUBLIC_FACT_KEYS.includes(k),
   );
   const claims = (d.claims_requiring_confirmation as string[] | undefined) ?? [];
   const plan = d.supporting_plan as Record<string, unknown> | undefined;
-  const { properties }=useCatalogue();
-  const related = properties.filter((x) => x.slug !== r.slug && sameCity(x.city, r.city)).slice(0, 3);
+  const { properties } = useCatalogue();
+  const related = properties
+    .filter((x) => x.slug !== r.slug && sameCity(x.city, r.city))
+    .map((x) => {
+      let score = 0;
+      if (d.project && x.details["project"] === d.project) score += 5;
+      if (neighborhood && x.details["neighborhood"] === neighborhood) score += 4;
+      if (r.location_label && x.location_label === r.location_label) score += 3;
+      if (propertyCategory && x.details["property_category"] === propertyCategory) score += 2;
+      if (r.record_type === x.record_type) score += 1;
+      return { x, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.x);
 
-  const images = media.floorPlan?[...new Set([...media.gallery,media.floorPlan])]:media.gallery;
-  const mediaKey=r.slug+"|"+media.cover+"|"+images.join("|");
-  const previousMedia=useRef(mediaKey);
-  useEffect(()=>{if(previousMedia.current!==mediaKey){previousMedia.current=mediaKey;setActiveImg(0);setLightbox(false);}},[mediaKey]);
-  useEffect(()=>{
-    if(!lightbox)return;
-    const trigger=document.activeElement as HTMLElement|null,previous=document.body.style.overflow;
-    document.body.style.overflow="hidden";galleryDialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
-    const keys=(event:KeyboardEvent)=>{
-      if(event.key==="Escape")setLightbox(false);
-      if(event.key==="ArrowRight"&&images.length>1)setActiveImg(i=>(i+1)%images.length);
-      if(event.key==="ArrowLeft"&&images.length>1)setActiveImg(i=>(i+images.length-1)%images.length);
-      if(event.key==="Tab"){
-        const buttons=galleryDialog.current?.querySelectorAll<HTMLButtonElement>("button"),first=buttons?.[0],last=buttons?.[buttons.length-1];
-        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
-        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+  const galleryCategories = [
+    "All",
+    ...Array.from(new Set(media.galleryItems.map((g) => g.category).filter(Boolean))),
+  ];
+  const filteredGalleryItems =
+    activeCategory === "All"
+      ? media.galleryItems
+      : media.galleryItems.filter((g) => g.category === activeCategory);
+
+  const allImages = media.floorPlan
+    ? [...new Set([...media.gallery, media.floorPlan])]
+    : media.gallery;
+  const images =
+    activeCategory === "All"
+      ? allImages
+      : filteredGalleryItems.length > 0
+        ? filteredGalleryItems.map((g) => g.url)
+        : allImages;
+  const mediaKey = r.slug + "|" + media.cover + "|" + images.join("|");
+  const previousMedia = useRef(mediaKey);
+  useEffect(() => {
+    if (previousMedia.current !== mediaKey) {
+      previousMedia.current = mediaKey;
+      setActiveImg(0);
+      setLightbox(false);
+    }
+  }, [mediaKey]);
+  useEffect(() => {
+    if (!lightbox) return;
+    const trigger = document.activeElement as HTMLElement | null,
+      previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    galleryDialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const keys = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setLightbox(false);
+      if (event.key === "ArrowRight" && images.length > 1)
+        setActiveImg((i) => (i + 1) % images.length);
+      if (event.key === "ArrowLeft" && images.length > 1)
+        setActiveImg((i) => (i + images.length - 1) % images.length);
+      if (event.key === "Tab") {
+        const buttons = galleryDialog.current?.querySelectorAll<HTMLButtonElement>("button"),
+          first = buttons?.[0],
+          last = buttons?.[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
       }
     };
-    window.addEventListener("keydown",keys);
-    return()=>{document.body.style.overflow=previous;window.removeEventListener("keydown",keys);if(trigger?.isConnected)trigger.focus();};
-  },[lightbox,images.length]);
+    window.addEventListener("keydown", keys);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", keys);
+      if (trigger?.isConnected) trigger.focus();
+    };
+  }, [lightbox, images.length]);
 
   const handleShare = () => {
-    if (!preview&&typeof navigator !== "undefined" && navigator.clipboard) {
+    if (!preview && typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       toast.success(t.propertyDetail.shareSuccess);
     }
   };
 
   return (
-    <div data-property-detail data-property-ready={ready} className={preview?"property-detail-preview":"property-detail-page"} onClickCapture={preview?e=>{if((e.target as Element).closest("a")){e.preventDefault();e.stopPropagation();}}:undefined}>
+    <div
+      data-property-detail
+      data-property-ready={ready}
+      className={preview ? "property-detail-preview" : "property-detail-page"}
+      onClickCapture={
+        preview
+          ? (e) => {
+              if ((e.target as Element).closest("a")) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }
+          : undefined
+      }
+    >
       {/* Breadcrumb Nav */}
       <div className="border-b border-border/60 bg-card/60">
-        <nav aria-label="Breadcrumb" className="container-site flex flex-wrap items-center justify-between gap-2 py-3 text-xs text-muted-foreground">
+        <nav
+          aria-label="Breadcrumb"
+          className="container-site flex flex-wrap items-center justify-between gap-2 py-3 text-xs text-muted-foreground"
+        >
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <Link to="/" className="shrink-0 hover:text-foreground">{t.propertyDetail.home}</Link>
-            <span className="shrink-0" aria-hidden="true">/</span>
-            <Link to="/properties" className="shrink-0 hover:text-foreground">{t.propertyDetail.properties}</Link>
-            <span className="shrink-0" aria-hidden="true">/</span>
-            <span className="min-w-0 flex-1 truncate font-medium text-foreground">{r.marketing_title}</span>
+            <Link to="/" className="shrink-0 hover:text-foreground">
+              {t.propertyDetail.home}
+            </Link>
+            <span className="shrink-0" aria-hidden="true">
+              /
+            </span>
+            <Link to="/properties" className="shrink-0 hover:text-foreground">
+              {t.propertyDetail.properties}
+            </Link>
+            {r.location_label && (
+              <>
+                <span className="shrink-0" aria-hidden="true">
+                  /
+                </span>
+                <span className="shrink-0 text-muted-foreground">{r.location_label}</span>
+              </>
+            )}
+            {neighborhood && (
+              <>
+                <span className="shrink-0" aria-hidden="true">
+                  /
+                </span>
+                <span className="shrink-0 text-muted-foreground">{neighborhood}</span>
+              </>
+            )}
+            <span className="shrink-0" aria-hidden="true">
+              /
+            </span>
+            <span className="min-w-0 flex-1 truncate font-medium text-foreground">
+              {displayTitle}
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -193,7 +364,8 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               className="flex min-h-11 min-w-11 items-center justify-center gap-1 hover:text-foreground transition-colors"
               title={t.propertyDetail.share}
             >
-              <Share2 className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t.propertyDetail.share}</span>
+              <Share2 className="h-3.5 w-3.5" />{" "}
+              <span className="hidden sm:inline">{t.propertyDetail.share}</span>
             </button>
             <button
               disabled={preview}
@@ -201,8 +373,12 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               className="flex min-h-11 min-w-11 items-center justify-center gap-1 hover:text-foreground transition-colors"
               title={t.propertyDetail.save}
             >
-              <Heart className={`h-3.5 w-3.5 ${saved ? "fill-destructive text-destructive" : ""}`} />
-              <span className="hidden sm:inline">{saved ? t.propertyDetail.saved : t.propertyDetail.save}</span>
+              <Heart
+                className={`h-3.5 w-3.5 ${saved ? "fill-destructive text-destructive" : ""}`}
+              />
+              <span className="hidden sm:inline">
+                {saved ? t.propertyDetail.saved : t.propertyDetail.save}
+              </span>
             </button>
           </div>
         </nav>
@@ -214,10 +390,16 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="rounded-xs bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-                {TYPE_LABEL[r.record_type]}
+                {propertyCategory || TYPE_LABEL[r.record_type]}
               </span>
+              {r.ref && (
+                <span className="rounded-xs border border-brass/50 bg-brass/10 px-2 py-0.5 text-xs font-semibold text-brass-text">
+                  REF: {r.ref}
+                </span>
+              )}
               <span className="rounded-xs border border-border bg-card px-2 py-0.5 text-xs font-medium">
-                {locationText(r)} · {sideText(r)}
+                {locationText(r)}
+                {neighborhood ? ` · ${neighborhood}` : ""} · {sideText(r)}
               </span>
               {isCbi ? (
                 <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
@@ -231,11 +413,19 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             </div>
 
             <h1 className="display-hero break-words !text-3xl md:!text-5xl font-semibold text-foreground">
-              {r.marketing_title}
+              {displayTitle}
             </h1>
+            {displayShortDesc && (
+              <p className="mt-2 max-w-3xl text-sm md:text-base text-muted-foreground">
+                {displayShortDesc}
+              </p>
+            )}
             <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground md:text-base">
               <MapPin className="h-4 w-4 text-brass" />
-              <span>{locationText(r)}</span>
+              <span>
+                {locationText(r)}
+                {neighborhood ? ` (${neighborhood})` : ""}
+              </span>
               <span>·</span>
               <span>{r.layout_label ?? t.propertyDetail.toConfirm}</span>
               <span>·</span>
@@ -244,7 +434,16 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
           </div>
 
           <div className="lg:text-right flex flex-col items-start lg:items-end">
-            <p className="eyebrow !text-muted-foreground">{r.mode==="rent"?t.propertyDetail.monthlyRent:t.propertyDetail.askingPrice}</p>
+            <p className="eyebrow !text-muted-foreground">
+              {r.mode === "rent" ? t.propertyDetail.monthlyRent : t.propertyDetail.askingPrice}
+            </p>
+            {typeof d["original_price"] === "number" &&
+              r.price.amount != null &&
+              d["original_price"] > r.price.amount && (
+                <p className="text-sm text-muted-foreground line-through">
+                  {usd(d["original_price"])}
+                </p>
+              )}
             <p className="font-display break-words text-3xl md:text-5xl font-semibold text-foreground tracking-tight">
               {displayPrice}
             </p>
@@ -259,16 +458,67 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
         {/* Gallery Showcase */}
         <div className="mt-8 space-y-3">
+          {galleryCategories.length > 2 && (
+            <div className="flex flex-wrap items-center gap-2 pb-1">
+              {galleryCategories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setActiveImg(0);
+                  }}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                    activeCategory === cat
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "border border-border/80 bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Main Display Image */}
-          <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xs border border-border/80 bg-muted group">
-            {images[activeImg]||media.cover?<GalleryImage
-              key={images[activeImg]||media.cover}
-              src={images[activeImg] || media.cover}
-              alt={r.marketing_title}
-              className="h-full w-full object-contain transition-transform duration-500"
-            />
-            :<div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t.propertyDetail.noPhotos}</div>}
+          <div
+            onTouchStart={(e) => {
+              touchStartX.current = e.touches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(e) => {
+              if (touchStartX.current == null || images.length <= 1) return;
+              const delta = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+              if (Math.abs(delta) > 40) {
+                setActiveImg((prev) =>
+                  delta < 0
+                    ? (prev + 1) % images.length
+                    : (prev + images.length - 1) % images.length,
+                );
+              }
+              touchStartX.current = null;
+            }}
+            className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xs border border-border/80 bg-muted group"
+          >
+            {images[activeImg] || media.cover ? (
+              <GalleryImage
+                key={images[activeImg] || media.cover}
+                src={images[activeImg] || media.cover}
+                alt={displayTitle}
+                className="h-full w-full object-contain transition-transform duration-500"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                {t.propertyDetail.noPhotos}
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+
+            {/* Image Counter Badge */}
+            {images.length > 0 && (
+              <span className="absolute left-3 bottom-3 rounded-xs bg-black/60 backdrop-blur-md px-2.5 py-1 text-xs font-semibold text-white">
+                {Math.min(activeImg + 1, images.length)} / {images.length}
+              </span>
+            )}
 
             {/* Lightbox / Expand Button */}
             <button
@@ -305,15 +555,30 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             {images.map((img, i) => (
               <button
                 key={i}
-                aria-label={img===media.floorPlan?t.propertyDetail.floorPlan:`${t.propertyDetail.fullscreen} ${i+1}`}
-                aria-pressed={activeImg===i}
+                aria-label={
+                  img === media.floorPlan
+                    ? t.propertyDetail.floorPlan
+                    : `${t.propertyDetail.fullscreen} ${i + 1}`
+                }
+                aria-pressed={activeImg === i}
                 onClick={() => setActiveImg(i)}
                 className={`relative h-20 w-32 shrink-0 overflow-hidden rounded-xs border transition-all ${
-                  activeImg === i ? "border-brass ring-2 ring-brass/40 scale-102" : "border-border/70 opacity-70 hover:opacity-100"
+                  activeImg === i
+                    ? "border-brass ring-2 ring-brass/40 scale-102"
+                    : "border-border/70 opacity-70 hover:opacity-100"
                 }`}
               >
-                <GalleryImage key={img} src={img} alt={img===media.floorPlan?t.propertyDetail.floorPlan:`${t.propertyDetail.fullscreen} ${i+1}`} className="h-full w-full object-cover" />
-                {img===media.floorPlan && (
+                <GalleryImage
+                  key={img}
+                  src={img}
+                  alt={
+                    img === media.floorPlan
+                      ? t.propertyDetail.floorPlan
+                      : `${t.propertyDetail.fullscreen} ${i + 1}`
+                  }
+                  className="h-full w-full object-cover"
+                />
+                {img === media.floorPlan && (
                   <span className="absolute bottom-1 left-1 rounded-xs bg-primary/90 px-1 text-[8px] font-bold text-white uppercase">
                     {t.propertyDetail.floorPlan}
                   </span>
@@ -332,20 +597,80 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             <div className="flex items-center gap-2 mb-2">
               <span className="eyebrow !text-brass">{t.propertyDetail.specificationsEyebrow}</span>
             </div>
-            <h2 className="headline text-2xl font-semibold">{t.propertyDetail.specificationsTitle}</h2>
+            <h2 className="headline text-2xl font-semibold">
+              {t.propertyDetail.specificationsTitle}
+            </h2>
 
             <div className="mt-6 grid gap-x-12 sm:grid-cols-2">
               <Fact k={t.propertyDetail.district} v={locationText(r)} />
-              {showsSide(r.city, r.side) && <Fact k={t.propertyDetail.istanbulSide} v={sideText(r)} />}
-              <Fact k={t.propertyDetail.listingType} v={r.mode==="rent"?t.propertyDetail.forRent:t.propertyDetail.forSale} />
-              {r.bathrooms!=null&&<Fact k={t.propertyDetail.bathrooms} v={r.bathrooms}/>}<Fact k={t.propertyDetail.availability} v={r.availability||t.propertyDetail.toConfirm} />
-              {r.tapu_status&&<Fact k={t.propertyDetail.titleDeedStatus} v={r.tapu_status}/>}
-              <Fact k={t.propertyDetail.apartmentLayout} v={r.layout_label ?? t.propertyDetail.toConfirm} />
-              {r.areas.length?r.areas.map((area,i)=><Fact key={i} k={area.basis==="gross"?t.propertyDetail.grossArea:area.basis==="net"?t.propertyDetail.netArea:t.propertyDetail.areaToConfirm} v={`${area.value_m2.toLocaleString()} m²`}/>):<Fact k={t.propertyDetail.areaToConfirm} v={t.propertyDetail.toConfirm}/>}
-              {typeof d.project === "string"&&d.project&&<Fact k={t.propertyDetail.development} v={d.project} />}
-              {typeof d["bedrooms"]==="number"&&<Fact k={t.propertyDetail.bedrooms} v={d["bedrooms"]}/>}
+              {showsSide(r.city, r.side) && (
+                <Fact k={t.propertyDetail.istanbulSide} v={sideText(r)} />
+              )}
+              <Fact
+                k={t.propertyDetail.listingType}
+                v={r.mode === "rent" ? t.propertyDetail.forRent : t.propertyDetail.forSale}
+              />
+              {r.bathrooms != null && <Fact k={t.propertyDetail.bathrooms} v={r.bathrooms} />}
+              <Fact
+                k={t.propertyDetail.availability}
+                v={r.availability || t.propertyDetail.toConfirm}
+              />
+              {r.tapu_status && <Fact k={t.propertyDetail.titleDeedStatus} v={r.tapu_status} />}
+              <Fact
+                k={t.propertyDetail.apartmentLayout}
+                v={r.layout_label ?? t.propertyDetail.toConfirm}
+              />
+              {r.areas.length ? (
+                r.areas.map((area, i) => (
+                  <Fact
+                    key={i}
+                    k={
+                      area.basis === "gross"
+                        ? t.propertyDetail.grossArea
+                        : area.basis === "net"
+                          ? t.propertyDetail.netArea
+                          : t.propertyDetail.areaToConfirm
+                    }
+                    v={`${area.value_m2.toLocaleString()} m²`}
+                  />
+                ))
+              ) : (
+                <Fact k={t.propertyDetail.areaToConfirm} v={t.propertyDetail.toConfirm} />
+              )}
+              {typeof d.project === "string" && d.project && (
+                <Fact k={t.propertyDetail.development} v={d.project} />
+              )}
+              {neighborhood && <Fact k="Neighborhood" v={neighborhood} />}
+              {propertyCategory && <Fact k="Property Category" v={propertyCategory} />}
+              {typeof d["bedrooms"] === "number" && (
+                <Fact k={t.propertyDetail.bedrooms} v={d["bedrooms"]} />
+              )}
+              {typeof d["living_rooms"] === "number" && (
+                <Fact k="Living Rooms" v={d["living_rooms"]} />
+              )}
+              {specs.floorNumber != null && specs.floorNumber !== "" && (
+                <Fact k="Floor Number" v={specs.floorNumber} />
+              )}
+              {specs.totalFloors != null && (
+                <Fact k="Total Building Floors" v={specs.totalFloors} />
+              )}
+              {specs.furnishingStatus && <Fact k="Furnishing Status" v={specs.furnishingStatus} />}
+              {specs.completionStatus && <Fact k="Completion Status" v={specs.completionStatus} />}
+              {specs.constructionYear != null && (
+                <Fact k="Construction Year" v={specs.constructionYear} />
+              )}
+              {specs.propertyCondition && (
+                <Fact k="Property Condition" v={specs.propertyCondition} />
+              )}
+              {specs.heatingSystem && <Fact k="Heating System" v={specs.heatingSystem} />}
+              {specs.viewType && <Fact k="View & Orientation" v={specs.viewType} />}
+              {specs.orientation && <Fact k="Orientation" v={specs.orientation} />}
+              {specs.balconyOrTerrace && <Fact k="Balcony / Terrace" v={specs.balconyOrTerrace} />}
+              {specs.gardenOrOutdoor && <Fact k="Garden / Outdoor" v={specs.gardenOrOutdoor} />}
+              {specs.parking && <Fact k="Parking Availability" v={specs.parking} />}
+              {specs.energyClass && <Fact k="Energy Class" v={specs.energyClass} />}
               {["block", "floor", "unit"].map(
-                (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />
+                (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />,
               )}
               {facts
                 .filter(([k]) => !["block", "floor", "unit"].includes(k))
@@ -355,65 +680,333 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             </div>
 
             <PriceBlock r={r} />
-            {Array.isArray(d["amenities"])&&d["amenities"].length>0&&<div className="mt-6"><h3 className="font-medium">Property features</h3><div className="mt-3 flex flex-wrap gap-2">{d["amenities"].filter((v):v is string=>typeof v==="string").map(feature=><span key={feature} className="rounded border bg-secondary/30 px-3 py-2 text-sm">{feature}</span>)}</div></div>}
-            {Array.isArray(d["pricing_options"])&&d["pricing_options"].length>0&&<div data-payment-plans className="mt-6 space-y-4"><h3 className="font-medium">Payment plans</h3>{(d["pricing_options"] as {name:string;amount:number|null;currency:string;down_payment_amount:number|null;down_payment_percent:number|null;installment_amount:number|null;installment_count:number|null;schedule:{number:number;date:string|null;month:number|null;amount:number;currency:string}[]}[]).map((plan,i)=><div key={i} className="rounded border bg-secondary/30 p-4"><h4 className="font-medium">{plan.name}</h4>{plan.amount!=null&&<Fact k="Total price" v={`${plan.currency} ${plan.amount.toLocaleString("en-US")}`}/>} {plan.down_payment_amount!=null&&<Fact k="Down payment" v={`${plan.currency} ${plan.down_payment_amount.toLocaleString("en-US")}`}/>} {plan.down_payment_percent!=null&&<Fact k="Down payment share" v={`${plan.down_payment_percent}%`}/>} {plan.installment_count!=null&&<Fact k="Number of payments" v={plan.installment_count}/>} {plan.installment_amount!=null&&<Fact k="Regular payment" v={`${plan.currency} ${plan.installment_amount.toLocaleString("en-US")}`}/>} {(plan.schedule||[]).map((payment,j)=><Fact key={j} k={`Payment ${payment.number}${payment.date?" · "+payment.date:payment.month!=null?" · Month "+payment.month:""}`} v={`${payment.currency} ${payment.amount.toLocaleString("en-US")}`}/>)}</div>)}</div>}
-            {Array.isArray(d["package_members"])&&d["package_members"].length>0&&<div className="mt-6"><h3 className="font-medium">Package contents</h3>{(d["package_members"] as {title:string|null;description:string|null}[]).map((member,i)=><p key={i} className="mt-2 text-sm text-muted-foreground">{member.title||member.description||"Identified apartment included"}{member.title&&member.description?" · "+member.description:""}</p>)}</div>}
+            {Array.isArray(d["amenities"]) && d["amenities"].length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-medium">Property features</h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {d["amenities"]
+                    .filter((v): v is string => typeof v === "string")
+                    .map((feature) => (
+                      <span
+                        key={feature}
+                        className="rounded border bg-secondary/30 px-3 py-2 text-sm"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                </div>
+              </div>
+            )}
+            {(() => {
+              const plan = (d["payment_plan"] ?? {}) as Record<string, unknown>;
+              const notes: Array<[string, unknown]> = [
+                ["Additional fees", plan["additionalFeesNote"]],
+                ["Rental yield", plan["rentalYieldNote"]],
+                ["Capital growth", plan["capitalGrowthNote"]],
+                ["Citizenship", plan["citizenshipNote"]],
+              ];
+              const shown = notes.filter(([, v]) => typeof v === "string" && v.trim());
+              if (shown.length === 0) return null;
+              return (
+                <div data-fees-investment className="mt-6 space-y-2">
+                  <h3 className="font-medium">Fees &amp; investment notes</h3>
+                  <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                    {shown.map(([label, value]) => (
+                      <div key={label} className="rounded border bg-secondary/30 px-3 py-2">
+                        <dt className="text-xs uppercase tracking-wider text-muted-foreground">
+                          {label}
+                        </dt>
+                        <dd className="mt-0.5">{String(value)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              );
+            })()}
+            {Array.isArray(d["pricing_options"]) && d["pricing_options"].length > 0 && (
+              <div data-payment-plans className="mt-6 space-y-4">
+                <h3 className="font-medium">Payment plans</h3>
+                {(
+                  d["pricing_options"] as {
+                    name: string;
+                    amount: number | null;
+                    currency: string;
+                    down_payment_amount: number | null;
+                    down_payment_percent: number | null;
+                    installment_amount: number | null;
+                    installment_count: number | null;
+                    schedule: {
+                      number: number;
+                      date: string | null;
+                      month: number | null;
+                      amount: number;
+                      currency: string;
+                    }[];
+                  }[]
+                ).map((plan, i) => (
+                  <div key={i} className="rounded border bg-secondary/30 p-4">
+                    <h4 className="font-medium">{plan.name}</h4>
+                    {plan.amount != null && (
+                      <Fact
+                        k="Total price"
+                        v={`${plan.currency} ${plan.amount.toLocaleString("en-US")}`}
+                      />
+                    )}{" "}
+                    {plan.down_payment_amount != null && (
+                      <Fact
+                        k="Down payment"
+                        v={`${plan.currency} ${plan.down_payment_amount.toLocaleString("en-US")}`}
+                      />
+                    )}{" "}
+                    {plan.down_payment_percent != null && (
+                      <Fact k="Down payment share" v={`${plan.down_payment_percent}%`} />
+                    )}{" "}
+                    {plan.installment_count != null && (
+                      <Fact k="Number of payments" v={plan.installment_count} />
+                    )}{" "}
+                    {plan.installment_amount != null && (
+                      <Fact
+                        k="Regular payment"
+                        v={`${plan.currency} ${plan.installment_amount.toLocaleString("en-US")}`}
+                      />
+                    )}{" "}
+                    {(plan.schedule || []).map((payment, j) => (
+                      <Fact
+                        key={j}
+                        k={`Payment ${payment.number}${payment.date ? " · " + payment.date : payment.month != null ? " · Month " + payment.month : ""}`}
+                        v={`${payment.currency} ${payment.amount.toLocaleString("en-US")}`}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+            {Array.isArray(d["package_members"]) && d["package_members"].length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-medium">Package contents</h3>
+                {(
+                  d["package_members"] as { title: string | null; description: string | null }[]
+                ).map((member, i) => (
+                  <p key={i} className="mt-2 text-sm text-muted-foreground">
+                    {member.title || member.description || "Identified apartment included"}
+                    {member.title && member.description ? " · " + member.description : ""}
+                  </p>
+                ))}
+              </div>
+            )}
 
-            {typeof d.note === "string" && (
+            {displayDescription && (
               <div className="mt-6 whitespace-pre-line rounded-xs border border-border/70 bg-secondary/30 p-4 text-sm text-muted-foreground leading-relaxed">
-                <strong className="text-foreground block mb-1">{t.propertyDetail.propertyDescription}</strong>
-                {d.note}
+                <strong className="text-foreground block mb-1">
+                  {t.propertyDetail.propertyDescription}
+                </strong>
+                {displayDescription}
               </div>
             )}
           </div>
 
           {/* Section 02: Approved highlights */}
-          {media.highlights.length>0&&<div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="eyebrow !text-brass">{t.propertyDetail.highlightsEyebrow}</span>
-            </div>
-            <h2 className="headline text-2xl font-semibold">{t.propertyDetail.highlightsTitle}</h2>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {media.highlights.map((h, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-xs border border-border/70 bg-background p-4">
-                  <CheckCircle2 className="h-4 w-4 text-brass shrink-0 mt-0.5" />
-                  <p className="text-xs md:text-sm text-foreground leading-relaxed font-medium">{h}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          }
-          {/* Section 03: Supplied floor plan */}
-          {media.floorPlan&&<div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="eyebrow !text-brass">{t.propertyDetail.floorPlan}</p>
-                <h2 className="headline text-2xl font-semibold mt-1">{t.propertyDetail.floorPlan}</h2>
+          {media.highlights.length > 0 && (
+            <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="eyebrow !text-brass">{t.propertyDetail.highlightsEyebrow}</span>
               </div>
-              <button
-                onClick={() => {
-                  setActiveImg(Math.max(0,images.indexOf(media.floorPlan!)));
-                  setLightbox(true);
-                }}
-                className="btn btn-outline !min-h-9 !px-3 text-xs gap-1.5"
-              >
-                <Maximize2 className="h-3.5 w-3.5" /> {t.propertyDetail.fullscreen}
-              </button>
-            </div>
+              <h2 className="headline text-2xl font-semibold">
+                {t.propertyDetail.highlightsTitle}
+              </h2>
 
-            <div className="relative aspect-[16/11] overflow-hidden rounded-xs border border-border/80 bg-white">
-              <GalleryImage
-                key={media.floorPlan}
-                src={media.floorPlan}
-                alt={t.propertyDetail.floorPlan}
-                className="h-full w-full object-contain p-4"
-              />
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {media.highlights.map((h, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 rounded-xs border border-border/70 bg-background p-4"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-brass shrink-0 mt-0.5" />
+                    <p className="text-xs md:text-sm text-foreground leading-relaxed font-medium">
+                      {h}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          }
+          {/* Section 03: Supplied floor plans (Multi-Floor-Plan Viewer & PDF Download) */}
+          {(media.floorPlans.length > 0 || media.floorPlan) && (
+            <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="eyebrow !text-brass">{t.propertyDetail.floorPlan}</p>
+                  <h2 className="headline text-2xl font-semibold mt-1">
+                    {t.propertyDetail.floorPlan}
+                  </h2>
+                </div>
+                {media.floorPlan && (
+                  <button
+                    onClick={() => {
+                      setActiveCategory("All");
+                      setActiveImg(Math.max(0, allImages.indexOf(media.floorPlan!)));
+                      setLightbox(true);
+                    }}
+                    className="btn btn-outline !min-h-9 !px-3 text-xs gap-1.5"
+                  >
+                    <Maximize2 className="h-3.5 w-3.5" /> {t.propertyDetail.fullscreen}
+                  </button>
+                )}
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                {(media.floorPlans.length > 0
+                  ? media.floorPlans
+                  : [
+                      {
+                        id: "fp-default",
+                        title: t.propertyDetail.floorPlan,
+                        unitType: r.layout_label || "Standard",
+                        imageUrl: media.floorPlan!,
+                      },
+                    ]
+                ).map((fp) => (
+                  <div
+                    key={fp.id}
+                    className="rounded-xs border border-border/80 bg-background p-4 space-y-3"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <h3 className="font-semibold text-sm text-foreground">{fp.title}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          {fp.unitType || r.layout_label || "Architectural Plan"}
+                          {fp.areaM2 ? ` · ${fp.areaM2} m²` : ""}
+                        </p>
+                      </div>
+                      {fp.pdfUrl && (
+                        <a
+                          href={fp.pdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 rounded-xs border border-border px-2.5 py-1 text-xs font-medium hover:border-brass hover:text-brass"
+                        >
+                          <Download className="h-3.5 w-3.5" /> PDF
+                        </a>
+                      )}
+                    </div>
+                    <div className="relative aspect-[16/11] overflow-hidden rounded-xs border border-border/60 bg-white">
+                      <GalleryImage
+                        key={fp.imageUrl}
+                        src={fp.imageUrl}
+                        alt={fp.title}
+                        className="h-full w-full object-contain p-3"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Section 03B: Public Brochures, Documents & Virtual Tour / Video / 3D Model */}
+          {(publicDocuments.length > 0 || virtualTourUrl || videoUrl || model3dUrl) && (
+            <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs space-y-4">
+              <div>
+                <p className="eyebrow !text-brass">Documentation & Digital Walkthrough</p>
+                <h2 className="headline text-2xl font-semibold mt-1">
+                  Brochures, Technical Dossiers & Tours
+                </h2>
+              </div>
+
+              {publicDocuments.length > 0 && (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {publicDocuments.map((doc) => (
+                    <a
+                      key={doc.id}
+                      href={doc.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between gap-3 rounded-xs border border-border/80 bg-background p-4 hover:border-brass transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-brass">
+                          {doc.category || doc.fileType || "Document"}
+                        </p>
+                        <p className="truncate font-medium text-sm text-foreground mt-0.5">
+                          {doc.title}
+                        </p>
+                      </div>
+                      <Download className="h-4 w-4 text-brass shrink-0" />
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {(virtualTourUrl || videoUrl || model3dUrl) && (
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {virtualTourUrl && (
+                    <a
+                      href={virtualTourUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-outline !min-h-9 !text-xs"
+                    >
+                      Launch 360° Virtual Tour
+                    </a>
+                  )}
+                  {videoUrl && (
+                    <a
+                      href={videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-outline !min-h-9 !text-xs"
+                    >
+                      Watch Video Walkthrough
+                    </a>
+                  )}
+                  {model3dUrl && (
+                    <a
+                      href={model3dUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-outline !min-h-9 !text-xs"
+                    >
+                      View 3D Architectural Model
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Section 03C: Interactive Location & Map Coordinates */}
+          {(coordinates?.lat != null && coordinates?.lng != null) || r.location_label ? (
+            <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="eyebrow !text-brass">Location & Urban Connectivity</p>
+                  <h2 className="headline text-2xl font-semibold mt-1">
+                    {locationText(r)}
+                    {neighborhood ? ` — ${neighborhood}` : ""}
+                  </h2>
+                </div>
+                {coordinates?.lat != null && coordinates?.lng != null && (
+                  <span className="rounded-xs border border-border bg-background px-2.5 py-1 font-mono text-xs text-muted-foreground">
+                    {coordinates.lat.toFixed(4)}° N, {coordinates.lng.toFixed(4)}° E
+                  </span>
+                )}
+              </div>
+              {typeof d["address"] === "string" && d["address"] && (
+                <p className="text-sm text-muted-foreground">{d["address"]}</p>
+              )}
+              {coordinates?.lat != null && coordinates?.lng != null && (
+                <div className="overflow-hidden rounded-xs border border-border/80 bg-muted aspect-[16/7]">
+                  <iframe
+                    title={`Map location for ${displayTitle}`}
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${coordinates.lng - 0.015}%2C${coordinates.lat - 0.01}%2C${coordinates.lng + 0.015}%2C${coordinates.lat + 0.01}&layer=mapnik&marker=${coordinates.lat}%2C${coordinates.lng}`}
+                    className="h-full w-full border-0"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+            </div>
+          ) : null}
           {/* Section 04: Recorded eligibility */}
           <div className="rounded-xs border border-brass/40 bg-primary p-6 md:p-8 text-on-dark shadow-md">
             <div className="flex items-center gap-2 mb-2">
@@ -424,13 +1017,17 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               {t.propertyDetail.legalVerificationTitle}
             </h2>
 
-            <p className="mt-4 text-sm text-on-dark-muted">{t.propertyDetail.legalVerificationDesc}</p>
+            <p className="mt-4 text-sm text-on-dark-muted">
+              {t.propertyDetail.legalVerificationDesc}
+            </p>
             <div className="mt-6 pt-4 border-t border-on-dark/15 flex flex-wrap gap-3">
               <Link to="/citizenship" className="btn btn-light !min-h-9 !text-xs">
                 {t.home.cbiExploreRoadmap}
               </Link>
               <a
-                href={waLink(`Hello Avrasya, I'd like to check citizenship eligibility for ${r.marketing_title} (${r.slug})`)}
+                href={waLink(
+                  `Hello Avrasya, I'd like to check citizenship eligibility for ${r.marketing_title} (${r.slug})`,
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline !border-on-dark/30 !text-on-dark !min-h-9 !text-xs hover:!bg-on-dark/10"
@@ -440,16 +1037,37 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
             </div>
           </div>
 
-          {(r.source_note||claims.length>0)&&<section className="rounded-xs border border-brass/40 bg-card p-6"><h2 className="headline text-xl">{t.propertyDetail.specificationsTitle}</h2>{r.source_note&&<p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{r.source_note}</p>}{claims.length>0&&<ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">{claims.map((claim,i)=><li key={i}>{claim}</li>)}</ul>}</section>}
+          {(r.source_note || claims.length > 0) && (
+            <section className="rounded-xs border border-brass/40 bg-card p-6">
+              <h2 className="headline text-xl">{t.propertyDetail.specificationsTitle}</h2>
+              {r.source_note && (
+                <p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">
+                  {r.source_note}
+                </p>
+              )}
+              {claims.length > 0 && (
+                <ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">
+                  {claims.map((claim, i) => (
+                    <li key={i}>{claim}</li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
         </div>
 
         {/* Sticky Consultation & Enquiry Sidebar */}
-        <aside id="property-enquiry" className="min-w-0 scroll-mt-24 space-y-6 lg:sticky lg:top-24 lg:self-start">
+        <aside
+          id="property-enquiry"
+          className="min-w-0 scroll-mt-24 space-y-6 lg:sticky lg:top-24 lg:self-start"
+        >
           <div className="rounded-xs border border-border/80 bg-card p-4 sm:p-6 shadow-md">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <span className="text-xs font-semibold text-muted-foreground">REF: {r.ref||r.slug}</span>
+              <span className="text-xs font-semibold text-muted-foreground">
+                REF: {r.ref || r.slug}
+              </span>
               <span className="rounded-xs bg-emerald-500/10 text-emerald-600 px-2 py-0.5 text-[0.65rem] font-bold uppercase">
-                {r.availability||t.propertyDetail.toConfirm}
+                {r.availability || t.propertyDetail.toConfirm}
               </span>
             </div>
 
@@ -460,7 +1078,12 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
               {t.propertyDetail.bookViewingDesc}
             </p>
 
-            <Enquiry defaultTopic={r.marketing_title} propertySlug={r.slug} preview={preview} compact />
+            <Enquiry
+              defaultTopic={r.marketing_title}
+              propertySlug={r.slug}
+              preview={preview}
+              compact
+            />
           </div>
 
           {/* Quick Direct Contacts */}
@@ -487,7 +1110,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
       </section>
 
       {/* Related Properties */}
-      {!preview&&related.length > 0 && (
+      {!preview && related.length > 0 && (
         <section className="container-site border-t border-border/80 pb-24 pt-16">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -496,7 +1119,10 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
                 {t.propertyDetail.similarSubtitle}
               </h2>
             </div>
-            <Link to="/properties" className="text-xs font-semibold text-foreground hover:text-brass underline">
+            <Link
+              to="/properties"
+              className="text-xs font-semibold text-foreground hover:text-brass underline"
+            >
               {t.propertyDetail.browseCurrent} →
             </Link>
           </div>
@@ -509,26 +1135,28 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
       )}
 
       {/* Mobile Sticky Bar */}
-      {!preview&&<div className="property-contact-bar fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border/80 bg-card/95 backdrop-blur-md p-3 lg:hidden shadow-lg">
-        <a href="#property-enquiry" className="btn btn-primary flex-1 !px-3">{t.propertyDetail.bookViewing}</a>
-        <a
-          href={`${contact.whatsapp}?text=${encodeURIComponent(`Hello, I'm interested in ${r.marketing_title} (${r.slug}).`)}`}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-outline flex-1 justify-center !px-3 gap-1.5"
-        >
-          <MessageSquare className="h-4 w-4" /> WhatsApp
-        </a>
-        <a
-          href={contact.phoneHref}
-          className="btn btn-outline !px-3"
-          aria-label={t.common.directInquiries}
-        >
-          <Phone className="h-4 w-4" />
-        </a>
-      </div>
-
-      }
+      {!preview && (
+        <div className="property-contact-bar fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border/80 bg-card/95 backdrop-blur-md p-3 lg:hidden shadow-lg">
+          <a href="#property-enquiry" className="btn btn-primary flex-1 !px-3">
+            {t.propertyDetail.bookViewing}
+          </a>
+          <a
+            href={`${contact.whatsapp}?text=${encodeURIComponent(`Hello, I'm interested in ${r.marketing_title} (${r.slug}).`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn btn-outline flex-1 justify-center !px-3 gap-1.5"
+          >
+            <MessageSquare className="h-4 w-4" /> WhatsApp
+          </a>
+          <a
+            href={contact.phoneHref}
+            className="btn btn-outline !px-3"
+            aria-label={t.common.directInquiries}
+          >
+            <Phone className="h-4 w-4" />
+          </a>
+        </div>
+      )}
       {/* Fullscreen Lightbox Modal */}
       {lightbox && (
         <div
@@ -548,7 +1176,7 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
 
           <div className="relative max-h-[85vh] max-w-[90vw] overflow-hidden flex items-center justify-center">
             <GalleryImage
-              key={images[activeImg]||media.cover}
+              key={images[activeImg] || media.cover}
               src={images[activeImg] || media.cover}
               alt=""
               className="max-h-[82vh] max-w-[88vw] object-contain rounded-xs"
@@ -581,4 +1209,3 @@ export function PropertyDetails({r,preview=false}:{r:PropertyRecord;preview?:boo
     </div>
   );
 }
-

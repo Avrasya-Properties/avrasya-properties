@@ -13,6 +13,10 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    // Allow tunnel hostnames like *.trycloudflare.com to proxy requests to localhost
+    server: {
+      allowedHosts: true,
+    },
     // Pre-bundle animation/3D dependencies up front: discovering them mid-session re-optimises the dep cache
     // and can leave two React copies loaded in dev ("Invalid hook call").
     optimizeDeps: { include: ["gsap", "gsap/ScrollTrigger", "@gsap/react", "three"] },

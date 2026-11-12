@@ -16,14 +16,14 @@ records are preserved locally, but are not automatically imported or published.
 
 ## Active connections
 
-| Action | Active implementation | Public website |
-| --- | --- | --- |
-| Create/edit/publish listing | `src/admin/remote.ts` → `save_offer` | `published_catalogue` → shared property cards/details |
-| Draft/review/archive | Guarded publication RPCs | Only Published snapshots are readable |
-| Shared settings/filter options | `site_settings` with optimistic revision checks | Query-backed header/homepage/footer/filter options |
-| Pages, sections, services, FAQs, brochures | `src/admin/management.ts` with database permissions | Public content queries |
-| Customer enquiry | Public Edge Function with consent and retry key | Real server receipt; no local success fallback |
-| Website refresh | Database `website_revision`, safe browser signals and fallback reads | Changed revision invalidates public queries and route loaders |
+| Action                                     | Active implementation                                                | Public website                                                |
+| ------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Create/edit/publish listing                | `src/admin/remote.ts` → `save_offer`                                 | `published_catalogue` → shared property cards/details         |
+| Draft/review/archive                       | Guarded publication RPCs                                             | Only Published snapshots are readable                         |
+| Shared settings/filter options             | `site_settings` with optimistic revision checks                      | Query-backed header/homepage/footer/filter options            |
+| Pages, sections, services, FAQs, brochures | `src/admin/management.ts` with database permissions                  | Public content queries                                        |
+| Customer enquiry                           | Public Edge Function with consent and retry key                      | Real server receipt; no local success fallback                |
+| Website refresh                            | Database `website_revision`, safe browser signals and fallback reads | Changed revision invalidates public queries and route loaders |
 
 `backend/services` is a separate, unwired implementation from an earlier change.
 The current admin does not call those classes. Their validation tests do not prove

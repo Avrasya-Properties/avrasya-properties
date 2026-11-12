@@ -25,9 +25,13 @@ export const Route = createFileRoute("/investment-in-turkiye")({
     meta(
       "Buying Property in Türkiye · Clear Guide & Practical Steps",
       "Clear, comprehensive guide to buying property in Istanbul: step-by-step process, transparent taxes, rental strategies, and essential buyer protections.",
-      "/investment-in-turkiye"
+      "/investment-in-turkiye",
     ),
-  component: () => <ManagedPage slug="investment-in-turkiye"><InvestmentPlaybook /></ManagedPage>,
+  component: () => (
+    <ManagedPage slug="investment-in-turkiye">
+      <InvestmentPlaybook />
+    </ManagedPage>
+  ),
 });
 
 type Strategy = {

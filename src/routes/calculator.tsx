@@ -32,7 +32,7 @@ export const Route = createFileRoute("/calculator")({
     meta(
       "Istanbul Property Acquisition & Investment Calculator · Avrasya Properties",
       "Model all-in title deed (Tapu) transfer taxes, foreigner VAT exemption (Law No. 3065), rental yields, and Turkish Citizenship ($400,000 CBI) outlay with complete statutory accuracy.",
-      "/calculator"
+      "/calculator",
     ),
   component: CalculatorPage,
 });
@@ -89,11 +89,16 @@ export function CalculatorPage() {
   const biometricCardPerPersonUsd = 350;
   const passportIssuancePerPersonUsd = 320;
 
-  const totalGovtPerPerson = govtFilingPerPersonUsd + biometricCardPerPersonUsd + passportIssuancePerPersonUsd;
+  const totalGovtPerPerson =
+    govtFilingPerPersonUsd + biometricCardPerPersonUsd + passportIssuancePerPersonUsd;
   const totalFamilyGovtFeesUsd = totalApplicants * totalGovtPerPerson;
   const tapuTransferFeeCbiUsd = Math.round(cbiPropertyPriceUsd * 0.04);
   const totalCbiProcessingUsd =
-    spkAppraisalCbiUsd + dabNotaryCbiUsd + legalCounselCbiUsd + totalFamilyGovtFeesUsd + tapuTransferFeeCbiUsd;
+    spkAppraisalCbiUsd +
+    dabNotaryCbiUsd +
+    legalCounselCbiUsd +
+    totalFamilyGovtFeesUsd +
+    tapuTransferFeeCbiUsd;
   const grandTotalCbiOutlayUsd = cbiPropertyPriceUsd + totalCbiProcessingUsd;
 
   // State for Ongoing Holding Costs
@@ -102,7 +107,8 @@ export function CalculatorPage() {
   const annualEmlakVergisiUsd = Math.round(holdingPriceUsd * 0.002); // 0.2% metropolitan Istanbul
   const annualDaskHoldingUsd = 180;
   const annualAidatHoldingUsd = holdingAidatMonthlyUsd * 12;
-  const totalAnnualHoldingCostUsd = annualEmlakVergisiUsd + annualDaskHoldingUsd + annualAidatHoldingUsd;
+  const totalAnnualHoldingCostUsd =
+    annualEmlakVergisiUsd + annualDaskHoldingUsd + annualAidatHoldingUsd;
   const monthlyHoldingReserveUsd = Math.round(totalAnnualHoldingCostUsd / 12);
 
   const [copiedLedger, setCopiedLedger] = useState(false);
@@ -171,7 +177,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     : "border-border/80 bg-card text-foreground hover:border-brass/40 hover:bg-secondary/40"
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? "text-brass" : "text-muted-foreground group-hover:text-brass"}`} />
+                <Icon
+                  className={`h-4 w-4 ${isActive ? "text-brass" : "text-muted-foreground group-hover:text-brass"}`}
+                />
                 <span>{tab.label}</span>
                 <span
                   className={`hidden sm:inline-block rounded px-1.5 py-0.5 text-[10px] font-mono ${
@@ -197,10 +205,13 @@ NET ANNUAL YIELD: ${netYieldPct}%
                   <ShieldCheck className="h-4 w-4" />
                   <span>Land Registry Law No. 4721</span>
                 </div>
-                <h4 className="font-display font-semibold text-foreground text-sm">4% Statutory Tapu Harcı</h4>
+                <h4 className="font-display font-semibold text-foreground text-sm">
+                  4% Statutory Tapu Harcı
+                </h4>
                 <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
-                  Turkish law stipulates a 4% title deed transfer fee based on declared value. While primary developers
-                  often split this 2% buyer / 2% seller, secondary resales typically require the buyer to bear 100%.
+                  Turkish law stipulates a 4% title deed transfer fee based on declared value. While
+                  primary developers often split this 2% buyer / 2% seller, secondary resales
+                  typically require the buyer to bear 100%.
                 </p>
               </div>
 
@@ -209,10 +220,13 @@ NET ANNUAL YIELD: ${netYieldPct}%
                   <CheckCircle2 className="h-4 w-4" />
                   <span>Law No. 3065 (VAT Exemption)</span>
                 </div>
-                <h4 className="font-display font-semibold text-foreground text-sm">0% VAT for Foreign Capital</h4>
+                <h4 className="font-display font-semibold text-foreground text-sm">
+                  0% VAT for Foreign Capital
+                </h4>
                 <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
-                  Foreign buyers bringing foreign currency directly into Turkey are eligible for 0% VAT exemption on first-hand
-                  developer purchases, saving 1% to 20% in purchase taxes when held for at least 3 years.
+                  Foreign buyers bringing foreign currency directly into Turkey are eligible for 0%
+                  VAT exemption on first-hand developer purchases, saving 1% to 20% in purchase
+                  taxes when held for at least 3 years.
                 </p>
               </div>
 
@@ -221,10 +235,13 @@ NET ANNUAL YIELD: ${netYieldPct}%
                   <Landmark className="h-4 w-4" />
                   <span>TCMB Currency Certificate</span>
                 </div>
-                <h4 className="font-display font-semibold text-foreground text-sm">DAB Foreign Exchange (DÖVİZ)</h4>
+                <h4 className="font-display font-semibold text-foreground text-sm">
+                  DAB Foreign Exchange (DÖVİZ)
+                </h4>
                 <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
-                  Foreign currency must be transferred to the Central Bank of the Republic of Türkiye (TCMB) via an authorized
-                  Turkish bank to generate the mandatory Döviz Alım Belgesi (DAB) prior to title conveyance.
+                  Foreign currency must be transferred to the Central Bank of the Republic of
+                  Türkiye (TCMB) via an authorized Turkish bank to generate the mandatory Döviz Alım
+                  Belgesi (DAB) prior to title conveyance.
                 </p>
               </div>
             </div>
@@ -241,13 +258,16 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     <span className="rounded bg-brass/10 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-brass-text">
                       Investment Return Analysis
                     </span>
-                    <span className="font-mono text-[10px] text-muted-foreground">USD / EUR Leases</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      USD / EUR Leases
+                    </span>
                   </div>
                   <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
                     {t.calculator.rentalYieldTitle}
                   </h3>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Model net yields after property management, tenant placement, building dues (Aidat), and compulsory DASK insurance.
+                    Model net yields after property management, tenant placement, building dues
+                    (Aidat), and compulsory DASK insurance.
                   </p>
                 </div>
                 <button
@@ -255,7 +275,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                   className="inline-flex items-center gap-1.5 rounded-xs border border-border bg-background px-3.5 py-2 text-xs font-semibold text-foreground hover:border-brass transition-colors self-start md:self-auto"
                 >
                   <Copy className="h-3.5 w-3.5 text-brass" />
-                  <span>{copiedLedger ? t.calculator.copiedToast : t.calculator.copyBreakdown}</span>
+                  <span>
+                    {copiedLedger ? t.calculator.copiedToast : t.calculator.copyBreakdown}
+                  </span>
                 </button>
               </div>
 
@@ -265,7 +287,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                   {/* Property Valuation */}
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-muted-foreground uppercase tracking-wider">{t.calculator.propertyPriceLabel}</span>
+                      <span className="text-muted-foreground uppercase tracking-wider">
+                        {t.calculator.propertyPriceLabel}
+                      </span>
                       <span className="font-mono text-base font-bold text-foreground">
                         ${yieldPriceUsd.toLocaleString()} USD ({formatCurr(yieldPriceUsd)})
                       </span>
@@ -299,8 +323,12 @@ NET ANNUAL YIELD: ${netYieldPct}%
                   {/* Gross Yield Percentage */}
                   <div className="border-t border-border/60 pt-5">
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-muted-foreground uppercase tracking-wider">{t.calculator.grossYieldPct}</span>
-                      <span className="font-mono text-base font-bold text-brass">{grossYieldPct}% / year</span>
+                      <span className="text-muted-foreground uppercase tracking-wider">
+                        {t.calculator.grossYieldPct}
+                      </span>
+                      <span className="font-mono text-base font-bold text-brass">
+                        {grossYieldPct}% / year
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -322,7 +350,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     <div>
                       <div className="flex items-center justify-between text-xs font-semibold">
                         <span className="text-foreground">{t.calculator.mgmtFeePct}</span>
-                        <span className="font-mono text-xs">{mgmtFeePct}% (${annualMgmtCostUsd.toLocaleString()}/yr)</span>
+                        <span className="font-mono text-xs">
+                          {mgmtFeePct}% (${annualMgmtCostUsd.toLocaleString()}/yr)
+                        </span>
                       </div>
                       <input
                         type="range"
@@ -337,7 +367,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs text-foreground block font-medium">{t.calculator.monthlyAidatFee}</label>
+                        <label className="text-xs text-foreground block font-medium">
+                          {t.calculator.monthlyAidatFee}
+                        </label>
                         <div className="mt-1.5 flex items-center rounded border border-border bg-background px-3 py-1.5">
                           <span className="text-xs text-muted-foreground mr-1">$</span>
                           <input
@@ -352,7 +384,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                       </div>
 
                       <div>
-                        <label className="text-xs text-foreground block font-medium">{t.calculator.annualDaskInsurance}</label>
+                        <label className="text-xs text-foreground block font-medium">
+                          {t.calculator.annualDaskInsurance}
+                        </label>
                         <div className="mt-1.5 flex items-center rounded border border-border bg-background px-3 py-1.5">
                           <span className="text-xs text-muted-foreground mr-1">$</span>
                           <input
@@ -376,36 +410,57 @@ NET ANNUAL YIELD: ${netYieldPct}%
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-xs bg-card border border-border/70 p-4">
-                        <p className="text-[11px] text-muted-foreground uppercase font-medium">{t.calculator.estimatedMonthlyNetRent}</p>
+                        <p className="text-[11px] text-muted-foreground uppercase font-medium">
+                          {t.calculator.estimatedMonthlyNetRent}
+                        </p>
                         <p className="font-display text-2xl font-semibold text-foreground mt-1">
                           ${monthlyGrossRentUsd.toLocaleString()}
                         </p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{formatCurr(monthlyGrossRentUsd)}/mo</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {formatCurr(monthlyGrossRentUsd)}/mo
+                        </p>
                       </div>
 
                       <div className="rounded-xs bg-card border border-border/70 p-4">
-                        <p className="text-[11px] text-muted-foreground uppercase font-medium">{t.calculator.estimatedGrossRentAnnual}</p>
+                        <p className="text-[11px] text-muted-foreground uppercase font-medium">
+                          {t.calculator.estimatedGrossRentAnnual}
+                        </p>
                         <p className="font-display text-2xl font-semibold text-foreground mt-1">
                           ${annualGrossRentUsd.toLocaleString()}
                         </p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{formatCurr(annualGrossRentUsd)}/yr</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {formatCurr(annualGrossRentUsd)}/yr
+                        </p>
                       </div>
                     </div>
 
                     <div className="rounded-xs border border-brass/40 bg-brass/5 p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs font-semibold text-brass">{t.calculator.estimatedNetRentAnnual}</p>
+                          <p className="text-xs font-semibold text-brass">
+                            {t.calculator.estimatedNetRentAnnual}
+                          </p>
                           <p className="font-display text-3xl font-bold text-foreground mt-1">
-                            ${annualNetRentUsd.toLocaleString()} <span className="text-sm font-sans font-normal text-muted-foreground">USD/yr</span>
+                            ${annualNetRentUsd.toLocaleString()}{" "}
+                            <span className="text-sm font-sans font-normal text-muted-foreground">
+                              USD/yr
+                            </span>
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Net Monthly: <strong className="text-foreground">${monthlyNetCashFlowUsd.toLocaleString()} USD</strong> ({formatCurr(monthlyNetCashFlowUsd)})
+                            Net Monthly:{" "}
+                            <strong className="text-foreground">
+                              ${monthlyNetCashFlowUsd.toLocaleString()} USD
+                            </strong>{" "}
+                            ({formatCurr(monthlyNetCashFlowUsd)})
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[11px] text-muted-foreground uppercase font-medium">{t.calculator.netYieldReturn}</p>
-                          <p className="font-display text-3xl font-bold text-brass mt-1">{netYieldPct}%</p>
+                          <p className="text-[11px] text-muted-foreground uppercase font-medium">
+                            {t.calculator.netYieldReturn}
+                          </p>
+                          <p className="font-display text-3xl font-bold text-brass mt-1">
+                            {netYieldPct}%
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -413,22 +468,30 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     <div className="border-t border-border/70 pt-4 space-y-2 text-xs">
                       <div className="flex justify-between text-muted-foreground">
                         <span>Total Annual Operating Overhead</span>
-                        <span className="font-mono text-foreground font-semibold">-${totalAnnualExpensesUsd.toLocaleString()} USD</span>
+                        <span className="font-mono text-foreground font-semibold">
+                          -${totalAnnualExpensesUsd.toLocaleString()} USD
+                        </span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
                         <span>3-Year Holding Total Cash Flow</span>
-                        <span className="font-mono text-brass font-semibold">${threeYearCumulativeCashFlowUsd.toLocaleString()} USD</span>
+                        <span className="font-mono text-brass font-semibold">
+                          ${threeYearCumulativeCashFlowUsd.toLocaleString()} USD
+                        </span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
                         <span>5-Year Cumulative Net Yield</span>
-                        <span className="font-mono text-foreground font-semibold">${fiveYearCumulativeCashFlowUsd.toLocaleString()} USD</span>
+                        <span className="font-mono text-foreground font-semibold">
+                          ${fiveYearCumulativeCashFlowUsd.toLocaleString()} USD
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-6 pt-5 border-t border-border/70">
                     <a
-                      href={waLink(`Hello Avrasya Properties, I modelled a $${yieldPriceUsd.toLocaleString()} USD property with a ${grossYieldPct}% target rental yield ($${monthlyGrossRentUsd.toLocaleString()}/mo). Please share high-yield verified listings.`)}
+                      href={waLink(
+                        `Hello Avrasya Properties, I modelled a $${yieldPriceUsd.toLocaleString()} USD property with a ${grossYieldPct}% target rental yield ($${monthlyGrossRentUsd.toLocaleString()}/mo). Please share high-yield verified listings.`,
+                      )}
                       target="_blank"
                       rel="noreferrer"
                       className="btn btn-primary w-full justify-center gap-2 btn-shimmer"
@@ -453,21 +516,27 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     <span className="rounded bg-brass/10 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-brass-text">
                       Turkish Citizenship Program
                     </span>
-                    <span className="font-mono text-[10px] text-muted-foreground">Law No. 5901</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      Law No. 5901
+                    </span>
                   </div>
                   <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
                     {t.calculator.cbiModelTitle}
                   </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t.citizenship.calcSubtitle}
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t.citizenship.calcSubtitle}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className={`rounded-xs px-3 py-1.5 text-xs font-semibold ${
-                    isCbiEligible ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30" : "bg-destructive/10 text-destructive border border-destructive/30"
-                  }`}>
-                    {isCbiEligible ? `✓ ${t.citizenship.cbiQualifiedTag}` : `${t.citizenship.cbiDeficitTag}: $${cbiDeficit.toLocaleString()} USD`}
+                  <div
+                    className={`rounded-xs px-3 py-1.5 text-xs font-semibold ${
+                      isCbiEligible
+                        ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30"
+                        : "bg-destructive/10 text-destructive border border-destructive/30"
+                    }`}
+                  >
+                    {isCbiEligible
+                      ? `✓ ${t.citizenship.cbiQualifiedTag}`
+                      : `${t.citizenship.cbiDeficitTag}: $${cbiDeficit.toLocaleString()} USD`}
                   </div>
                 </div>
               </div>
@@ -477,7 +546,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-muted-foreground uppercase tracking-wider">{t.citizenship.propertyPriceLabel}</span>
+                      <span className="text-muted-foreground uppercase tracking-wider">
+                        {t.citizenship.propertyPriceLabel}
+                      </span>
                       <span className="font-mono text-base font-bold text-foreground">
                         ${cbiPropertyPriceUsd.toLocaleString()} USD
                       </span>
@@ -495,7 +566,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                       <button
                         onClick={() => setCbiPropertyPriceUsd(400000)}
                         className={`rounded px-2.5 py-1 text-[11px] font-mono transition-colors ${
-                          cbiPropertyPriceUsd === 400000 ? "bg-brass text-primary font-bold" : "bg-secondary text-muted-foreground"
+                          cbiPropertyPriceUsd === 400000
+                            ? "bg-brass text-primary font-bold"
+                            : "bg-secondary text-muted-foreground"
                         }`}
                       >
                         $400,000 (Min CBI)
@@ -503,7 +576,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                       <button
                         onClick={() => setCbiPropertyPriceUsd(450000)}
                         className={`rounded px-2.5 py-1 text-[11px] font-mono transition-colors ${
-                          cbiPropertyPriceUsd === 450000 ? "bg-brass text-primary font-bold" : "bg-secondary text-muted-foreground"
+                          cbiPropertyPriceUsd === 450000
+                            ? "bg-brass text-primary font-bold"
+                            : "bg-secondary text-muted-foreground"
                         }`}
                       >
                         $450,000 (Buffer)
@@ -511,7 +586,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                       <button
                         onClick={() => setCbiPropertyPriceUsd(650000)}
                         className={`rounded px-2.5 py-1 text-[11px] font-mono transition-colors ${
-                          cbiPropertyPriceUsd === 650000 ? "bg-brass text-primary font-bold" : "bg-secondary text-muted-foreground"
+                          cbiPropertyPriceUsd === 650000
+                            ? "bg-brass text-primary font-bold"
+                            : "bg-secondary text-muted-foreground"
                         }`}
                       >
                         $650,000
@@ -529,15 +606,23 @@ NET ANNUAL YIELD: ${netYieldPct}%
                       <div className="flex items-center justify-between rounded-xs border border-border/70 bg-card p-3.5">
                         <div>
                           <p className="text-xs font-semibold text-foreground">Primary Investor</p>
-                          <p className="text-[11px] text-muted-foreground">Principal applicant & title deed owner</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Principal applicant & title deed owner
+                          </p>
                         </div>
-                        <span className="font-mono text-xs font-bold text-brass">1 (Mandatory)</span>
+                        <span className="font-mono text-xs font-bold text-brass">
+                          1 (Mandatory)
+                        </span>
                       </div>
 
                       <div className="flex items-center justify-between rounded-xs border border-border/70 bg-card p-3.5">
                         <div>
-                          <p className="text-xs font-semibold text-foreground">{t.citizenship.includeSpouse}</p>
-                          <p className="text-[11px] text-muted-foreground">Legally registered spouse included</p>
+                          <p className="text-xs font-semibold text-foreground">
+                            {t.citizenship.includeSpouse}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Legally registered spouse included
+                          </p>
                         </div>
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -552,7 +637,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
 
                       <div className="flex items-center justify-between rounded-xs border border-border/70 bg-card p-3.5">
                         <div>
-                          <p className="text-xs font-semibold text-foreground">{t.citizenship.childrenCountLabel}</p>
+                          <p className="text-xs font-semibold text-foreground">
+                            {t.citizenship.childrenCountLabel}
+                          </p>
                           <p className="text-[11px] text-muted-foreground">&lt;18 Years Old</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -561,7 +648,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                               key={cnt}
                               onClick={() => setChildCount(cnt)}
                               className={`h-7 w-7 rounded font-mono text-xs font-semibold transition-colors ${
-                                childCount === cnt ? "bg-brass text-primary font-bold" : "bg-secondary text-muted-foreground"
+                                childCount === cnt
+                                  ? "bg-brass text-primary font-bold"
+                                  : "bg-secondary text-muted-foreground"
                               }`}
                             >
                               {cnt}
@@ -580,39 +669,62 @@ NET ANNUAL YIELD: ${netYieldPct}%
 
                     <div className="divide-y divide-border/60 text-xs">
                       <div className="py-2.5 flex justify-between">
-                        <span className="text-foreground">{t.citizenship.breakdownPropertyPrice}</span>
-                        <span className="font-mono font-semibold">${cbiPropertyPriceUsd.toLocaleString()} USD</span>
+                        <span className="text-foreground">
+                          {t.citizenship.breakdownPropertyPrice}
+                        </span>
+                        <span className="font-mono font-semibold">
+                          ${cbiPropertyPriceUsd.toLocaleString()} USD
+                        </span>
                       </div>
                       <div className="py-2.5 flex justify-between">
-                        <span className="text-muted-foreground">{t.citizenship.breakdownTapuFee}</span>
-                        <span className="font-mono">${tapuTransferFeeCbiUsd.toLocaleString()} USD</span>
+                        <span className="text-muted-foreground">
+                          {t.citizenship.breakdownTapuFee}
+                        </span>
+                        <span className="font-mono">
+                          ${tapuTransferFeeCbiUsd.toLocaleString()} USD
+                        </span>
                       </div>
                       <div className="py-2.5 flex justify-between">
                         <span className="text-muted-foreground">{t.citizenship.breakdownSpk}</span>
-                        <span className="font-mono">${spkAppraisalCbiUsd.toLocaleString()} USD</span>
+                        <span className="font-mono">
+                          ${spkAppraisalCbiUsd.toLocaleString()} USD
+                        </span>
                       </div>
                       <div className="py-2.5 flex justify-between">
-                        <span className="text-muted-foreground">{t.citizenship.breakdownDabNotary}</span>
+                        <span className="text-muted-foreground">
+                          {t.citizenship.breakdownDabNotary}
+                        </span>
                         <span className="font-mono">${dabNotaryCbiUsd.toLocaleString()} USD</span>
                       </div>
                       <div className="py-2.5 flex justify-between">
                         <span className="text-muted-foreground">
                           {t.citizenship.breakdownGovtFiling} ({totalApplicants})
                         </span>
-                        <span className="font-mono">${totalFamilyGovtFeesUsd.toLocaleString()} USD</span>
+                        <span className="font-mono">
+                          ${totalFamilyGovtFeesUsd.toLocaleString()} USD
+                        </span>
                       </div>
                       <div className="py-2.5 flex justify-between">
-                        <span className="text-muted-foreground">{t.citizenship.breakdownLegal}</span>
-                        <span className="font-mono">${legalCounselCbiUsd.toLocaleString()} USD</span>
+                        <span className="text-muted-foreground">
+                          {t.citizenship.breakdownLegal}
+                        </span>
+                        <span className="font-mono">
+                          ${legalCounselCbiUsd.toLocaleString()} USD
+                        </span>
                       </div>
                     </div>
 
                     <div className="rounded-xs border border-brass/40 bg-brass/10 p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs font-bold text-brass uppercase">{t.citizenship.totalEstimatedOutlay}</p>
+                          <p className="text-xs font-bold text-brass uppercase">
+                            {t.citizenship.totalEstimatedOutlay}
+                          </p>
                           <p className="font-display text-3xl font-bold text-foreground mt-1">
-                            ${grandTotalCbiOutlayUsd.toLocaleString()} <span className="text-sm font-sans font-normal text-muted-foreground">USD</span>
+                            ${grandTotalCbiOutlayUsd.toLocaleString()}{" "}
+                            <span className="text-sm font-sans font-normal text-muted-foreground">
+                              USD
+                            </span>
                           </p>
                         </div>
                       </div>
@@ -621,7 +733,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
 
                   <div className="mt-6 pt-5 border-t border-border/70 flex flex-col gap-2.5">
                     <a
-                      href={waLink(`Hello Avrasya Properties, I modelled Turkish Citizenship by Investment for ${totalApplicants} family members with a budget of $${cbiPropertyPriceUsd.toLocaleString()} USD. I would like to review qualifying verified properties.`)}
+                      href={waLink(
+                        `Hello Avrasya Properties, I modelled Turkish Citizenship by Investment for ${totalApplicants} family members with a budget of $${cbiPropertyPriceUsd.toLocaleString()} USD. I would like to review qualifying verified properties.`,
+                      )}
                       target="_blank"
                       rel="noreferrer"
                       className="btn btn-primary w-full justify-center gap-2 btn-shimmer"
@@ -652,7 +766,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     <span className="rounded bg-brass/10 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-brass-text">
                       Post-Acquisition Carrying Costs
                     </span>
-                    <span className="font-mono text-[10px] text-muted-foreground">Istanbul Metropolitan Municipality</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      Istanbul Metropolitan Municipality
+                    </span>
                   </div>
                   <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
                     {t.calculator.holdingTaxTitle}
@@ -668,7 +784,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-muted-foreground uppercase tracking-wider">{t.calculator.propertyPriceLabel}</span>
+                      <span className="text-muted-foreground uppercase tracking-wider">
+                        {t.calculator.propertyPriceLabel}
+                      </span>
                       <span className="font-mono text-base font-bold text-foreground">
                         ${holdingPriceUsd.toLocaleString()} USD
                       </span>
@@ -686,8 +804,12 @@ NET ANNUAL YIELD: ${netYieldPct}%
 
                   <div className="border-t border-border/60 pt-5">
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-muted-foreground uppercase tracking-wider">{t.calculator.monthlyAidatFee}</span>
-                      <span className="font-mono text-base font-bold text-brass">${holdingAidatMonthlyUsd} USD/mo</span>
+                      <span className="text-muted-foreground uppercase tracking-wider">
+                        {t.calculator.monthlyAidatFee}
+                      </span>
+                      <span className="font-mono text-base font-bold text-brass">
+                        ${holdingAidatMonthlyUsd} USD/mo
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -709,35 +831,60 @@ NET ANNUAL YIELD: ${netYieldPct}%
                     <div className="divide-y divide-border/60 text-xs">
                       <div className="py-3 flex justify-between">
                         <div>
-                          <p className="font-semibold text-foreground">Municipal Property Tax (Emlak Vergisi)</p>
-                          <p className="text-[11px] text-muted-foreground">0.2% Istanbul Metropolitan</p>
+                          <p className="font-semibold text-foreground">
+                            Municipal Property Tax (Emlak Vergisi)
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            0.2% Istanbul Metropolitan
+                          </p>
                         </div>
-                        <span className="font-mono font-semibold">${annualEmlakVergisiUsd.toLocaleString()} USD/yr</span>
+                        <span className="font-mono font-semibold">
+                          ${annualEmlakVergisiUsd.toLocaleString()} USD/yr
+                        </span>
                       </div>
 
                       <div className="py-3 flex justify-between">
                         <div>
-                          <p className="font-semibold text-foreground">{t.calculator.monthlyAidatFee} (Annual)</p>
-                          <p className="text-[11px] text-muted-foreground">${holdingAidatMonthlyUsd} USD × 12</p>
+                          <p className="font-semibold text-foreground">
+                            {t.calculator.monthlyAidatFee} (Annual)
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            ${holdingAidatMonthlyUsd} USD × 12
+                          </p>
                         </div>
-                        <span className="font-mono font-semibold">${annualAidatHoldingUsd.toLocaleString()} USD/yr</span>
+                        <span className="font-mono font-semibold">
+                          ${annualAidatHoldingUsd.toLocaleString()} USD/yr
+                        </span>
                       </div>
 
                       <div className="py-3 flex justify-between">
                         <div>
-                          <p className="font-semibold text-foreground">{t.calculator.annualDaskInsurance}</p>
+                          <p className="font-semibold text-foreground">
+                            {t.calculator.annualDaskInsurance}
+                          </p>
                         </div>
-                        <span className="font-mono font-semibold">${annualDaskHoldingUsd} USD/yr</span>
+                        <span className="font-mono font-semibold">
+                          ${annualDaskHoldingUsd} USD/yr
+                        </span>
                       </div>
                     </div>
 
                     <div className="rounded-xs border border-brass/40 bg-brass/10 p-4">
-                      <p className="text-xs font-bold text-brass uppercase">{t.calculator.holding5YearZeroTax}</p>
+                      <p className="text-xs font-bold text-brass uppercase">
+                        {t.calculator.holding5YearZeroTax}
+                      </p>
                       <p className="font-display text-3xl font-bold text-foreground mt-1">
-                        ${totalAnnualHoldingCostUsd.toLocaleString()} <span className="text-sm font-sans font-normal text-muted-foreground">USD/yr</span>
+                        ${totalAnnualHoldingCostUsd.toLocaleString()}{" "}
+                        <span className="text-sm font-sans font-normal text-muted-foreground">
+                          USD/yr
+                        </span>
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Monthly: <strong className="text-foreground">${monthlyHoldingReserveUsd} USD/mo</strong> ({formatCurr(monthlyHoldingReserveUsd)})
+                        Monthly:{" "}
+                        <strong className="text-foreground">
+                          ${monthlyHoldingReserveUsd} USD/mo
+                        </strong>{" "}
+                        ({formatCurr(monthlyHoldingReserveUsd)})
                       </p>
                     </div>
                   </div>
@@ -774,7 +921,9 @@ NET ANNUAL YIELD: ${netYieldPct}%
                 {t.cta.scheduleMeeting}
               </Link>
               <a
-                href={waLink("Hello Avrasya Properties, I used your calculator and would like to review verified properties with detailed statutory costs.")}
+                href={waLink(
+                  "Hello Avrasya Properties, I used your calculator and would like to review verified properties with detailed statutory costs.",
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-outline !border-white/20 !bg-white/5 !text-white hover:!bg-white/10 gap-1.5"
