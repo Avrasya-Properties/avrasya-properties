@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Sparkles, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export interface PassportFallbackCardProps {
   className?: string;
@@ -15,6 +16,7 @@ export interface PassportFallbackCardProps {
  */
 export function PassportFallbackCard({ className, interactive = true }: PassportFallbackCardProps) {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const { t } = useTranslation();
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!interactive) return;
@@ -95,7 +97,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
                 textShadow: "0 1px 2px rgba(0,0,0,0.8), 0 0 12px rgba(245, 208, 97, 0.4)",
               }}
             >
-              TÜRKİYE CUMHURİYETİ
+              {t.servicesUi.passportCoverTop}
             </span>
             <span
               className="block font-serif tracking-[0.28em] text-[10px] sm:text-[11px] font-medium text-[#ECC755] mt-1 uppercase"
@@ -103,7 +105,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
                 textShadow: "0 1px 2px rgba(0,0,0,0.8)",
               }}
             >
-              PASAPORT · PASSPORT
+              {t.servicesUi.passportCoverMain}
             </span>
           </div>
 
@@ -124,7 +126,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
                 <polygon points="68,36 71.8,43.8 80.4,45 74.2,51 75.7,59.6 68,55.5 60.3,59.6 61.8,51 55.6,45 64.2,43.8" />
               </svg>
             </div>
-            <span className="sr-only">Law No. 5901 Naturalization</span>
+            <span className="sr-only">{t.servicesUi.passportCoverSub}</span>
           </div>
 
           {/* Bottom Foil: Biometric e-Passport Chip Symbol */}
@@ -143,7 +145,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
 
             <div className="sr-only">
               <ShieldCheck className="h-3 w-3 text-[#F5D061]" />
-              <span>Biometric Sovereign Naturalization</span>
+              <span>{t.servicesUi.passportFallbackTitle}</span>
             </div>
           </div>
 

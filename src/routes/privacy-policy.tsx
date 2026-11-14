@@ -1,6 +1,16 @@
 import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalDraft, meta } from "@/components/site/TextPage";
+import { useTranslation } from "@/hooks/useLanguage";
+
+function PrivacyPolicyPage() {
+  const { t } = useTranslation();
+  return (
+    <ManagedPage slug="privacy-policy">
+      <LegalDraft title={t.legalDraftPages.privacyTitle} topics={t.legalDraftPages.privacyTopics} />
+    </ManagedPage>
+  );
+}
 
 export const Route = createFileRoute("/privacy-policy")({
   head: () => ({
@@ -10,16 +20,5 @@ export const Route = createFileRoute("/privacy-policy")({
       "/privacy-policy",
     ),
   }),
-  component: () => (
-    <ManagedPage slug="privacy-policy">
-      <LegalDraft
-        title="Privacy Policy"
-        topics={[
-          "What personal data is collected through enquiries",
-          "How enquiry data is used and stored",
-          "Your rights and how to contact us",
-        ]}
-      />
-    </ManagedPage>
-  ),
+  component: PrivacyPolicyPage,
 });

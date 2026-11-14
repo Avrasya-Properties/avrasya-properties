@@ -57,9 +57,29 @@ export function Header() {
   const [currency, setCurrency] = useCurrency();
   const { count: shortlistCount } = useShortlist();
   const contact = useLiveContact();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const settings = useSiteSettings();
   const isHome = pathname === "/";
+
+  const translateDefaultNavLabel = (href: string, label: string) => {
+    if (locale === "en") return label;
+    const defaultByHref: Record<string, { expected: string[]; value: string }> = {
+      "/": { expected: ["Home"], value: t.nav.home },
+      "/properties": { expected: ["Properties", "Offers & Projects"], value: t.nav.properties },
+      "/locations": { expected: ["Locations", "Destinations"], value: t.chrome.navLocations },
+      "/services": { expected: ["Services"], value: t.nav.services },
+      "/citizenship": { expected: ["Citizenship"], value: t.nav.citizenship },
+      "/why-turkiye": { expected: ["Why Türkiye", "Why Turkey"], value: t.nav.whyTurkiye },
+      "/calculator": { expected: ["Calculator"], value: t.nav.calculator },
+      "/about": { expected: ["About", "About Us"], value: t.nav.about },
+      "/contact": { expected: ["Contact"], value: t.nav.contact },
+    };
+    const match = defaultByHref[href];
+    if (match && match.expected.includes(label.trim())) {
+      return match.value;
+    }
+    return label;
+  };
 
   const dynamicNavItems = useMemo(() => {
     let rawItems = settings.navigationItems;
@@ -75,29 +95,40 @@ export function Header() {
       return [...rawItems]
         .filter((item) => item.is_visible !== false)
         .sort((a, b) => (a.order || 0) - (b.order || 0))
-        .map((item) => ({ to: item.href, label: item.label }));
+        .map((item) => ({
+          to: item.href,
+          label: translateDefaultNavLabel(item.href, item.label),
+        }));
     }
     return [
       { to: "/", label: t.nav.home || "Home" },
       { to: "/properties", label: t.nav.properties },
-      { to: "/locations", label: "Locations" },
+      { to: "/locations", label: t.chrome.navLocations },
       { to: "/services", label: t.nav.services },
       { to: "/citizenship", label: t.nav.citizenship },
       { to: "/why-turkiye", label: t.nav.whyTurkiye },
       { to: "/calculator", label: t.nav.calculator },
       { to: "/about", label: t.nav.about },
     ];
-  }, [settings.navigationItems, settings.websiteDesign?.navigation, t]);
+  }, [settings.navigationItems, settings.websiteDesign?.navigation, t, locale]);
 
   const ctaConfig = useMemo(() => {
-    return (
-      settings.headerCta || {
-        label: t.nav.contact || "Contact",
-        href: "/contact",
-        is_visible: true,
-      }
-    );
-  }, [settings.headerCta, t]);
+    const rawCta = settings.headerCta;
+    if (rawCta) {
+      return {
+        ...rawCta,
+        label:
+          locale !== "en" && (!rawCta.label || rawCta.label.trim() === "Contact")
+            ? t.nav.contact
+            : rawCta.label,
+      };
+    }
+    return {
+      label: t.nav.contact || "Contact",
+      href: "/contact",
+      is_visible: true,
+    };
+  }, [settings.headerCta, t, locale]);
 
   useEffect(() => {
     setOpen(false);
@@ -220,7 +251,7 @@ export function Header() {
 
             <div className="relative flex items-center">
               <select
-                aria-label="Display currency"
+                aria-label={t.nav.displayCurrency}
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
                 className="cursor-pointer appearance-none rounded-full border border-[#163038]/15 bg-transparent py-1.5 pr-6 pl-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#163038] transition-colors hover:border-[#163038] focus:outline-none"
@@ -346,19 +377,25 @@ export function Header() {
           {/* Drawer Footer with Theme, Language, Currency & Direct Contacts */}
           <div className="border-t border-white/10 pt-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-widest text-[#C5A059]">Theme</span>
+              <span className="text-xs uppercase tracking-widest text-[#C5A059]">
+                {t.chrome.themeLabel}
+              </span>
               <ThemeToggle variant="mobile" />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-widest text-[#C5A059]">Language</span>
+              <span className="text-xs uppercase tracking-widest text-[#C5A059]">
+                {t.nav.language}
+              </span>
               <LanguageSwitcher variant="navbar" />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-widest text-[#C5A059]">Currency</span>
+              <span className="text-xs uppercase tracking-widest text-[#C5A059]">
+                {t.chrome.currencyLabel}
+              </span>
               <select
-                aria-label="Display currency mobile"
+                aria-label={t.nav.displayCurrency}
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
                 className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white cursor-pointer"
@@ -386,7 +423,7 @@ export function Header() {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#10785F] py-2.5 text-xs font-semibold text-white no-underline transition-colors hover:bg-[#0c5d49]"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
-                <span>WhatsApp</span>
+                <span>{t.nav.whatsApp}</span>
               </a>
 
               {ctaConfig.is_visible !== false && (
@@ -395,7 +432,7 @@ export function Header() {
                   onClick={() => setOpen(false)}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/10 py-2.5 text-xs font-medium text-white no-underline transition-colors hover:bg-white hover:text-[#163038]"
                 >
-                  <span>{ctaConfig.label || t.nav.bookConsultation || "Contact"}</span>
+                  <span>{ctaConfig.label || t.nav.bookConsultation || t.nav.contact}</span>
                   <span>→</span>
                 </Link>
               )}
@@ -411,7 +448,7 @@ export function Header() {
  * Section 5 – Footer (Recreated from Reference Image 5 — Bildora Pre-Footer CTA + Dark Footer)
  */
 export function Footer() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const contact = useLiveContact();
   const settings = useSiteSettings();
 
@@ -428,35 +465,83 @@ export function Footer() {
     return raw;
   }, [settings.footerSettings, settings.websiteDesign?.footer]);
 
+  const rawFooterNote = footerSettings?.note || settings.websiteDesign?.["footerNote"];
+  const isDefaultFooterNote =
+    !rawFooterNote ||
+    rawFooterNote.replace(/\s+/g, " ").trim() === "Built to last. Delivered with precision.";
   const footerNote =
-    footerSettings?.note ||
-    settings.websiteDesign?.["footerNote"] ||
-    "Built to last. Delivered\nwith precision.";
+    locale !== "en" && isDefaultFooterNote
+      ? t.chrome.footerTagline
+      : rawFooterNote || t.chrome.footerTagline;
+
+  const rawCopyright = footerSettings?.copyrightText;
+  const isDefaultCopyright =
+    !rawCopyright ||
+    rawCopyright.includes("Avrasya Properties Group — Luxury Real Estate & Advisory");
   const copyrightText =
-    footerSettings?.copyrightText ||
-    `© ${new Date().getFullYear()} ${contact.company} — Luxury Real Estate & Advisory.`;
+    locale !== "en" && isDefaultCopyright
+      ? `© ${new Date().getFullYear()} ${contact.company} — ${t.chrome.footerCopyright}`
+      : rawCopyright ||
+        `© ${new Date().getFullYear()} ${contact.company} — ${t.chrome.footerCopyright}`;
+
   const footerEmail = footerSettings?.contactOverrides?.email || contact.email;
   const footerPhone = footerSettings?.contactOverrides?.phone || contact.phone;
   const footerAddress = footerSettings?.contactOverrides?.address || contact.address;
 
   const footerColumns = useMemo(() => {
+    const translateFooterLink = (href: string, label: string) => {
+      if (locale === "en") return label;
+      const map: Record<string, { expected: string[]; value: string }> = {
+        "/": { expected: ["Home"], value: t.nav.home },
+        "/about": { expected: ["About", "About Us"], value: t.nav.about },
+        "/services": { expected: ["Services"], value: t.nav.services },
+        "/properties": { expected: ["Properties", "Offers & Projects"], value: t.nav.properties },
+        "/locations": { expected: ["Locations"], value: t.chrome.navLocations },
+        "/citizenship": { expected: ["Citizenship"], value: t.nav.citizenship },
+        "/why-turkiye": { expected: ["Why Türkiye", "Why Turkey"], value: t.nav.whyTurkiye },
+        "/contact": { expected: ["Contact"], value: t.nav.contact },
+        "/calculator": { expected: ["Calculator"], value: t.nav.calculator },
+      };
+      const entry = map[href];
+      return entry && entry.expected.includes(label.trim()) ? entry.value : label;
+    };
+
+    const translateColTitle = (title: string) => {
+      if (locale === "en") return title;
+      if (title.trim() === "Quick Links" || title.trim() === "Quick Link") {
+        return t.chrome.quickLinksTitle;
+      }
+      if (title.trim() === "Explore") {
+        return t.chrome.exploreTitle;
+      }
+      return title;
+    };
+
     if (Array.isArray(footerSettings?.columns) && footerSettings.columns.length > 0) {
-      return footerSettings.columns;
+      return footerSettings.columns.map(
+        (col: { title: string; links: Array<{ label: string; href: string }> }) => ({
+          title: translateColTitle(col.title),
+          links: (col.links || []).map((l) => ({
+            ...l,
+            label: translateFooterLink(l.href, l.label),
+          })),
+        }),
+      );
     }
     return [
       {
-        title: "Quick Link",
+        title: t.chrome.quickLinksTitle,
         links: [
-          { label: "Home", href: "/" },
+          { label: t.nav.home, href: "/" },
           { label: t.nav.about, href: "/about" },
           { label: t.nav.services, href: "/services" },
           { label: t.nav.properties, href: "/properties" },
         ],
       },
       {
-        title: "Quick Link",
+        title: t.chrome.exploreTitle,
         links: [
-          { label: "Locations", href: "/locations" },
+          { label: t.chrome.navLocations, href: "/locations" },
           { label: t.nav.citizenship, href: "/citizenship" },
           { label: t.nav.whyTurkiye || "Why Türkiye", href: "/why-turkiye" },
           { label: t.nav.contact, href: "/contact" },
@@ -464,7 +549,7 @@ export function Footer() {
         ],
       },
     ];
-  }, [footerSettings?.columns, t]);
+  }, [footerSettings?.columns, t, locale]);
 
   const footerRef = useRef<HTMLElement>(null);
   const ctaBandRef = useRef<HTMLDivElement>(null);
@@ -539,7 +624,7 @@ export function Footer() {
     }, footerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [locale]);
 
   return (
     <footer
@@ -580,7 +665,7 @@ export function Footer() {
             className="inline-flex items-center justify-center rounded-[99px] bg-[#C5A059] px-4 py-1.5 shadow-md"
           >
             <span className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-white">
-              Our Projects
+              {t.projectsShowcase.eyebrow}
             </span>
           </div>
 
@@ -590,7 +675,8 @@ export function Footer() {
             className="mt-6 text-[32px] sm:text-[48px] lg:text-[56px] font-normal leading-[1.08] tracking-[-0.02em] text-white"
             style={{ fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif' }}
           >
-            Built with Purpose. <span className="italic">Made to Last.</span>
+            {t.heroShowcase.skyCtaTitleLine1}{" "}
+            <span className="italic">{t.heroShowcase.skyCtaTitleItalicLine2}</span>
           </h2>
 
           {/* Subtitle */}
@@ -598,8 +684,7 @@ export function Footer() {
             data-cta-item
             className="mt-5 max-w-2xl text-[14px] sm:text-[16px] leading-[1.65] text-white/85"
           >
-            Explore a selection of projects where thoughtful planning, skilled craftsmanship, and
-            dependable execution come together to create spaces built for the future.
+            {t.heroShowcase.skyCtaSubtitle}
           </p>
 
           {/* Call to Action Buttons */}
@@ -611,7 +696,7 @@ export function Footer() {
               to="/properties"
               className="group inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-3.5 text-[13.5px] font-medium tracking-[0.03em] text-[#163038] shadow-lg transition-all duration-300 ease-out hover:bg-[#C5A059] hover:text-white hover:-translate-y-0.5 hover:shadow-xl no-underline"
             >
-              <span>Explore Developments</span>
+              <span>{t.heroShowcase.skyCtaPrimary}</span>
               <span className="transition-transform duration-300 ease-out group-hover:translate-x-1">
                 →
               </span>
@@ -620,7 +705,7 @@ export function Footer() {
               to="/contact"
               className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/25 backdrop-blur-md px-6 py-3.5 text-[13.5px] font-medium tracking-[0.03em] text-white transition-all duration-300 ease-out hover:border-white hover:bg-white/15 hover:-translate-y-0.5 no-underline"
             >
-              <span>Schedule Private Consultation</span>
+              <span>{t.heroShowcase.skyCtaSecondary}</span>
             </Link>
           </div>
         </div>
@@ -669,7 +754,9 @@ export function Footer() {
 
             {/* Contact Info Column (.framer-6niz2k) */}
             <div data-ftr-col className="flex flex-col items-start gap-[28px]">
-              <p className="text-[18px] font-medium leading-[1.4] text-white">Contact Info</p>
+              <p className="text-[18px] font-medium leading-[1.4] text-white">
+                {t.chrome.contactInfoTitle}
+              </p>
 
               <div className="flex flex-col gap-[16px]">
                 {/* Email */}

@@ -133,7 +133,7 @@ function HomeCollection({
 
       {/* HIGHLIGHTED SERVICE SECTION (Transferred from Services Page: Turkish Citizenship in Just 4 steps) */}
       <ServicesProcessTimeline
-        sectionTitle="Our Highlighted Service: Turkish Citizenship in Just 4 steps"
+        sectionTitle={t.heroShowcase.highlightedServiceTitle}
         sectionSubtitle={t.services.subtitle}
         showActionButtons={true}
       />
@@ -162,13 +162,14 @@ function HomeCollection({
             data-empty-collection
             className="container-site py-6 text-center text-xs text-muted-foreground"
           >
-            Curated property listings are being updated.
+            {t.heroShowcase.emptyCollection}
           </div>
         ) : null}
 
         <BildoraProjectsShowcase
           properties={properties}
           collectionHeading={
+            locale === "en" &&
             typeof settings.websiteDesign?.["collectionHeading"] === "string" &&
             settings.websiteDesign["collectionHeading"].trim()
               ? (settings.websiteDesign["collectionHeading"] as string)
@@ -177,7 +178,7 @@ function HomeCollection({
         />
 
         <Link to="/calculator" className="sr-only">
-          Investment Calculator
+          {t.nav.calculator}
         </Link>
       </div>
 

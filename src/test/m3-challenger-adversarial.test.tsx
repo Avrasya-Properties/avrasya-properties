@@ -500,8 +500,8 @@ describe("Milestone M3 Empirical Adversarial Challenge Suite (Challenger 1)", ()
       expect(screen.getByText("Empty Links Column")).toBeInTheDocument();
     });
 
-    it("reveals architectural vulnerability: footer column with undefined links throws TypeError", () => {
-      // In adversarial challenge: what if Supabase/CMS delivers a column without a 'links' array?
+    it("handles footer column with undefined links gracefully without throwing TypeError", () => {
+      // Defensive guard against Supabase/CMS delivering a column without a 'links' array
       store.updateSiteSettings({
         footerSettings: {
           columns: [
@@ -512,11 +512,8 @@ describe("Milestone M3 Empirical Adversarial Challenge Suite (Challenger 1)", ()
         },
       });
 
-      // Chrome.tsx line 513 calls col.links.map(...) without optional chaining
-      // This test captures and verifies the exact empirical failure mode
-      expect(() => renderWithProviders(<Footer />)).toThrow(
-        /Cannot read properties of undefined \(reading 'map'\)/,
-      );
+      expect(() => renderWithProviders(<Footer />)).not.toThrow();
+      expect(screen.getByText("Corrupted Column Without Links Array")).toBeInTheDocument();
     });
   });
 

@@ -9,7 +9,7 @@ import {
   locationText,
   priceDisplay,
   sideText,
-  TYPE_LABEL,
+  localizedRecordTypeLabel,
   type PropertyRecord,
 } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
@@ -48,7 +48,7 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
 
   const statusPillLabel =
     r.record_type === "package"
-      ? "PORTFOLIO PACKAGE"
+      ? t.propertiesExtra.portfolioPackage
       : qualifiesStandalone
         ? t.propertyCard.cbiVerified.toUpperCase()
         : r.mode === "rent"
@@ -66,7 +66,7 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
   const locationStr = locationText(r);
   const sideStr = sideText(r);
   const areaStr = areaText(r);
-  const typeStr = TYPE_LABEL[r.record_type];
+  const typeStr = localizedRecordTypeLabel(r.record_type, t.common, t.propertiesExtra.typeLabels);
 
   const waHref = `${contact.whatsapp}?text=${encodeURIComponent(
     `Hello Avrasya Properties, I would like to inquire about "${r.marketing_title}" (${locationStr}).`,
@@ -131,7 +131,7 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
           </span>
           {qualifiesViaBundle && (
             <span className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[#0E2228]/80 px-2.5 py-1 text-[9.5px] font-medium uppercase leading-none tracking-[0.1em] text-white backdrop-blur-md">
-              Combinable for $400k+
+              {t.propertiesExtra.combinableCbi}
             </span>
           )}
           {r.ref && (
@@ -195,7 +195,7 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
             </Link>
           </h3>
           <p className="m-0 line-clamp-2 text-[12.5px] leading-[1.45] text-white/75">
-            {r.marketing_title} in {locationStr}.
+            {r.marketing_title} {t.propertiesExtra.inLocationPrefix} {locationStr}.
           </p>
         </div>
 
@@ -214,7 +214,7 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
             params={{ slug: r.slug }}
             className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[12px] font-medium text-white no-underline backdrop-blur-sm transition-all duration-300 hover:border-[#C5A059] hover:bg-[#C5A059] hover:text-[#0E2228]"
           >
-            <span>View Residence</span>
+            <span>{t.propertiesExtra.viewResidence}</span>
             <span aria-hidden="true">&rarr;</span>
           </Link>
 

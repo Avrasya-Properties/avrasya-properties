@@ -4,6 +4,7 @@ import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 import { applyMagneticHover } from "@/lib/animation/magnetic";
 import * as Icons from "lucide-react";
 import { useServices, type ManagedService } from "@/data/live";
+import { useTranslation } from "@/hooks/useLanguage";
 import {
   PLACEHOLDER_IMAGES,
   resolvePlaceholderSrc,
@@ -125,13 +126,17 @@ export interface BildoraServicesTimelineProps {
 }
 
 export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = ({
-  badgeText = "Our Values",
-  heading = "Built on Values. Driven by Quality.",
-  subtitle = "We combine honest communication, thoughtful planning, and dependable craftsmanship to deliver real estate acquisitions that stand strong and create lasting value.",
+  badgeText,
+  heading,
+  subtitle,
   showDeliverables = false,
   showCtaFooter = false,
   services: propServices,
 }) => {
+  const { t, locale } = useTranslation();
+  const resolvedBadgeText = badgeText ?? t.servicesUi.valuesBadge;
+  const resolvedHeading = heading ?? t.servicesUi.valuesHeading;
+  const resolvedSubtitle = subtitle ?? t.servicesUi.valuesSubtitle;
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -140,7 +145,18 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
 
   const timelineItems: TimelineServiceItem[] = useMemo(() => {
     if (!rawServices || rawServices.length === 0) {
-      return AVRASYA_SERVICES_TIMELINE;
+      return t.servicesUi.valuesItems.map((item, idx) => ({
+        number: item.number,
+        tag: `${item.number} — ${item.title}`,
+        title: item.title,
+        description: item.desc,
+        deliverables: item.deliverables,
+        cta_label: t.servicesUi.moreDetailsBtn,
+        cta_link: "/services",
+        slot: PLACEHOLDER_IMAGES.servicesTimeline[
+          idx % PLACEHOLDER_IMAGES.servicesTimeline.length
+        ]!,
+      }));
     }
     return rawServices.map((s, idx) => {
       const slot =
@@ -163,7 +179,7 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
         slot,
       };
     });
-  }, [rawServices]);
+  }, [rawServices, t]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -293,7 +309,7 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
       magneticCleanups.forEach((fn) => fn());
       ctx.revert();
     };
-  }, [timelineItems.length]);
+  }, [timelineItems.length, locale]);
 
   const renderBlurWords = (text: string) =>
     text.split(" ").map((word, idx, arr) => (
@@ -329,7 +345,7 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
             className="inline-flex items-center justify-center rounded-[99px] border border-[#DEE0DD] bg-[#F7F6F2] px-[14px] py-[6px] shadow-xs"
           >
             <span className="text-[13px] font-medium leading-[1.35] text-[#C5A059]">
-              {badgeText}
+              {resolvedBadgeText}
             </span>
           </div>
 
@@ -339,10 +355,10 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
             className="flex w-full flex-col items-center justify-center gap-[16px]"
           >
             <h2 className="max-w-[780px] text-[28px] font-normal leading-[1.1] tracking-[0em] text-[#163038] sm:text-[36px] lg:text-[44px]">
-              {renderBlurWords(heading)}
+              {renderBlurWords(resolvedHeading)}
             </h2>
             <p className="max-w-[564px] text-[14px] font-normal leading-[1.35] text-[#5C6F73] sm:text-[15px]">
-              {renderBlurWords(subtitle)}
+              {renderBlurWords(resolvedSubtitle)}
             </p>
           </div>
         </div>
@@ -503,13 +519,13 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
 
         {/* Optional Consultation Footer (used on standalone /services page) */}
         {showCtaFooter && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-6 rounded-[16px] border border-[#DEE0DD] bg-white p-8 text-center shadow-xs sm:flex-row sm:text-left lg:w-full lg:max-w-[850px]">
+          <div className="mt-4 flex flex-col items-center justify-between gap-6 rounded-[16px] border border-[#DEE0DD] bg-white p-8 text-center shadow-xs sm:flex-row sm:text-start lg:w-full lg:max-w-[850px]">
             <div className="space-y-1.5">
               <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#C5A059]">
-                Private Advisory Desk · Istanbul
+                {t.servicesUi.privateDeskBadge}
               </p>
               <h3 className="text-[22px] font-normal text-[#163038]">
-                Need Bespoke Acquisition &amp; Citizenship Structuring?
+                {t.servicesUi.bespokeHeading}
               </h3>
             </div>
             <Link
@@ -517,7 +533,7 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
               data-consultation-cta
               className="inline-flex shrink-0 items-center gap-2.5 rounded-full bg-[#163038] px-6 py-3 text-[13.5px] font-medium text-white no-underline transition-colors hover:bg-[#10785F]"
             >
-              <span data-magnetic-inner>Schedule Consultation</span>
+              <span data-magnetic-inner>{t.servicesUi.scheduleConsultation}</span>
               <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>

@@ -11,6 +11,7 @@ import { useCurrency } from "@/hooks/usePreferences";
 import { comparableUsd, convertUsdPrice, priceDisplay } from "@/data/properties";
 import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
 import { REGIONS_DATA, type RegionData } from "@/components/site/CaldrenLocationsSection";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export const Route = createFileRoute("/regions/$slug")({
   loader: async ({ params }) => {
@@ -43,6 +44,7 @@ export const Route = createFileRoute("/regions/$slug")({
 
 function RegionLanding() {
   const { slug } = Route.useParams();
+  const { t, locale } = useTranslation();
   const settings = useSiteSettings();
   const catalogue = useCatalogue();
   const properties = catalogue.properties;
@@ -54,35 +56,43 @@ function RegionLanding() {
   const showcaseMatch = REGIONS_DATA.find((r: RegionData) => r.slug === slug);
 
   const region = useMemo(() => {
+    const locCard = t.regionsShowcase.locationCards[slug];
+    const descFallback = t.regionsShowcase.regionDescriptions[slug];
     if (regionFromStore) {
       return {
         slug: regionFromStore.slug,
-        name: regionFromStore.name,
-        tagline: showcaseMatch?.tagline ?? `${regionFromStore.name}, ${regionFromStore.country}`,
-        description: regionFromStore.summary || showcaseMatch?.description || "",
+        name: locale !== "en" && locCard?.title ? locCard.title : regionFromStore.name,
+        tagline:
+          locale !== "en" && locCard?.subtitle
+            ? locCard.subtitle
+            : (showcaseMatch?.tagline ?? `${regionFromStore.name}, ${regionFromStore.country}`),
+        description:
+          locale !== "en" && (descFallback || locCard?.description)
+            ? descFallback || locCard?.description || ""
+            : regionFromStore.summary || showcaseMatch?.description || "",
         districts: regionFromStore.districts,
       };
     }
     if (showcaseMatch) {
       return {
         slug: showcaseMatch.slug,
-        name: showcaseMatch.name,
-        tagline: showcaseMatch.tagline,
-        description: showcaseMatch.description,
+        name: locale !== "en" && locCard?.title ? locCard.title : showcaseMatch.name,
+        tagline: locCard?.subtitle || showcaseMatch.tagline,
+        description: descFallback || locCard?.description || showcaseMatch.description,
         districts: showcaseMatch.districts ?? [],
       };
     }
     if (presetMatch) {
       return {
         slug: presetMatch.slug,
-        name: presetMatch.name,
-        tagline: `${presetMatch.name}, ${presetMatch.country}`,
-        description: presetMatch.summary,
+        name: locale !== "en" && locCard?.title ? locCard.title : presetMatch.name,
+        tagline: locCard?.subtitle || `${presetMatch.name}, ${presetMatch.country}`,
+        description: descFallback || locCard?.description || presetMatch.summary,
         districts: presetMatch.districts,
       };
     }
     return null;
-  }, [regionFromStore, showcaseMatch, presetMatch]);
+  }, [regionFromStore, showcaseMatch, presetMatch, slug, locale, t]);
 
   const regionListings = useMemo(() => {
     if (!region) return [];
@@ -97,14 +107,13 @@ function RegionLanding() {
       >
         <section className="mx-auto max-w-[1312px] px-5 pt-20 pb-16 sm:px-8 lg:px-[64px]">
           <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#b08d44]">
-            Regions · Türkiye
+            {t.chrome.navLocations} · Türkiye
           </p>
           <h1 className="mt-4 text-[48px] font-normal leading-[1.05] tracking-[-0.04em] sm:text-[72px]">
-            Region not available
+            {t.regionsShowcase.regionNotAvailableTitle}
           </h1>
           <p className="mt-4 max-w-xl text-[16px] text-[#63615b]">
-            This region page isn’t published yet, or the link you followed is out of date. Explore
-            our active locations below.
+            {t.regionsShowcase.regionNotAvailableDesc}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             {allPublic.map((r) => (
@@ -114,14 +123,17 @@ function RegionLanding() {
                 params={{ slug: r.slug }}
                 className="inline-flex h-[44px] items-center gap-2 rounded-full bg-[#0e0e0c] px-6 text-[13px] text-white no-underline"
               >
-                <MapPin className="h-3.5 w-3.5 text-[#b08d44]" /> {r.name}
+                <MapPin className="h-3.5 w-3.5 text-[#b08d44]" />{" "}
+                {locale !== "en" && t.regionsShowcase.locationCards[r.slug]?.title
+                  ? t.regionsShowcase.locationCards[r.slug]!.title
+                  : r.name}
               </Link>
             ))}
             <Link
               to="/why-turkiye"
               className="inline-flex h-[44px] items-center gap-2 rounded-full border border-[#0e0e0c]/20 px-6 text-[13px] text-[#0e0e0c] no-underline"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> All Locations
+              <ArrowLeft className="h-3.5 w-3.5" /> {t.regionsShowcase.allLocationsBtn}
             </Link>
           </div>
         </section>
@@ -148,7 +160,7 @@ function RegionLanding() {
             to="/why-turkiye"
             className="mb-4 inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.14em] text-[#63615b] no-underline hover:text-[#0e0e0c]"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Locations Index
+            <ArrowLeft className="h-3.5 w-3.5" /> {t.regionsShowcase.locationsIndexBtn}
           </Link>
           <h1 className="m-0 text-[52px] font-normal leading-[1.03] tracking-[-0.04em] text-[#0e0e0c] sm:text-[76px] lg:text-[112px]">
             <span>{region.name},</span>
@@ -159,15 +171,14 @@ function RegionLanding() {
                 fontFamily: '"Instrument Serif", "Cormorant Garamond", Georgia, serif',
               }}
             >
-              considered.
+              {t.regionsShowcase.consideredLabel}
             </span>
           </h1>
         </div>
 
         <div className="w-full max-w-[400px] pb-2">
           <p className="m-0 text-[16px] font-normal leading-[1.55] tracking-[-0.01em] text-[#63615b]">
-            {region.tagline} — curated residences, SPK-licensed valuation, and title review by
-            Avrasya’s in-house attorney.
+            {region.tagline} — {region.description}
           </p>
         </div>
       </section>
@@ -177,6 +188,10 @@ function RegionLanding() {
         <div className="mx-auto grid w-full max-w-[1312px] grid-cols-2 px-5 sm:grid-cols-4 sm:px-8 lg:px-[64px]">
           {REGIONS_DATA.map((reg: RegionData) => {
             const isActive = reg.slug === region.slug;
+            const tabTitle =
+              locale !== "en" && t.regionsShowcase.locationCards[reg.slug]?.title
+                ? t.regionsShowcase.locationCards[reg.slug]!.title
+                : reg.name;
             return (
               <Link
                 key={reg.slug}
@@ -189,7 +204,7 @@ function RegionLanding() {
                 }`}
               >
                 <span className="text-[15px] tabular-nums">{reg.index}</span>
-                <span className="text-[15px] tracking-[-0.01em]">{reg.name}</span>
+                <span className="text-[15px] tracking-[-0.01em]">{tabTitle}</span>
               </Link>
             );
           })}
@@ -242,7 +257,7 @@ function RegionLanding() {
                 {showcaseMatch?.avgPriceM2 ?? "$3,850"}
               </span>
               <span className="text-[12px] text-[#63615b] sm:text-[13px]">
-                Avg. price / m² (indicative)
+                {t.regionsShowcase.avgPriceM2}
               </span>
             </div>
             <div className="flex flex-col gap-[4px]">
@@ -250,14 +265,16 @@ function RegionLanding() {
                 {showcaseMatch?.indicativeYield ?? "6.5–8.0%"}
               </span>
               <span className="text-[12px] text-[#63615b] sm:text-[13px]">
-                Gross yield (indicative)
+                {t.regionsShowcase.grossYield}
               </span>
             </div>
             <div className="flex flex-col gap-[4px]">
               <span className="text-[24px] font-normal leading-[1.1] tracking-[-0.03em] text-[#0e0e0c] tabular-nums sm:text-[34px]">
                 {regionListings.length || showcaseMatch?.defaultResidencesCount || 4}
               </span>
-              <span className="text-[12px] text-[#63615b] sm:text-[13px]">Residences</span>
+              <span className="text-[12px] text-[#63615b] sm:text-[13px]">
+                {t.regionsShowcase.residencesLabel}
+              </span>
             </div>
           </div>
 
@@ -276,7 +293,7 @@ function RegionLanding() {
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-[4px]">
                 <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#63615b]">
-                  FEATURED PROPERTY
+                  {t.regionsShowcase.featuredPropertyLabel}
                 </span>
                 <span className="truncate text-[16px] text-[#0e0e0c] sm:text-[17px]">
                   {featuredProp.marketing_title}
@@ -295,7 +312,9 @@ function RegionLanding() {
             search={region.slug === "istanbul" ? {} : { region: region.slug }}
             className="inline-flex h-[47px] items-center justify-center gap-[10px] rounded-full bg-[#0e0e0c] px-[26px] text-[14px] text-white no-underline transition-colors hover:bg-[#b08d44]"
           >
-            <span>Explore properties in {region.name}</span>
+            <span>
+              {t.regionsShowcase.explorePropertiesIn} {region.name}
+            </span>
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
@@ -306,10 +325,10 @@ function RegionLanding() {
         <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#b08d44]">
-              Verified Portfolio · {region.name}
+              {t.properties.eyebrow} · {region.name}
             </p>
             <h2 className="mt-2 text-[32px] font-normal tracking-[-0.03em] text-[#0e0e0c] sm:text-[42px]">
-              Available residences in {region.name}
+              {t.regionsShowcase.availableResidencesIn} {region.name}
             </h2>
           </div>
           <Link
@@ -317,7 +336,7 @@ function RegionLanding() {
             search={region.slug === "istanbul" ? {} : { region: region.slug }}
             className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#0e0e0c] no-underline hover:text-[#b08d44]"
           >
-            <span>Open full filter view</span>
+            <span>{t.regionsShowcase.openFullFilter}</span>
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
@@ -325,24 +344,23 @@ function RegionLanding() {
         {regionListings.length === 0 ? (
           <div className="rounded-[6px] border border-[#0e0e0c]/12 bg-[#f4f3ef] p-12 text-center">
             <h3 className="text-[24px] font-normal text-[#0e0e0c]">
-              Private &amp; Off-Market Inventory in {region.name}
+              {t.regionsShowcase.privatePortfolioNote} ({region.name})
             </h3>
             <p className="mx-auto mt-2 max-w-lg text-[14px] text-[#63615b]">
-              We are currently curating new residences in {region.name}. Share your brief with an
-              Avrasya advisor to receive our private off-market shortlist.
+              {t.regionsShowcase.locationsSubtitle}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link
                 to="/contact"
                 className="inline-flex h-[44px] items-center rounded-full bg-[#0e0e0c] px-6 text-[13px] font-medium text-white no-underline"
               >
-                Request {region.name} Shortlist
+                {t.regionsShowcase.requestShortlist}
               </Link>
               <Link
                 to="/properties"
                 className="inline-flex h-[44px] items-center rounded-full border border-[#0e0e0c]/20 bg-white px-6 text-[13px] font-medium text-[#0e0e0c] no-underline"
               >
-                Browse Istanbul Portfolio
+                {t.regionsShowcase.browseIstanbul}
               </Link>
             </div>
           </div>

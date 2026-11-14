@@ -1,6 +1,16 @@
 import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalDraft, meta } from "@/components/site/TextPage";
+import { useTranslation } from "@/hooks/useLanguage";
+
+function TermsPage() {
+  const { t } = useTranslation();
+  return (
+    <ManagedPage slug="terms">
+      <LegalDraft title={t.legalDraftPages.termsTitle} topics={t.legalDraftPages.termsTopics} />
+    </ManagedPage>
+  );
+}
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -10,16 +20,5 @@ export const Route = createFileRoute("/terms")({
       "/terms",
     ),
   }),
-  component: () => (
-    <ManagedPage slug="terms">
-      <LegalDraft
-        title="Terms & Conditions"
-        topics={[
-          "Use of this website",
-          "Nature of the information provided",
-          "Limitation of liability",
-        ]}
-      />
-    </ManagedPage>
-  ),
+  component: TermsPage,
 });

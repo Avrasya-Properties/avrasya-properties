@@ -34,61 +34,16 @@ export function formatWhatsAppLink(base: string, text: string) {
   }
 }
 
-const SERVICES = [
-  "General consultation",
-  "Turkish Citizenship by Investment ($400k+)",
-  "Prime Istanbul Residences & Penthouses",
-  "Aegean & Mediterranean Coastal Villas",
-  "Capital Growth & Rental Strategy",
-  "Property Selection & Virtual Tours",
-  "Commercial Floorplates & Hotels",
-  "Legal & Administrative Due Diligence",
-  "Investment catalog request",
-];
-
-const LUXURY_TOPIC_PILLS = [
-  {
-    id: "cbi",
-    label: "Turkish Citizenship ($400k+)",
-    full: "Citizenship by Investment ($400k+)",
-    icon: "🏛️",
-  },
-  {
-    id: "res",
-    label: "Prime Istanbul Residences",
-    full: "Prime Residential & Penthouses",
-    icon: "🏢",
-  },
-  {
-    id: "villas",
-    label: "Coastal Villas (Bodrum/Antalya)",
-    full: "Coastal Villas & Estates",
-    icon: "🏖️",
-  },
-  {
-    id: "commercial",
-    label: "Commercial & High-Yield",
-    full: "Commercial Real Estate",
-    icon: "📈",
-  },
-  { id: "general", label: "Private Portfolio Mandate", full: "General consultation", icon: "💼" },
-];
-
-const BUDGET_PRESETS = [
-  { label: "$400k – $600k (CBI)", value: "$400,000 – $600,000" },
-  { label: "$600k – $1M", value: "$600,000 – $1,000,000" },
-  { label: "$1M – $2.5M", value: "$1,000,000 – $2,500,000" },
-  { label: "$2.5M+ (Ultra-Prime)", value: "$2,500,000+" },
-];
-
-const REQUIREMENT_TAGS = [
-  "Sea / Bosphorus View",
-  "Ready Title Deed (Tapu)",
-  "Citizenship Eligible ($400k+)",
-  "Installment Plan",
-  "High Rental Guarantee",
-  "Private Garden & Pool",
-];
+const TOPIC_ICONS: Record<string, string> = {
+  cbi: "🏛️",
+  invest: "📈",
+  legal: "⚖️",
+  lifestyle: "🏖️",
+  res: "🏢",
+  villas: "🏖️",
+  commercial: "📈",
+  general: "💼",
+};
 
 export function buildWhatsAppEnquiryMessage(v: {
   name: string;
@@ -169,13 +124,19 @@ export function Enquiry({
 }) {
   const { t } = useLanguage();
   const servicesQuery = useServices();
+  const ee = t.enquiryExtra;
 
   const services = DEMO_MODE
-    ? SERVICES
+    ? ee.servicesList
     : [
-        "General consultation",
+        ee.defaultTopicFallback,
         ...(servicesQuery.data || []).map((s: { title: string }) => s.title),
       ];
+
+  const topicPills = ee.topicPills.map((p) => ({
+    ...p,
+    icon: TOPIC_ICONS[p.id] || "💼",
+  }));
 
   const previousTopic = useRef(defaultTopic);
   const contact = useLiveContact();
@@ -188,12 +149,13 @@ export function Enquiry({
     name: "",
     email: "",
     phone: "",
-    topic: defaultTopic || "General consultation",
+    topic: defaultTopic || ee.defaultTopicFallback,
     budget: "",
     message: "",
     website: "",
   });
-  const [selectedRegion, setSelectedRegion] = useState("Istanbul");
+  const [selectedRegionIdx, setSelectedRegionIdx] = useState(0);
+  const selectedRegion = ee.regionsList[selectedRegionIdx] || ee.regionsList[0] || "Istanbul";
   const [preferredMethod, setPreferredMethod] = useState("WhatsApp");
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -242,10 +204,10 @@ export function Enquiry({
   useEffect(() => {
     const old = previousTopic.current;
     setV((curr) =>
-      curr.topic === old ? { ...curr, topic: defaultTopic || "General consultation" } : curr,
+      curr.topic === old ? { ...curr, topic: defaultTopic || ee.defaultTopicFallback } : curr,
     );
     previousTopic.current = defaultTopic;
-  }, [defaultTopic]);
+  }, [defaultTopic, ee.defaultTopicFallback]);
 
   useEffect(() => {
     if (receipt) successRef.current?.focus();
@@ -271,9 +233,7 @@ export function Enquiry({
 
       const combinedMessage = [
         v.message.trim(),
-        selectedRegion && selectedRegion !== "Istanbul"
-          ? `Preferred Destination: ${selectedRegion}`
-          : "",
+        selectedRegion && selectedRegionIdx !== 0 ? `Preferred Destination: ${selectedRegion}` : "",
         preferredMethod ? `Preferred Contact: ${preferredMethod}` : "",
       ]
         .filter(Boolean)
@@ -394,54 +354,51 @@ export function Enquiry({
           </div>
           <div>
             <p className="kicker text-brass-text">{t.enquiry.successTitle}</p>
-            <h3 className="text-base font-bold text-foreground">Consultation Brief Registered</h3>
+            <h3 className="text-base font-bold text-foreground">{ee.receiptBriefRegistered}</h3>
           </div>
         </div>
 
         <div className="rounded-lg bg-background/80 p-3.5 border border-border/60">
-          <p className="text-xs text-muted-foreground mb-1">Official Inquiry Reference Number:</p>
+          <p className="text-xs text-muted-foreground mb-1">{ee.receiptRefLabel}</p>
           <div className="flex items-center justify-between">
             <strong className="font-mono text-lg font-bold tracking-wider text-brass-text">
               {receipt}
             </strong>
             <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Delivered
-              to Inbox
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />{" "}
+              {ee.receiptDeliveredInbox}
             </span>
           </div>
         </div>
 
         <p className="text-xs leading-relaxed text-muted-foreground">
-          {t.enquiry.successNext} An advisor will review your brief and initiate private
-          communications according to your preference.
+          {t.enquiry.successNext} {ee.receiptAdvisorFollowup}
         </p>
 
         {/* Message Summary Card */}
         <div className="rounded-lg border border-border/60 bg-background/50 p-3.5 text-xs space-y-2">
           <div className="flex justify-between text-muted-foreground">
-            <span>Client:</span>
+            <span>{ee.receiptClientLabel}</span>
             <span className="font-medium text-foreground">{savedData?.name || v.name}</span>
           </div>
           {(savedData?.phone || v.phone) && (
             <div className="flex justify-between text-muted-foreground">
-              <span>Phone / WhatsApp:</span>
+              <span>{ee.receiptPhoneLabel}</span>
               <span className="font-medium text-foreground">{savedData?.phone || v.phone}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground">
-            <span>Topic / Intent:</span>
+            <span>{ee.receiptTopicLabel}</span>
             <span className="font-medium text-foreground">{savedData?.topic || v.topic}</span>
           </div>
           {(savedData?.budget || v.budget) && (
             <div className="flex justify-between text-muted-foreground">
-              <span>Budget:</span>
+              <span>{ee.receiptBudgetLabel}</span>
               <span className="font-medium text-foreground">{savedData?.budget || v.budget}</span>
             </div>
           )}
           <div className="pt-2 text-muted-foreground border-t border-border/40">
-            <span className="block font-medium text-foreground mb-1">
-              Consultation Message in Inbox:
-            </span>
+            <span className="block font-medium text-foreground mb-1">{ee.receiptMessageLabel}</span>
             <p className="italic line-clamp-3 text-foreground/90 bg-muted/40 p-2 rounded">
               "{savedData?.message || v.message}"
             </p>
@@ -456,7 +413,7 @@ export function Enquiry({
             className="btn btn-primary flex-1 inline-flex items-center justify-center gap-2 text-xs py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-md"
           >
             <MessageSquare className="h-4 w-4" />
-            <span>Chat on WhatsApp with Enquiry</span>
+            <span>{ee.chatWhatsappEnquiryBtn}</span>
           </a>
           <button
             type="button"
@@ -469,7 +426,7 @@ export function Enquiry({
                 name: "",
                 email: "",
                 phone: "",
-                topic: defaultTopic || "General consultation",
+                topic: defaultTopic || ee.defaultTopicFallback,
                 budget: "",
                 message: "",
                 website: "",
@@ -552,7 +509,7 @@ export function Enquiry({
 
           {!compact && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2.5">
-              {LUXURY_TOPIC_PILLS.map((pill) => {
+              {topicPills.map((pill) => {
                 const active = v.topic === pill.full || v.topic === pill.label;
                 return (
                   <button
@@ -597,15 +554,15 @@ export function Enquiry({
         {/* Step 4: Destination & Region (When not in compact modal) */}
         {!compact && (
           <div>
-            <label className={label}>Target Region / Destination in Türkiye</label>
+            <label className={label}>{ee.targetRegionLabel}</label>
             <div className="flex flex-wrap gap-1.5">
-              {["Istanbul", "Antalya", "Bodrum", "Izmir", "Ankara", "Fethiye"].map((city) => {
-                const active = selectedRegion === city;
+              {ee.regionsList.map((city, idx) => {
+                const active = selectedRegionIdx === idx;
                 return (
                   <button
                     key={city}
                     type="button"
-                    onClick={() => setSelectedRegion(city)}
+                    onClick={() => setSelectedRegionIdx(idx)}
                     className={`rounded-full px-3 py-1 text-xs transition-colors ${
                       active
                         ? "bg-brass text-primary font-semibold"
@@ -629,7 +586,7 @@ export function Enquiry({
 
           {!compact && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
-              {BUDGET_PRESETS.map((b) => {
+              {ee.budgetPresets.map((b) => {
                 const active = v.budget === b.value;
                 return (
                   <button
@@ -670,11 +627,9 @@ export function Enquiry({
 
           {!compact && (
             <div className="mb-2">
-              <p className="text-[11px] text-muted-foreground mb-1.5">
-                Quick requirement tags (click to add):
-              </p>
+              <p className="text-[11px] text-muted-foreground mb-1.5">{ee.quickTagsLabel}</p>
               <div className="flex flex-wrap gap-1.5">
-                {REQUIREMENT_TAGS.map((tag) => (
+                {ee.requirementTags.map((tag) => (
                   <button
                     key={tag}
                     type="button"
@@ -736,10 +691,7 @@ export function Enquiry({
         {/* Reassurance Micro-Copy */}
         <div className="rounded-lg border border-border/40 bg-muted/20 p-3 text-[11px] text-muted-foreground flex items-center gap-2.5">
           <ShieldCheck className="h-4 w-4 text-brass shrink-0" />
-          <span>
-            Strictly confidential client advisory. Direct developer pricing, zero buyer agency fees,
-            and full SPK valuation compliance.
-          </span>
+          <span>{ee.reassuranceText}</span>
         </div>
 
         {err && (
@@ -755,8 +707,7 @@ export function Enquiry({
         >
           <MessageSquare className="h-4 w-4" />
           <span>
-            {busy ? t.enquiry.submitting : t.enquiry.submitBtn || "Send Private Enquiry"} & Connect
-            on WhatsApp
+            {busy ? t.enquiry.submitting : t.enquiry.submitBtn} &amp; {ee.connectWhatsappSuffix}
           </span>
         </button>
 
@@ -780,7 +731,7 @@ export function Enquiry({
           >
             {contact.email}
           </a>{" "}
-          or{" "}
+          {ee.contactHeroOr}{" "}
           <a
             className="underline underline-offset-2 font-medium text-foreground hover:text-brass"
             href={contact.phoneHref}

@@ -125,12 +125,14 @@ export interface CaldrenLocationsSectionProps {
 
 export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = ({
   properties = [],
-  title = "Four regions,",
-  subtitle = "We work only where architecture, demand and quality of life align — each market guided by an Avrasya advisor and our in-house attorney.",
+  title,
+  subtitle,
   settings: propSettings,
   regions: propRegions,
 }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const resolvedTitle = title ?? t.regionsShowcase.fourRegions;
+  const resolvedSubtitle = subtitle ?? t.regionsShowcase.locationsSubtitle;
   const [currency] = useCurrency();
   const hookSettings = useSiteSettings();
   const effectiveSettings = propSettings || hookSettings;
@@ -139,11 +141,20 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
     const raw =
       propRegions || (effectiveSettings?.regions ? publicRegions(effectiveSettings.regions) : []);
     if (!raw || raw.length === 0) {
-      return REGIONS_DATA;
+      return REGIONS_DATA.map((item) => {
+        const loc = t.regionsShowcase.locationCards[item.slug];
+        return {
+          ...item,
+          name: locale !== "en" && loc?.title ? loc.title : item.name,
+          tagline: loc?.subtitle || item.tagline,
+          description: loc?.description || item.description,
+        };
+      });
     }
     return raw.map((reg, idx) => {
       const fallback =
         REGIONS_DATA.find((r) => r.slug === reg.slug) || REGIONS_DATA[idx % REGIONS_DATA.length]!;
+      const loc = t.regionsShowcase.locationCards[reg.slug];
       const matchingCount = properties.filter((p) => {
         const citySlug = slugifyRegion(p.city || "");
         const locSlug = slugifyRegion(p.location_label || "");
@@ -160,9 +171,15 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
       return {
         index: String(idx + 1).padStart(2, "0"),
         slug: reg.slug,
-        name: reg.name,
-        tagline: reg.summary || fallback.tagline,
-        description: reg.summary || fallback.description,
+        name: locale !== "en" && loc?.title ? loc.title : reg.name,
+        tagline:
+          locale !== "en" && loc?.subtitle
+            ? loc.subtitle
+            : reg.summary || loc?.subtitle || fallback.tagline,
+        description:
+          locale !== "en" && loc?.description
+            ? loc.description
+            : reg.summary || loc?.description || fallback.description,
         avgPriceM2: fallback.avgPriceM2 || "$3,200",
         priceGrowthYoY: fallback.priceGrowthYoY || "+15%",
         defaultResidencesCount: matchingCount > 0 ? matchingCount : fallback.defaultResidencesCount,
@@ -171,11 +188,11 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
         featuredFallbackSlug: fallback.featuredFallbackSlug,
         featuredThumb: reg.heroImage || fallback.featuredThumb,
         imageSrc: reg.heroImage || reg.ogImage || fallback.imageSrc,
-        imageAlt: `${reg.name} luxury residences and architecture`,
+        imageAlt: `${loc?.title || reg.name}`,
         slotIndex: fallback.slotIndex ?? idx,
       };
     });
-  }, [propRegions, effectiveSettings?.regions, properties]);
+  }, [propRegions, effectiveSettings?.regions, properties, t, locale]);
 
   const [activeSlug, setActiveSlug] = useState<string>("istanbul");
 
@@ -264,7 +281,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [locale]);
 
   // Animate content on active tab switch
   useEffect(() => {
@@ -309,7 +326,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
         >
           <div data-loc-anim className="max-w-[700px]">
             <h2 className="m-0 text-[42px] font-normal leading-[1.04] tracking-[-0.04em] text-[#163038] sm:text-[64px] lg:text-[84px]">
-              <span>{title}</span>
+              <span>{resolvedTitle}</span>
               <br />
               <span
                 className="italic font-normal tracking-[-0.02em] text-[#163038]"
@@ -317,14 +334,14 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                   fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif',
                 }}
               >
-                one standard.
+                {t.regionsShowcase.oneStandard}
               </span>
             </h2>
           </div>
 
           <div data-loc-anim className="w-full max-w-[420px] pb-1">
             <p className="m-0 text-[14px] sm:text-[15px] font-normal leading-[1.6] text-[#5C6F73]">
-              {subtitle}
+              {resolvedSubtitle}
             </p>
           </div>
         </div>
@@ -375,7 +392,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
           <button
             type="button"
             onClick={handlePrev}
-            aria-label="Previous location"
+            aria-label={t.regionsShowcase.previousLocationAria}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#163038]/20 bg-white text-[#163038] transition-colors hover:bg-[#163038] hover:text-white cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -391,7 +408,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
           <button
             type="button"
             onClick={handleNext}
-            aria-label="Next location"
+            aria-label={t.regionsShowcase.nextLocationAria}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#163038]/20 bg-white text-[#163038] transition-colors hover:bg-[#163038] hover:text-white cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
@@ -420,7 +437,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                 <button
                   type="button"
                   onClick={handlePrev}
-                  aria-label="Previous location photo"
+                  aria-label={`${t.regionsShowcase.previousLocationAria} photo`}
                   className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#163038]/70 text-white backdrop-blur-md shadow-md transition-colors hover:bg-[#163038] cursor-pointer"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -428,7 +445,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                 <button
                   type="button"
                   onClick={handleNext}
-                  aria-label="Next location photo"
+                  aria-label={`${t.regionsShowcase.nextLocationAria} photo`}
                   className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#163038]/70 text-white backdrop-blur-md shadow-md transition-colors hover:bg-[#163038] cursor-pointer"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -461,7 +478,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                   {activeRegion.avgPriceM2}
                 </p>
                 <p className="mt-1 text-[11.5px] uppercase tracking-[0.08em] text-[#5C6F73]">
-                  Avg. price / m²
+                  {t.regionsShowcase.avgPriceM2}
                 </p>
               </div>
 
@@ -470,7 +487,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                   {activeRegion.priceGrowthYoY}
                 </p>
                 <p className="mt-1 text-[11.5px] uppercase tracking-[0.08em] text-[#5C6F73]">
-                  Price growth YoY
+                  {t.regionsShowcase.priceGrowthYoY}
                 </p>
               </div>
 
@@ -479,7 +496,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                   {regionFeaturedProperty.count}
                 </p>
                 <p className="mt-1 text-[11.5px] uppercase tracking-[0.08em] text-[#5C6F73]">
-                  Residences
+                  {t.regionsShowcase.residencesLabel}
                 </p>
               </div>
             </div>
@@ -503,7 +520,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                 />
                 <div className="min-w-0">
                   <span className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-[#C5A059]">
-                    FEATURED PROPERTY
+                    {t.regionsShowcase.featuredPropertyLabel}
                   </span>
                   <h4 className="truncate text-[14px] font-semibold text-[#163038] group-hover:text-[#10785F] transition-colors">
                     {regionFeaturedProperty.title}
@@ -526,7 +543,9 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
                 search={{ region: activeRegion.slug }}
                 className="group inline-flex h-[48px] items-center gap-3 rounded-full bg-[#163038] px-6 text-[13.5px] font-medium text-white no-underline shadow-md transition-all duration-300 hover:bg-[#10785F] hover:shadow-lg"
               >
-                <span>Explore properties in {activeRegion.name}</span>
+                <span>
+                  {t.regionsShowcase.explorePropertiesIn} {activeRegion.name}
+                </span>
                 <span
                   aria-hidden="true"
                   className="text-[14px] transition-transform duration-300 group-hover:translate-x-1"

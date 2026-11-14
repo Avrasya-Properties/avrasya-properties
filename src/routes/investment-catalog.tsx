@@ -134,7 +134,7 @@ function Catalog() {
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
               </div>
               <div className="mt-4 pt-3 border-t border-border/60 flex items-center gap-1.5 text-xs text-brass font-medium">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Full Advisory Governance
+                <CheckCircle2 className="h-3.5 w-3.5" /> {t.servicesUi.legalRepHeading}
               </div>
             </div>
           ))}

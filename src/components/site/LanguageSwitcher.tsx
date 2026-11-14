@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Globe, Check, ChevronDown } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
+import { useLanguage, useTranslation } from "@/hooks/useLanguage";
 import type { Locale, LocaleConfig } from "@/i18n";
 
 interface LanguageSwitcherProps {
@@ -10,6 +10,7 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ variant = "navbar", className = "" }: LanguageSwitcherProps) {
   const { locale, setLocale, locales, config, isRtl } = useLanguage();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -89,7 +90,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
           onClick={() => setOpen((prev) => !prev)}
           aria-expanded={open}
           aria-haspopup="listbox"
-          aria-label="Change language"
+          aria-label={t.chrome.changeLanguage}
           className="group flex items-center gap-1.5 rounded border border-on-dark/20 bg-primary/40 px-2 py-0.5 text-[0.68rem] font-semibold text-on-dark-muted transition-all hover:border-brass/70 hover:bg-primary/80 hover:text-on-dark focus-visible:ring-1 focus-visible:ring-brass"
         >
           <span className="select-none text-xs">{config.flag}</span>
@@ -108,7 +109,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
             style={{ [isRtl ? "left" : "right"]: 0 }}
           >
             <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-brass/80 border-b border-white/10 mb-1">
-              Select Language
+              {t.chrome.selectLanguage}
             </div>
             {locales.map((loc) => {
               const active = loc.code === locale;
@@ -201,7 +202,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-haspopup="listbox"
-        aria-label="Change language"
+        aria-label={t.chrome.changeLanguage}
         className={`group flex items-center gap-2 rounded-xs border border-border bg-card text-xs font-semibold text-foreground transition-colors duration-300 hover:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass ${compact ? "h-11 px-2.5" : "h-10 px-3"}`}
       >
         {!compact && <Globe className="h-3.5 w-3.5 text-brass" />}
@@ -223,7 +224,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
           style={{ [isRtl ? "left" : "right"]: 0 }}
         >
           <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/50 mb-1">
-            Language / Dil / اللغة
+            {t.chrome.languageHeader}
           </div>
           {locales.map((loc) => {
             const active = loc.code === locale;

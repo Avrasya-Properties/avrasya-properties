@@ -115,9 +115,16 @@ const DISTRICTS: DistrictProfile[] = [
 
 export function WhyTurkiye() {
   const { t } = useTranslation();
+  const bw = t.bosphorusAndWhyExtra;
   const [activeSide, setActiveSide] = useState<"All" | "European" | "Asian">("All");
 
-  const filteredDistricts = DISTRICTS.filter((d) => activeSide === "All" || d.side === activeSide);
+  const localizedDistricts = DISTRICTS.map((d, idx) => {
+    const loc = bw.whyDistricts[idx];
+    return loc ? { ...d, ...loc } : d;
+  });
+  const filteredDistricts = localizedDistricts.filter(
+    (d) => activeSide === "All" || d.side === activeSide,
+  );
 
   return (
     <>
@@ -239,7 +246,8 @@ export function WhyTurkiye() {
                   className="h-full w-full object-cover transition-transform duration-650 group-hover:scale-105"
                 />
                 <div className="glass-pill-dark absolute top-3 left-3 rounded-xs px-2.5 py-1 text-[11px] font-medium text-on-dark shadow-xs">
-                  {d.side} Side · {d.category}
+                  {d.side === "European" ? t.whyTurkiye.filterEuropean : t.whyTurkiye.filterAsian} ·{" "}
+                  {d.category}
                 </div>
               </div>
 
@@ -280,47 +288,39 @@ export function WhyTurkiye() {
       <section className="border-t bg-ink py-20 text-on-dark">
         <div className="container-site">
           <div className="mb-12 max-w-2xl">
-            <p className="eyebrow text-brass">Life in Istanbul</p>
+            <p className="eyebrow text-brass">{bw.lifeInIstanbul}</p>
             <h2 className="font-display text-3xl font-semibold text-on-dark md:text-4xl">
-              A Wonderful Place to Live &amp; Raise a Family
+              {t.whyTurkiye.districtsTitle}
             </h2>
-            <p className="mt-3 text-on-dark-muted">
-              From renowned English-language schools and top-tier hospitals to seamless metro lines,
-              Istanbul offers an exceptional quality of life for international families.
-            </p>
+            <p className="mt-3 text-on-dark-muted">{t.whyTurkiye.districtsSubtitle}</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <GraduationCap className="mb-3 h-6 w-6 text-brass" />
-              <h3 className="font-display text-lg font-semibold text-on-dark">
-                40+ International Schools
-              </h3>
+              <h3 className="font-display text-lg font-semibold text-on-dark">{bw.intlSchools}</h3>
               <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">
-                British curriculum, American high schools (Robert College), and International
-                Baccalaureate (IB) academies teach in English, French, and German.
+                {bw.intlSchoolsDesc}
               </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <HeartHandshake className="mb-3 h-6 w-6 text-brass" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
-                World-Class Healthcare
+                {bw.worldHealthcare}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">
-                Hospital groups such as Acıbadem, Memorial, and Koç University Hospital are renowned
-                globally for medical excellence and multilingual patient care.
+                {bw.worldHealthcareDesc}
               </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <Train className="mb-3 h-6 w-6 text-brass" />
               <h3 className="font-display text-lg font-semibold text-on-dark">
-                Seamless Modern Transit
+                {bw.modernTransit}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-on-dark-muted">
-                Marmaray connects Europe and Asia under the Bosphorus in 4 minutes; the M11 metro
-                line speeds between Kağıthane and Istanbul Airport in under 24 minutes.
+                {bw.modernTransitDesc}
               </p>
             </div>
           </div>
@@ -329,7 +329,7 @@ export function WhyTurkiye() {
 
       <div className="container-site flex justify-center py-12">
         <Link to="/properties" className="btn btn-primary px-8 py-3 text-base">
-          Explore Available Homes
+          {bw.exploreAvailableHomes}
         </Link>
       </div>
     </>

@@ -287,4 +287,45 @@ describe("LanguageProvider & LanguageSwitcher component", () => {
     expect(screen.getByRole("option", { name: /中文/i })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: /বাংলা/i })).toBeInTheDocument();
   });
+
+  it("maintains array length parity and non-English copy across expanded customer sections", () => {
+    const nonEnLocales = [
+      { code: "tr", data: tr },
+      { code: "ar", data: ar },
+      { code: "ru", data: ru },
+      { code: "fa", data: fa },
+      { code: "zh", data: zh },
+      { code: "bn", data: bn },
+    ];
+    for (const { data } of nonEnLocales) {
+      expect(data.aboutSection.metrics).toHaveLength(en.aboutSection.metrics.length);
+      expect(data.aboutPageExtra.stats).toHaveLength(en.aboutPageExtra.stats.length);
+      expect(data.aboutPageExtra.approachSteps).toHaveLength(
+        en.aboutPageExtra.approachSteps.length,
+      );
+      expect(data.aboutPageExtra.expertiseItems).toHaveLength(
+        en.aboutPageExtra.expertiseItems.length,
+      );
+      expect(data.aboutPageExtra.teamMembers).toHaveLength(en.aboutPageExtra.teamMembers.length);
+      expect(data.aboutPageExtra.partnerCategories).toHaveLength(
+        en.aboutPageExtra.partnerCategories.length,
+      );
+      expect(data.servicesUi.valuesItems).toHaveLength(en.servicesUi.valuesItems.length);
+      expect(data.servicesUi.benefits).toHaveLength(en.servicesUi.benefits.length);
+      expect(data.projectsShowcase.defaultProjects).toHaveLength(
+        en.projectsShowcase.defaultProjects.length,
+      );
+      expect(data.bosphorusAndWhyExtra.whyDistricts).toHaveLength(
+        en.bosphorusAndWhyExtra.whyDistricts.length,
+      );
+      expect(Object.keys(data.bosphorusAndWhyExtra.corridors)).toEqual(
+        Object.keys(en.bosphorusAndWhyExtra.corridors),
+      );
+      // Verify expanded sections are actually translated (not copy-pasted English)
+      expect(data.aboutSection.badge).not.toBe(en.aboutSection.badge);
+      expect(data.heroShowcase.exploreProperties).not.toBe(en.heroShowcase.exploreProperties);
+      expect(data.servicesUi.valuesHeading).not.toBe(en.servicesUi.valuesHeading);
+      expect(data.projectsShowcase.viewDossier).not.toBe(en.projectsShowcase.viewDossier);
+    }
+  });
 });

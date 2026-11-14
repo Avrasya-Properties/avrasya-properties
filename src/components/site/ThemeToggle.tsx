@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useTheme } from "@/hooks/useTheme";
+import { useTranslation } from "@/hooks/useLanguage";
 import { applyMagneticHover } from "@/lib/animation/magnetic";
 
 export interface ThemeToggleProps {
@@ -14,6 +15,7 @@ export interface ThemeToggleProps {
  */
 export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleProps) {
   const { resolvedTheme, isDark, toggleTheme, setTheme } = useTheme();
+  const { t } = useTranslation();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const sunGroupRef = useRef<SVGGElement>(null);
   const moonGroupRef = useRef<SVGGElement>(null);
@@ -122,7 +124,7 @@ export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleP
           }`}
         >
           <span>☀</span>
-          <span>Light</span>
+          <span>{t.chrome.themeLight}</span>
         </button>
         <button
           type="button"
@@ -134,7 +136,7 @@ export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleP
           }`}
         >
           <span>☾</span>
-          <span>Dark</span>
+          <span>{t.chrome.themeDark}</span>
         </button>
       </div>
     );
@@ -149,8 +151,8 @@ export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleP
       data-testid="theme-toggle-button"
       onClick={toggleTheme}
       aria-pressed={isDark}
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      aria-label={isDark ? t.chrome.switchToLight : t.chrome.switchToDark}
+      title={isDark ? t.chrome.switchToLight : t.chrome.switchToDark}
       className={`group relative inline-flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A059] ${
         isCompact ? "h-10 w-10" : "h-9 px-3 gap-2"
       } ${
@@ -225,7 +227,7 @@ export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleP
 
         {!isCompact && (
           <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em]">
-            {resolvedTheme === "dark" ? "Dark" : "Light"}
+            {resolvedTheme === "dark" ? t.chrome.themeDark : t.chrome.themeLight}
           </span>
         )}
       </span>

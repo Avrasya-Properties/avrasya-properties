@@ -5,6 +5,7 @@ import { applyMagneticHover } from "@/lib/animation/magnetic";
 import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
 import type { PropertyRecord } from "@/data/properties";
 import { useCatalogue } from "@/data/live";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export interface BildoraProjectsShowcaseProps {
   properties?: PropertyRecord[];
@@ -73,6 +74,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
   properties: propProperties,
   collectionHeading,
 }) => {
+  const { t, locale } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIdxRef = useRef(0);
   const swipeStartXRef = useRef<number | null>(null);
@@ -115,17 +117,25 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
 
   // Always preserve all 4 curated showcase slides while linking to live properties when available
   const showcaseItems: ShowcaseProject[] = useMemo(() => {
+    const localizedDefaults = t.projectsShowcase.defaultProjects;
     return DEFAULT_SHOWCASE_PROJECTS.map((item, idx) => {
       const matchedProp = rawProperties[idx];
-      if (!matchedProp) return item;
-      const locLabel = matchedProp.location_label || matchedProp.city;
+      const localized = localizedDefaults[idx];
+      const locLabel = matchedProp?.location_label || matchedProp?.city;
       return {
         ...item,
-        location: locLabel ? `${locLabel} · ${matchedProp.city}` : item.location,
-        href: matchedProp.slug ? `/properties/${matchedProp.slug}` : item.href,
+        badge: localized?.category || item.badge,
+        title: localized?.title || item.title,
+        description: localized?.description || item.description,
+        location: matchedProp
+          ? locLabel
+            ? `${locLabel} · ${matchedProp.city}`
+            : item.location
+          : item.location,
+        href: matchedProp?.slug ? `/properties/${matchedProp.slug}` : item.href,
       };
     });
-  }, [rawProperties]);
+  }, [rawProperties, t]);
 
   // Word-by-word blur reveal whenever activeIndex changes
   useEffect(() => {
@@ -295,7 +305,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
       magneticCleanups.forEach((fn) => fn());
       ctx.revert();
     };
-  }, [showcaseItems.length]);
+  }, [showcaseItems.length, locale]);
 
   const currentProject = showcaseItems[activeIndex] ?? showcaseItems[0]!;
 
@@ -338,7 +348,9 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
           data-framer-name="Section Tag"
           className="inline-flex items-center justify-center rounded-[99px] bg-[#C5A059] px-[16px] py-[6px] shadow-sm"
         >
-          <span className="text-[13px] font-medium leading-[1.35] text-white">Our Projects</span>
+          <span className="text-[13px] font-medium leading-[1.35] text-white">
+            {t.projectsShowcase.eyebrow}
+          </span>
         </div>
 
         {/* Heading & Subtitle */}
@@ -347,12 +359,10 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
           className="flex w-full flex-col items-center justify-center gap-[16px]"
         >
           <h2 className="max-w-[780px] text-[28px] font-normal leading-[1.1] tracking-[0em] text-white sm:text-[36px] lg:text-[44px]">
-            {renderHeaderWords(collectionHeading || "Built with Purpose. Made to Last.")}
+            {renderHeaderWords(collectionHeading || t.projectsShowcase.heading)}
           </h2>
           <p className="max-w-[564px] text-[14px] font-normal leading-[1.45] text-white/85 sm:text-[15px]">
-            {renderHeaderWords(
-              "Explore a selection of projects where thoughtful planning, skilled craftsmanship, and dependable execution come together to create spaces built for the future.",
-            )}
+            {renderHeaderWords(t.projectsShowcase.subtitle)}
           </p>
         </div>
       </div>
@@ -399,7 +409,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
                   {item.badge}
                 </span>
                 <Link to={item.href} data-project-cta tabIndex={-1} className="sr-only">
-                  <span data-magnetic-inner>View Residence Dossier</span>
+                  <span data-magnetic-inner>{t.projectsShowcase.viewDossier}</span>
                 </Link>
               </div>
             );
@@ -444,7 +454,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
 
             <div
               role="tablist"
-              aria-label="Featured project selector"
+              aria-label={t.projectsShowcase.selectResidenceAria}
               className="flex items-center gap-2 rounded-full border border-white/15 bg-[#0E2228]/65 p-1.5 backdrop-blur-md"
             >
               {showcaseItems.map((item, idx) => {
@@ -496,7 +506,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
               to={currentProject.href}
               className="inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-6 py-3 text-[12px] font-medium uppercase tracking-[0.14em] text-white no-underline backdrop-blur-md transition-all duration-300 hover:border-[#C5A059] hover:bg-[#C5A059] hover:text-[#0E2228]"
             >
-              <span>View Residence Dossier</span>
+              <span>{t.projectsShowcase.viewDossier}</span>
               <span aria-hidden="true">&rarr;</span>
             </Link>
 

@@ -96,7 +96,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                 {t.calculator.eyebrow}
               </span>
               <span className="font-mono text-[10px] text-muted-foreground">
-                Turkish Land Registry Law No. 4721
+                {t.calculatorExtra.law4721Title}
               </span>
             </div>
             <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
@@ -158,7 +158,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
               {/* Presets Quick Buttons */}
               <div className="flex flex-wrap gap-2 pt-1">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground self-center mr-1">
-                  Presets:
+                  {t.calculatorExtra.presetsLabel}
                 </span>
                 {[325000, 400000, 495000, 750000, 1200000].map((preset) => (
                   <button
@@ -171,7 +171,11 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                     }`}
                   >
                     ${preset >= 1000000 ? `${(preset / 1000000).toFixed(1)}M` : `${preset / 1000}K`}
-                    {preset === 400000 && <span className="ml-1 text-[9px] text-brass">CBI</span>}
+                    {preset === 400000 && (
+                      <span className="ml-1 text-[9px] text-brass">
+                        {t.calculatorExtra.cbiBadge}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -389,7 +393,7 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
 
                 {currency !== "USD" && (
                   <p className="text-right text-xs font-mono text-muted-foreground">
-                    Approx. {formatCurr(allInAcquisitionUsd)}
+                    {t.calculatorExtra.approxPrefix} {formatCurr(allInAcquisitionUsd)}
                   </p>
                 )}
               </div>
@@ -403,7 +407,9 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                   <p className="font-mono text-base font-semibold text-foreground mt-0.5">
                     ${monthlyRentalUsd.toLocaleString("en-US")}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">7.2% Net USD</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {t.calculatorExtra.netUsdNote}
+                  </p>
                 </div>
                 <div className="rounded border border-border/60 bg-card p-3">
                   <p className="text-[10px] font-mono uppercase text-muted-foreground">
@@ -413,11 +419,10 @@ Projected Annual Net Rental: $${annualRentalUsd.toLocaleString()} USD/yr ($${mon
                     ${annualRentalUsd.toLocaleString("en-US")}
                   </p>
                   <p className="text-[10px] text-muted-foreground">
-                    Per Year · 3-Yr: ${threeYearRentalUsd.toLocaleString("en-US")}
+                    {t.calculatorExtra.perYearThreeYr} ${threeYearRentalUsd.toLocaleString("en-US")}
                   </p>
                   <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
-                    Estimates only, based on the assumptions shown. Not an offer, valuation or
-                    guarantee of return.
+                    {t.calculatorExtra.estimateDisclaimer}
                   </p>
                 </div>
               </div>

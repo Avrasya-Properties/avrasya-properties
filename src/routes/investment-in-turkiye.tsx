@@ -45,6 +45,7 @@ type Strategy = {
 
 export function InvestmentPlaybook() {
   const { t } = useTranslation();
+  const bw = t.bosphorusAndWhyExtra;
   const [activeStrategy, setActiveStrategy] = useState("residential");
 
   const STRATEGIES: Strategy[] = [
@@ -78,37 +79,37 @@ export function InvestmentPlaybook() {
     {
       stage: "01",
       title: t.investment.step1Title,
-      timeframe: "Week 1",
+      timeframe: bw.timelineWeeks["Week 1"] ?? "Week 1",
       desc: t.investment.step1Desc,
     },
     {
       stage: "02",
       title: t.investment.step2Title,
-      timeframe: "Weeks 1–2",
+      timeframe: bw.timelineWeeks["Weeks 1–2"] ?? "Weeks 1–2",
       desc: t.investment.step2Desc,
     },
     {
       stage: "03",
       title: t.investment.step3Title,
-      timeframe: "Weeks 2–3",
+      timeframe: bw.timelineWeeks["Weeks 2–3"] ?? "Weeks 2–3",
       desc: t.investment.step3Desc,
     },
     {
       stage: "04",
       title: t.investment.step4Title,
-      timeframe: "Week 3",
+      timeframe: bw.timelineWeeks["Week 3"] ?? "Week 3",
       desc: t.investment.step4Desc,
     },
     {
       stage: "05",
       title: t.investment.step5Title,
-      timeframe: "Week 4",
+      timeframe: bw.timelineWeeks["Week 4"] ?? "Week 4",
       desc: t.investment.step5Desc,
     },
     {
       stage: "06",
       title: t.investment.step6Title,
-      timeframe: "Post-closing",
+      timeframe: bw.timelineWeeks["Post-closing"] ?? "Post-closing",
       desc: t.investment.step6Desc,
     },
   ];
@@ -167,14 +168,16 @@ export function InvestmentPlaybook() {
               <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
                 <div>
                   <span className="text-xs font-semibold uppercase tracking-wider text-brass">
-                    Strategy Profile
+                    {bw.strategyProfileLabel}
                   </span>
                   <h3 className="font-display text-2xl font-bold text-foreground">
                     {currentStrat.title}
                   </h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-muted-foreground block">Expected Net Return</span>
+                  <span className="text-xs text-muted-foreground block">
+                    {bw.expectedNetReturnLabel}
+                  </span>
                   <span className="font-mono text-2xl font-bold text-brass">
                     {currentStrat.targetYield}
                   </span>
@@ -182,7 +185,7 @@ export function InvestmentPlaybook() {
               </div>
 
               <div className="mt-6">
-                <p className="text-sm font-medium text-foreground">Target Profile:</p>
+                <p className="text-sm font-medium text-foreground">{bw.targetProfileLabel}</p>
                 <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
                   {currentStrat.profile}
                 </p>
@@ -190,7 +193,7 @@ export function InvestmentPlaybook() {
 
               <div className="mt-6 space-y-3">
                 <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
-                  Key Features
+                  {bw.keyFeaturesLabel}
                 </p>
                 {currentStrat.points.map((pt, i) => (
                   <div
@@ -206,10 +209,10 @@ export function InvestmentPlaybook() {
 
             <div className="mt-8 pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
               <span className="text-xs text-muted-foreground">
-                Recommended minimum holding period: <b>{currentStrat.horizon}</b>
+                {bw.recommendedHoldLabel} <b>{currentStrat.horizon}</b>
               </span>
               <Link to="/properties" className="btn btn-primary w-full sm:w-auto">
-                Browse Matching Opportunities
+                {bw.browseMatchingBtn}
               </Link>
             </div>
           </div>
@@ -276,7 +279,9 @@ export function InvestmentPlaybook() {
             <h3 className="font-display text-lg font-bold text-foreground">
               {t.investment.tax2Title}
             </h3>
-            <p className="mt-1 font-mono text-xl font-bold text-brass">0.2% per year</p>
+            <p className="mt-1 font-mono text-xl font-bold text-brass">
+              0.2% / {t.calculatorExtra.yrShort}
+            </p>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               {t.investment.tax2Desc}
             </p>
@@ -289,7 +294,9 @@ export function InvestmentPlaybook() {
             <h3 className="font-display text-lg font-bold text-foreground">
               {t.investment.tax3Title}
             </h3>
-            <p className="mt-1 font-mono text-xl font-bold text-emerald-600">0% (5+ Yrs)</p>
+            <p className="mt-1 font-mono text-xl font-bold text-emerald-600">
+              0% (5+ {t.calculatorExtra.yrShort})
+            </p>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               {t.investment.tax3Desc}
             </p>

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslation } from "@/hooks/useLanguage";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -33,14 +34,20 @@ export interface CaldrenSkyCtaSectionProps {
  * with procedural `SkyStars` canvas (`density: 260`) and GSAP scroll reveal.
  */
 export const CaldrenSkyCtaSection: React.FC<CaldrenSkyCtaSectionProps> = ({
-  titleLine1 = "Let’s find your",
-  titleItalicLine2 = "next address.",
-  subtitle = "Tell us how you want to live. We will return with a short, considered selection.",
-  primaryLabel = "Start a Conversation",
+  titleLine1,
+  titleItalicLine2,
+  subtitle,
+  primaryLabel,
   primaryTo = "/contact",
-  secondaryLabel = "Explore Properties",
+  secondaryLabel,
   secondaryTo = "/properties",
 }) => {
+  const { t } = useTranslation();
+  const resolvedTitleLine1 = titleLine1 ?? t.heroShowcase.skyCtaTitleLine1;
+  const resolvedTitleItalicLine2 = titleItalicLine2 ?? t.heroShowcase.skyCtaTitleItalicLine2;
+  const resolvedSubtitle = subtitle ?? t.heroShowcase.skyCtaSubtitle;
+  const resolvedPrimaryLabel = primaryLabel ?? t.heroShowcase.skyCtaPrimary;
+  const resolvedSecondaryLabel = secondaryLabel ?? t.heroShowcase.skyCtaSecondary;
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -198,7 +205,7 @@ export const CaldrenSkyCtaSection: React.FC<CaldrenSkyCtaSectionProps> = ({
           data-sky-cta-item
           className="m-0 text-center text-[46px] font-normal leading-[1.0] tracking-[-0.04em] text-white sm:text-[72px] lg:text-[104px]"
         >
-          <span>{titleLine1}</span>
+          <span>{resolvedTitleLine1}</span>
           <br />
           <span
             className="italic font-normal tracking-[-0.02em] text-[#C5A059]"
@@ -206,7 +213,7 @@ export const CaldrenSkyCtaSection: React.FC<CaldrenSkyCtaSectionProps> = ({
               fontFamily: '"Instrument Serif", "Cormorant Garamond", Georgia, serif',
             }}
           >
-            {titleItalicLine2}
+            {resolvedTitleItalicLine2}
           </span>
         </h2>
 
@@ -214,7 +221,7 @@ export const CaldrenSkyCtaSection: React.FC<CaldrenSkyCtaSectionProps> = ({
           data-sky-cta-item
           className="m-0 max-w-[520px] text-center text-[16px] font-normal leading-[1.55] tracking-[-0.01em] text-white/80 sm:text-[18px]"
         >
-          {subtitle}
+          {resolvedSubtitle}
         </p>
 
         {/* CTA Buttons (.framer-17e3c5o: gap 14px) */}
@@ -223,13 +230,13 @@ export const CaldrenSkyCtaSection: React.FC<CaldrenSkyCtaSectionProps> = ({
             to={primaryTo}
             className="inline-flex h-[47px] items-center justify-center rounded-full bg-white px-[28px] text-[14px] font-medium tracking-[-0.01em] text-[#163038] no-underline shadow-md transition-all duration-300 hover:bg-[#F9F8F5] hover:scale-[1.03]"
           >
-            {primaryLabel}
+            {resolvedPrimaryLabel}
           </Link>
           <Link
             to={secondaryTo}
             className="inline-flex h-[47px] items-center justify-center rounded-full border border-white/40 bg-transparent px-[28px] text-[14px] font-medium tracking-[-0.01em] text-white no-underline transition-all duration-300 hover:border-white hover:bg-white/10"
           >
-            {secondaryLabel}
+            {resolvedSecondaryLabel}
           </Link>
         </div>
       </div>

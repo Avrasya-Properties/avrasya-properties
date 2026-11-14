@@ -85,6 +85,34 @@ export const TYPE_LABEL: Record<RecordType, string> = {
   ambiguous_offer: "Offer to confirm",
 };
 
+/** Resolve localized display label for any RecordType value safely. */
+export function localizedRecordTypeLabel(
+  recordType: RecordType,
+  common: {
+    unitOffer: string;
+    unitType: string;
+    multiApartmentPackage: string;
+    projectIntroduction: string;
+    offerToConfirm: string;
+  },
+  typeLabels?: Partial<Record<"single_unit" | "package" | "project", string>>,
+): string {
+  switch (recordType) {
+    case "unit_offer":
+      return common.unitOffer;
+    case "unit_type":
+      return common.unitType;
+    case "package":
+      return typeLabels?.package || common.multiApartmentPackage;
+    case "project":
+      return typeLabels?.project || common.projectIntroduction;
+    case "ambiguous_offer":
+      return common.offerToConfirm;
+    default:
+      return TYPE_LABEL[recordType];
+  }
+}
+
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", {
     style: "currency",

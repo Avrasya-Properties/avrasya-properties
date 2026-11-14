@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import {
   CONTACT,
-  TYPE_LABEL,
+  localizedRecordTypeLabel,
   areaText,
   comparableUsd,
   convertUsdPrice,
@@ -59,13 +59,14 @@ function Fact({ k, v }: { k: string; v: React.ReactNode }) {
 
 function GalleryImage({ src, alt, className }: { src: string; alt: string; className: string }) {
   const [failed, setFailed] = useState(false);
+  const { t } = useLanguage();
   return failed ? (
     <div
       role="img"
       aria-label={alt}
       className="flex h-full w-full items-center justify-center bg-muted p-4 text-center text-sm text-muted-foreground"
     >
-      This photo is temporarily unavailable.
+      {t.propertiesExtra.detail.photoUnavailable}
     </div>
   ) : (
     <img src={src} alt={alt} className={className} onError={() => setFailed(true)} />
@@ -77,46 +78,47 @@ const tryf = (n: number) => "TRY " + n.toLocaleString("en-US");
 
 function PriceBlock({ r }: { r: PropertyRecord }) {
   const { t } = useLanguage();
+  const dt = t.propertiesExtra.detail;
   const p = r.price;
   const rows: [string, string][] = [];
   if (p.previous_advertised_amount)
-    rows.push(["Formerly Advertised", usd(p.previous_advertised_amount)]);
-  if (p.list_price) rows.push(["Source List Price", usd(p.list_price)]);
-  if (p.expenses_amount) rows.push(["Stated Transfer Expenses", usd(p.expenses_amount)]);
+    rows.push([dt.formerlyAdvertised, usd(p.previous_advertised_amount)]);
+  if (p.list_price) rows.push([dt.sourceListPrice, usd(p.list_price)]);
+  if (p.expenses_amount) rows.push([dt.additionalFees, usd(p.expenses_amount)]);
   const inst = r.details.installment_offer as
     | { total: number; down_payment_percent: number; months: number }
     | undefined;
   if (inst)
     rows.push([
-      "Developer Instalment Plan",
-      `${usd(inst.total)} · ${inst.down_payment_percent}% down · ${inst.months} months`,
+      dt.installmentOption,
+      `${usd(inst.total)} · ${inst.down_payment_percent}% ${dt.downShort} · ${inst.months} ${dt.monthsSuffix}`,
     ]);
   if (p.basis === "installment_schedule") {
     const money = (n: number) => `${p.currency || "TRY"} ${n.toLocaleString("en-US")}`;
     if (typeof p.down_payment_amount === "number")
       rows.push([
         p.down_payment_percent != null
-          ? `Down Payment (${p.down_payment_percent}%)`
-          : "Down payment",
+          ? `${dt.downPayment} (${p.down_payment_percent}%)`
+          : dt.downPayment,
         money(p.down_payment_amount),
       ]);
     if (typeof p.delivery_payment_amount === "number")
       rows.push([
         p.delivery_payment_percent != null
-          ? `At Delivery (${p.delivery_payment_percent}%)`
-          : "At delivery",
+          ? `${dt.atDelivery} (${p.delivery_payment_percent}%)`
+          : dt.atDelivery,
         money(p.delivery_payment_amount),
       ]);
     if (typeof p.installment_amount === "number")
       rows.push([
-        "Instalments",
-        `${p.installment_count ?? "To confirm"} × ${money(p.installment_amount)}`,
+        dt.installmentsLabel,
+        `${p.installment_count ?? t.propertyDetail.toConfirm} × ${money(p.installment_amount)}`,
       ]);
   }
   p.source_offers?.forEach((o, i) =>
     rows.push([
-      `Starting Offer ${i + 1}`,
-      `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m² gross` : ""}`,
+      `${dt.sourceListPrice} ${i + 1}`,
+      `${usd(o.amount)}${o.area_m2 ? ` · ${o.area_m2} m²` : ""}`,
     ]),
   );
   if (!rows.length) return null;
@@ -390,7 +392,8 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="rounded-xs bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-                {propertyCategory || TYPE_LABEL[r.record_type]}
+                {propertyCategory ||
+                  localizedRecordTypeLabel(r.record_type, t.common, t.propertiesExtra.typeLabels)}
               </span>
               {r.ref && (
                 <span className="rounded-xs border border-brass/50 bg-brass/10 px-2 py-0.5 text-xs font-semibold text-brass-text">
@@ -474,7 +477,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                       : "border border-border/80 bg-card text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {cat}
+                  {cat === "All" ? t.propertiesExtra.detail.allCategory : cat}
                 </button>
               ))}
             </div>
@@ -640,38 +643,61 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
               {typeof d.project === "string" && d.project && (
                 <Fact k={t.propertyDetail.development} v={d.project} />
               )}
-              {neighborhood && <Fact k="Neighborhood" v={neighborhood} />}
-              {propertyCategory && <Fact k="Property Category" v={propertyCategory} />}
+              {neighborhood && <Fact k={t.propertiesExtra.detail.neighborhood} v={neighborhood} />}
+              {propertyCategory && (
+                <Fact k={t.propertiesExtra.detail.propertyCategory} v={propertyCategory} />
+              )}
               {typeof d["bedrooms"] === "number" && (
                 <Fact k={t.propertyDetail.bedrooms} v={d["bedrooms"]} />
               )}
               {typeof d["living_rooms"] === "number" && (
-                <Fact k="Living Rooms" v={d["living_rooms"]} />
+                <Fact k={t.propertiesExtra.detail.livingRooms} v={d["living_rooms"]} />
               )}
               {specs.floorNumber != null && specs.floorNumber !== "" && (
-                <Fact k="Floor Number" v={specs.floorNumber} />
+                <Fact k={t.propertiesExtra.detail.floorNumber} v={specs.floorNumber} />
               )}
               {specs.totalFloors != null && (
-                <Fact k="Total Building Floors" v={specs.totalFloors} />
+                <Fact k={t.propertiesExtra.detail.totalFloors} v={specs.totalFloors} />
               )}
-              {specs.furnishingStatus && <Fact k="Furnishing Status" v={specs.furnishingStatus} />}
-              {specs.completionStatus && <Fact k="Completion Status" v={specs.completionStatus} />}
+              {specs.furnishingStatus && (
+                <Fact k={t.propertiesExtra.detail.furnishingStatus} v={specs.furnishingStatus} />
+              )}
+              {specs.completionStatus && (
+                <Fact k={t.propertiesExtra.detail.completionStatus} v={specs.completionStatus} />
+              )}
               {specs.constructionYear != null && (
-                <Fact k="Construction Year" v={specs.constructionYear} />
+                <Fact k={t.propertiesExtra.detail.constructionYear} v={specs.constructionYear} />
               )}
               {specs.propertyCondition && (
-                <Fact k="Property Condition" v={specs.propertyCondition} />
+                <Fact k={t.propertiesExtra.detail.propertyCondition} v={specs.propertyCondition} />
               )}
-              {specs.heatingSystem && <Fact k="Heating System" v={specs.heatingSystem} />}
-              {specs.viewType && <Fact k="View & Orientation" v={specs.viewType} />}
-              {specs.orientation && <Fact k="Orientation" v={specs.orientation} />}
-              {specs.balconyOrTerrace && <Fact k="Balcony / Terrace" v={specs.balconyOrTerrace} />}
-              {specs.gardenOrOutdoor && <Fact k="Garden / Outdoor" v={specs.gardenOrOutdoor} />}
-              {specs.parking && <Fact k="Parking Availability" v={specs.parking} />}
-              {specs.energyClass && <Fact k="Energy Class" v={specs.energyClass} />}
-              {["block", "floor", "unit"].map(
-                (k) => d[k] != null && <Fact key={k} k={humanKey(k)} v={String(d[k])} />,
+              {specs.heatingSystem && (
+                <Fact k={t.propertiesExtra.detail.heatingSystem} v={specs.heatingSystem} />
               )}
+              {specs.viewType && (
+                <Fact k={t.propertiesExtra.detail.viewOrientation} v={specs.viewType} />
+              )}
+              {specs.orientation && (
+                <Fact k={t.propertiesExtra.detail.orientation} v={specs.orientation} />
+              )}
+              {specs.balconyOrTerrace && (
+                <Fact k={t.propertiesExtra.detail.balconyTerrace} v={specs.balconyOrTerrace} />
+              )}
+              {specs.gardenOrOutdoor && (
+                <Fact k={t.propertiesExtra.detail.gardenOutdoor} v={specs.gardenOrOutdoor} />
+              )}
+              {specs.parking && <Fact k={t.propertiesExtra.detail.parking} v={specs.parking} />}
+              {specs.energyClass && (
+                <Fact k={t.propertiesExtra.detail.energyClass} v={specs.energyClass} />
+              )}
+              {(["block", "floor", "unit"] as const).map((k) => {
+                const labelMap = {
+                  block: t.propertiesExtra.detail.blockLabel,
+                  floor: t.propertiesExtra.detail.floorLabel,
+                  unit: t.propertiesExtra.detail.unitLabel,
+                };
+                return d[k] != null ? <Fact key={k} k={labelMap[k]} v={String(d[k])} /> : null;
+              })}
               {facts
                 .filter(([k]) => !["block", "floor", "unit"].includes(k))
                 .map(([k, v]) => (
@@ -682,7 +708,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             <PriceBlock r={r} />
             {Array.isArray(d["amenities"]) && d["amenities"].length > 0 && (
               <div className="mt-6">
-                <h3 className="font-medium">Property features</h3>
+                <h3 className="font-medium">{t.propertiesExtra.detail.propertyFeatures}</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {d["amenities"]
                     .filter((v): v is string => typeof v === "string")
@@ -700,16 +726,16 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             {(() => {
               const plan = (d["payment_plan"] ?? {}) as Record<string, unknown>;
               const notes: Array<[string, unknown]> = [
-                ["Additional fees", plan["additionalFeesNote"]],
-                ["Rental yield", plan["rentalYieldNote"]],
-                ["Capital growth", plan["capitalGrowthNote"]],
-                ["Citizenship", plan["citizenshipNote"]],
+                [t.propertiesExtra.detail.additionalFees, plan["additionalFeesNote"]],
+                [t.propertiesExtra.detail.rentalYield, plan["rentalYieldNote"]],
+                [t.propertiesExtra.detail.capitalGrowth, plan["capitalGrowthNote"]],
+                [t.propertiesExtra.detail.citizenshipNote, plan["citizenshipNote"]],
               ];
               const shown = notes.filter(([, v]) => typeof v === "string" && v.trim());
               if (shown.length === 0) return null;
               return (
                 <div data-fees-investment className="mt-6 space-y-2">
-                  <h3 className="font-medium">Fees &amp; investment notes</h3>
+                  <h3 className="font-medium">{t.propertiesExtra.detail.feesNotesHeading}</h3>
                   <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     {shown.map(([label, value]) => (
                       <div key={label} className="rounded border bg-secondary/30 px-3 py-2">
@@ -725,7 +751,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             })()}
             {Array.isArray(d["pricing_options"]) && d["pricing_options"].length > 0 && (
               <div data-payment-plans className="mt-6 space-y-4">
-                <h3 className="font-medium">Payment plans</h3>
+                <h3 className="font-medium">{t.propertiesExtra.detail.paymentPlansHeading}</h3>
                 {(
                   d["pricing_options"] as {
                     name: string;
@@ -748,32 +774,35 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                     <h4 className="font-medium">{plan.name}</h4>
                     {plan.amount != null && (
                       <Fact
-                        k="Total price"
+                        k={t.propertiesExtra.detail.totalPrice}
                         v={`${plan.currency} ${plan.amount.toLocaleString("en-US")}`}
                       />
                     )}{" "}
                     {plan.down_payment_amount != null && (
                       <Fact
-                        k="Down payment"
+                        k={t.propertiesExtra.detail.downPayment}
                         v={`${plan.currency} ${plan.down_payment_amount.toLocaleString("en-US")}`}
                       />
                     )}{" "}
                     {plan.down_payment_percent != null && (
-                      <Fact k="Down payment share" v={`${plan.down_payment_percent}%`} />
+                      <Fact
+                        k={t.propertiesExtra.detail.downPaymentShare}
+                        v={`${plan.down_payment_percent}%`}
+                      />
                     )}{" "}
                     {plan.installment_count != null && (
-                      <Fact k="Number of payments" v={plan.installment_count} />
+                      <Fact k={t.propertiesExtra.detail.numPayments} v={plan.installment_count} />
                     )}{" "}
                     {plan.installment_amount != null && (
                       <Fact
-                        k="Regular payment"
+                        k={t.propertiesExtra.detail.regularPayment}
                         v={`${plan.currency} ${plan.installment_amount.toLocaleString("en-US")}`}
                       />
                     )}{" "}
                     {(plan.schedule || []).map((payment, j) => (
                       <Fact
                         key={j}
-                        k={`Payment ${payment.number}${payment.date ? " · " + payment.date : payment.month != null ? " · Month " + payment.month : ""}`}
+                        k={`${t.propertiesExtra.detail.paymentLabel} ${payment.number}${payment.date ? " · " + payment.date : payment.month != null ? ` · ${t.propertiesExtra.detail.monthLabel} ` + payment.month : ""}`}
                         v={`${payment.currency} ${payment.amount.toLocaleString("en-US")}`}
                       />
                     ))}
@@ -783,12 +812,14 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             )}
             {Array.isArray(d["package_members"]) && d["package_members"].length > 0 && (
               <div className="mt-6">
-                <h3 className="font-medium">Package contents</h3>
+                <h3 className="font-medium">{t.propertiesExtra.detail.packageContents}</h3>
                 {(
                   d["package_members"] as { title: string | null; description: string | null }[]
                 ).map((member, i) => (
                   <p key={i} className="mt-2 text-sm text-muted-foreground">
-                    {member.title || member.description || "Identified apartment included"}
+                    {member.title ||
+                      member.description ||
+                      t.propertiesExtra.detail.unitIncludedFallback}
                     {member.title && member.description ? " · " + member.description : ""}
                   </p>
                 ))}
@@ -908,9 +939,11 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
           {(publicDocuments.length > 0 || virtualTourUrl || videoUrl || model3dUrl) && (
             <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs space-y-4">
               <div>
-                <p className="eyebrow !text-brass">Documentation & Digital Walkthrough</p>
+                <p className="eyebrow !text-brass">
+                  {t.propertiesExtra.detail.docsWalkthroughEyebrow}
+                </p>
                 <h2 className="headline text-2xl font-semibold mt-1">
-                  Brochures, Technical Dossiers & Tours
+                  {t.propertiesExtra.detail.docsWalkthroughEyebrow}
                 </h2>
               </div>
 
@@ -926,7 +959,9 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                     >
                       <div className="min-w-0">
                         <p className="text-xs font-semibold uppercase tracking-wider text-brass">
-                          {doc.category || doc.fileType || "Document"}
+                          {doc.category ||
+                            doc.fileType ||
+                            t.propertiesExtra.detail.documentFallback}
                         </p>
                         <p className="truncate font-medium text-sm text-foreground mt-0.5">
                           {doc.title}
@@ -947,7 +982,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                       rel="noreferrer"
                       className="btn btn-outline !min-h-9 !text-xs"
                     >
-                      Launch 360° Virtual Tour
+                      360° {t.propertiesExtra.detail.watchVideo}
                     </a>
                   )}
                   {videoUrl && (
@@ -957,7 +992,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                       rel="noreferrer"
                       className="btn btn-outline !min-h-9 !text-xs"
                     >
-                      Watch Video Walkthrough
+                      {t.propertiesExtra.detail.watchVideo}
                     </a>
                   )}
                   {model3dUrl && (
@@ -967,7 +1002,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                       rel="noreferrer"
                       className="btn btn-outline !min-h-9 !text-xs"
                     >
-                      View 3D Architectural Model
+                      {t.propertiesExtra.detail.view3dModel}
                     </a>
                   )}
                 </div>
@@ -980,7 +1015,9 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             <div className="rounded-xs border border-border/80 bg-card p-6 md:p-8 shadow-xs space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="eyebrow !text-brass">Location & Urban Connectivity</p>
+                  <p className="eyebrow !text-brass">
+                    {t.propertiesExtra.detail.locationConnectivityEyebrow}
+                  </p>
                   <h2 className="headline text-2xl font-semibold mt-1">
                     {locationText(r)}
                     {neighborhood ? ` — ${neighborhood}` : ""}
@@ -998,7 +1035,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
               {coordinates?.lat != null && coordinates?.lng != null && (
                 <div className="overflow-hidden rounded-xs border border-border/80 bg-muted aspect-[16/7]">
                   <iframe
-                    title={`Map location for ${displayTitle}`}
+                    title={`${t.propertiesExtra.detail.mapLocationFor} ${displayTitle}`}
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${coordinates.lng - 0.015}%2C${coordinates.lat - 0.01}%2C${coordinates.lng + 0.015}%2C${coordinates.lat + 0.01}&layer=mapnik&marker=${coordinates.lat}%2C${coordinates.lng}`}
                     className="h-full w-full border-0"
                     loading="lazy"
@@ -1162,14 +1199,14 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Property photo gallery"
+          aria-label={t.propertiesExtra.detail.galleryAria}
           ref={galleryDialog}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-4"
         >
           <button
             onClick={() => setLightbox(false)}
             className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
-            aria-label="Close lightbox"
+            aria-label={t.propertiesExtra.detail.closeLightboxAria}
           >
             <X className="h-6 w-6" />
           </button>
@@ -1188,7 +1225,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
               <button
                 onClick={() => setActiveImg((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/25 transition-colors"
-                aria-label="Previous image"
+                aria-label={t.propertyDetail.previousImage}
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
@@ -1198,7 +1235,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
               <button
                 onClick={() => setActiveImg((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/25 transition-colors"
-                aria-label="Next image"
+                aria-label={t.propertyDetail.nextImage}
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
