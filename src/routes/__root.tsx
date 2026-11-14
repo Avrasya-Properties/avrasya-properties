@@ -19,6 +19,7 @@ import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import { loadCatalogue, loadPublicSettings } from "@/data/live";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { ThemeProvider } from "@/hooks/useTheme";
 import type { SiteSettings } from "@/admin/demo";
 import { DEMO_MODE, SUPABASE_URL } from "@/lib/supabase";
 import { useSmoothScroll, getLenis } from "@/lib/animation/lenis";
@@ -238,9 +239,14 @@ function RootShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k="avrasya_theme_preference";var s=localStorage.getItem(k);var d=s==="dark"||(s!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;if(d){r.classList.add("dark");r.classList.remove("light");r.setAttribute("data-theme","dark");r.style.colorScheme="dark";}else{r.classList.remove("dark");r.classList.add("light");r.setAttribute("data-theme","light");r.style.colorScheme="light";}}catch(e){}})();`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
@@ -288,24 +294,28 @@ function RootComponent() {
   if (isAdmin)
     return (
       <QueryClientProvider client={queryClient}>
-        <Outlet />
+        <ThemeProvider>
+          <Outlet />
+        </ThemeProvider>
       </QueryClientProvider>
     );
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <a href="#main" className="skip-link sr-only">
-          Skip to content
-        </a>
-        <Preloader />
-        <div className="star-bg" aria-hidden="true" />
-        {path !== "/" && <MotionRoot />}
-        <Header />
-        <main id="main">
-          <Outlet />
-        </main>
-        <Footer />
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <a href="#main" className="skip-link sr-only">
+            Skip to content
+          </a>
+          <Preloader />
+          <div className="star-bg" aria-hidden="true" />
+          {path !== "/" && <MotionRoot />}
+          <Header />
+          <main id="main">
+            <Outlet />
+          </main>
+          <Footer />
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
