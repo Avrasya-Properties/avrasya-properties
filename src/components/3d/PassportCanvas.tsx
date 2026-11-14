@@ -176,6 +176,7 @@ function createPassportCoverTexture(): {
   }
 
   const diffuseTexture = new THREE.CanvasTexture(canvas);
+  diffuseTexture.colorSpace = THREE.SRGBColorSpace;
   diffuseTexture.generateMipmaps = true;
   diffuseTexture.minFilter = THREE.LinearMipmapLinearFilter;
 
@@ -228,7 +229,8 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
     renderer.setClearColor(0x000000, 0);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.domElement.style.cssText = "display:block;width:100%;height:100%;outline:none;";
+    renderer.domElement.style.cssText =
+      "display:block;width:100%;height:100%;outline:none;touch-action:pan-y;";
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -252,9 +254,9 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
     const { diffuseTexture, bumpTexture } = createPassportCoverTexture();
     textures.push(diffuseTexture, bumpTexture);
 
-    // PBR Leather Cover Material
+    // PBR Leather Cover Material (color 0xffffff preserves full sRGB gold foil #F5D061 & burgundy #5E0016 in diffuseTexture)
     const coverMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x5e0016,
+      color: 0xffffff,
       map: diffuseTexture,
       bumpMap: bumpTexture,
       bumpScale: 0.012,
@@ -369,12 +371,13 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
     cursorGlintLight.position.set(0, 0, 2);
     scene.add(cursorGlintLight);
 
-    // Resize Handler
+    // Resize Handler (adapts camera distance on mobile viewports so floating passport never clips)
     const handleResize = () => {
-      const w = container.clientWidth || 320;
-      const h = container.clientHeight || 420;
+      const w = container.clientWidth || 300;
+      const h = container.clientHeight || 340;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
+      camera.position.z = w < 380 ? 6.4 : w < 640 ? 6.05 : 5.8;
       camera.updateProjectionMatrix();
     };
     handleResize();
@@ -389,7 +392,7 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
     });
     intersectionObserver.observe(container);
 
-    // Interactivity: Drag & Perspective Tilt
+    // Interactivity: Drag & Perspective Tilt (Mouse + Mobile Touch)
     let isDragging = false;
     let prevPointerX = 0;
     let prevPointerY = 0;
@@ -407,18 +410,20 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
 
     const onPointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect();
-      const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-      pointerNorm.tx = Math.max(-1, Math.min(1, normX));
-      pointerNorm.ty = Math.max(-1, Math.min(1, normY));
+      if (rect.width > 0 && rect.height > 0) {
+        const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+        const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+        pointerNorm.tx = Math.max(-1, Math.min(1, normX));
+        pointerNorm.ty = Math.max(-1, Math.min(1, normY));
+      }
 
       if (isDragging && interactive) {
         const deltaX = e.clientX - prevPointerX;
         const deltaY = e.clientY - prevPointerY;
         prevPointerX = e.clientX;
         prevPointerY = e.clientY;
-        targetRotation.y += deltaX * 0.012;
-        targetRotation.x += deltaY * 0.012;
+        targetRotation.y += deltaX * 0.014;
+        targetRotation.x = Math.max(-0.55, Math.min(0.55, targetRotation.x + deltaY * 0.012));
       }
     };
 
@@ -431,6 +436,7 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
     container.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
 
     // Animation Render Loop
     let animFrameId = 0;
@@ -447,14 +453,15 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
       pointerNorm.x += (pointerNorm.tx - pointerNorm.x) * 0.08;
       pointerNorm.y += (pointerNorm.ty - pointerNorm.y) * 0.08;
 
-      // Cursor Glint Point Light follows pointer across passport face
-      cursorGlintLight.position.x = pointerNorm.x * 1.5;
-      cursorGlintLight.position.y = -pointerNorm.y * 1.8;
+      // Cursor Glint Point Light follows pointer + organic shimmer across passport face
+      cursorGlintLight.position.x = pointerNorm.x * 1.5 + Math.sin(elapsedTime * 1.3) * 0.45;
+      cursorGlintLight.position.y = -pointerNorm.y * 1.8 + Math.cos(elapsedTime * 0.9) * 0.35;
       cursorGlintLight.position.z = 1.4 + Math.sin(elapsedTime * 2) * 0.2;
 
-      // Natural Sinusoidal Floating Levitation Drift
-      const levitationY = Math.sin(elapsedTime * 1.6) * 0.07;
-      const levitationTilt = Math.cos(elapsedTime * 1.1) * 0.04;
+      // Natural Sinusoidal Floating Levitation Drift + Autonomous 3D Sway (active on mobile & desktop)
+      const levitationY = Math.sin(elapsedTime * 1.6) * 0.08;
+      const levitationTilt = Math.sin(elapsedTime * 0.95) * 0.24;
+      const levitationPitch = Math.cos(elapsedTime * 0.75) * 0.06;
       passportRoot.position.y = levitationY;
 
       if (!isDragging) {
@@ -463,7 +470,8 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
         const perspectivePitch = -pointerNorm.y * 0.22;
         currentRotation.y +=
           (targetRotation.y + perspectiveYaw + levitationTilt - currentRotation.y) * 0.06;
-        currentRotation.x += (targetRotation.x + perspectivePitch - currentRotation.x) * 0.06;
+        currentRotation.x +=
+          (targetRotation.x + perspectivePitch + levitationPitch - currentRotation.x) * 0.06;
       } else {
         currentRotation.x += (targetRotation.x - currentRotation.x) * 0.15;
         currentRotation.y += (targetRotation.y - currentRotation.y) * 0.15;
@@ -486,6 +494,7 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
       container.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
 
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
@@ -502,7 +511,8 @@ export function PassportCanvas({ className = "", interactive = true }: PassportC
   return (
     <div
       ref={mountRef}
-      className={`relative w-full h-[320px] sm:h-[400px] select-none ${className}`}
+      style={{ touchAction: "pan-y" }}
+      className={`relative w-full h-[300px] sm:h-[380px] select-none ${className}`}
       data-testid="passport-canvas-container"
       aria-label="Turkish Passport 3D WebGL Interactive Showcase"
     />

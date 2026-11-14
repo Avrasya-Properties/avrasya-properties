@@ -34,7 +34,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
   return (
     <div
       className={cn("relative mx-auto flex items-center justify-center p-4", className)}
-      style={{ perspective: "1000px" }}
+      style={{ perspective: "1000px", touchAction: "pan-y" }}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >
@@ -124,12 +124,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
                 <polygon points="68,36 71.8,43.8 80.4,45 74.2,51 75.7,59.6 68,55.5 60.3,59.6 61.8,51 55.6,45 64.2,43.8" />
               </svg>
             </div>
-            <span
-              className="mt-2 text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-[#F5D061]/80"
-              style={{ textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}
-            >
-              Law No. 5901 Naturalization
-            </span>
+            <span className="sr-only">Law No. 5901 Naturalization</span>
           </div>
 
           {/* Bottom Foil: Biometric e-Passport Chip Symbol */}
@@ -146,7 +141,7 @@ export function PassportFallbackCard({ className, interactive = true }: Passport
               <div className="relative z-10 w-3 h-3 rounded-full border-[1.5px] border-[#F5D061] bg-[#5E0016]" />
             </div>
 
-            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-mono tracking-wider text-[#ECC755]/90 uppercase">
+            <div className="sr-only">
               <ShieldCheck className="h-3 w-3 text-[#F5D061]" />
               <span>Biometric Sovereign Naturalization</span>
             </div>

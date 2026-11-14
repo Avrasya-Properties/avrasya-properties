@@ -138,6 +138,10 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
     const rect = skylineRef.current.getBoundingClientRect();
     const tilt = calculateHero3DTilt(e.clientX, e.clientY, rect);
 
+    qRotateXRef.current?.(tilt.rotateX);
+    qRotateYRef.current?.(tilt.rotateY);
+    qTranslateZRef.current?.(tilt.translateZ);
+
     if (glazeRef.current) {
       glazeRef.current.style.setProperty("--sheen-x", `${tilt.sheenX}%`);
       glazeRef.current.style.setProperty("--sheen-y", `${tilt.sheenY}%`);
@@ -145,6 +149,9 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
   };
 
   const handlePointerLeave = () => {
+    qRotateXRef.current?.(0);
+    qRotateYRef.current?.(0);
+    qTranslateZRef.current?.(0);
     if (glazeRef.current) {
       glazeRef.current.style.setProperty("--sheen-x", "50%");
       glazeRef.current.style.setProperty("--sheen-y", "50%");
@@ -415,17 +422,22 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
         ].filter(Boolean);
 
         if (sideNodes.length) {
-          gsap.to(sideNodes, {
-            opacity: 0,
-            y: -24,
-            ease: "none",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top+=40 top",
-              end: "center top",
-              scrub: 0.5,
+          gsap.fromTo(
+            sideNodes,
+            { opacity: 1, y: 0 },
+            {
+              opacity: 0,
+              y: -24,
+              immediateRender: false,
+              ease: "none",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top+=40 top",
+                end: "center top",
+                scrub: 0.5,
+              },
             },
-          });
+          );
         }
       }
     }, sectionRef);
@@ -509,33 +521,91 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
             </h1>
           </div>
 
-          {/* Solitary Mobile CTA: Explore Properties */}
+          {/* Interactive Mobile Overview Strip: Subtitle + Explore Properties + Watch Showreel + Featured Pin */}
           <div
             ref={mobileCtaRef}
             data-mobile-solitary-cta
-            className="relative z-20 mt-4 sm:mt-5 flex justify-center lg:hidden"
+            className="relative z-20 mt-3 sm:mt-4 flex flex-col items-center gap-3 px-4 lg:hidden"
           >
-            <Link
-              to="/properties"
-              className="group inline-flex h-[44px] items-center gap-[12px] rounded-full bg-[#163038] py-[5px] pr-[5px] pl-[18px] text-[13px] font-medium text-white no-underline shadow-md transition-all duration-300 hover:bg-[#10785F] active:scale-[0.98]"
+            <p className="m-0 max-w-[330px] text-center text-[12px] sm:text-[13px] font-normal leading-[1.45] text-[#5C6F73]">
+              {heroSubtitle}
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <Link
+                to="/properties"
+                className="group inline-flex h-[42px] items-center gap-[10px] rounded-full bg-[#163038] py-[5px] pr-[5px] pl-[16px] text-[12.5px] font-medium text-white no-underline shadow-md transition-all duration-300 hover:bg-[#10785F] active:scale-[0.98]"
+              >
+                <span>Explore Properties</span>
+                <span className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-white text-[#163038] transition-transform duration-300 group-hover:translate-x-0.5">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
+              </Link>
+
+              <button
+                type="button"
+                data-mobile-showreel-trigger
+                onClick={() => {
+                  setModalMode("showreel");
+                  setModalOpen(true);
+                }}
+                aria-haspopup="dialog"
+                className="group inline-flex h-[42px] cursor-pointer items-center gap-2 rounded-full border border-[#DEE0DD] bg-white/95 py-1 pr-3.5 pl-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#163038] shadow-xs backdrop-blur-md transition-all active:scale-[0.98]"
+              >
+                <span className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#163038] text-white">
+                  <img
+                    src={resolvePlaceholderSrc(PLACEHOLDER_IMAGES.hero.showreelThumb)}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-full w-full object-cover opacity-80"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center bg-[#163038]/35 text-white">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <polygon points="8 5 19 12 8 19 8 5" fill="currentColor" />
+                    </svg>
+                  </span>
+                </span>
+                <span>Showreel</span>
+              </button>
+            </div>
+
+            {/* Compact Interactive Property Pin Callout for Mobile */}
+            <button
+              type="button"
+              onClick={() => {
+                setModalMode("viewing");
+                setModalOpen(true);
+              }}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#DEE0DD] bg-white/90 px-3 py-1 text-left shadow-xs backdrop-blur-md transition-all hover:border-[#C5A059]"
             >
-              <span>Explore Properties</span>
-              <span className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-white text-[#163038] transition-transform duration-300 group-hover:translate-x-0.5">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
+              <span className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2DD4BF] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2DD4BF]" />
               </span>
-            </Link>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#163038]">
+                {pinTitle}
+              </span>
+              <span className="text-[10px] text-[#5C6F73]">&middot; {pinSubtitle}</span>
+            </button>
           </div>
 
           {/* Desktop Spatial Elements Flanking the Centered Building (Hidden on mobile to eliminate clutter) */}

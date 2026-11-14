@@ -55,7 +55,8 @@ export function ArchitecturalBuildingCanvas({
     renderer.setClearColor(0x000000, 0);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.domElement.style.cssText = "display:block;width:100%;height:100%;outline:none;";
+    renderer.domElement.style.cssText =
+      "display:block;width:100%;height:100%;outline:none;touch-action:pan-y;";
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -303,10 +304,13 @@ export function ArchitecturalBuildingCanvas({
     // RESPONSIVE RESIZE & INTERSECTION OBSERVER
     // =========================================================================
     const handleResize = () => {
-      const w = container.clientWidth || 360;
-      const h = container.clientHeight || 420;
+      const w = container.clientWidth || 320;
+      const h = container.clientHeight || 340;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
+      const distScale = w < 420 ? 1.18 : w < 640 ? 1.08 : 1.0;
+      camera.position.set(6.8 * distScale, 4.8 * distScale, 8.2 * distScale);
+      camera.lookAt(0, 1.7, 0);
       camera.updateProjectionMatrix();
     };
     handleResize();
@@ -358,6 +362,7 @@ export function ArchitecturalBuildingCanvas({
     container.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
 
     // =========================================================================
     // ANIMATION RENDER LOOP
@@ -402,6 +407,7 @@ export function ArchitecturalBuildingCanvas({
       container.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
 
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
@@ -417,7 +423,8 @@ export function ArchitecturalBuildingCanvas({
   return (
     <div
       ref={mountRef}
-      className={`relative w-full h-[320px] sm:h-[400px] select-none ${className}`}
+      style={{ touchAction: "pan-y" }}
+      className={`relative w-full h-[300px] sm:h-[380px] select-none ${className}`}
       data-testid="building-canvas-container"
       aria-label="Modernist Architectural Residence 3D WebGL Interactive Showcase"
     />

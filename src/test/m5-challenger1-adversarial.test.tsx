@@ -650,9 +650,9 @@ describe("Milestone M5 Empirical Challenger 1: Adversarial Verification Suite", 
     it("renders accessible heading role with aria-label preserved across kinetic SplitText", () => {
       renderWithProviders(<PartnersSection partners={DEFAULT_PARTNERS} />);
 
-      const heading = screen.getByRole("heading", { name: /references and partners/i });
+      const heading = screen.getByRole("heading", { name: /partners & references/i });
       expect(heading).toBeInTheDocument();
-      expect(heading).toHaveAttribute("aria-label", "References and Partners");
+      expect(heading).toHaveAttribute("aria-label", "Partners & References");
     });
   });
 });
