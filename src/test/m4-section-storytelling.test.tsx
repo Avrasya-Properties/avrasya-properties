@@ -353,7 +353,7 @@ describe("Milestone M4: Visual Storytelling, Section Animations & Interactive Ga
       const { container } = render(<PartnersSection />);
 
       const heading = container.querySelector("[data-partners-heading]");
-      expect(heading?.textContent).toContain("References and Partners");
+      expect(heading?.textContent).toContain("Partners & References");
       expect(screen.getByText("Partners & References")).toBeDefined();
 
       const marqueeTrack = container.querySelector("[data-marquee-track]");

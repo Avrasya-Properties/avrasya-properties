@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 import { applyMagneticHover } from "@/lib/animation/magnetic";
-import { animateTextH } from "@/lib/animation/typography";
 import type { PartnerItem } from "@/admin/demo";
 import { DEFAULT_PARTNERS } from "@/admin/demo";
 
@@ -42,34 +41,41 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      // 1. Kinetic Typography on Section Heading
+      // 1. Smooth Entrance Animation on Golden Section Heading
       if (headingRef.current && !isReduced) {
-        animateTextH(headingRef.current, {
-          duration: 1.1,
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 88%",
-            toggleActions: "play none none reverse",
+        gsap.fromTo(
+          headingRef.current,
+          { opacity: 0, y: 14 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.85,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headingRef.current,
+              start: "top 88%",
+              toggleActions: "play none none reverse",
+            },
           },
-        });
+        );
       }
 
-      // 2. Staggered Entrance Animation for Partner Cards
+      // 2. Staggered Entrance Animation for Partner Cards (keep base opacity visible so marquee logos never disappear on fast scroll)
       const partnerCards = section.querySelectorAll<HTMLElement>("[data-partner-card]");
       if (partnerCards.length && !isReduced) {
         gsap.fromTo(
           partnerCards,
-          { opacity: 0, scale: 0.88, y: 16 },
+          { opacity: 0.92, scale: 0.94, y: 10 },
           {
             opacity: 1,
             scale: 1,
             y: 0,
-            duration: 0.75,
-            stagger: 0.04,
+            duration: 0.65,
+            stagger: 0.03,
             ease: "power2.out",
             scrollTrigger: {
               trigger: section,
-              start: "top 85%",
+              start: "top 92%",
             },
           },
         );
@@ -152,8 +158,9 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
       <img
         src={partner.logo}
         alt={`${partner.name} logo`}
-        className="max-h-[44px] sm:max-h-[52px] md:max-h-[60px] max-w-[170px] sm:max-w-[210px] w-auto object-contain brightness-0 invert opacity-85 transition-all duration-300 group-hover:opacity-100 group-hover:scale-[1.04]"
-        loading="lazy"
+        className="max-h-[44px] sm:max-h-[52px] md:max-h-[60px] max-w-[170px] sm:max-w-[210px] w-auto object-contain brightness-0 invert opacity-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-[1.04]"
+        loading="eager"
+        decoding="async"
       />
     </div>
   );
@@ -182,21 +189,15 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
       />
 
       <div className="relative z-10 mx-auto max-w-[1312px] px-5 sm:px-8">
-        {/* Section Heading */}
-        <div className="text-center md:text-left mb-10 sm:mb-14">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C5A059]">
-            {eyebrow}
-          </p>
+        {/* Section Heading — Bigger Golden Typography (Serif References and Partners removed) */}
+        <div className="text-center md:text-left mb-8 sm:mb-12">
           <h2
             ref={headingRef}
             data-partners-heading
-            aria-label={title}
-            className="mt-2 text-[28px] font-light tracking-[-0.03em] text-white sm:text-[38px] lg:text-[46px]"
-            style={{
-              fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif',
-            }}
+            aria-label={eyebrow}
+            className="text-[20px] sm:text-[26px] lg:text-[32px] font-semibold uppercase tracking-[0.22em] text-[#C5A059]"
           >
-            {title}
+            {eyebrow}
           </h2>
         </div>
       </div>
@@ -230,6 +231,8 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
           className="relative z-10 w-full overflow-hidden"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onTouchStart={handleMouseEnter}
+          onTouchEnd={handleMouseLeave}
           style={{
             maskImage:
               "linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, transparent 100%)",

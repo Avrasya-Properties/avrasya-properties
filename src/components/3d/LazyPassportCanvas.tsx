@@ -11,9 +11,8 @@ export interface LazyPassportCanvasProps {
 
 /**
  * Progressive enhancement lazy loader for Turkish Passport 3D WebGL Canvas (Milestone 3).
- * Activates WebGL Three.js on modern desktop displays with mouse/pointer and WebGL capability.
- * Instantly provides high-fidelity CSS 3D PassportFallbackCard for mobile screens, reduced motion,
- * low-bandwidth environments, or unsupported WebGL contexts.
+ * Activates WebGL Three.js across both mobile and desktop displays whenever WebGL is supported
+ * and reduced-motion / data-saver are not active.
  */
 export function LazyPassportCanvas({
   className = "",
@@ -32,43 +31,29 @@ export function LazyPassportCanvas({
       return;
     }
 
-    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-    const isFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const allowsMotion = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isDataSaver =
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData ===
       true;
 
-    if (!isDesktop || !isFinePointer || !allowsMotion || isDataSaver) {
+    if (!allowsMotion || isDataSaver) {
       return;
     }
 
-    // Check actual WebGL availability
+    // Check actual WebGL availability (works on both mobile and desktop GPUs)
     try {
       const testCanvas = document.createElement("canvas");
-      const gl = testCanvas.getContext("webgl2") || testCanvas.getContext("webgl");
+      const gl =
+        testCanvas.getContext("webgl2") ||
+        testCanvas.getContext("webgl") ||
+        testCanvas.getContext("experimental-webgl");
       if (!gl) return;
     } catch {
       return;
     }
 
-    // WebGL capability verified: load Three.js canvas
-    let timeoutId: number | undefined;
-    if (priority) {
-      setUseWebGL(true);
-    } else {
-      const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number })
-        .requestIdleCallback;
-      timeoutId = idle
-        ? idle(() => setUseWebGL(true))
-        : window.setTimeout(() => setUseWebGL(true), 300);
-    }
-
-    return () => {
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
-      }
-    };
+    // WebGL capability verified: activate Three.js canvas smoothly on both mobile and desktop
+    setUseWebGL(true);
   }, [priority]);
 
   if (!useWebGL) {

@@ -451,9 +451,9 @@ describe("Milestone M5 Empirical Challenger 2: Cross-Viewport, Stress & Interact
     it("verifies PartnersSection preserves accessible heading role and aria-label", () => {
       render(<PartnersSection partners={DEFAULT_PARTNERS} />);
 
-      const heading = screen.getByRole("heading", { name: /references and partners/i });
+      const heading = screen.getByRole("heading", { name: /partners & references/i });
       expect(heading).toBeInTheDocument();
-      expect(heading).toHaveAttribute("aria-label", "References and Partners");
+      expect(heading).toHaveAttribute("aria-label", "Partners & References");
     });
 
     it("verifies pure splitText utility correctly splits Turkish unicode characters and reverts cleanly", () => {

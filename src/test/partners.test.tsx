@@ -11,7 +11,8 @@ describe("Partners & References Section Component", () => {
     render(<PartnersSection partners={DEFAULT_PARTNERS} />);
 
     expect(screen.getByText("Partners & References")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /references and partners/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /partners & references/i })).toBeInTheDocument();
+    expect(screen.queryByText("References and Partners")).toBeNull();
 
     // Check that logos are rendered with alt text
     const logos = screen.getAllByRole("img");

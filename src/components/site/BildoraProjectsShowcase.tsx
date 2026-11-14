@@ -75,6 +75,27 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIdxRef = useRef(0);
+  const swipeStartXRef = useRef<number | null>(null);
+
+  const handleStagePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    swipeStartXRef.current = e.clientX;
+  };
+
+  const handleStagePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (swipeStartXRef.current === null) return;
+    const dx = e.clientX - swipeStartXRef.current;
+    swipeStartXRef.current = null;
+    if (Math.abs(dx) > 42) {
+      const next =
+        dx < 0
+          ? Math.min(showcaseItems.length - 1, activeIdxRef.current + 1)
+          : Math.max(0, activeIdxRef.current - 1);
+      if (next !== activeIdxRef.current) {
+        activeIdxRef.current = next;
+        setActiveIndex(next);
+      }
+    }
+  };
 
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -336,12 +357,15 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
         </div>
       </div>
 
-      {/* Full-Viewport Pinned Showcase Stage (Restored Previous Layout) */}
+      {/* Full-Viewport Pinned Showcase Stage (Restored Previous Layout + Mobile Swipe Interactivity) */}
       <div
         ref={pinStageRef}
         data-pin-stage
         data-framer-name="Project Wrapper"
-        className="relative mx-auto flex min-h-[540px] w-full flex-col justify-between overflow-hidden bg-[#142A30] sm:min-h-[640px] lg:h-[85vh] lg:min-h-[680px] lg:max-h-[880px]"
+        onPointerDown={handleStagePointerDown}
+        onPointerUp={handleStagePointerUp}
+        style={{ touchAction: "pan-y" }}
+        className="relative mx-auto flex min-h-[500px] w-full flex-col justify-between overflow-hidden bg-[#142A30] sm:min-h-[620px] lg:h-[85vh] lg:min-h-[680px] lg:max-h-[880px]"
       >
         {/* Full-Bleed Background Slides Track */}
         <div

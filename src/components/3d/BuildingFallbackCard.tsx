@@ -34,7 +34,7 @@ export function BuildingFallbackCard({ className, interactive = true }: Building
   return (
     <div
       className={cn("relative mx-auto flex items-center justify-center p-4", className)}
-      style={{ perspective: "1000px" }}
+      style={{ perspective: "1000px", touchAction: "pan-y" }}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >

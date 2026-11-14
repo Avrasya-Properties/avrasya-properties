@@ -370,13 +370,16 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
         const dt = Math.min(deltaTime, 50) / 1000;
         if (!st.isDragging) {
           st.targetY += 9 * dt + st.scrollBoost;
+          st.targetX *= 0.92;
           st.scrollBoost *= 0.92;
         }
         st.currentY += (st.targetY - st.currentY) * 0.12;
         st.currentX += (st.targetX - st.currentX) * 0.12;
 
         if (cylinderRef.current) {
-          cylinderRef.current.style.transform = `rotateX(${st.currentX.toFixed(2)}deg) rotateY(${st.currentY.toFixed(2)}deg)`;
+          const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
+          const cylScale = vw < 480 ? 0.56 : vw < 768 ? 0.72 : vw < 1024 ? 0.86 : 1;
+          cylinderRef.current.style.transform = `scale(${cylScale}) rotateX(${st.currentX.toFixed(2)}deg) rotateY(${st.currentY.toFixed(2)}deg)`;
         }
       };
 
@@ -391,7 +394,7 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
     };
   }, [headingText, descriptionText, statementText, JSON.stringify(resolvedMetrics)]);
 
-  // Pointer drag handlers for 3D Look
+  // Pointer drag handlers for 3D Look (Desktop Mouse + Mobile Touch)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     rotationState.current.isDragging = true;
     rotationState.current.startX = e.clientX;
@@ -402,7 +405,8 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!rotationState.current.isDragging) return;
     const deltaX = e.clientX - rotationState.current.startX;
-    rotationState.current.targetY = rotationState.current.startRotationY - deltaX / 5;
+    const sensitivity = typeof window !== "undefined" && window.innerWidth < 640 ? 2.6 : 4.5;
+    rotationState.current.targetY = rotationState.current.startRotationY - deltaX / sensitivity;
   };
 
   const handlePointerUp = () => {
@@ -520,17 +524,16 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative flex h-[410px] w-full cursor-grab items-center justify-center overflow-hidden select-none active:cursor-grabbing sm:h-[460px] lg:h-[500px]"
+          className="relative flex h-[280px] w-full cursor-grab items-center justify-center overflow-hidden select-none active:cursor-grabbing sm:h-[380px] md:h-[440px] lg:h-[500px]"
           style={{
-            perspective: "1000px",
-            transformStyle: "preserve-3d",
             touchAction: "pan-y",
           }}
         >
-          {/* Responsive scale wrapper */}
+          {/* Dedicated 3D Perspective Stage (kept free of overflow:hidden so mobile WebKit/Blink preserves 3D depth) */}
           <div
-            className="flex items-center justify-center scale-[0.52] sm:scale-[0.72] md:scale-[0.88] lg:scale-100 origin-center transition-transform"
+            className="relative flex h-full w-full items-center justify-center"
             style={{
+              perspective: "1000px",
               transformStyle: "preserve-3d",
             }}
           >
@@ -538,79 +541,71 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
             <div
               ref={cylinderRef}
               data-framer-name="Custom Carousel"
-              className="relative h-[370px] w-[1200px] will-change-transform flex items-center justify-center"
+              className="relative h-[370px] w-[1200px] shrink-0 will-change-transform flex items-center justify-center"
               style={{
                 transformStyle: "preserve-3d",
               }}
             >
-              <div
-                data-framer-name="List"
-                className="relative h-full w-full flex items-center justify-center"
-                style={{
-                  transformStyle: "preserve-3d",
-                }}
-              >
-                {CYLINDER_COLUMNS.map((col, idx) => {
-                  const slotA =
-                    PLACEHOLDER_IMAGES.aboutArcGallery[
-                      (col.slotIndex * 2) % PLACEHOLDER_IMAGES.aboutArcGallery.length
-                    ]!;
-                  const slotB =
-                    PLACEHOLDER_IMAGES.aboutArcGallery[
-                      (col.slotIndex * 2 + 1) % PLACEHOLDER_IMAGES.aboutArcGallery.length
-                    ]!;
-                  const imgSrcA = resolvePlaceholderSrc(slotA);
-                  const imgSrcB = resolvePlaceholderSrc(slotB);
+              {CYLINDER_COLUMNS.map((col, idx) => {
+                const slotA =
+                  PLACEHOLDER_IMAGES.aboutArcGallery[
+                    (col.slotIndex * 2) % PLACEHOLDER_IMAGES.aboutArcGallery.length
+                  ]!;
+                const slotB =
+                  PLACEHOLDER_IMAGES.aboutArcGallery[
+                    (col.slotIndex * 2 + 1) % PLACEHOLDER_IMAGES.aboutArcGallery.length
+                  ]!;
+                const imgSrcA = resolvePlaceholderSrc(slotA);
+                const imgSrcB = resolvePlaceholderSrc(slotB);
 
-                  return (
+                return (
+                  <div
+                    key={col.angle}
+                    data-framer-name={`Column ${idx + 1}`}
+                    className="absolute top-[calc(50%-150px)] left-[calc(50%-700px)] flex h-[300px] w-[1400px] items-center justify-between"
+                    style={{
+                      transformStyle: "preserve-3d",
+                      transform: `rotateY(${col.angle}deg)`,
+                    }}
+                  >
+                    {/* Opposing Card A */}
                     <div
-                      key={col.angle}
-                      data-framer-name={`Column ${idx + 1}`}
-                      className="absolute top-[calc(50%-150px)] left-[calc(50%-700px)] flex h-[300px] w-[1400px] items-center justify-between"
+                      data-framer-name="Image"
+                      className="relative h-[370px] w-[260px] shrink-0 overflow-hidden rounded-[20px] bg-[#e3e3de] shadow-[0_14px_34px_rgba(15,23,42,0.12)] border border-black/5"
                       style={{
-                        transformStyle: "preserve-3d",
-                        transform: `rotateY(${col.angle}deg)`,
+                        transform: "rotateY(90deg)",
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
                       }}
                     >
-                      {/* Opposing Card A */}
-                      <div
-                        data-framer-name="Image"
-                        className="relative h-[370px] w-[260px] shrink-0 overflow-hidden rounded-[20px] bg-[#e3e3de] shadow-[0_14px_34px_rgba(15,23,42,0.12)] border border-black/5"
-                        style={{
-                          transform: "rotateY(90deg)",
-                          backfaceVisibility: "hidden",
-                          WebkitBackfaceVisibility: "hidden",
-                        }}
-                      >
-                        <img
-                          src={imgSrcA}
-                          alt={slotA.alt}
-                          draggable={false}
-                          className="pointer-events-none block h-full w-full object-cover object-center select-none"
-                        />
-                      </div>
-
-                      {/* Opposing Card B */}
-                      <div
-                        data-framer-name="Image"
-                        className="relative h-[370px] w-[260px] shrink-0 overflow-hidden rounded-[20px] bg-[#e3e3de] shadow-[0_14px_34px_rgba(15,23,42,0.12)] border border-black/5"
-                        style={{
-                          transform: "rotateY(-90deg)",
-                          backfaceVisibility: "hidden",
-                          WebkitBackfaceVisibility: "hidden",
-                        }}
-                      >
-                        <img
-                          src={imgSrcB}
-                          alt={slotB.alt}
-                          draggable={false}
-                          className="pointer-events-none block h-full w-full object-cover object-center select-none"
-                        />
-                      </div>
+                      <img
+                        src={imgSrcA}
+                        alt={slotA.alt}
+                        draggable={false}
+                        className="pointer-events-none block h-full w-full object-cover object-center select-none"
+                      />
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Opposing Card B */}
+                    <div
+                      data-framer-name="Image"
+                      className="relative h-[370px] w-[260px] shrink-0 overflow-hidden rounded-[20px] bg-[#e3e3de] shadow-[0_14px_34px_rgba(15,23,42,0.12)] border border-black/5"
+                      style={{
+                        transform: "rotateY(-90deg)",
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                      }}
+                    >
+                      <img
+                        src={imgSrcB}
+                        alt={slotB.alt}
+                        draggable={false}
+                        className="pointer-events-none block h-full w-full object-cover object-center select-none"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -620,22 +615,22 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
           ref={counterSectionRef}
           data-counter-section
           data-framer-name="Counter Section"
-          className="mx-auto grid w-full max-w-[1390px] grid-cols-2 gap-y-10 px-4 sm:px-8 lg:flex lg:flex-row lg:items-center lg:justify-between"
+          className="mx-auto grid w-full max-w-[1390px] grid-cols-2 gap-4 sm:gap-8 px-4 sm:px-8 lg:flex lg:flex-row lg:items-center lg:justify-between"
         >
           {resolvedMetrics.map((metric) => (
             <div
               key={metric.label}
               data-counter-card
               data-framer-name="Counter Wrap"
-              className="flex flex-col items-center justify-center gap-[16px] text-center"
+              className="flex flex-col items-center justify-center gap-[8px] sm:gap-[16px] rounded-[16px] border border-[#DEE0DD]/60 bg-[#F7F6F2]/70 dark:border-[#1e3842] dark:bg-[#112228]/90 p-4 text-center lg:border-0 lg:bg-transparent lg:dark:bg-transparent lg:p-0"
             >
               <h2
                 data-counter-num
-                className="text-[32px] font-normal leading-[1.1] tracking-[0em] text-[#163038] sm:text-[38px] lg:text-[44px]"
+                className="text-[28px] font-normal leading-[1.1] tracking-[0em] text-[#163038] sm:text-[38px] lg:text-[44px]"
               >
                 {metric.value}
               </h2>
-              <p className="text-[14px] font-normal leading-[1.3] text-[#5C6F73] sm:text-[15px]">
+              <p className="text-[13px] font-normal leading-[1.3] text-[#5C6F73] sm:text-[15px]">
                 {metric.label}
               </p>
             </div>

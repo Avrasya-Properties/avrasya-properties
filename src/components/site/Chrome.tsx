@@ -30,12 +30,17 @@ export function Logo({
   const { isDark } = useTheme();
   const isLight = variant === "light" || (variant === "auto" && isDark);
   const settings = useSiteSettings();
+  const configuredLight = settings.websiteDesign?.["logoLight"];
+  const configuredDark = settings.websiteDesign?.["logoDark"];
+  const lightLogoSrc =
+    configuredLight && configuredLight !== "/images/avrasya-logo.svg"
+      ? configuredLight
+      : "/images/avrasya-logo-pure-white.svg";
+  const darkLogoSrc = configuredDark || "/images/avrasya-logo.svg";
+
   return (
     <img
-      src={
-        (isLight ? settings.websiteDesign?.["logoLight"] : settings.websiteDesign?.["logoDark"]) ||
-        (isLight ? "/images/avrasya-logo-pure-white.svg" : "/images/avrasya-logo.svg")
-      }
+      src={isLight ? lightLogoSrc : darkLogoSrc}
       alt="Avrasya Properties Group"
       className={`w-auto shrink-0 select-none object-contain ${className}`}
     />
@@ -265,7 +270,7 @@ export function Header() {
               aria-controls="mobile-nav"
               aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
               onClick={() => setOpen((v) => !v)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#163038]/15 bg-white text-[#163038]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#163038]/15 bg-white text-[#163038] dark:border-[#C5A059]/35 dark:bg-[#112228] dark:text-[#F4F2ED]"
             >
               {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>

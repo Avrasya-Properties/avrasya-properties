@@ -194,19 +194,19 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
           );
         }
 
-        // 2. Timeline Rows: 3D Staggered Card Reveal + Circle Pop + Scrubbed Progress Bar
+        // 2. Timeline Rows: 3D Staggered Card Reveal + Circle Pop + Scrubbed Progress Bar (both desktop & mobile layouts)
         const rows = sectionRef.current?.querySelectorAll<HTMLElement>("[data-tl-row]");
         rows?.forEach((row) => {
-          const card = row.querySelector<HTMLElement>("[data-tl-card]");
-          const circle = row.querySelector<HTMLElement>("[data-tl-circle]");
-          const fill = row.querySelector<HTMLElement>("[data-tl-fill]");
+          const cards = row.querySelectorAll<HTMLElement>("[data-tl-card]");
+          const circles = row.querySelectorAll<HTMLElement>("[data-tl-circle]");
+          const fills = row.querySelectorAll<HTMLElement>("[data-tl-fill]");
 
-          if (card) {
+          if (cards.length) {
             gsap.fromTo(
-              card,
+              cards,
               {
                 opacity: 0,
-                y: 80,
+                y: 50,
                 rotateX: 6,
                 transformPerspective: 1200,
               },
@@ -214,20 +214,20 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
                 opacity: 1,
                 y: 0,
                 rotateX: 0,
-                duration: 0.95,
+                duration: 0.9,
                 ease: "power3.out",
                 scrollTrigger: {
                   trigger: row,
-                  start: "top 82%",
+                  start: "top 85%",
                   toggleActions: "play none none reverse",
                 },
               },
             );
           }
 
-          if (circle) {
+          if (circles.length) {
             gsap.fromTo(
-              circle,
+              circles,
               { opacity: 0.25, scale: 0.5 },
               {
                 opacity: 1,
@@ -236,23 +236,23 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
                 ease: "back.out(2)",
                 scrollTrigger: {
                   trigger: row,
-                  start: "top 65%",
+                  start: "top 72%",
                   toggleActions: "play none none reverse",
                 },
               },
             );
           }
 
-          if (fill) {
+          if (fills.length) {
             gsap.fromTo(
-              fill,
+              fills,
               { yPercent: -100 },
               {
                 yPercent: 0,
                 ease: "none",
                 scrollTrigger: {
                   trigger: row,
-                  start: "top 65%",
+                  start: "top 72%",
                   end: "bottom 45%",
                   scrub: 0.35,
                 },
@@ -279,12 +279,12 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
         }
         const rows = sectionRef.current?.querySelectorAll<HTMLElement>("[data-tl-row]");
         rows?.forEach((row) => {
-          const card = row.querySelector<HTMLElement>("[data-tl-card]");
-          const circle = row.querySelector<HTMLElement>("[data-tl-circle]");
-          const fill = row.querySelector<HTMLElement>("[data-tl-fill]");
-          if (card) gsap.set(card, { opacity: 1, y: 0, rotateX: 0 });
-          if (circle) gsap.set(circle, { opacity: 1, scale: 1 });
-          if (fill) gsap.set(fill, { yPercent: 0 });
+          const cards = row.querySelectorAll<HTMLElement>("[data-tl-card]");
+          const circles = row.querySelectorAll<HTMLElement>("[data-tl-circle]");
+          const fills = row.querySelectorAll<HTMLElement>("[data-tl-fill]");
+          if (cards.length) gsap.set(cards, { opacity: 1, y: 0, rotateX: 0 });
+          if (circles.length) gsap.set(circles, { opacity: 1, scale: 1 });
+          if (fills.length) gsap.set(fills, { yPercent: 0 });
         });
       }
     }, sectionRef);
