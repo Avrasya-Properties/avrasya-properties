@@ -36,6 +36,7 @@ import {
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 
 const NAV = [
   {
@@ -302,6 +303,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 <span>Istanbul {time} TRT</span>
               </div>
             )}
+            <ThemeToggle variant="compact" />
             <a
               href="/"
               target="_blank"

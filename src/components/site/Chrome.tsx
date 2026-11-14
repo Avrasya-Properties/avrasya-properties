@@ -7,7 +7,9 @@ import { type SupportedCurrency } from "@/data/properties";
 import { useCurrency, useShortlist } from "@/hooks/usePreferences";
 import { useLiveContact } from "@/hooks/useLiveContact";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useTheme } from "@/hooks/useTheme";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 import { Magnetic } from "./Motion";
 import { applyMagneticHover } from "@/lib/animation/magnetic";
 import { useSiteSettings } from "@/admin/store";
@@ -25,7 +27,8 @@ export function Logo({
   className?: string;
   variant?: "auto" | "light" | "dark";
 }) {
-  const isLight = variant === "light";
+  const { isDark } = useTheme();
+  const isLight = variant === "light" || (variant === "auto" && isDark);
   const settings = useSiteSettings();
   return (
     <img
@@ -173,7 +176,7 @@ export function Header() {
             aria-label="Avrasya Properties — Home"
             className="inline-flex min-h-11 items-center no-underline"
           >
-            <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" variant="dark" />
+            <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" variant="auto" />
           </Link>
 
           {/* Center Caldren Pill Navigation with Magnetic Physics */}
@@ -204,6 +207,7 @@ export function Header() {
 
           {/* Right Utilities & Contact Pill */}
           <div className="hidden items-center gap-2.5 xl:flex">
+            <ThemeToggle variant="navbar" />
             <LanguageSwitcher variant="navbar" />
 
             <div className="relative flex items-center">
@@ -253,6 +257,7 @@ export function Header() {
 
           {/* Mobile Hamburger Trigger */}
           <div className="flex shrink-0 items-center gap-1.5 xl:hidden">
+            <ThemeToggle variant="compact" />
             <LanguageSwitcher variant="compact" />
             <button
               type="button"
@@ -330,8 +335,13 @@ export function Header() {
             })}
           </nav>
 
-          {/* Drawer Footer with Language, Currency & Direct Contacts */}
+          {/* Drawer Footer with Theme, Language, Currency & Direct Contacts */}
           <div className="border-t border-white/10 pt-4 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase tracking-widest text-[#C5A059]">Theme</span>
+              <ThemeToggle variant="mobile" />
+            </div>
+
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-widest text-[#C5A059]">Language</span>
               <LanguageSwitcher variant="navbar" />
