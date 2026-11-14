@@ -142,6 +142,7 @@ describe("M1 Foundational Fixes Test Suite", () => {
       const drawer = screen.getByRole("dialog", { name: /mobile navigation drawer/i });
       expect(drawer).toBeInTheDocument();
       expect(drawer.className).toContain("fixed inset-0");
+      expect(drawer.closest("header")).toBeNull();
 
       // Verify navigation links are present inside the drawer
       expect(within(drawer).getByRole("link", { name: /^properties/i })).toBeInTheDocument();

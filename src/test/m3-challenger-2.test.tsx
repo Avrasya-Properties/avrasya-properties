@@ -395,12 +395,12 @@ describe("Milestone M3 Independent Adversarial Verification Suite (Challenger 2)
   // 3. LIVE ROUTE RESOLUTION & AUTH PROTECTION CONTRACT
   // =========================================================================
   describe("3. Live Route Resolution & Auth Protection Contract", () => {
-      it("resolves /admin/cms through the route tree (no live server needed)", () => {
-        const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
-        const matches = router.matchRoutes("/admin/cms");
-        expect(matches.at(-1)?.routeId).toBe("/admin/cms");
-        expect(matches.some((m) => m.routeId === "/admin")).toBe(true);
-      });
+    it("resolves /admin/cms through the route tree (no live server needed)", () => {
+      const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+      const matches = router.matchRoutes("/admin/cms");
+      expect(matches.at(-1)?.routeId).toBe("/admin/cms");
+      expect(matches.some((m) => m.routeId === "/admin")).toBe(true);
+    });
 
     it("verifies /admin/cms is structured as a child route under /admin layout", async () => {
       // Contract verification from source files

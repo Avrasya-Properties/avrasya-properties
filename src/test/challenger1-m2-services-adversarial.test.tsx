@@ -259,23 +259,11 @@ describe("Milestone 2 Adversarial Challenge Suite: Services Page & Process Timel
   // CHALLENGE 4: 3D MOUNTING SLOTS ARCHITECTURAL INVARIANTS
   // =========================================================================
   describe("Challenge 4: 3D Mounting Slots Invariants", () => {
-    it("Exactly one building 3D slot exists, mounted exclusively in Step 04", () => {
+    it("Building 3D model is removed from Step 04 and all other steps", () => {
       const { container } = renderWithProviders(<ServicesProcessTimeline />);
 
       const allBuildingSlots = container.querySelectorAll("[data-3d-building-slot]");
-      expect(allBuildingSlots.length).toBe(1);
-
-      const step04 = container.querySelector("[data-step='04']");
-      const buildingSlot = step04?.querySelector("[data-3d-building-slot]");
-      expect(buildingSlot).not.toBeNull();
-      expect(buildingSlot?.id).toBe("services-3d-building");
-
-      // Verify no other step contains the building slot
-      const otherSteps = ["01", "02", "03", "05", "06", "07", "08", "09"];
-      for (const num of otherSteps) {
-        const step = container.querySelector(`[data-step='${num}']`);
-        expect(step?.querySelector("[data-3d-building-slot]")).toBeNull();
-      }
+      expect(allBuildingSlots.length).toBe(0);
     });
 
     it("Exactly one passport 3D slot exists, mounted exclusively in Step 07", () => {
