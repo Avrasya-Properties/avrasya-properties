@@ -582,6 +582,8 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
                         src={imgSrcA}
                         alt={slotA.alt}
                         draggable={false}
+                        loading="lazy"
+                        decoding="async"
                         className="pointer-events-none block h-full w-full object-cover object-center select-none"
                       />
                     </div>
@@ -600,6 +602,8 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
                         src={imgSrcB}
                         alt={slotB.alt}
                         draggable={false}
+                        loading="lazy"
+                        decoding="async"
                         className="pointer-events-none block h-full w-full object-cover object-center select-none"
                       />
                     </div>

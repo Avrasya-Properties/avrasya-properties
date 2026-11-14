@@ -33,7 +33,10 @@ export function Logo({
   const configuredLight = settings.websiteDesign?.["logoLight"];
   const configuredDark = settings.websiteDesign?.["logoDark"];
   const lightLogoSrc =
-    configuredLight && configuredLight !== "/images/avrasya-logo.svg"
+    configuredLight &&
+    configuredLight !== "/images/avrasya-logo.svg" &&
+    configuredLight !== "/images/avrasya-logo-white.svg" &&
+    configuredLight !== "/images/avrasya-logo.png"
       ? configuredLight
       : "/images/avrasya-logo-pure-white.svg";
   const darkLogoSrc = configuredDark || "/images/avrasya-logo.svg";

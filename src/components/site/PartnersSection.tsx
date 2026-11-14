@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 import { applyMagneticHover } from "@/lib/animation/magnetic";
+import { sanitizeSafeUrl } from "@/lib/security";
 import type { PartnerItem } from "@/admin/demo";
 import { DEFAULT_PARTNERS } from "@/admin/demo";
 
@@ -207,10 +208,11 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
         <div className="relative z-10 mx-auto flex max-w-[1312px] flex-wrap items-center justify-center gap-6 px-5 sm:px-8">
           {activePartners.map((partner) => {
             const content = renderCardContent(partner);
-            return partner.website ? (
+            const safeWebsite = sanitizeSafeUrl(partner.website);
+            return safeWebsite ? (
               <a
                 key={partner.id}
-                href={partner.website}
+                href={safeWebsite}
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`Visit ${partner.name}`}
@@ -247,11 +249,12 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
           >
             {marqueeItems.map((partner, index) => {
               const content = renderCardContent(partner);
+              const safeWebsite = sanitizeSafeUrl(partner.website);
 
-              return partner.website ? (
+              return safeWebsite ? (
                 <a
                   key={`${partner.id}-${index}`}
-                  href={partner.website}
+                  href={safeWebsite}
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`Visit ${partner.name}`}

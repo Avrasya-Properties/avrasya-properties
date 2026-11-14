@@ -1,4 +1,5 @@
 import { publicSupabase } from "./supabase";
+import { sanitizeEnquiryField } from "./security";
 import type { PublicEnquiryInput } from "@/admin/demo";
 
 /** How long a visitor waits before we stop and tell them the request may not have arrived. */
@@ -22,18 +23,22 @@ export async function submitPublicEnquiry(input: PublicEnquiryInput): Promise<{ 
   if (input.consent !== true) throw new EnquiryError("Please consent to being contacted.", "input");
   if (!input.idempotencyKey)
     throw new EnquiryError("Please refresh the form and try again.", "input");
+  const safeSlug =
+    typeof input.propertySlug === "string" && /^[a-z0-9-]+$/i.test(input.propertySlug.trim())
+      ? input.propertySlug.trim().slice(0, 160)
+      : undefined;
   const { data, error } = await publicSupabase.functions.invoke("submit-enquiry", {
     body: {
-      name: input.name,
-      email: input.email,
-      phone: input.phone,
-      topic: input.topic,
-      budget: input.budget || "",
-      message: input.message,
-      propertySlug: input.propertySlug,
+      name: sanitizeEnquiryField(input.name, 120),
+      email: sanitizeEnquiryField(input.email, 254),
+      phone: sanitizeEnquiryField(input.phone, 40),
+      topic: sanitizeEnquiryField(input.topic, 120),
+      budget: sanitizeEnquiryField(input.budget || "", 80),
+      message: sanitizeEnquiryField(input.message, 4000),
+      propertySlug: safeSlug,
       consent: input.consent,
-      idempotencyKey: input.idempotencyKey,
-      website: input.website || "",
+      idempotencyKey: sanitizeEnquiryField(input.idempotencyKey, 64),
+      website: sanitizeEnquiryField(input.website || "", 120),
     },
     timeout: ENQUIRY_TIMEOUT_MS,
   });

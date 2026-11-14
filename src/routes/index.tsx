@@ -2,7 +2,6 @@ import { ManagedPage } from "@/components/site/ManagedPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "@/hooks/useLanguage";
 import { type PropertyRecord } from "@/data/properties";
-import { MotionRoot } from "@/components/site/Motion";
 import { meta } from "@/components/site/TextPage";
 import { useCatalogue, loadPublicSettings } from "@/data/live";
 import { useSiteSettings } from "@/admin/store";
@@ -54,15 +53,12 @@ export const Route = createFileRoute("/")({
 function Home() {
   const catalogue = useCatalogue();
   return (
-    <>
-      <HomeCollection
-        properties={catalogue.properties}
-        loading={catalogue.isPending}
-        unavailable={catalogue.isError}
-        retry={() => void catalogue.refetch()}
-      />
-      <MotionRoot />
-    </>
+    <HomeCollection
+      properties={catalogue.properties}
+      loading={catalogue.isPending}
+      unavailable={catalogue.isError}
+      retry={() => void catalogue.refetch()}
+    />
   );
 }
 
