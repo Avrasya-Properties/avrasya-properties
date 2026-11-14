@@ -14,7 +14,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { watchWebsiteChanges, PUBLIC_QUERY_KEYS } from "@/lib/website-sync";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { MotionRoot } from "@/components/site/Motion";
+import { escapeJsonLd } from "@/lib/security";
+import { MotionRoot, scheduleScrollRefresh } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import { loadCatalogue, loadPublicSettings } from "@/data/live";
@@ -96,13 +97,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       context.queryClient.ensureQueryData({
         queryKey: ["site-settings"],
         queryFn: loadPublicSettings,
-        staleTime: 15000,
+        staleTime: 60000,
         retry: false,
       }),
       context.queryClient.ensureQueryData({
         queryKey: ["published-catalogue"],
         queryFn: loadCatalogue,
-        staleTime: 15000,
+        staleTime: 60000,
         retry: false,
       }),
     ]);
@@ -249,11 +250,11 @@ function RootShell({ children }: { children: ReactNode }) {
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+          dangerouslySetInnerHTML={{ __html: escapeJsonLd(jsonLdWebSite) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdRealEstateAgent) }}
+          dangerouslySetInnerHTML={{ __html: escapeJsonLd(jsonLdRealEstateAgent) }}
         />
       </head>
       <body>
@@ -268,6 +269,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const isRouteLoading = useRouterState({ select: (s) => s.status === "pending" });
   const isAdmin = path.startsWith("/admin");
   useSmoothScroll(!isAdmin);
 
@@ -277,6 +279,7 @@ function RootComponent() {
     if (lenis && !window.location.hash) {
       lenis.scrollTo(0, { immediate: true });
     }
+    scheduleScrollRefresh(220);
   }, [path, isAdmin]);
   useEffect(
     () =>
@@ -308,10 +311,19 @@ function RootComponent() {
           </a>
           <Preloader />
           <div className="star-bg" aria-hidden="true" />
-          {path !== "/" && <MotionRoot />}
+          <MotionRoot />
+          {isRouteLoading && (
+            <div
+              data-route-loading-bar
+              aria-hidden="true"
+              className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-[2px] animate-pulse bg-[#C5A059]"
+            />
+          )}
           <Header />
           <main id="main">
-            <Outlet />
+            <div key={path} data-page-transition className="page-route-transition">
+              <Outlet />
+            </div>
           </main>
           <Footer />
         </LanguageProvider>

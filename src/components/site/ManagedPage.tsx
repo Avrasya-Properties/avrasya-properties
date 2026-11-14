@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { useManagedPage } from "@/data/live";
+import { sanitizeSafeUrl } from "@/lib/security";
 import { Enquiry } from "./Enquiry";
 import { ArrowRight, Quote } from "lucide-react";
 
@@ -170,10 +171,10 @@ export function ManagedPage({
             )}
 
             {/* CTA Button */}
-            {c["cta_label"] && c["cta_link"] && (
+            {c["cta_label"] && sanitizeSafeUrl(c["cta_link"]) && (
               <div className="mt-4">
                 <a
-                  href={c["cta_link"]}
+                  href={sanitizeSafeUrl(c["cta_link"])}
                   className="inline-flex items-center gap-2 rounded-full bg-[#163038] px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#10785F]"
                 >
                   <span>{c["cta_label"]}</span>

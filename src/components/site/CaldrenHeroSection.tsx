@@ -870,6 +870,8 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                   alt={PLACEHOLDER_IMAGES.hero.towerSkyline.alt}
                   className="block h-auto w-full min-w-full object-cover object-bottom select-none pointer-events-none"
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </div>
 
