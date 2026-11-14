@@ -25,52 +25,59 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 // Mock Language hook
-vi.mock("@/hooks/useLanguage", () => ({
-  useLanguage: () => ({
-    locale: "en",
-    isRtl: false,
-    config: { code: "en", flag: "🇬🇧", nativeName: "English" },
-    locales: [{ code: "en", flag: "🇬🇧", nativeName: "English" }],
-    setLocale: vi.fn(),
-    t: {
-      nav: {
-        home: "Home",
-        services: "Services",
-        properties: "Properties",
-        citizenship: "Citizenship",
-        whyTurkiye: "Why Türkiye",
-        calculator: "Calculators",
-        about: "About",
-        contact: "Contact",
+vi.mock("@/hooks/useLanguage", async () => {
+  const { en } = await import("@/i18n/locales/en");
+  return {
+    useTranslation: () => ({ t: en, locale: "en", isRtl: false }),
+    useLanguage: () => ({
+      locale: "en",
+      isRtl: false,
+      config: { code: "en", flag: "🇬🇧", nativeName: "English", dir: "ltr" },
+      locales: [{ code: "en", flag: "🇬🇧", nativeName: "English", dir: "ltr" }],
+      setLocale: vi.fn(),
+      t: {
+        ...en,
+        nav: {
+          ...en.nav,
+          home: "Home",
+          services: "Services",
+          properties: "Properties",
+          citizenship: "Citizenship",
+          whyTurkiye: "Why Türkiye",
+          calculator: "Calculators",
+          about: "About",
+          contact: "Contact",
+        },
+        services: {
+          ...en.services,
+          eyebrow: "Our Services",
+          title: "One team. Every step.",
+          subtitle: "From first call to passport",
+          closingLine: "One lawyer. One team. One process.",
+          legalDisclaimer: "Legal disclaimer text",
+          parts: [
+            {
+              partNumber: "PART 1",
+              title: "CHOOSE",
+              steps: [
+                {
+                  stepNumber: "01",
+                  title: "Portfolio Selection",
+                  description: "Selecting prime real estate",
+                },
+                {
+                  stepNumber: "02",
+                  title: "Feasibility Analysis",
+                  description: "Appraisal verification",
+                },
+              ],
+            },
+          ],
+        },
       },
-      services: {
-        eyebrow: "Our Services",
-        title: "One team. Every step.",
-        subtitle: "From first call to passport",
-        closingLine: "One lawyer. One team. One process.",
-        legalDisclaimer: "Legal disclaimer text",
-        parts: [
-          {
-            partNumber: "PART 1",
-            title: "CHOOSE",
-            steps: [
-              {
-                stepNumber: "01",
-                title: "Portfolio Selection",
-                description: "Selecting prime real estate",
-              },
-              {
-                stepNumber: "02",
-                title: "Feasibility Analysis",
-                description: "Appraisal verification",
-              },
-            ],
-          },
-        ],
-      },
-    },
-  }),
-}));
+    }),
+  };
+});
 
 // Mock admin store
 vi.mock("@/admin/store", () => ({

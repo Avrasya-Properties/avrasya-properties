@@ -61,9 +61,9 @@ export function ServicesPage() {
 
       {/* Our Values / Services Vertical Alternating Scroll Timeline (Brought from Homepage) */}
       <BildoraServicesTimeline
-        badgeText="Our Values"
-        heading="Built on Values. Driven by Quality."
-        subtitle="We combine honest communication, thoughtful planning, and dependable craftsmanship to deliver real estate projects that stand strong and create lasting value."
+        badgeText={t.servicesUi.valuesBadge}
+        heading={t.servicesUi.valuesHeading}
+        subtitle={t.servicesUi.valuesSubtitle}
         showDeliverables={true}
         showCtaFooter={true}
         services={[]}

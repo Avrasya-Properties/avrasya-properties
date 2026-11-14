@@ -7,15 +7,17 @@ import {
   getPropertyMedia,
   locationText,
   priceDisplay,
-  TYPE_LABEL,
+  localizedRecordTypeLabel,
   type PropertyRecord,
 } from "@/data/properties";
 import { useCurrency } from "@/hooks/usePreferences";
+import { useLanguage } from "@/hooks/useLanguage";
 import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
 
 /** Compact horizontal row used by the catalogue's List view. */
 export function PropertyListRow({ r }: { r: PropertyRecord }) {
   const [currency] = useCurrency();
+  const { t } = useLanguage();
   const media = getPropertyMedia(r);
   const usd = comparableUsd(r.price);
   const price = priceDisplay(r.price);
@@ -42,7 +44,7 @@ export function PropertyListRow({ r }: { r: PropertyRecord }) {
       <div className="flex flex-1 flex-col justify-between gap-3 p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#C5A059]">
-            {TYPE_LABEL[r.record_type]}
+            {localizedRecordTypeLabel(r.record_type, t.common, t.propertiesExtra.typeLabels)}
           </p>
           <h3 className="mt-1 line-clamp-2 text-[20px] font-normal tracking-[-0.02em] text-[#163038]">
             {r.marketing_title}
@@ -55,7 +57,7 @@ export function PropertyListRow({ r }: { r: PropertyRecord }) {
         <div className="flex items-center justify-between">
           <span className="text-[17px] font-medium text-[#163038]">{shown}</span>
           <span className="inline-flex items-center gap-1 text-[12px] font-medium text-[#163038]">
-            View <ArrowUpRight className="h-3.5 w-3.5" />
+            {t.propertiesExtra.viewShort} <ArrowUpRight className="h-3.5 w-3.5" />
           </span>
         </div>
       </div>

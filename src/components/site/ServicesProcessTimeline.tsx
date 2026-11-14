@@ -144,14 +144,14 @@ export function ServicesProcessTimeline({
         className,
       )}
       dir={isRtl ? "rtl" : "ltr"}
-      aria-label="Acquisition and Citizenship Timeline"
+      aria-label={t.servicesUi.processNavAria}
     >
       <div className="container-site max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {sectionTitle && (
           <div className="mb-12 sm:mb-16 flex flex-col items-center text-center gap-4">
             <div className="inline-flex items-center justify-center rounded-full border border-[#DEE0DD] bg-[#F7F6F2] px-3.5 py-1.5 shadow-xs">
               <span className="text-[12px] font-medium uppercase tracking-[0.14em] text-[#C5A059]">
-                Highlighted Advisory Service
+                {t.servicesUi.highlightedService}
               </span>
             </div>
             <h2 className="font-display max-w-3xl text-3xl sm:text-4xl lg:text-[44px] font-normal leading-[1.12] tracking-[-0.02em] text-[#163038] dark:text-stone-100">
@@ -298,7 +298,7 @@ export function ServicesProcessTimeline({
         {/* Closing Line at the conclusion of the timeline */}
         <div className="mt-16 sm:mt-20 text-center border-t border-stone-200/80 dark:border-white/10 pt-12 sm:pt-16">
           <span className="font-mono text-xs uppercase tracking-widest text-[#C5A059]">
-            The Avrasya Difference
+            {t.servicesUi.avrasyaDifference}
           </span>
           <h3 className="font-display mt-3 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#163038] dark:text-stone-100">
             &ldquo;{t.services.closingLine}&rdquo;
@@ -313,7 +313,7 @@ export function ServicesProcessTimeline({
             </div>
             <div className="flex-1 text-start">
               <h4 className="font-display text-base font-bold text-[#163038] dark:text-stone-100">
-                Istanbul Bar Association Legal Representation & Statutory Disclaimers
+                {t.servicesUi.legalRepHeading}
               </h4>
               <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground dark:text-stone-300">
                 {t.services.legalDisclaimer}
@@ -332,14 +332,14 @@ export function ServicesProcessTimeline({
               to="/services"
               className="group inline-flex h-[48px] items-center justify-center gap-2.5 rounded-full bg-[#163038] px-7 text-[13.5px] font-medium text-white no-underline shadow-sm transition-all duration-300 hover:bg-[#10785F] hover:shadow-md"
             >
-              <span>All Services</span>
+              <span>{t.servicesUi.allServicesBtn}</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
             </Link>
             <Link
               to="/citizenship"
               className="group inline-flex h-[48px] items-center justify-center gap-2.5 rounded-full border border-[#163038]/25 bg-white px-7 text-[13.5px] font-medium text-[#163038] no-underline shadow-xs transition-all duration-300 hover:border-[#C5A059] hover:bg-[#F7F6F2]"
             >
-              <span>More Details</span>
+              <span>{t.servicesUi.moreDetailsBtn}</span>
               <ArrowRight className="h-4 w-4 text-[#C5A059] transition-transform duration-300 group-hover:translate-x-0.5" />
             </Link>
           </div>

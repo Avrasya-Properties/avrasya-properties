@@ -93,7 +93,8 @@ export function ContactPage() {
             <Enquiry
               key={selectedTopic}
               defaultTopic={
-                topics.find((item) => item.id === selectedTopic)?.label || "General consultation"
+                topics.find((item) => item.id === selectedTopic)?.label ||
+                t.enquiryExtra.defaultTopicFallback
               }
             />
           </div>

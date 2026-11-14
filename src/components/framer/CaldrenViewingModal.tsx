@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export interface CaldrenViewingModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
   agentPhone = "+90 545 924 80 42",
   onSubmitInquiry,
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"viewing" | "showreel">(mode);
   const [submitted, setSubmitted] = useState(false);
   const [viewingType, setViewingType] = useState("Private In-Person");
@@ -78,7 +80,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={
-        activeTab === "showreel" ? "Avrasya Architectural Showreel" : "Schedule a Private Viewing"
+        activeTab === "showreel" ? t.viewingModal.tabShowreel : t.viewingModal.dialogTitle
       }
       className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0e0e0c]/75 p-4 backdrop-blur-md animate-fade-in"
       onClick={resetAndClose}
@@ -100,7 +102,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                   : "text-[#63615b] hover:text-[#0e0e0c]"
               }`}
             >
-              Architectural Showreel
+              {t.viewingModal.tabShowreel}
             </button>
             <button
               type="button"
@@ -111,13 +113,13 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                   : "text-[#63615b] hover:text-[#0e0e0c]"
               }`}
             >
-              Private Viewing Brief
+              {t.viewingModal.tabBooking}
             </button>
           </div>
           <button
             type="button"
             onClick={resetAndClose}
-            aria-label="Close modal"
+            aria-label={t.viewingModal.closeAria}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-[#0e0e0c]/12 text-[#0e0e0c] transition-colors hover:bg-[#0e0e0c] hover:text-white"
           >
             ✕
@@ -135,7 +137,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0c] via-[#0e0e0c]/30 to-transparent" />
               <div className="relative z-10 flex items-center justify-between">
                 <span className="rounded-full bg-white/15 px-3.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm">
-                  Avrasya Showreel · Placeholder Preview
+                  {t.viewingModal.cinemaBadge}
                 </span>
                 <span className="text-[11px] tracking-[0.12em] text-white/70">02:14 · 4K HDR</span>
               </div>
@@ -147,7 +149,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                   </svg>
                 </div>
                 <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-white/80">
-                  Architectural Reel Placeholder
+                  {t.viewingModal.cinemaTitle}
                 </p>
               </div>
 
@@ -159,7 +161,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                   className="mt-1 text-2xl font-normal tracking-[-0.02em] text-white"
                   style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
                 >
-                  {propertyTitle} — Curated Portfolio Film
+                  {propertyTitle} — {t.viewingModal.cinemaTitle}
                 </h3>
               </div>
             </div>
@@ -167,28 +169,31 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
             <div className="flex flex-col justify-between bg-white p-8 lg:col-span-4">
               <div>
                 <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#94918a]">
-                  Featured Development
+                  {t.viewingModal.eyebrow}
                 </p>
                 <h4 className="mt-2 text-xl font-medium tracking-[-0.03em] text-[#0e0e0c]">
-                  Exceptional spaces, thoughtfully presented.
+                  {t.heroShowcase.subtitle}
                 </h4>
                 <p className="mt-3 text-[13px] leading-[1.6] text-[#63615b]">
-                  Every residence in the Avrasya portfolio undergoes independent valuation, Tapu
-                  title clearance, and architectural review before private presentation.
+                  {t.viewingModal.footerNote}
                 </p>
 
                 <div className="mt-6 space-y-3 border-t border-[#0e0e0c]/10 pt-5 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-[#94918a]">Locations</span>
-                    <span className="font-medium text-[#0e0e0c]">Istanbul · Bodrum · Coast</span>
+                    <span className="text-[#94918a]">{t.viewingModal.statPortfolioLabel}</span>
+                    <span className="font-medium text-[#0e0e0c]">
+                      {t.viewingModal.statPortfolioVal}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#94918a]">Advisory Scope</span>
-                    <span className="font-medium text-[#0e0e0c]">Acquisition & Citizenship</span>
+                    <span className="text-[#94918a]">{t.viewingModal.statYieldLabel}</span>
+                    <span className="font-medium text-[#0e0e0c]">
+                      {t.viewingModal.statYieldVal}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#94918a]">Legal Clearance</span>
-                    <span className="font-medium text-[#0e0e0c]">100% Title Verified</span>
+                    <span className="text-[#94918a]">{t.viewingModal.statTapuLabel}</span>
+                    <span className="font-medium text-[#0e0e0c]">{t.viewingModal.statTapuVal}</span>
                   </div>
                 </div>
               </div>
@@ -198,7 +203,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                 onClick={() => setActiveTab("viewing")}
                 className="mt-8 flex w-full items-center justify-between rounded-full bg-[#0e0e0c] px-5 py-3 text-[12px] font-medium text-white transition-transform hover:scale-[1.01]"
               >
-                <span>Arrange Private Viewing</span>
+                <span>{t.viewingModal.scheduleVisitCta}</span>
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#0e0e0c]">
                   →
                 </span>
@@ -211,7 +216,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
             <div className="flex flex-col justify-between bg-[#0e0e0c] p-8 text-white md:col-span-5">
               <div>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">
-                  Private Client Desk
+                  {t.nav.advisoryDesk}
                 </span>
                 <h3 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.03em] text-white">
                   {propertyTitle}
@@ -221,7 +226,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
 
               <div className="mt-10 border-t border-white/15 pt-6">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
-                  Assigned Advisor
+                  {t.viewingModal.eyebrow}
                 </span>
                 <div className="mt-2 text-[16px] font-medium text-white">{agentName}</div>
                 <div className="text-[12px] text-white/65">{agentRole}</div>
@@ -240,32 +245,31 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                     ✓
                   </div>
                   <h4 className="mt-4 text-xl font-medium tracking-[-0.02em] text-[#0e0e0c]">
-                    Viewing Request Registered
+                    {t.viewingModal.confirmedTitle}
                   </h4>
                   <p className="mx-auto mt-2 max-w-sm text-[13px] leading-relaxed text-[#63615b]">
-                    Thank you. {agentName} will contact you shortly to confirm your private
-                    itinerary and dossier.
+                    {t.viewingModal.confirmedDesc}
                   </p>
                   <button
                     type="button"
                     onClick={resetAndClose}
                     className="mt-6 rounded-full bg-[#0e0e0c] px-6 py-2.5 text-[12px] font-medium text-white"
                   >
-                    Return to Portfolio
+                    {t.viewingModal.doneBtn}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#63615b]">
-                      Full Name *
+                      {t.viewingModal.fieldNameLabel} *
                     </label>
                     <input
                       required
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData((s) => ({ ...s, name: e.target.value }))}
-                      placeholder="Your full name"
+                      placeholder={t.viewingModal.fieldNamePlaceholder}
                       className="mt-1.5 w-full border border-[#0e0e0c]/15 bg-[#f5f2ec]/60 px-3.5 py-2.5 text-[13px] text-[#0e0e0c] outline-none focus:border-[#0e0e0c]"
                     />
                   </div>
@@ -273,7 +277,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#63615b]">
-                        Email *
+                        {t.enquiry.email} *
                       </label>
                       <input
                         required
@@ -286,14 +290,14 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#63615b]">
-                        Phone / WhatsApp *
+                        {t.viewingModal.fieldContactLabel} *
                       </label>
                       <input
                         required
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData((s) => ({ ...s, phone: e.target.value }))}
-                        placeholder="+90 545 ..."
+                        placeholder={t.viewingModal.fieldContactPlaceholder}
                         className="mt-1.5 w-full border border-[#0e0e0c]/15 bg-[#f5f2ec]/60 px-3.5 py-2.5 text-[13px] text-[#0e0e0c] outline-none focus:border-[#0e0e0c]"
                       />
                     </div>
@@ -302,7 +306,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#63615b]">
-                        Preferred Date
+                        {t.viewingModal.fieldDateLabel}
                       </label>
                       <input
                         type="date"
@@ -313,21 +317,24 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#63615b]">
-                        Format
+                        {t.viewingModal.fieldDistrictLabel}
                       </label>
                       <div className="mt-1.5 grid grid-cols-2 gap-2">
-                        {["Private In-Person", "Live Video Tour"].map((type) => (
+                        {[
+                          { value: "Private In-Person", label: t.viewingModal.districtOpt1 },
+                          { value: "Live Video Tour", label: t.viewingModal.districtOpt2 },
+                        ].map((opt) => (
                           <button
-                            key={type}
+                            key={opt.value}
                             type="button"
-                            onClick={() => setViewingType(type)}
+                            onClick={() => setViewingType(opt.value)}
                             className={`border px-2.5 py-2.5 text-[11px] font-medium transition-colors ${
-                              viewingType === type
+                              viewingType === opt.value
                                 ? "border-[#0e0e0c] bg-[#0e0e0c] text-white"
                                 : "border-[#0e0e0c]/15 bg-transparent text-[#0e0e0c]"
                             }`}
                           >
-                            {type}
+                            {opt.label}
                           </button>
                         ))}
                       </div>
@@ -336,13 +343,13 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
 
                   <div>
                     <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#63615b]">
-                      Advisory Notes
+                      {t.enquiry.message}
                     </label>
                     <textarea
                       rows={2}
                       value={formData.notes}
                       onChange={(e) => setFormData((s) => ({ ...s, notes: e.target.value }))}
-                      placeholder="Preferred districts, citizenship requirements, or portfolio goals..."
+                      placeholder={t.viewingModal.footerNote}
                       className="mt-1.5 w-full border border-[#0e0e0c]/15 bg-[#f5f2ec]/60 px-3.5 py-2 text-[13px] text-[#0e0e0c] outline-none focus:border-[#0e0e0c]"
                     />
                   </div>
@@ -351,7 +358,7 @@ export const CaldrenViewingModal: React.FC<CaldrenViewingModalProps> = ({
                     type="submit"
                     className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0e0e0c] py-3.5 text-[12px] font-medium uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-90"
                   >
-                    <span>Confirm Private Viewing</span>
+                    <span>{t.viewingModal.submitBtn}</span>
                     <span>→</span>
                   </button>
                 </form>

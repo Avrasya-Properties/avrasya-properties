@@ -19,6 +19,7 @@ import { meta } from "@/components/site/TextPage";
 import { PageIntro } from "@/components/site/Chrome";
 import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
 import { useLiveContact } from "@/hooks/useLiveContact";
+import { useLanguage } from "@/hooks/useLanguage";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -181,6 +182,63 @@ const CLIENT_LANGUAGES = [
 
 export function About() {
   const contact = useLiveContact();
+  const { t, locale, locales } = useLanguage();
+  const ap = t.aboutPageExtra;
+  const localizedMetrics = METRICS.map((m, idx) => {
+    const stat = ap.stats[idx];
+    if (!stat) return m;
+    const match = stat.number.match(/^([^0-9]*)([0-9]+(?:\.[0-9]+)?)(.*)$/);
+    const target = match ? Number(match[2]) : m.target;
+    const decimals = match?.[2]?.includes(".") ? match[2].split(".")[1]!.length : 0;
+    const prefix = match?.[1] ?? "";
+    const suffix = match?.[3] ?? m.suffix;
+    return {
+      target,
+      decimals,
+      prefix,
+      suffix,
+      displayFallback: stat.number,
+      label: stat.label,
+      desc: stat.desc,
+    };
+  });
+  const localizedApproachSteps = ap.approachSteps.map((s) => ({
+    step: s.step,
+    title: s.title,
+    description: s.desc,
+  }));
+  const localizedExpertise = EXPERTISE_ITEMS.map((item, idx) => {
+    const loc = ap.expertiseItems[idx];
+    return loc
+      ? {
+          title: loc.title,
+          subtitle: loc.tag,
+          description: loc.desc,
+          slot: item.slot,
+        }
+      : item;
+  });
+  const localizedTeam = TEAM_MEMBERS.map((member, idx) => {
+    const loc = ap.teamMembers[idx % ap.teamMembers.length];
+    return loc
+      ? {
+          ...member,
+          role: loc.role,
+          languages: loc.languages,
+        }
+      : member;
+  });
+  const localizedPartners = PARTNERS.map((partner, idx) => {
+    const loc = ap.partnerCategories[idx % ap.partnerCategories.length];
+    return loc
+      ? {
+          ...partner,
+          category: loc.category,
+          description: loc.description,
+        }
+      : { ...partner, description: "" };
+  });
+  const languageLabels = locales.map((l) => l.nativeName);
   const pageRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const storySectionRef = useRef<HTMLElement>(null);
@@ -273,7 +331,7 @@ export function About() {
         );
 
         nums.forEach((el, idx) => {
-          const m = METRICS[idx];
+          const m = localizedMetrics[idx];
           if (!m) return;
           const proxy = { val: 0 };
           gsap.to(proxy, {
@@ -286,7 +344,7 @@ export function About() {
               once: true,
             },
             onUpdate: () => {
-              el.textContent = `${proxy.val.toFixed(m.decimals)}${m.suffix}`;
+              el.textContent = `${"prefix" in m ? m.prefix : ""}${proxy.val.toFixed(m.decimals)}${m.suffix}`;
             },
             onComplete: () => {
               el.textContent = m.displayFallback;
@@ -378,7 +436,7 @@ export function About() {
     }, pageRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [locale]);
 
   const renderHeroWords = (text: string) =>
     text.split(" ").map((word, idx, arr) => (
@@ -398,29 +456,31 @@ export function About() {
       {/* 1. Canonical Editorial PageIntro (Aligned with all other inner pages + Enlarged PageIdentityLineArt) */}
       <div ref={heroRef as React.RefObject<HTMLDivElement>} data-framer-name="Hero">
         <PageIntro
-          eyebrow="About Avrasya · Istanbul Real Estate & Legal Advisory"
+          eyebrow={ap.heroEyebrow}
           title={
-            <>
-              Building More Than Structures. <em>Building Trust.</em>
-            </>
+            locale === "en" ? (
+              <>
+                Building More Than Structures. <em>Building Trust.</em>
+              </>
+            ) : (
+              ap.heroTitle
+            )
           }
           aside={
             <div className="flex flex-wrap items-center gap-3 md:justify-end">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium tracking-wide text-white/90 backdrop-blur-xs">
                 <Scale className="h-3.5 w-3.5 text-[#C5A059]" />
-                <span>In-House Attorney Governance</span>
+                <span>{t.servicesUi.legalRepHeading}</span>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium tracking-wide text-white/90 backdrop-blur-xs">
                 <Globe2 className="h-3.5 w-3.5 text-[#C5A059]" />
-                <span>7 Advisory Languages</span>
+                <span>{ap.officeBadgeText}</span>
               </div>
             </div>
           }
         >
           <p className="text-base leading-relaxed text-on-dark/90 sm:text-lg">
-            {renderHeroWords(
-              "Your trusted Istanbul partner for handpicked homes, Turkish citizenship guidance, and in-house legal peace of mind.",
-            )}
+            {renderHeroWords(ap.heroSubtitle)}
           </p>
         </PageIntro>
       </div>
@@ -450,28 +510,23 @@ export function About() {
             data-abt-story-copy
             className="flex flex-1 flex-col items-start justify-center gap-[24px] lg:gap-[30px]"
           >
-            <p className="eyebrow">Our Story</p>
+            <p className="eyebrow">{ap.ourStoryBadge}</p>
 
             <div className="flex flex-col gap-[20px]">
               <h2 className="font-display m-0 text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-[44px]">
-                From Ambitious Ideas to{" "}
-                <em className="font-normal italic text-brass">Lasting Structures.</em>
+                {locale === "en" ? (
+                  <>
+                    From Ambitious Ideas to{" "}
+                    <em className="font-normal italic text-brass">Lasting Structures.</em>
+                  </>
+                ) : (
+                  ap.ourStoryHeading
+                )}
               </h2>
 
               <div className="flex flex-col gap-[16px] text-[15px] leading-[1.7] text-muted-foreground">
-                <p className="m-0">
-                  Avrasya Properties was built around a simple conviction: international buyers in
-                  Türkiye deserve the same rigor, contract transparency, and direct developer
-                  pricing enjoyed by domestic institutional investors. From the earliest portfolio
-                  brief to the final Land Registry signature, we work closely with families and
-                  investors to deliver residences that perform over the long term.
-                </p>
-                <p className="m-0">
-                  Headquartered in Mecidiyeköy, Şişli — at the crossroads of European Istanbul — our
-                  multilingual advisors and Avrasya’s in-house attorney review every title deed, SPK
-                  valuation report, and developer track record before a property ever reaches our
-                  shortlist.
-                </p>
+                <p className="m-0">{ap.ourStoryP1}</p>
+                <p className="m-0">{ap.ourStoryP2}</p>
               </div>
             </div>
 
@@ -479,7 +534,7 @@ export function About() {
               href="#our-approach"
               className="btn btn-primary inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-medium no-underline"
             >
-              Discover Our Approach
+              {ap.coreValuesBadge}
             </a>
           </div>
         </div>
@@ -490,7 +545,7 @@ export function About() {
           data-framer-name="Metrics"
           className="grid w-full grid-cols-2 gap-6 border-t border-border pt-[44px] lg:grid-cols-4 lg:gap-[32px]"
         >
-          {METRICS.map((metric) => (
+          {localizedMetrics.map((metric) => (
             <div
               key={metric.label}
               data-abt-metric-card
@@ -520,15 +575,19 @@ export function About() {
         <div className="container-site flex flex-col items-center justify-between gap-12 lg:flex-row lg:gap-[72px]">
           {/* Left Column (4 process cards) */}
           <div className="flex w-full flex-col items-start gap-[24px] lg:w-[50%]">
-            <p className="eyebrow">Our Approach</p>
+            <p className="eyebrow">{ap.coreValuesBadge}</p>
 
             <h2 className="font-display m-0 text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-[44px]">
-              A Better Way to Buy,{" "}
-              <em className="font-normal italic text-brass">From Start to Finish.</em>
+              {ap.coreValuesHeading}
             </h2>
+            {ap.coreValuesSubtitle && (
+              <p className="m-0 text-[15px] leading-[1.6] text-muted-foreground">
+                {ap.coreValuesSubtitle}
+              </p>
+            )}
 
             <div className="mt-2 flex w-full flex-col gap-[16px]">
-              {APPROACH_STEPS.map((item) => (
+              {localizedApproachSteps.map((item) => (
                 <div
                   key={item.step}
                   data-abt-approach-step
@@ -570,20 +629,18 @@ export function About() {
         className="container-site flex flex-col items-center gap-[48px] py-[72px] lg:py-[96px]"
       >
         <div className="flex max-w-[680px] flex-col items-center gap-[14px] text-center">
-          <p className="eyebrow">Our Expertise</p>
+          <p className="eyebrow">{ap.expertiseBadge}</p>
           <h2 className="font-display m-0 text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-[44px]">
-            Experience That Turns Plans Into{" "}
-            <em className="font-normal italic text-brass">Progress.</em>
+            {ap.expertiseHeading}
           </h2>
           <p className="m-0 max-w-[540px] text-[15px] leading-[1.6] text-muted-foreground">
-            We combine market intelligence, in-house legal representation, and post-handover
-            management under one roof in Istanbul.
+            {t.about.description}
           </p>
         </div>
 
         {/* 3-Column Expertise Grid */}
         <div className="grid w-full grid-cols-1 gap-[28px] md:grid-cols-3">
-          {EXPERTISE_ITEMS.map((item) => (
+          {localizedExpertise.map((item) => (
             <div
               key={item.title}
               data-abt-expertise-card
@@ -621,21 +678,18 @@ export function About() {
       >
         <div className="container-site flex flex-col items-center gap-[48px]">
           <div className="flex max-w-[680px] flex-col items-center gap-[14px] text-center">
-            <p className="eyebrow">Meet The Team</p>
+            <p className="eyebrow">{ap.teamBadge}</p>
             <h2 className="font-display m-0 text-3xl font-semibold leading-[1.12] text-foreground sm:text-4xl lg:text-[44px]">
-              The People Behind Every{" "}
-              <em className="font-normal italic text-brass">Acquisition.</em>
+              {ap.teamHeading}
             </h2>
             <p className="m-0 max-w-[580px] text-[15px] leading-[1.6] text-muted-foreground">
-              Our advisors and in-house legal counsel speak 7 languages —{" "}
-              <strong className="font-medium text-foreground">{CLIENT_LANGUAGES.join(", ")}</strong>{" "}
-              — guiding you clearly at every stage.
+              {ap.teamSubtitle}
             </p>
           </div>
 
           {/* 4-Column Team Card Grid */}
           <div className="grid w-full grid-cols-1 gap-[24px] sm:grid-cols-2 lg:grid-cols-4">
-            {TEAM_MEMBERS.map((member) => (
+            {localizedTeam.map((member) => (
               <div
                 key={member.name}
                 data-abt-team-card
@@ -675,19 +729,18 @@ export function About() {
           <div className="flex flex-col gap-[28px]">
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
               <div>
-                <p className="eyebrow">References &amp; Partners</p>
+                <p className="eyebrow">{ap.partnersBadge}</p>
                 <h2 className="font-display mt-2 text-3xl font-semibold leading-[1.15] text-foreground sm:text-4xl">
-                  Trusted Institutional &amp; Service Network
+                  {ap.partnersHeading}
                 </h2>
               </div>
               <p className="max-w-md text-[14px] leading-[1.6] text-muted-foreground">
-                We collaborate with established consultancy, valuation, sworn translation, and
-                hospitality partners across Istanbul.
+                {ap.partnersSubtitle}
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-              {PARTNERS.map((partner) => (
+              {localizedPartners.map((partner) => (
                 <div
                   key={partner.name}
                   className="card-elevate flex flex-col justify-between gap-3 rounded-xl border border-border/80 bg-card p-5 transition-colors hover:border-brass/60"
@@ -711,15 +764,13 @@ export function About() {
             <div className="flex flex-col justify-between gap-6 lg:col-span-7">
               <div className="space-y-4">
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#C5A059]">
-                  <ShieldCheck className="h-3.5 w-3.5" /> Credentials &amp; Headquarters
+                  <ShieldCheck className="h-3.5 w-3.5" /> {ap.visitBadge}
                 </span>
                 <h2 className="font-display m-0 text-[30px] font-semibold leading-[1.15] text-white sm:text-[38px]">
-                  Visit Our Şişli Advisory Desk in Central Istanbul
+                  {ap.visitHeading}
                 </h2>
                 <p className="m-0 max-w-xl text-[14.5px] leading-[1.65] text-white/80">
-                  All legal due diligence, title deed checks, and citizenship filings are conducted
-                  by Avrasya’s in-house attorney from our Mecidiyeköy headquarters. Fees depend on
-                  the transaction — ask us for a clear written quote before you commit.
+                  {ap.visitDesc}
                 </p>
               </div>
 
@@ -727,21 +778,19 @@ export function About() {
                 <div className="rounded-[12px] border border-white/10 bg-white/5 p-4">
                   <Award className="mb-2 h-5 w-5 text-[#C5A059]" />
                   <div className="text-[13px] font-medium text-white">
-                    Real Estate Authorization Certificate
+                    {ap.partnerCategories[1]?.category ?? ap.stats[3]?.label}
                   </div>
                   <p className="mt-1 text-[12px] text-white/70">
-                    Ministry of Trade Registered Real Estate Enterprise · Certificate No. [Verified
-                    on Request]
+                    {ap.partnerCategories[1]?.description ?? ap.stats[3]?.desc}
                   </p>
                 </div>
                 <div className="rounded-[12px] border border-white/10 bg-white/5 p-4">
                   <Scale className="mb-2 h-5 w-5 text-[#C5A059]" />
                   <div className="text-[13px] font-medium text-white">
-                    In-House Legal &amp; Bar Governance
+                    {t.servicesUi.legalRepHeading}
                   </div>
                   <p className="mt-1 text-[12px] text-white/70">
-                    Contract review, Tapu conveyance &amp; citizenship filings handled by Avrasya’s
-                    in-house attorney.
+                    {ap.partnerCategories[0]?.description ?? ap.stats[2]?.desc}
                   </p>
                 </div>
               </div>
@@ -751,7 +800,7 @@ export function About() {
                   to="/contact"
                   className="inline-flex h-[46px] items-center justify-center rounded-full border border-white/20 bg-[#163038] px-7 text-[13.5px] font-medium text-white no-underline shadow-md transition-colors hover:bg-[#10785F]"
                 >
-                  Book Private Appointment
+                  {ap.directAdvisoryCta}
                 </Link>
                 <a
                   href="https://maps.google.com/?q=Mecidiyekoy+Mah.+Hark+Sk.+No:+6+A+34387+Sisli+Istanbul"
@@ -759,7 +808,7 @@ export function About() {
                   rel="noreferrer"
                   className="inline-flex h-[46px] items-center justify-center rounded-full border border-white/25 px-6 text-[13.5px] font-normal text-white no-underline transition-colors hover:bg-white/10"
                 >
-                  Open in Google Maps →
+                  {ap.getDirections} &rarr;
                 </a>
               </div>
             </div>
@@ -771,10 +820,10 @@ export function About() {
                   <MapPin className="mt-1 h-4 w-4 shrink-0 text-[#C5A059]" />
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
-                      Istanbul Office Address
+                      {ap.officeLabel}
                     </div>
                     <div className="mt-1 text-[14px] leading-snug text-white">
-                      Mecidiyeköy Mah., Hark Sk. No: 6 A, 34387 Şişli/İstanbul
+                      {contact.address}
                     </div>
                   </div>
                 </div>
@@ -783,10 +832,10 @@ export function About() {
                   <Clock className="mt-1 h-4 w-4 shrink-0 text-[#C5A059]" />
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
-                      Office Hours
+                      {ap.officeHoursLabel}
                     </div>
                     <div className="mt-1 text-[14px] leading-snug text-white">
-                      Mon–Fri 09:30–18:30 TRT · Sat by private appointment
+                      {ap.officeHoursVal}
                     </div>
                   </div>
                 </div>
@@ -795,7 +844,7 @@ export function About() {
                   <Phone className="mt-1 h-4 w-4 shrink-0 text-[#C5A059]" />
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
-                      Phone &amp; WhatsApp
+                      {ap.officePhoneLabel}
                     </div>
                     <a
                       href={contact.phoneHref}
@@ -810,7 +859,7 @@ export function About() {
                   <Mail className="mt-1 h-4 w-4 shrink-0 text-[#C5A059]" />
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
-                      Direct Email
+                      {ap.officeEmailLabel}
                     </div>
                     <a
                       href={`mailto:${contact.email}`}
@@ -825,7 +874,7 @@ export function About() {
               <div className="border-t border-white/10 pt-4">
                 <div className="flex items-center gap-2 text-[12px] text-white/75">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-[#C5A059]" />
-                  <span>7 Advisory Languages: {CLIENT_LANGUAGES.join(" · ")}</span>
+                  <span>{languageLabels.join(" · ")}</span>
                 </div>
               </div>
             </div>

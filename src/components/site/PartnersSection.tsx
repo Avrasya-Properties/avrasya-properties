@@ -4,6 +4,7 @@ import { applyMagneticHover } from "@/lib/animation/magnetic";
 import { sanitizeSafeUrl } from "@/lib/security";
 import type { PartnerItem } from "@/admin/demo";
 import { DEFAULT_PARTNERS } from "@/admin/demo";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export type PartnerInput = Omit<PartnerItem, "sortOrder"> & { sortOrder?: number };
 
@@ -14,10 +15,13 @@ export interface PartnersSectionProps {
 }
 
 export const PartnersSection: React.FC<PartnersSectionProps> = ({
-  title = "References and Partners",
-  eyebrow = "Partners & References",
+  title,
+  eyebrow,
   partners = DEFAULT_PARTNERS,
 }) => {
+  const { t } = useTranslation();
+  const resolvedEyebrow = eyebrow ?? t.partnersSection.referencesAndPartners;
+  const resolvedTitle = title ?? t.partnersSection.heading;
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -171,7 +175,7 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
       ref={sectionRef}
       id="partners-section"
       data-partners-section
-      aria-label="Partners and References"
+      aria-label={resolvedTitle}
       className="relative w-full overflow-hidden border-t border-[#1F4550] py-14 sm:py-20 lg:py-24 select-none"
       style={{
         background: "linear-gradient(180deg, #163038 0%, #112830 50%, #0D2026 100%)",
@@ -195,10 +199,10 @@ export const PartnersSection: React.FC<PartnersSectionProps> = ({
           <h2
             ref={headingRef}
             data-partners-heading
-            aria-label={eyebrow}
+            aria-label={resolvedTitle}
             className="text-[20px] sm:text-[26px] lg:text-[32px] font-semibold uppercase tracking-[0.22em] text-[#C5A059]"
           >
-            {eyebrow}
+            {resolvedTitle}
           </h2>
         </div>
       </div>

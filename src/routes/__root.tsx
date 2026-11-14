@@ -19,41 +19,40 @@ import { MotionRoot, scheduleScrollRefresh } from "@/components/site/Motion";
 import { Footer, Header } from "@/components/site/Chrome";
 import { Preloader } from "@/components/site/Preloader";
 import { loadCatalogue, loadPublicSettings } from "@/data/live";
-import { LanguageProvider } from "@/hooks/useLanguage";
+import { LanguageProvider, useTranslation } from "@/hooks/useLanguage";
 import { ThemeProvider } from "@/hooks/useTheme";
 import type { SiteSettings } from "@/admin/demo";
 import { DEMO_MODE, SUPABASE_URL } from "@/lib/supabase";
 import { useSmoothScroll, getLenis } from "@/lib/animation/lenis";
 
 function NotFoundComponent() {
+  const { t } = useTranslation();
   return (
     <div
       className="container-site py-24 flex flex-col items-center justify-center"
       aria-hidden="false"
     >
-      <p className="eyebrow eyebrow-mark">404 · Page not found</p>
-      <h1 className="display-hero mt-3 text-center">This address isn&apos;t on our map.</h1>
-      <p className="mt-4 max-w-xl text-center text-muted-foreground">
-        The page may have moved. Use the buttons below to navigate.
-      </p>
+      <p className="eyebrow eyebrow-mark">{t.chrome.notFoundEyebrow}</p>
+      <h1 className="display-hero mt-3 text-center">{t.common.pageNotFoundTitle}</h1>
+      <p className="mt-4 max-w-xl text-center text-muted-foreground">{t.common.pageNotFoundDesc}</p>
       <div className="mt-8 flex flex-wrap gap-3 justify-center">
         <Link to="/" className="btn btn-primary">
-          Home
+          {t.common.goHome}
         </Link>
         <Link to="/properties" className="btn btn-outline">
-          Offers &amp; projects
+          {t.common.exploreOffers}
         </Link>
         <Link to="/services" className="btn btn-outline">
-          Services
+          {t.nav.services}
         </Link>
         <Link to="/contact" className="btn btn-outline">
-          Contact
+          {t.nav.contact}
         </Link>
       </div>
       {/* Optional illustration */}
       <img
         src="/images/media_1794440389807_5dfb60a4.png"
-        alt="Not found illustration"
+        alt={t.common.pageNotFoundTitle}
         className="mt-8 max-w-full h-auto"
       />
     </div>
@@ -63,13 +62,14 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  const { t } = useTranslation();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
   return (
     <div className="container-site py-24">
-      <h1 className="headline">This page didn't load</h1>
-      <p className="mt-2 text-muted-foreground">Something went wrong on our end.</p>
+      <h1 className="headline">{t.chrome.errorHeading}</h1>
+      <p className="mt-2 text-muted-foreground">{t.chrome.errorUnexpected}</p>
       <div className="mt-6 flex gap-2">
         <button
           onClick={() => {
@@ -78,13 +78,22 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           }}
           className="btn btn-primary"
         >
-          Try again
+          {t.common.retry}
         </button>
         <a href="/" className="btn btn-outline">
-          Go home
+          {t.common.goHome}
         </a>
       </div>
     </div>
+  );
+}
+
+function SkipToContent() {
+  const { t } = useTranslation();
+  return (
+    <a href="#main" className="skip-link sr-only">
+      {t.common.skipToContent}
+    </a>
   );
 }
 
@@ -306,9 +315,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LanguageProvider>
-          <a href="#main" className="skip-link sr-only">
-            Skip to content
-          </a>
+          <SkipToContent />
           <Preloader />
           <div className="star-bg" aria-hidden="true" />
           <MotionRoot />

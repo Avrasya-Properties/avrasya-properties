@@ -5,6 +5,7 @@ import { animateSlide } from "@/lib/animation/masking";
 import { PLACEHOLDER_IMAGES, resolvePlaceholderSrc } from "@/data/placeholders";
 import type { SiteSettings } from "@/admin/demo";
 import { useSiteSettings } from "@/admin/store";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export interface BildoraAboutSectionProps {
   propertyCount?: number;
@@ -82,24 +83,56 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
 }) => {
   const hookSettings = useSiteSettings();
   const settings = propSettings || hookSettings;
+  const { t, locale } = useTranslation();
 
+  const cmsHeading =
+    typeof settings?.websiteDesign?.["aboutHeading"] === "string"
+      ? (settings.websiteDesign["aboutHeading"] as string)
+      : "";
+  const isDefaultHeading = !cmsHeading || cmsHeading.trim() === DEFAULT_HEADING;
   const headingText =
     propHeading ||
-    (typeof settings?.websiteDesign?.["aboutHeading"] === "string"
-      ? (settings.websiteDesign["aboutHeading"] as string)
-      : DEFAULT_HEADING);
+    (locale !== "en" && isDefaultHeading
+      ? t.aboutSection.heading
+      : cmsHeading || t.aboutSection.heading);
 
+  const cmsDescription =
+    typeof settings?.websiteDesign?.["aboutDescription"] === "string"
+      ? (settings.websiteDesign["aboutDescription"] as string)
+      : "";
+  const isDefaultDescription = !cmsDescription || cmsDescription.trim() === DEFAULT_DESCRIPTION;
   const descriptionText =
     propDescription ||
-    (typeof settings?.websiteDesign?.["aboutDescription"] === "string"
-      ? (settings.websiteDesign["aboutDescription"] as string)
-      : DEFAULT_DESCRIPTION);
+    (locale !== "en" && isDefaultDescription
+      ? t.aboutSection.description
+      : cmsDescription || t.aboutSection.description);
 
+  const cmsStatement =
+    typeof settings?.websiteDesign?.["aboutStatement"] === "string"
+      ? (settings.websiteDesign["aboutStatement"] as string)
+      : "";
+  const isDefaultStatement = !cmsStatement || cmsStatement.trim() === STATEMENT_TEXT;
   const statementText: string =
     propStatement ||
-    (typeof settings?.websiteDesign?.["aboutStatement"] === "string"
-      ? (settings.websiteDesign["aboutStatement"] as string)
-      : STATEMENT_TEXT);
+    (locale !== "en" && isDefaultStatement
+      ? t.aboutSection.statement
+      : cmsStatement || t.aboutSection.statement);
+
+  const baseMetrics = (t.aboutSection.metrics.length > 0 ? t.aboutSection.metrics : METRICS).map(
+    (m, idx) => {
+      const refMetric = METRICS[idx];
+      const valStr = "value" in m ? m.value : refMetric?.displayFallback || "0";
+      const match = valStr.match(/^([^\d.]*)([\d.]+)(.*)$/);
+      const targetVal = match?.[2] ? parseFloat(match[2]) : refMetric?.target;
+      return {
+        label: m.label,
+        value: valStr,
+        ...(targetVal !== undefined ? { target: targetVal } : {}),
+        suffix: match?.[3] ?? refMetric?.suffix ?? "",
+        decimals: match?.[2]?.includes(".") ? (match[2].split(".")[1]?.length ?? 0) : 0,
+      };
+    },
+  );
 
   let resolvedMetrics: Array<{
     label: string;
@@ -107,15 +140,10 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
     target?: number;
     suffix?: string;
     decimals?: number;
-  }> = METRICS.map((m) => ({
-    label: m.label,
-    value: m.displayFallback,
-    target: m.target,
-    suffix: m.suffix,
-    decimals: m.decimals,
-  }));
+  }> = baseMetrics;
 
-  const rawMetrics = propMetrics || settings?.websiteDesign?.["aboutMetrics"];
+  const rawMetrics =
+    propMetrics || (locale === "en" ? settings?.websiteDesign?.["aboutMetrics"] : undefined);
   if (rawMetrics) {
     try {
       const parsed = typeof rawMetrics === "string" ? JSON.parse(rawMetrics) : rawMetrics;
@@ -126,7 +154,7 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
               item.displayFallback ??
               (item.target !== undefined
                 ? `${item.target}${item.suffix || ""}`
-                : METRICS[idx]?.displayFallback || "0"),
+                : baseMetrics[idx]?.value || "0"),
           );
           const match = valStr.match(/^([^\d.]*)([\d.]+)(.*)$/);
           const numStr = match?.[2];
@@ -140,7 +168,7 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
                 ? (numStr.split(".")[1]?.length ?? 0)
                 : 0;
           return {
-            label: item.label || METRICS[idx]?.label || "Metric",
+            label: item.label || baseMetrics[idx]?.label || "Metric",
             value: valStr,
             target,
             suffix,
@@ -392,7 +420,7 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
       }
       ctx.revert();
     };
-  }, [headingText, descriptionText, statementText, JSON.stringify(resolvedMetrics)]);
+  }, [headingText, descriptionText, statementText, JSON.stringify(resolvedMetrics), locale]);
 
   // Pointer drag handlers for 3D Look (Desktop Mouse + Mobile Touch)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -439,7 +467,9 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
             data-framer-name="Section Tag"
             className="inline-flex items-center justify-center rounded-[99px] border border-[#DEE0DD] bg-[#F7F6F2] px-[14px] py-[6px] shadow-xs"
           >
-            <span className="text-[13px] font-medium leading-[1.35] text-[#C5A059]">About Us</span>
+            <span className="text-[13px] font-medium leading-[1.35] text-[#C5A059]">
+              {t.aboutSection.badge}
+            </span>
           </div>
 
           {/* Kinetic Typography Display Heading (animateTextH) */}
@@ -498,18 +528,18 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
               ref={maskImageRef}
               data-mask-image
               src={featuredImageSrc}
-              alt="Avrasya Architectural Heritage"
+              alt={t.aboutSection.portfolioHeading}
               loading="lazy"
               className="h-full w-full object-cover object-center select-none"
             />
             {/* Scrim Overlay & Distinction Badge */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent flex items-end p-6 sm:p-10 pointer-events-none">
-              <div className="space-y-1.5 text-left text-white">
+              <div className="space-y-1.5 text-start text-white">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C5A059]">
-                  Architectural Portfolio
+                  {t.aboutSection.portfolioBadge}
                 </span>
                 <h3 className="text-[20px] font-light font-serif sm:text-[26px] lg:text-[32px]">
-                  Uncompromising Structural Craftsmanship
+                  {t.aboutSection.portfolioHeading}
                 </h3>
               </div>
             </div>

@@ -634,6 +634,486 @@ export interface CommonTranslations {
   directInquiries: string;
 }
 
+export interface ChromeTranslations {
+  navLocations: string;
+  navDestinations: string;
+  navPortfolio: string;
+  navBrandSubtitle: string;
+  menuLabel: string;
+  themeLabel: string;
+  themeLight: string;
+  themeDark: string;
+  switchToLight: string;
+  switchToDark: string;
+  selectLanguage: string;
+  changeLanguage: string;
+  languageHeader: string;
+  currencyLabel: string;
+  quickLinksTitle: string;
+  exploreTitle: string;
+  contactInfoTitle: string;
+  footerTagline: string;
+  footerCopyright: string;
+  managedUnavailable: string;
+  errorUnexpected: string;
+  errorHeading: string;
+  errorFallback: string;
+  backToHomepage: string;
+  notFoundEyebrow: string;
+  notFoundButton: string;
+  fallbackPropertyAlt: string;
+  breadcrumbAria: string;
+}
+
+export interface HeroShowcaseTranslations {
+  topBar: string;
+  headlineWord1: string;
+  headlineWord2: string;
+  headlineWord3: string;
+  headlineWord4: string;
+  subtitle: string;
+  exploreProperties: string;
+  watchLabel: string;
+  showreelLabel: string;
+  openShowreelAria: string;
+  keepScrolling: string;
+  tapuBadge: string;
+  discoverLead: string;
+  discoverCta: string;
+  highlightedServiceEyebrow: string;
+  highlightedServiceTitle: string;
+  emptyCollection: string;
+  skyCtaTitleLine1: string;
+  skyCtaTitleItalicLine2: string;
+  skyCtaSubtitle: string;
+  skyCtaPrimary: string;
+  skyCtaSecondary: string;
+}
+
+export interface ViewingModalTranslations {
+  eyebrow: string;
+  dialogTitle: string;
+  tabShowreel: string;
+  tabBooking: string;
+  closeAria: string;
+  cinemaBadge: string;
+  cinemaTitle: string;
+  statPortfolioLabel: string;
+  statPortfolioVal: string;
+  statYieldLabel: string;
+  statYieldVal: string;
+  statTapuLabel: string;
+  statTapuVal: string;
+  scheduleVisitCta: string;
+  confirmedTitle: string;
+  confirmedDesc: string;
+  doneBtn: string;
+  fieldNameLabel: string;
+  fieldNamePlaceholder: string;
+  fieldContactLabel: string;
+  fieldContactPlaceholder: string;
+  fieldDateLabel: string;
+  fieldDistrictLabel: string;
+  districtOpt1: string;
+  districtOpt2: string;
+  districtOpt3: string;
+  districtOpt4: string;
+  submitBtn: string;
+  footerNote: string;
+}
+
+export interface AboutSectionTranslations {
+  badge: string;
+  heading: string;
+  description: string;
+  statement: string;
+  portfolioBadge: string;
+  portfolioHeading: string;
+  imageAltPrefix: string;
+  metrics: Array<{ value: string; label: string }>;
+}
+
+export interface AboutPageExtendedTranslations {
+  heroEyebrow: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  stats: Array<{ number: string; label: string; desc: string }>;
+  ourStoryBadge: string;
+  ourStoryHeading: string;
+  ourStoryP1: string;
+  ourStoryP2: string;
+  officeBadgeText: string;
+  coreValuesBadge: string;
+  coreValuesHeading: string;
+  coreValuesSubtitle: string;
+  approachSteps: Array<{ step: string; title: string; desc: string }>;
+  expertiseBadge: string;
+  expertiseHeading: string;
+  expertiseItems: Array<{ tag: string; title: string; desc: string }>;
+  teamBadge: string;
+  teamHeading: string;
+  teamSubtitle: string;
+  teamMembers: Array<{ role: string; bio: string; languages: string }>;
+  partnersBadge: string;
+  partnersHeading: string;
+  partnersSubtitle: string;
+  partnerCategories: Array<{ category: string; description: string }>;
+  visitBadge: string;
+  visitHeading: string;
+  visitDesc: string;
+  officeLabel: string;
+  officeHoursLabel: string;
+  officeHoursVal: string;
+  officeEmailLabel: string;
+  officePhoneLabel: string;
+  getDirections: string;
+  directAdvisoryCta: string;
+}
+
+export interface ServicesUiTranslations {
+  highlightedService: string;
+  avrasyaDifference: string;
+  legalRepHeading: string;
+  allServicesBtn: string;
+  moreDetailsBtn: string;
+  processNavAria: string;
+  valuesBadge: string;
+  valuesHeading: string;
+  valuesSubtitle: string;
+  valuesItems: Array<{
+    number: string;
+    title: string;
+    desc: string;
+    deliverables: string[];
+  }>;
+  privateDeskBadge: string;
+  bespokeHeading: string;
+  scheduleConsultation: string;
+  timelineLabel: string;
+  months3to6: string;
+  years3: string;
+  passportBannerEyebrow: string;
+  passportBannerTitle: string;
+  passportBannerDesc: string;
+  stepLabel: string;
+  globalFreedomEyebrow: string;
+  advantagesTitle: string;
+  benefits: Array<{ title: string; desc: string }>;
+  helpfulFaqs: string;
+  importantNotice: string;
+  regulatoryNotice: string;
+  fullAdvisoryGovernance: string;
+  buildingFallbackEyebrow: string;
+  buildingFallbackTitle: string;
+  buildingFallbackBadge: string;
+  buildingFallbackTagline: string;
+  buildingFallbackHint: string;
+  passportFallbackEyebrow: string;
+  passportFallbackTitle: string;
+  passportFallbackBadge: string;
+  passportFallbackHint: string;
+  passportCoverTop: string;
+  passportCoverMain: string;
+  passportCoverSub: string;
+}
+
+export interface ProjectsShowcaseTranslations {
+  eyebrow: string;
+  heading: string;
+  subtitle: string;
+  viewDossier: string;
+  selectResidenceAria: string;
+  defaultProjects: Array<{
+    category: string;
+    year: string;
+    title: string;
+    description: string;
+  }>;
+}
+
+export interface PartnersSectionTranslations {
+  heading: string;
+  referencesAndPartners: string;
+}
+
+export interface RegionsShowcaseTranslations {
+  ourLocations: string;
+  fourRegions: string;
+  oneStandard: string;
+  locationsSubtitle: string;
+  keyDistrictsLabel: string;
+  publishedAvailableSuffix: string;
+  privatePortfolioNote: string;
+  exploreProperties: string;
+  explorePropertiesIn: string;
+  avgPriceM2: string;
+  priceGrowthYoY: string;
+  grossYield: string;
+  residencesLabel: string;
+  featuredPropertyLabel: string;
+  previousLocationAria: string;
+  nextLocationAria: string;
+  allLocationsBtn: string;
+  locationsIndexBtn: string;
+  regionNotAvailableTitle: string;
+  regionNotAvailableDesc: string;
+  availableResidencesIn: string;
+  residenceSingular: string;
+  residencesPlural: string;
+  consideredLabel: string;
+  openFullFilter: string;
+  requestShortlist: string;
+  browseIstanbul: string;
+  regionDescriptions: Record<string, string>;
+  locationCards: Record<
+    string,
+    { title: string; subtitle: string; description: string; featuredDistrict: string }
+  >;
+}
+
+export interface PropertiesExtraTranslations {
+  everyResidence: string;
+  considered: string;
+  countIntroPrefix: string;
+  residenceCountSuffix: string;
+  labelLocation: string;
+  labelPropertyType: string;
+  labelPrice: string;
+  labelBedrooms: string;
+  labelSide: string;
+  searchBtn: string;
+  moreFilters: string;
+  grid: string;
+  list: string;
+  map: string;
+  listView: string;
+  neighborhood: string;
+  allNeighborhoods: string;
+  category: string;
+  allCategories: string;
+  project: string;
+  allDevelopments: string;
+  completionStatus: string;
+  anyStatus: string;
+  ready: string;
+  underConstruction: string;
+  offPlan: string;
+  minArea: string;
+  maxArea: string;
+  minPrice: string;
+  maxPrice: string;
+  atlasEyebrow: string;
+  atlasTitle: string;
+  atlasHint: string;
+  atlasFooter: string;
+  portfolioPackage: string;
+  combinableCbi: string;
+  viewResidence: string;
+  viewShort: string;
+  inLocationPrefix: string;
+  typeLabels: {
+    single_unit: string;
+    package: string;
+    project: string;
+  };
+  detail: {
+    photoUnavailable: string;
+    downPayment: string;
+    atDelivery: string;
+    allCategory: string;
+    neighborhood: string;
+    propertyCategory: string;
+    livingRooms: string;
+    floorNumber: string;
+    totalFloors: string;
+    furnishingStatus: string;
+    completionStatus: string;
+    constructionYear: string;
+    propertyCondition: string;
+    heatingSystem: string;
+    viewOrientation: string;
+    orientation: string;
+    balconyTerrace: string;
+    gardenOutdoor: string;
+    parking: string;
+    energyClass: string;
+    propertyFeatures: string;
+    feesNotesHeading: string;
+    additionalFees: string;
+    rentalYield: string;
+    capitalGrowth: string;
+    citizenshipNote: string;
+    paymentPlansHeading: string;
+    totalPrice: string;
+    downPaymentShare: string;
+    numPayments: string;
+    regularPayment: string;
+    paymentLabel: string;
+    monthLabel: string;
+    packageContents: string;
+    unitIncludedFallback: string;
+    docsWalkthroughEyebrow: string;
+    documentFallback: string;
+    watchVideo: string;
+    view3dModel: string;
+    locationConnectivityEyebrow: string;
+    mapLocationFor: string;
+    galleryAria: string;
+    closeLightboxAria: string;
+    formerlyAdvertised: string;
+    sourceListPrice: string;
+    installmentOption: string;
+    installmentSchedule: string;
+    installmentsLabel: string;
+    monthsSuffix: string;
+    downShort: string;
+    developerFallback: string;
+    deliveryLabel: string;
+    blockLabel: string;
+    floorLabel: string;
+    unitLabel: string;
+  };
+}
+
+export interface BosphorusAndWhyExtraTranslations {
+  chooseNeighborhood: string;
+  areasSuffix: string;
+  areaLabel: string;
+  sideSuffix: string;
+  returnLabel: string;
+  districtOverview: string;
+  refLabel: string;
+  expectedReturn: string;
+  priceRange: string;
+  perM2Usd: string;
+  expectedRentalReturn: string;
+  usdIndexedLeases: string;
+  airportTravel: string;
+  valueGrowth: string;
+  indicativeDisclaimer: string;
+  whyLoveNeighborhood: string;
+  titleDeedLabel: string;
+  tenantProfileLabel: string;
+  lifeInIstanbul: string;
+  intlSchools: string;
+  intlSchoolsDesc: string;
+  worldHealthcare: string;
+  worldHealthcareDesc: string;
+  modernTransit: string;
+  modernTransitDesc: string;
+  exploreAvailableHomes: string;
+  timelineWeeks: Record<string, string>;
+  strategyProfileLabel: string;
+  expectedNetReturnLabel: string;
+  targetProfileLabel: string;
+  keyFeaturesLabel: string;
+  recommendedHoldLabel: string;
+  browseMatchingBtn: string;
+  whyDistricts: Array<{
+    name: string;
+    category: string;
+    tagline: string;
+    features: string[];
+  }>;
+  corridors: Record<
+    string,
+    {
+      name: string;
+      subName: string;
+      tagline: string;
+      appreciation: string;
+      airportTime: string;
+      tenantProfile: string;
+      titleDeedStatus: string;
+      keyStrengths: string[];
+    }
+  >;
+}
+
+export interface CalculatorExtraTranslations {
+  presetsLabel: string;
+  cbiBadge: string;
+  approxPrefix: string;
+  netUsdNote: string;
+  perYearThreeYr: string;
+  estimateDisclaimer: string;
+  law4721Title: string;
+  law4721Sub: string;
+  law4721Desc: string;
+  law3065Title: string;
+  law3065Sub: string;
+  law3065Desc: string;
+  tcmbTitle: string;
+  tcmbSub: string;
+  tcmbDesc: string;
+  returnAnalysisBadge: string;
+  usdEurLeases: string;
+  yieldSubtitle: string;
+  perYearSuffix: string;
+  perMonthSuffix: string;
+  operatingDeductionsHeading: string;
+  yrShort: string;
+  moShort: string;
+  usdPerYr: string;
+  netMonthlyLabel: string;
+  totalAnnualOverhead: string;
+  threeYrCashflow: string;
+  fiveYrCashflow: string;
+  requestHighYieldBtn: string;
+  turkishCbiProgram: string;
+  law5901: string;
+  minCbiBtn: string;
+  bufferBtn: string;
+  familyComposition: string;
+  applicantsSuffix: string;
+  primaryInvestor: string;
+  primaryInvestorDesc: string;
+  oneMandatory: string;
+  spouseRegisteredDesc: string;
+  under18Label: string;
+  postAcquisitionBadge: string;
+  immLabel: string;
+  municipalTaxTitle: string;
+  municipalTaxSub: string;
+  annualAidatSuffix: string;
+  monthlyLabel: string;
+}
+
+export interface EnquiryExtraTranslations {
+  servicesList: string[];
+  topicPills: Array<{ id: string; label: string; full: string }>;
+  budgetPresets: Array<{ label: string; value: string }>;
+  requirementTags: string[];
+  targetRegionLabel: string;
+  regionsList: string[];
+  quickTagsLabel: string;
+  reassuranceText: string;
+  connectWhatsappSuffix: string;
+  receiptBriefRegistered: string;
+  receiptRefLabel: string;
+  receiptDeliveredInbox: string;
+  receiptAdvisorFollowup: string;
+  receiptClientLabel: string;
+  receiptPhoneLabel: string;
+  receiptTopicLabel: string;
+  receiptBudgetLabel: string;
+  receiptMessageLabel: string;
+  chatWhatsappEnquiryBtn: string;
+  defaultTopicFallback: string;
+  contactHeroOr: string;
+}
+
+export interface LegalDraftPagesTranslations {
+  privacyTitle: string;
+  privacyTopics: string[];
+  termsTitle: string;
+  termsTopics: string[];
+  cookieTitle: string;
+  cookieTopics: string[];
+  disclaimerTitle: string;
+  disclaimerTopics: string[];
+}
+
 export interface AppTranslations {
   common: CommonTranslations;
   nav: NavTranslations;
@@ -653,4 +1133,18 @@ export interface AppTranslations {
   catalog: CatalogTranslations;
   enquiry: EnquiryTranslations;
   legalDraft: LegalDraftTranslations;
+  chrome: ChromeTranslations;
+  heroShowcase: HeroShowcaseTranslations;
+  viewingModal: ViewingModalTranslations;
+  aboutSection: AboutSectionTranslations;
+  aboutPageExtra: AboutPageExtendedTranslations;
+  servicesUi: ServicesUiTranslations;
+  projectsShowcase: ProjectsShowcaseTranslations;
+  partnersSection: PartnersSectionTranslations;
+  regionsShowcase: RegionsShowcaseTranslations;
+  propertiesExtra: PropertiesExtraTranslations;
+  bosphorusAndWhyExtra: BosphorusAndWhyExtraTranslations;
+  calculatorExtra: CalculatorExtraTranslations;
+  enquiryExtra: EnquiryExtraTranslations;
+  legalDraftPages: LegalDraftPagesTranslations;
 }

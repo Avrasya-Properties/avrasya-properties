@@ -23,6 +23,7 @@ import {
   LOCATIONS,
   PROPERTY_CATEGORIES,
   TYPE_LABEL,
+  localizedRecordTypeLabel,
   type Filters,
   type RecordType,
   type SupportedCurrency,
@@ -233,14 +234,15 @@ function PropertiesIndex() {
   }, [list.length, search.loc, search.type, search.budget, search.sort, search.layout]);
 
   const sortOptions = [
-    { key: "", label: "Featured" },
-    { key: "featured", label: "Featured First" },
-    { key: "newest", label: "Newest Listings" },
-    { key: "oldest", label: "Oldest Listings" },
+    {
+      key: "",
+      label: t.properties.allTypes === "All Record Types" ? "Featured" : t.projectsShowcase.eyebrow,
+    },
+    { key: "newest", label: t.properties.sortNewest },
     { key: "price-asc", label: t.properties.sortLowest },
     { key: "price-desc", label: t.properties.sortHighest },
-    { key: "area-desc", label: "Area: Large to Small" },
-    { key: "area-asc", label: "Area: Small to Large" },
+    { key: "area-desc", label: `${t.propertiesExtra.minArea} ↓` },
+    { key: "area-asc", label: `${t.propertiesExtra.minArea} ↑` },
   ] as const;
 
   const currentBudgetLabel =
@@ -265,7 +267,7 @@ function PropertiesIndex() {
             {t.properties.eyebrow} — {t.properties.title} {t.properties.titleEm}
           </p>
           <h1 className="m-0 text-[52px] font-normal leading-[1.03] tracking-[-0.04em] text-[#163038] sm:text-[76px] lg:text-[112px]">
-            <span>Every residence,</span>
+            <span>{t.propertiesExtra.everyResidence}</span>
             <br />
             <span
               className="italic font-normal tracking-[-0.02em] text-[#163038]"
@@ -273,7 +275,7 @@ function PropertiesIndex() {
                 fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif',
               }}
             >
-              considered.
+              {t.propertiesExtra.considered}
             </span>
           </h1>
         </div>
@@ -284,8 +286,7 @@ function PropertiesIndex() {
             {formattedCount}
           </div>
           <p className="m-0 text-[15px] font-normal leading-[1.45] tracking-[-0.01em] text-[#5C6F73]">
-            Residences and verified packages available now across Istanbul, Bodrum, Antalya and
-            Sakarya.
+            {t.propertiesExtra.residenceCountSuffix}
           </p>
         </div>
       </section>
@@ -304,7 +305,7 @@ function PropertiesIndex() {
               htmlFor="f-district"
               className="text-[10px] font-semibold uppercase leading-[1.2] tracking-[0.14em] text-[#5C6F73]"
             >
-              LOCATION
+              {t.propertiesExtra.labelLocation}
             </label>
             <div className="relative flex items-center">
               <select
@@ -330,7 +331,7 @@ function PropertiesIndex() {
               htmlFor="f-record-type"
               className="text-[10px] font-semibold uppercase leading-[1.2] tracking-[0.14em] text-[#5C6F73]"
             >
-              PROPERTY TYPE
+              {t.propertiesExtra.labelPropertyType}
             </label>
             <div className="relative flex items-center">
               <select
@@ -342,7 +343,7 @@ function PropertiesIndex() {
                 <option value="">{t.properties.allTypes}</option>
                 {(Object.keys(TYPE_LABEL) as RecordType[]).map((rt) => (
                   <option key={rt} value={rt}>
-                    {TYPE_LABEL[rt]}
+                    {localizedRecordTypeLabel(rt, t.common, t.propertiesExtra.typeLabels)}
                   </option>
                 ))}
               </select>
@@ -357,7 +358,7 @@ function PropertiesIndex() {
                 htmlFor="f-budget"
                 className="text-[10px] font-semibold uppercase leading-[1.2] tracking-[0.14em] text-[#5C6F73]"
               >
-                PRICE
+                {t.propertiesExtra.labelPrice}
               </label>
             </div>
             <div className="relative flex items-center">
@@ -384,7 +385,7 @@ function PropertiesIndex() {
               htmlFor="f-bedrooms"
               className="text-[10px] font-semibold uppercase leading-[1.2] tracking-[0.14em] text-[#5C6F73]"
             >
-              BEDROOMS
+              {t.propertiesExtra.labelBedrooms}
             </label>
             <div className="relative flex items-center">
               <select
@@ -413,7 +414,7 @@ function PropertiesIndex() {
             }}
             className="mt-2 inline-flex shrink-0 items-center justify-center gap-[10px] rounded-[6px] bg-[#163038] px-[32px] py-[16px] text-[14px] font-medium text-white transition-all duration-300 hover:bg-[#10785F] shadow-xs lg:mt-0 cursor-pointer"
           >
-            <span>Search</span>
+            <span>{t.propertiesExtra.searchBtn}</span>
             <span aria-hidden="true">&rarr;</span>
           </button>
         </div>
@@ -473,7 +474,7 @@ function PropertiesIndex() {
                 htmlFor="f-side"
                 className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#5C6F73]"
               >
-                Side
+                {t.propertiesExtra.labelSide}
               </label>
               <select
                 id="f-side"
@@ -519,7 +520,7 @@ function PropertiesIndex() {
               }`}
             >
               <SlidersHorizontal className="h-3 w-3" />
-              <span>More Filters</span>
+              <span>{t.propertiesExtra.moreFilters}</span>
             </button>
 
             <div
@@ -536,14 +537,14 @@ function PropertiesIndex() {
                     : "text-[#5C6F73] hover:text-[#163038]"
                 }`}
               >
-                <LayoutGrid className="h-3 w-3" /> Grid
+                <LayoutGrid className="h-3 w-3" /> {t.propertiesExtra.grid}
               </button>
               <button
                 type="button"
                 onClick={() => setParam("view", "list")}
                 className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${search.view === "list" ? "bg-[#163038] text-white" : "text-[#5C6F73] hover:text-[#163038]"}`}
               >
-                <ListIcon className="h-3 w-3" /> List
+                <ListIcon className="h-3 w-3" /> {t.propertiesExtra.list}
               </button>
               <button
                 type="button"
@@ -554,7 +555,7 @@ function PropertiesIndex() {
                     : "text-[#5C6F73] hover:text-[#163038]"
                 }`}
               >
-                <MapIcon className="h-3 w-3" /> Map
+                <MapIcon className="h-3 w-3" /> {t.propertiesExtra.map}
               </button>
             </div>
           </div>
@@ -565,14 +566,14 @@ function PropertiesIndex() {
           <div className="mt-3 grid grid-cols-1 gap-3 rounded-[8px] border border-[#DEE0DD] bg-white p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Neighborhood
+                {t.propertiesExtra.neighborhood}
               </label>
               <select
                 value={search.neighborhood ?? ""}
                 onChange={(e) => setParam("neighborhood", e.target.value || undefined)}
                 className="w-full rounded-[6px] border border-[#DEE0DD] bg-[#F7F6F2] px-3 py-1.5 text-[13px] text-[#163038]"
               >
-                <option value="">All Neighborhoods</option>
+                <option value="">{t.propertiesExtra.allNeighborhoods}</option>
                 {neighborhoodOptions.map((n) => (
                   <option key={n} value={n}>
                     {n}
@@ -583,14 +584,14 @@ function PropertiesIndex() {
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Property Category
+                {t.propertiesExtra.category}
               </label>
               <select
                 value={search.category ?? ""}
                 onChange={(e) => setParam("category", e.target.value || undefined)}
                 className="w-full rounded-[6px] border border-[#DEE0DD] bg-[#F7F6F2] px-3 py-1.5 text-[13px] text-[#163038]"
               >
-                <option value="">All Categories</option>
+                <option value="">{t.propertiesExtra.allCategories}</option>
                 {categoryOptions.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
@@ -601,14 +602,14 @@ function PropertiesIndex() {
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Development / Project
+                {t.propertiesExtra.project}
               </label>
               <select
                 value={search.project ?? ""}
                 onChange={(e) => setParam("project", e.target.value || undefined)}
                 className="w-full rounded-[6px] border border-[#DEE0DD] bg-[#F7F6F2] px-3 py-1.5 text-[13px] text-[#163038]"
               >
-                <option value="">All Developments</option>
+                <option value="">{t.propertiesExtra.allDevelopments}</option>
                 {projectOptions.map((proj) => (
                   <option key={proj} value={proj}>
                     {proj}
@@ -619,27 +620,27 @@ function PropertiesIndex() {
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Completion Status
+                {t.propertiesExtra.completionStatus}
               </label>
               <select
                 value={search.completionStatus ?? ""}
                 onChange={(e) => setParam("completionStatus", e.target.value || undefined)}
                 className="w-full rounded-[6px] border border-[#DEE0DD] bg-[#F7F6F2] px-3 py-1.5 text-[13px] text-[#163038]"
               >
-                <option value="">Any Status</option>
-                <option value="Ready">Ready to Move</option>
-                <option value="Under Construction">Under Construction</option>
-                <option value="Off-Plan">Off-Plan</option>
+                <option value="">{t.propertiesExtra.anyStatus}</option>
+                <option value="Ready">{t.propertiesExtra.ready}</option>
+                <option value="Under Construction">{t.propertiesExtra.underConstruction}</option>
+                <option value="Off-Plan">{t.propertiesExtra.offPlan}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Min Area (m²)
+                {t.propertiesExtra.minArea}
               </label>
               <input
                 type="number"
-                placeholder="e.g. 80"
+                placeholder="80"
                 value={search.minArea ?? ""}
                 onChange={(e) =>
                   setParam("minArea", e.target.value ? Number(e.target.value) : undefined)
@@ -650,11 +651,11 @@ function PropertiesIndex() {
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Max Area (m²)
+                {t.propertiesExtra.maxArea}
               </label>
               <input
                 type="number"
-                placeholder="e.g. 500"
+                placeholder="500"
                 value={search.maxArea ?? ""}
                 onChange={(e) =>
                   setParam("maxArea", e.target.value ? Number(e.target.value) : undefined)
@@ -665,11 +666,11 @@ function PropertiesIndex() {
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Min Price (USD)
+                {t.propertiesExtra.minPrice}
               </label>
               <input
                 type="number"
-                placeholder="e.g. 250000"
+                placeholder="250000"
                 value={search.minPrice ?? ""}
                 onChange={(e) =>
                   setParam("minPrice", e.target.value ? Number(e.target.value) : undefined)
@@ -680,7 +681,7 @@ function PropertiesIndex() {
 
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#5C6F73] mb-1">
-                Max Price (USD)
+                {t.propertiesExtra.maxPrice}
               </label>
               <input
                 type="number"
@@ -704,7 +705,7 @@ function PropertiesIndex() {
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-[14px] font-normal tracking-[-0.01em] text-[#5C6F73]">
             <strong className="font-medium text-[#163038] tabular-nums">{list.length}</strong>{" "}
-            {list.length === 1 ? "residence" : "residences"}
+            {t.properties.showingCount}
           </span>
 
           <span className="text-[#163038]/20">|</span>
@@ -858,14 +859,14 @@ function PropertiesIndex() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#C5A059]">
-                    Interactive Portfolio Atlas
+                    {t.propertiesExtra.atlasEyebrow}
                   </p>
                   <h3 className="mt-1 text-xl font-medium">
-                    {list.length} Properties Mapped Across Türkiye
+                    {t.propertiesExtra.atlasTitle} ({list.length})
                   </h3>
                 </div>
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs">
-                  Click any pin to preview residence
+                  {t.propertiesExtra.atlasHint}
                 </span>
               </div>
 
@@ -900,9 +901,7 @@ function PropertiesIndex() {
                 })}
               </div>
 
-              <p className="text-xs text-white/60">
-                Coordinates verified with municipal district boundaries and cadastral parcel data.
-              </p>
+              <p className="text-xs text-white/60">{t.propertiesExtra.atlasFooter}</p>
             </div>
 
             <div>

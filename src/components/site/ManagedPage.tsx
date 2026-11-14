@@ -3,6 +3,7 @@ import { useManagedPage } from "@/data/live";
 import { sanitizeSafeUrl } from "@/lib/security";
 import { Enquiry } from "./Enquiry";
 import { ArrowRight, Quote } from "lucide-react";
+import { useTranslation } from "@/hooks/useLanguage";
 
 interface RepeatableItem {
   id: string;
@@ -32,6 +33,7 @@ export function ManagedPage({
   secondary?: boolean;
 }) {
   const q = useManagedPage(slug);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!q.data?.published || !q.data.title) return;
@@ -57,9 +59,9 @@ export function ManagedPage({
     return (
       <>
         <div role="alert" className="container-site my-6 rounded border p-4 text-sm">
-          This page's saved content is temporarily unavailable.{" "}
+          {t.chrome.managedUnavailable}{" "}
           <button className="underline" onClick={() => void q.refetch()}>
-            Try again
+            {t.common.retry}
           </button>
         </div>
         {children}

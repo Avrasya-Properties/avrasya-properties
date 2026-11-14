@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Building2, Key, CheckCircle2, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useLanguage";
 
 export interface BuildingFallbackCardProps {
   className?: string;
@@ -15,6 +16,7 @@ export interface BuildingFallbackCardProps {
  */
 export function BuildingFallbackCard({ className, interactive = true }: BuildingFallbackCardProps) {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const { t } = useTranslation();
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!interactive) return;
@@ -79,17 +81,17 @@ export function BuildingFallbackCard({ className, interactive = true }: Building
               </div>
               <div>
                 <span className="block font-mono text-[10px] uppercase tracking-wider text-[#C5A059]">
-                  Architectural Elevation
+                  {t.servicesUi.buildingFallbackEyebrow}
                 </span>
                 <span className="block font-display text-xs sm:text-sm font-semibold text-stone-100">
-                  Villa & Penthouse Model
+                  {t.servicesUi.buildingFallbackTitle}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-mono text-emerald-400">
               <CheckCircle2 className="h-3 w-3" />
-              <span>Tapu Ready</span>
+              <span>{t.servicesUi.buildingFallbackBadge}</span>
             </div>
           </div>
 
@@ -153,7 +155,7 @@ export function BuildingFallbackCard({ className, interactive = true }: Building
               </div>
               <div className="flex-1 px-3 text-center">
                 <span className="font-mono text-[9px] uppercase tracking-wider text-[#C5A059]/90">
-                  Floor-to-Ceiling Glazing · 3.4m Ceiling Height
+                  {t.servicesUi.buildingFallbackTagline}
                 </span>
               </div>
             </div>
@@ -169,10 +171,10 @@ export function BuildingFallbackCard({ className, interactive = true }: Building
           <div className="relative z-10 flex items-center justify-between border-t border-stone-800 pt-2 text-[10px] font-mono text-stone-400">
             <span className="flex items-center gap-1 text-[#C5A059]">
               <Compass className="h-3 w-3" />
-              <span>Travertine & Bronze Louvers</span>
+              <span>{t.servicesUi.buildingFallbackHint}</span>
             </span>
             <span className="uppercase tracking-wider text-stone-400">
-              Interactive 3D WebGL Ready
+              {t.servicesUi.passportFallbackHint}
             </span>
           </div>
 

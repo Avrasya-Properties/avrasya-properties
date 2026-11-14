@@ -130,9 +130,13 @@ export function CitizenshipPage() {
             <p className="text-xs text-muted-foreground">{t.home.cbiPillar3Title}</p>
           </div>
           <div className="border-l-2 border-brass pl-4">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Timeline</p>
-            <p className="font-display text-2xl font-bold text-foreground">3 – 6 Months</p>
-            <p className="text-xs text-muted-foreground">{t.citizenship.step5Duration}</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {t.citizenship.stepsEyebrow}
+            </p>
+            <p className="font-display text-2xl font-bold text-foreground">
+              {t.citizenship.step5Duration}
+            </p>
+            <p className="text-xs text-muted-foreground">{t.citizenship.step5Title}</p>
           </div>
           <div className="border-l-2 border-brass pl-4">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -147,7 +151,9 @@ export function CitizenshipPage() {
             <p className="text-xs uppercase tracking-wider text-muted-foreground">
               {t.home.cbiPillar3Title}
             </p>
-            <p className="font-display text-2xl font-bold text-foreground">3 Years</p>
+            <p className="font-display text-2xl font-bold text-foreground">
+              {t.citizenship.req4Title}
+            </p>
             <p className="text-xs text-muted-foreground">{t.home.cbiPillar3Desc}</p>
           </div>
         </div>
@@ -158,22 +164,20 @@ export function CitizenshipPage() {
         <div className="container-site grid gap-8 lg:grid-cols-12 items-center">
           <div className="lg:col-span-7">
             <span className="font-mono text-xs uppercase tracking-widest text-brass">
-              Official Naturalization Pathway · Law No. 5901
+              {t.calculatorExtra.turkishCbiProgram} · {t.calculatorExtra.law5901}
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-on-dark mt-2">
-              Sovereign Citizenship & Passport Delivery
+              {t.citizenship.title} {t.citizenship.titleEm}
             </h2>
             <p className="mt-3 text-sm sm:text-base leading-relaxed text-on-dark-muted max-w-xl">
-              Qualify for Turkish citizenship through a $400,000 real estate acquisition. Your full
-              family—spouse and children under 18—obtains full citizenship and biometric passports
-              with complete bar-certified legal oversight.
+              {t.citizenship.description}
             </p>
             <div className="mt-6 flex flex-wrap gap-4 text-xs font-mono">
               <div className="rounded-xs border border-brass/30 bg-brass/10 px-3 py-1.5 text-brass">
-                ✓ Visa-free travel to 110+ destinations
+                ✓ {t.home.cbiPillar1Title}
               </div>
               <div className="rounded-xs border border-white/20 bg-white/5 px-3 py-1.5 text-on-dark-muted">
-                ✓ Full dual citizenship rights
+                ✓ {t.home.cbiPillar2Title}
               </div>
             </div>
           </div>
@@ -220,7 +224,7 @@ export function CitizenshipPage() {
                 className="range-luxury my-3"
               />
               <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
-                <span>$400,000 (Min Threshold)</span>
+                <span>$400,000 ({t.calculatorExtra.minCbiBtn})</span>
                 <span>$1,000,000</span>
                 <span>$2,000,000+</span>
               </div>
@@ -292,7 +296,7 @@ export function CitizenshipPage() {
                   {t.citizenship.breakdownTitle}
                 </h3>
                 <span className="rounded bg-brass/10 px-3 py-1 text-xs font-semibold text-brass">
-                  {totalApplicants} {totalApplicants === 1 ? "Passport" : "Passports"} Included
+                  {totalApplicants} {t.calculatorExtra.applicantsSuffix}
                 </span>
               </div>
 
@@ -350,7 +354,9 @@ export function CitizenshipPage() {
                   <p className="font-display text-3xl font-bold text-brass tabular-nums">
                     ${new Intl.NumberFormat("en-US").format(estimatedTotal)}
                   </p>
-                  <p className="text-[11px] text-muted-foreground font-mono">USD Net Estimate</p>
+                  <p className="text-[11px] text-muted-foreground font-mono">
+                    {t.calculatorExtra.netUsdNote}
+                  </p>
                 </div>
               </div>
 
@@ -382,10 +388,7 @@ export function CitizenshipPage() {
             <h2 className="font-display text-3xl font-semibold md:text-4xl text-on-dark">
               {t.citizenship.stepsTitle}
             </h2>
-            <p className="mt-3 text-on-dark-muted">
-              Every step is handled with independent legal oversight to make your application
-              smooth, safe, and completely predictable.
-            </p>
+            <p className="mt-3 text-on-dark-muted">{t.citizenship.description}</p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -414,9 +417,9 @@ export function CitizenshipPage() {
       {/* Benefits Grid */}
       <section className="container-site py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="eyebrow">Global Freedom & Security</p>
+          <p className="eyebrow">{t.citizenship.keyRequirementsEyebrow}</p>
           <h2 className="font-display text-3xl font-semibold md:text-4xl">
-            Advantages of Turkish Citizenship
+            {t.citizenship.keyRequirementsTitle}
           </h2>
         </div>
 
@@ -437,7 +440,7 @@ export function CitizenshipPage() {
       </section>
 
       {/* Questions & Legal Clarification */}
-      <Margin label="Helpful FAQs">
+      <Margin label={t.services.faqEyebrow}>
         <div className="space-y-6">
           {faqs.map(([q, a]) => (
             <div key={q} className="rounded-lg border bg-card p-6">
@@ -449,16 +452,10 @@ export function CitizenshipPage() {
       </Margin>
 
       {/* Strict Compliance Disclaimer */}
-      <Margin label="Important Notice">
+      <Margin label={t.servicesUi.importantNotice}>
         <div className="rounded-xl border-l-4 border-brass bg-card p-6 text-sm leading-relaxed text-muted-foreground">
-          <p className="font-semibold text-foreground mb-1">Regulatory & Compliance Notice</p>
-          <p>
-            Avrasya Properties provides dedicated property advisory and transaction support. Final
-            citizenship approval is granted by the Republic of Türkiye Ministry of Interior
-            Directorate of Migration Management. Every property in our collection is independently
-            appraised by licensed experts, and all legal filings are handled by certified members of
-            the Istanbul Bar Association.
-          </p>
+          <p className="font-semibold text-foreground mb-1">{t.servicesUi.legalRepHeading}</p>
+          <p>{t.servicesUi.regulatoryNotice}</p>
         </div>
       </Margin>
 

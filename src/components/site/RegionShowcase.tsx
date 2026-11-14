@@ -50,7 +50,7 @@ export function RegionShowcase({
   regions: Region[];
   properties: PropertyRecord[];
 }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   // Guarantee key regions (Istanbul, Antalya, Bodrum, etc.) are always present for the editorial showcase
   const effectiveRegions: Region[] =
@@ -73,11 +73,17 @@ export function RegionShowcase({
       (listings[0] ? getPropertyMedia(listings[0]).cover : "") ||
       REGION_FALLBACK_IMAGES[region.slug] ||
       "/images/properties/hero-main.jpg";
+    const localizedDesc = t.regionsShowcase.regionDescriptions[region.slug];
+    const localizedCardTitle = t.regionsShowcase.locationCards[region.slug]?.title;
+    const displayName = locale !== "en" && localizedCardTitle ? localizedCardTitle : region.name;
     const description =
-      region.summary?.trim() ||
-      REGION_DESCRIPTIONS[region.slug] ||
-      "Curated luxury residences, verified title deeds, and premier investment opportunities.";
-    return { region, count: listings.length, cover, description };
+      locale !== "en" && localizedDesc
+        ? localizedDesc
+        : region.summary?.trim() ||
+          REGION_DESCRIPTIONS[region.slug] ||
+          localizedDesc ||
+          t.regionsShowcase.privatePortfolioNote;
+    return { region, displayName, count: listings.length, cover, description };
   });
 
   const [activeSlug, setActiveSlug] = useState<string>(rows[0]?.region.slug || "istanbul");
@@ -111,7 +117,7 @@ export function RegionShowcase({
           </p>
 
           <div className="mt-10 border-t border-[#DEE0DD]">
-            {rows.map(({ region, count, cover, description }, i) => {
+            {rows.map(({ region, displayName, count, cover, description }, i) => {
               const isOpen = activeSlug === region.slug;
               return (
                 <div
@@ -152,7 +158,7 @@ export function RegionShowcase({
                           fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif',
                         }}
                       >
-                        {region.name}
+                        {displayName}
                       </span>
                       <span className="mt-1 block truncate text-xs text-[#5C6F73]">
                         {region.country}
@@ -191,16 +197,16 @@ export function RegionShowcase({
                         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[12px] bg-[#163038]/10 lg:hidden">
                           <img
                             src={cover}
-                            alt={`${region.name} real estate`}
+                            alt={`${displayName}`}
                             className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                             loading="lazy"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                          <div className="absolute bottom-3 left-3 text-white">
+                          <div className="absolute bottom-3 start-3 text-white">
                             <p className="text-xs uppercase tracking-widest text-[#C5A059]">
                               {region.country}
                             </p>
-                            <p className="text-xl font-medium">{region.name}</p>
+                            <p className="text-xl font-medium">{displayName}</p>
                           </div>
                         </div>
 
@@ -211,9 +217,9 @@ export function RegionShowcase({
                           {/* District badges */}
                           {region.districts.length > 0 && (
                             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                              <span className="text-[11px] font-medium text-[#5C6F73] flex items-center gap-1 mr-1">
+                              <span className="text-[11px] font-medium text-[#5C6F73] flex items-center gap-1 me-1">
                                 <MapPin className="h-3 w-3 text-[#C5A059]" />
-                                Key Districts:
+                                {t.regionsShowcase.keyDistrictsLabel}
                               </span>
                               {region.districts.slice(0, 5).map((d) => (
                                 <span
@@ -233,8 +239,8 @@ export function RegionShowcase({
                             <Building2 className="h-4 w-4 text-[#C5A059]" />
                             <span>
                               {count > 0
-                                ? `${count} published residences available`
-                                : "Private investment portfolio available on request"}
+                                ? `${count} ${t.regionsShowcase.publishedAvailableSuffix}`
+                                : t.regionsShowcase.privatePortfolioNote}
                             </span>
                           </div>
 
@@ -243,7 +249,7 @@ export function RegionShowcase({
                             search={{ region: region.slug }}
                             className="group inline-flex items-center gap-2 rounded-full bg-[#163038] px-5 py-2.5 text-xs font-semibold text-white no-underline shadow-sm transition-all duration-300 hover:bg-[#10785F] hover:shadow-md"
                           >
-                            <span>Explore Properties</span>
+                            <span>{t.regionsShowcase.exploreProperties}</span>
                             <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                           </Link>
                         </div>
@@ -285,7 +291,7 @@ export function RegionShowcase({
                   fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif',
                 }}
               >
-                {current.region.name}
+                {current.displayName}
               </p>
               <p className="mt-3 line-clamp-3 max-w-sm text-xs leading-relaxed text-white/80">
                 {current.description}
@@ -296,7 +302,9 @@ export function RegionShowcase({
                   search={{ region: current.region.slug }}
                   className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-medium text-white backdrop-blur-sm transition-all hover:bg-white hover:text-[#163038]"
                 >
-                  <span>Explore Properties in {current.region.name}</span>
+                  <span>
+                    {t.regionsShowcase.explorePropertiesIn} {current.displayName}
+                  </span>
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>

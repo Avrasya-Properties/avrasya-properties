@@ -7,13 +7,14 @@ import { CaldrenViewingModal } from "@/components/framer/CaldrenViewingModal";
 import type { SiteSettings } from "@/admin/demo";
 import { recordPublicEnquiry } from "@/admin/store";
 import type { PropertyRecord } from "@/data/properties";
+import { useTranslation } from "@/hooks/useLanguage";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 export interface CaldrenHeroSectionProps {
-  settings: SiteSettings;
+  settings?: Partial<SiteSettings>;
   locale?: string;
   t?: any;
   featuredProperty?: PropertyRecord | undefined;
@@ -63,8 +64,16 @@ export function calculateHero3DTilt(
 
 export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
   settings,
+  locale: propLocale,
+  t: propT,
   featuredProperty,
 }) => {
+  const { t: hookT, locale: hookLocale } = useTranslation();
+  const t =
+    propT && typeof propT === "object" && "heroShowcase" in propT && propT.heroShowcase
+      ? (propT as typeof hookT)
+      : hookT;
+  const activeLocale = propLocale || hookLocale;
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"showreel" | "viewing">("showreel");
 
@@ -104,23 +113,41 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
     : "Beşiktaş, Istanbul · From $420,000";
 
   const rawHeadline =
-    (typeof settings.websiteDesign?.["heroHeadline"] === "string"
+    (typeof settings?.websiteDesign?.["heroHeadline"] === "string"
       ? (settings.websiteDesign["heroHeadline"] as string)
-      : "") || settings.heroHeadline;
+      : "") || settings?.heroHeadline;
+  const defaultHeadlines = new Set([
+    "Curated Offers & Developments in Istanbul.",
+    "Exceptional spaces, thoughtfully presented.",
+  ]);
+  const localizedHeadlineWords = [
+    t.heroShowcase.headlineWord1,
+    t.heroShowcase.headlineWord2,
+    t.heroShowcase.headlineWord3,
+    t.heroShowcase.headlineWord4,
+  ].filter(Boolean);
   const headlineWords =
-    rawHeadline && rawHeadline.trim()
-      ? rawHeadline.trim().split(/\s+/)
-      : ["Exceptional", "spaces,", "thoughtfully", "presented."];
+    activeLocale !== "en" && (!rawHeadline || defaultHeadlines.has(rawHeadline.trim()))
+      ? localizedHeadlineWords
+      : rawHeadline && rawHeadline.trim()
+        ? rawHeadline.trim().split(/\s+/)
+        : localizedHeadlineWords;
 
-  const heroSubtitle =
-    (typeof settings.websiteDesign?.["heroSubtitle"] === "string"
+  const rawHeroSubtitle =
+    (typeof settings?.websiteDesign?.["heroSubtitle"] === "string"
       ? (settings.websiteDesign["heroSubtitle"] as string)
-      : "") ||
-    settings.heroSubtitle ||
-    "Residences, penthouses and new developments selected for architecture, address and light.";
+      : "") || settings?.heroSubtitle;
+  const defaultSubtitles = new Set([
+    "Residences, penthouses and new developments selected for architecture, address and light.",
+    "Residences, penthouses and new developments across Istanbul and the Turkish coast, selected for architecture, location and long-term value.",
+  ]);
+  const heroSubtitle =
+    activeLocale !== "en" && (!rawHeroSubtitle || defaultSubtitles.has(rawHeroSubtitle.trim()))
+      ? t.heroShowcase.subtitle
+      : rawHeroSubtitle || t.heroShowcase.subtitle;
 
   const heroMainImage =
-    (typeof settings.websiteDesign?.["heroMain"] === "string" &&
+    (typeof settings?.websiteDesign?.["heroMain"] === "string" &&
     settings.websiteDesign["heroMain"].trim().length > 0
       ? (settings.websiteDesign["heroMain"] as string)
       : "") ||
@@ -443,7 +470,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [activeLocale]);
 
   return (
     <section
@@ -468,7 +495,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
         className="relative z-[2] flex h-[44px] sm:h-[48px] w-full items-center justify-center px-4 text-center"
       >
         <p className="text-[10px] sm:text-[10.5px] font-medium uppercase tracking-[0.22em] text-white/85">
-          AVRASYA — LUXURY REAL ESTATE &amp; PROPERTY ADVISORY
+          {t.heroShowcase.topBar}
         </p>
       </div>
 
@@ -536,7 +563,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                 to="/properties"
                 className="group inline-flex h-[42px] items-center gap-[10px] rounded-full bg-[#163038] py-[5px] pr-[5px] pl-[16px] text-[12.5px] font-medium text-white no-underline shadow-md transition-all duration-300 hover:bg-[#10785F] active:scale-[0.98]"
               >
-                <span>Explore Properties</span>
+                <span>{t.heroShowcase.exploreProperties}</span>
                 <span className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-white text-[#163038] transition-transform duration-300 group-hover:translate-x-0.5">
                   <svg
                     width="14"
@@ -584,7 +611,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                     </svg>
                   </span>
                 </span>
-                <span>Showreel</span>
+                <span>{t.heroShowcase.showreelLabel}</span>
               </button>
             </div>
 
@@ -622,7 +649,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
               data-framer-name="Showreel"
               className="group inline-flex cursor-pointer items-center gap-[16px] border-0 bg-transparent p-0 text-[11px] font-medium uppercase tracking-[0.18em] text-[#163038] lg:absolute lg:top-[225px] lg:left-[48px] xl:left-[80px] 2xl:left-[110px] lg:z-[3]"
             >
-              <span>Watch</span>
+              <span>{t.heroShowcase.watchLabel}</span>
               <span className="relative block h-[54px] w-[54px] shrink-0">
                 <span
                   ref={pulseRingRef}
@@ -651,7 +678,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                   </span>
                 </span>
               </span>
-              <span>Showreel</span>
+              <span>{t.heroShowcase.showreelLabel}</span>
             </button>
 
             {/* 2. Left Column Intro Copy & Desktop Explore Properties Pill */}
@@ -668,7 +695,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                 to="/properties"
                 className="group inline-flex h-[46px] items-center gap-[14px] rounded-full bg-[#163038] py-[6px] pr-[6px] pl-[20px] text-[13px] font-medium text-white no-underline shadow-md transition-all duration-300 hover:bg-[#10785F] hover:shadow-lg"
               >
-                <span>Explore Properties</span>
+                <span>{t.heroShowcase.exploreProperties}</span>
                 <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white text-[#163038] transition-transform duration-300 group-hover:translate-x-0.5">
                   <svg
                     width="15"
@@ -716,11 +743,11 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
               ref={keepScrollingRef}
               type="button"
               onClick={scrollToNextSection}
-              aria-label="Keep scrolling"
+              aria-label={t.heroShowcase.keepScrolling}
               data-framer-name="Keep Scrolling"
               className="inline-flex cursor-pointer items-center gap-[10px] border-0 bg-transparent p-0 text-[11px] font-medium uppercase tracking-[0.18em] text-[#163038] transition-opacity hover:opacity-75 lg:absolute lg:top-[180px] lg:right-[48px] xl:right-[80px] 2xl:right-[110px] lg:z-[3]"
             >
-              <span>Keep scrolling</span>
+              <span>{t.heroShowcase.keepScrolling}</span>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path
                   d="M10 18.3333C13.4417 18.3333 16.25 15.525 16.25 12.0833V7.91667C16.25 4.475 13.4417 1.66667 10 1.66667C6.55833 1.66667 3.75 4.475 3.75 7.91667V12.0833C3.75 15.525 6.55833 18.3333 10 18.3333Z"
@@ -781,7 +808,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                     {pinSubtitle}
                   </span>
                   <span className="text-[9px] font-medium uppercase tracking-[0.1em] text-[#10785F]">
-                    Tapu Ready &middot; CBI Eligible
+                    {t.heroShowcase.tapuBadge}
                   </span>
                 </Link>
               </div>
@@ -791,10 +818,10 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
             <div
               ref={discoverRef}
               data-framer-name="Discover"
-              className="flex max-w-[240px] flex-col items-start gap-[12px] text-left lg:absolute lg:top-[375px] lg:right-[48px] xl:right-[80px] 2xl:right-[110px] lg:z-[3]"
+              className="flex max-w-[240px] flex-col items-start gap-[12px] text-start lg:absolute lg:top-[375px] lg:right-[48px] xl:right-[80px] 2xl:right-[110px] lg:z-[3]"
             >
               <p className="text-[11px] font-normal uppercase leading-[1.55] tracking-[0.06em] text-[#163038]">
-                Curating exceptional residences across Istanbul, Bodrum, Antalya and Sakarya.
+                {t.heroShowcase.discoverLead}
               </p>
               <Link
                 to="/about"
@@ -803,7 +830,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
                 <span className="text-[13px] leading-none transition-transform duration-300 group-hover:rotate-90">
                   +
                 </span>
-                <span>DISCOVER AVRASYA</span>
+                <span>{t.heroShowcase.discoverCta}</span>
               </Link>
             </div>
           </div>
@@ -902,8 +929,8 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
             ? `${featuredProperty.location_label || featuredProperty.city} · Türkiye`
             : "Beşiktaş · Istanbul, Türkiye"
         }
-        agentEmail={settings.email}
-        agentPhone={settings.phone}
+        agentEmail={settings?.email ?? ""}
+        agentPhone={settings?.phone ?? ""}
         onSubmitInquiry={handleViewingSubmit}
       />
     </section>
