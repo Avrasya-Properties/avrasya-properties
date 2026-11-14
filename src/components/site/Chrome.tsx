@@ -266,122 +266,125 @@ export function Header() {
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Full-Screen Accessible Mobile Navigation Drawer Overlay (< xl) */}
-        {open && (
-          <div
-            id="mobile-nav"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile Navigation Drawer"
-            className="fixed inset-0 z-[100] flex flex-col justify-between bg-[#163038]/98 px-6 py-6 text-white backdrop-blur-2xl transition-all duration-300 xl:hidden animate-in fade-in slide-in-from-top-2"
+      {/* Full-Screen Accessible Mobile Navigation Drawer Overlay (< xl)
+          Rendered as a sibling of <header> so <header>'s backdrop-blur-md does not
+          create a 72px containing block for `position: fixed; inset: 0`. */}
+      {open && (
+        <div
+          id="mobile-nav"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation Drawer"
+          style={{ fontFamily: '"Geist", "Inter", sans-serif' }}
+          className="fixed inset-0 z-[100] flex h-dvh flex-col justify-between overflow-y-auto bg-[#163038] px-6 py-6 text-white xl:hidden"
+        >
+          {/* Drawer Top Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              aria-label="Avrasya Properties — Home"
+              className="inline-flex items-center no-underline"
+            >
+              <Logo className="h-8 max-w-[140px]" variant="light" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label={t.nav.closeMenu || "Close navigation"}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-[#163038] cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Drawer Nav Links List */}
+          <nav
+            aria-label="Mobile Navigation Links"
+            className="flex flex-col gap-1.5 py-4 overflow-y-auto"
           >
-            {/* Drawer Top Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <Link
-                to="/"
-                onClick={() => setOpen(false)}
-                aria-label="Avrasya Properties — Home"
-                className="inline-flex items-center no-underline"
-              >
-                <Logo className="h-8 max-w-[140px]" variant="light" />
-              </Link>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label={t.nav.closeMenu || "Close navigation"}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-[#163038] cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
+            {dynamicNavItems.map((item, idx) => {
+              const active =
+                item.to === "/"
+                  ? pathname === "/"
+                  : pathname === item.to || pathname.startsWith(`${item.to}/`);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-lg font-light tracking-wide no-underline transition-colors ${
+                    active
+                      ? "bg-white/15 text-white font-normal"
+                      : "text-white/95 hover:bg-white/10 active:bg-white/15"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  <span className="text-xs text-white/40 font-mono">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Drawer Footer with Language, Currency & Direct Contacts */}
+          <div className="border-t border-white/10 pt-4 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase tracking-widest text-[#C5A059]">Language</span>
+              <LanguageSwitcher variant="navbar" />
             </div>
 
-            {/* Drawer Nav Links List */}
-            <nav
-              aria-label="Mobile Navigation Links"
-              className="flex flex-col gap-1.5 py-4 overflow-y-auto"
-            >
-              {dynamicNavItems.map((item, idx) => {
-                const active =
-                  item.to === "/"
-                    ? pathname === "/"
-                    : pathname === item.to || pathname.startsWith(`${item.to}/`);
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setOpen(false)}
-                    className={`flex items-center justify-between rounded-xl px-4 py-3 text-lg font-light tracking-wide no-underline transition-colors ${
-                      active
-                        ? "bg-white/15 text-white font-normal"
-                        : "text-white/95 hover:bg-white/10 active:bg-white/15"
-                    }`}
-                  >
-                    <span>{item.label}</span>
-                    <span className="text-xs text-white/40 font-mono">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                  </Link>
-                );
-              })}
-            </nav>
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase tracking-widest text-[#C5A059]">Currency</span>
+              <select
+                aria-label="Display currency mobile"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
+                className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white cursor-pointer"
+              >
+                <option value="USD" className="text-neutral-900">
+                  USD ($)
+                </option>
+                <option value="EUR" className="text-neutral-900">
+                  EUR (€)
+                </option>
+                <option value="GBP" className="text-neutral-900">
+                  GBP (£)
+                </option>
+                <option value="TRY" className="text-neutral-900">
+                  TRY (₺)
+                </option>
+              </select>
+            </div>
 
-            {/* Drawer Footer with Language, Currency & Direct Contacts */}
-            <div className="border-t border-white/10 pt-4 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-widest text-[#C5A059]">Language</span>
-                <LanguageSwitcher variant="navbar" />
-              </div>
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <a
+                href={contact.whatsapp}
+                target="_blank"
+                rel="noreferrer"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#10785F] py-2.5 text-xs font-semibold text-white no-underline transition-colors hover:bg-[#0c5d49]"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+                <span>WhatsApp</span>
+              </a>
 
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-widest text-[#C5A059]">Currency</span>
-                <select
-                  aria-label="Display currency mobile"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-                  className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white cursor-pointer"
+              {ctaConfig.is_visible !== false && (
+                <Link
+                  to={ctaConfig.href || "/contact"}
+                  onClick={() => setOpen(false)}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/10 py-2.5 text-xs font-medium text-white no-underline transition-colors hover:bg-white hover:text-[#163038]"
                 >
-                  <option value="USD" className="text-neutral-900">
-                    USD ($)
-                  </option>
-                  <option value="EUR" className="text-neutral-900">
-                    EUR (€)
-                  </option>
-                  <option value="GBP" className="text-neutral-900">
-                    GBP (£)
-                  </option>
-                  <option value="TRY" className="text-neutral-900">
-                    TRY (₺)
-                  </option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <a
-                  href={contact.whatsapp}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#10785F] py-2.5 text-xs font-semibold text-white no-underline transition-colors hover:bg-[#0c5d49]"
-                >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  <span>WhatsApp</span>
-                </a>
-
-                {ctaConfig.is_visible !== false && (
-                  <Link
-                    to={ctaConfig.href || "/contact"}
-                    onClick={() => setOpen(false)}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/10 py-2.5 text-xs font-medium text-white no-underline transition-colors hover:bg-white hover:text-[#163038]"
-                  >
-                    <span>{ctaConfig.label || t.nav.bookConsultation || "Contact"}</span>
-                    <span>→</span>
-                  </Link>
-                )}
-              </div>
+                  <span>{ctaConfig.label || t.nav.bookConsultation || "Contact"}</span>
+                  <span>→</span>
+                </Link>
+              )}
             </div>
           </div>
-        )}
-      </header>
+        </div>
+      )}
     </>
   );
 }
@@ -613,20 +616,12 @@ export function Footer() {
           data-framer-name="Top Content"
           className="flex flex-col justify-between gap-12 lg:flex-row lg:items-start lg:gap-10"
         >
-          {/* Left Column (.framer-15ub24g: width 247px, rounded 12px image card + tagline + Avrasya Logo) */}
-          <div data-ftr-col className="flex w-full max-w-[247px] flex-col items-start gap-[24px]">
-            <div className="relative h-[206px] w-full overflow-hidden rounded-[12px] bg-[#10242A] border border-white/10 p-6 flex items-center justify-center">
-              <img
-                src={resolvePlaceholderSrc(PLACEHOLDER_IMAGES.footer.featureCard)}
-                alt={PLACEHOLDER_IMAGES.footer.featureCard.alt}
-                loading="lazy"
-                className="block h-full w-full object-contain object-center"
-              />
-            </div>
+          {/* Left Column: White Avrasya Logo + Tagline (no symbol box, no border) */}
+          <div data-ftr-col className="flex w-full max-w-[247px] flex-col items-start gap-[20px]">
+            <Logo className="h-12 sm:h-14 w-auto opacity-95" variant="light" />
             <p className="text-[15px] font-normal leading-[1.45] text-white whitespace-pre-line">
               {footerNote}
             </p>
-            <Logo className="h-8 opacity-90" variant="light" />
           </div>
 
           {/* Right Columns: Dynamic Navigation Columns + Contact Info Column (.framer-vchq4r) */}
@@ -843,6 +838,11 @@ export function Footer() {
               </Link>
               <LanguageSwitcher variant="footer" />
             </div>
+          </div>
+
+          {/* Small credit tag at the end of everything */}
+          <div className="flex items-center justify-center pt-1 text-[11px] tracking-[0.08em] text-white/50">
+            <span>Built by Zarif</span>
           </div>
         </div>
       </div>

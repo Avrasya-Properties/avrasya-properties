@@ -19,7 +19,7 @@ import { TRANSLATIONS, type TimelinePart, type TimelineStep } from "@/i18n";
 import { useScopedGSAP } from "@/lib/animation/context";
 import { prefersReducedMotion, gsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
-import { LazyBuildingCanvas, LazyPassportCanvas } from "@/components/3d";
+import { LazyPassportCanvas } from "@/components/3d";
 
 const STEP_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "01": Compass,
@@ -273,67 +273,14 @@ export function ServicesProcessTimeline({
                                 {step.description}
                               </p>
 
-                              {/* Mounting Container for Milestone 3 Architectural Building 3D Canvas (Step 04) */}
-                              {step.stepNumber === "04" && (
-                                <div
-                                  data-3d-building-slot
-                                  id="services-3d-building"
-                                  className="mt-6 relative w-full overflow-hidden rounded-xs border border-[#C5A059]/40 bg-stone-50/90 dark:bg-[#0c1619] p-5 backdrop-blur-xs transition-all hover:border-[#C5A059]"
-                                >
-                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-3">
-                                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xs bg-[#163038] text-[#C5A059] shadow-xs">
-                                        <Building2 className="h-5 w-5" />
-                                      </div>
-                                      <div>
-                                        <span className="font-mono text-[11px] font-semibold tracking-wider text-[#C5A059] uppercase">
-                                          3D Architectural Model
-                                        </span>
-                                        <h5 className="font-display text-sm sm:text-base font-semibold text-[#163038] dark:text-stone-100">
-                                          Modernist Residence · Title Deed (Tapu) Ready
-                                        </h5>
-                                      </div>
-                                    </div>
-                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C5A059]/30 bg-[#C5A059]/10 px-3 py-1 font-mono text-[11px] font-medium text-[#8B6B23] dark:text-[#E2C37A] self-start sm:self-auto">
-                                      <span className="h-1.5 w-1.5 rounded-full bg-[#C5A059] animate-pulse" />
-                                      Interactive 3D WebGL
-                                    </span>
-                                  </div>
-                                  <div className="mt-4 pt-4 border-t border-[#C5A059]/20">
-                                    <LazyBuildingCanvas className="w-full" interactive={true} />
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Mounting Container for Milestone 3 Turkish Passport 3D Canvas (Step 07) */}
+                              {/* Floating Turkish Passport 3D Model (Step 07) */}
                               {step.stepNumber === "07" && (
                                 <div
                                   data-3d-passport-slot
                                   id="services-3d-passport"
-                                  className="mt-6 relative w-full overflow-hidden rounded-xs border border-[#C5A059]/40 bg-stone-50/90 dark:bg-[#0c1619] p-5 backdrop-blur-xs transition-all hover:border-[#C5A059]"
+                                  className="mt-6 relative w-full"
                                 >
-                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-3">
-                                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xs bg-[#5E0016] text-[#C5A059] shadow-xs">
-                                        <Sparkles className="h-5 w-5 text-[#C5A059]" />
-                                      </div>
-                                      <div>
-                                        <span className="font-mono text-[11px] font-semibold tracking-wider text-[#C5A059] uppercase">
-                                          3D Sovereign Naturalization Asset
-                                        </span>
-                                        <h5 className="font-display text-sm sm:text-base font-semibold text-[#163038] dark:text-stone-100">
-                                          Republic of Türkiye Passport · Law No. 5901 Naturalization
-                                        </h5>
-                                      </div>
-                                    </div>
-                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5E0016]/30 bg-[#5E0016]/10 px-3 py-1 font-mono text-[11px] font-medium text-[#5E0016] dark:text-rose-200 self-start sm:self-auto">
-                                      <span className="h-1.5 w-1.5 rounded-full bg-[#C5A059] animate-pulse" />
-                                      PBR Leather & Gold Foil Emboss
-                                    </span>
-                                  </div>
-                                  <div className="mt-4 pt-4 border-t border-[#C5A059]/20">
-                                    <LazyPassportCanvas className="w-full" interactive={true} />
-                                  </div>
+                                  <LazyPassportCanvas className="w-full" interactive={true} />
                                 </div>
                               )}
                             </div>

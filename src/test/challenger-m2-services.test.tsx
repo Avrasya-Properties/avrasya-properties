@@ -195,10 +195,9 @@ describe("Empirical Challenger Suite: Milestone 2 Services & Process Timeline", 
         const stepButtons = container.querySelectorAll("button[aria-label^='Step']");
         expect(stepButtons.length).toBe(9);
 
-        // Check 3D slots
+        // Check 3D slots: building model removed from Step 04; floating passport model in Step 07
         const buildingSlot = container.querySelector("[data-3d-building-slot]");
-        expect(buildingSlot).not.toBeNull();
-        expect(buildingSlot?.id).toBe("services-3d-building");
+        expect(buildingSlot).toBeNull();
 
         const passportSlot = container.querySelector("[data-3d-passport-slot]");
         expect(passportSlot).not.toBeNull();

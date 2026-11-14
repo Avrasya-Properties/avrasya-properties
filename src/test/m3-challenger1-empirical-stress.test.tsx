@@ -393,30 +393,25 @@ describe("Empirical Challenger 1: Milestone 3 (3D WebGL Experiences & Spatial Ar
   // 5. SERVICES TIMELINE 3D MOUNTING SLOTS INTEGRITY
   // =========================================================================
   describe("Adversarial Dimension 5: Services Timeline 3D Mounting Slots", () => {
-    it("5.1: 3D Building Canvas is strictly mounted inside Step 04 ([data-3d-building-slot])", () => {
+    it("5.1: 3D Building Canvas is removed from Step 04", () => {
       const { container } = renderServicesWithProviders();
       const buildingSlot = container.querySelector("[data-3d-building-slot]");
-      expect(buildingSlot).toBeInTheDocument();
-      expect(buildingSlot?.id).toBe("services-3d-building");
-
-      // Verify the slot is within Step 04
-      const stepRow = buildingSlot?.closest("[data-step]");
-      expect(stepRow).toBeInTheDocument();
-      expect(stepRow?.getAttribute("data-step")).toBe("04");
-      expect(stepRow?.textContent).toContain("3D Architectural Model");
+      expect(buildingSlot).toBeNull();
     });
 
-    it("5.2: 3D Passport Canvas is strictly mounted inside Step 07 ([data-3d-passport-slot])", () => {
+    it("5.2: Floating 3D Passport Canvas is strictly mounted inside Step 07 ([data-3d-passport-slot]) with no border or tags", () => {
       const { container } = renderServicesWithProviders();
       const passportSlot = container.querySelector("[data-3d-passport-slot]");
       expect(passportSlot).toBeInTheDocument();
       expect(passportSlot?.id).toBe("services-3d-passport");
+      expect(passportSlot?.className).not.toContain("border");
 
       // Verify the slot is within Step 07
       const stepRow = passportSlot?.closest("[data-step]");
       expect(stepRow).toBeInTheDocument();
       expect(stepRow?.getAttribute("data-step")).toBe("07");
-      expect(stepRow?.textContent).toContain("3D Sovereign Naturalization Asset");
+      expect(stepRow?.textContent).not.toContain("3D Sovereign Naturalization Asset");
+      expect(stepRow?.textContent).not.toContain("PBR Leather & Gold Foil Emboss");
     });
 
     it("5.3: No other steps contain rogue 3D building or passport mounting slots", () => {
@@ -424,7 +419,7 @@ describe("Empirical Challenger 1: Milestone 3 (3D WebGL Experiences & Spatial Ar
       const buildingSlots = container.querySelectorAll("[data-3d-building-slot]");
       const passportSlots = container.querySelectorAll("[data-3d-passport-slot]");
 
-      expect(buildingSlots.length).toBe(1);
+      expect(buildingSlots.length).toBe(0);
       expect(passportSlots.length).toBe(1);
     });
   });
