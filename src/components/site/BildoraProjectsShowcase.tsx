@@ -334,7 +334,7 @@ export const BildoraProjectsShowcase: React.FC<BildoraProjectsShowcaseProps> = (
       ref={sectionRef}
       data-framer-name="Project"
       className="relative z-[2] w-full overflow-hidden bg-[#0E2228] pt-[60px] pb-[40px] sm:pt-[80px] lg:pt-[110px] lg:pb-[60px]"
-      style={{ fontFamily: '"Inter", sans-serif' }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       {/* Top Section Header */}
       <div

@@ -115,12 +115,18 @@ export function Header() {
   const ctaConfig = useMemo(() => {
     const rawCta = settings.headerCta;
     if (rawCta) {
+      const trimmed = rawCta.label?.trim() || "";
+      const localizedLabel =
+        locale !== "en"
+          ? !trimmed || trimmed === "Contact"
+            ? t.nav.contact
+            : trimmed === "Book Consultation"
+              ? t.nav.bookConsultation
+              : rawCta.label
+          : rawCta.label;
       return {
         ...rawCta,
-        label:
-          locale !== "en" && (!rawCta.label || rawCta.label.trim() === "Contact")
-            ? t.nav.contact
-            : rawCta.label,
+        label: localizedLabel,
       };
     }
     return {
@@ -206,20 +212,27 @@ export function Header() {
       )}
       <header
         className="sticky top-0 z-50 border-b border-[#DEE0DD] bg-[#F7F6F2]/95 backdrop-blur-md transition-all duration-300"
-        style={{ fontFamily: '"Geist", "Inter", sans-serif' }}
+        style={{ fontFamily: "var(--font-sans)" }}
       >
-        <div className="mx-auto flex h-[72px] max-w-[1312px] items-center justify-between gap-4 px-5 sm:px-8">
+        <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-2 px-4 sm:px-6 xl:gap-3">
           {/* Original Avrasya Logo Left */}
           <Link
             to="/"
             aria-label="Avrasya Properties — Home"
-            className="inline-flex min-h-11 items-center no-underline"
+            className="inline-flex min-h-11 shrink-0 items-center no-underline"
           >
-            <Logo className="h-8 max-w-[148px] sm:h-10 sm:max-w-none md:h-11" variant="auto" />
+            <Logo
+              className="h-8 max-w-[132px] sm:h-9 xl:max-w-[148px] 2xl:h-10 2xl:max-w-none"
+              variant="auto"
+            />
           </Link>
 
           {/* Center Caldren Pill Navigation with Magnetic Physics */}
-          <nav ref={navRef} aria-label="Primary" className="hidden items-center gap-1 xl:flex">
+          <nav
+            ref={navRef}
+            aria-label="Primary"
+            className="hidden min-w-0 items-center gap-0.5 xl:flex 2xl:gap-1"
+          >
             {dynamicNavItems.map((item) => {
               const active =
                 item.to === "/"
@@ -230,7 +243,7 @@ export function Header() {
                   key={item.to}
                   to={item.to}
                   data-nav-link
-                  className={`group relative overflow-hidden rounded-full px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap no-underline transition-colors duration-250 ease-out ${
+                  className={`group relative overflow-hidden rounded-full px-2.5 py-1.5 text-[12px] font-medium whitespace-nowrap no-underline transition-colors duration-250 ease-out 2xl:px-3 2xl:text-[13px] ${
                     active
                       ? "bg-[#163038] text-white shadow-xs"
                       : "text-[#163038] hover:bg-[#163038]/8"
@@ -245,7 +258,7 @@ export function Header() {
           </nav>
 
           {/* Right Utilities & Contact Pill */}
-          <div className="hidden items-center gap-2.5 xl:flex">
+          <div className="hidden shrink-0 items-center gap-1.5 xl:flex 2xl:gap-2">
             <ThemeToggle variant="navbar" />
             <LanguageSwitcher variant="navbar" />
 
@@ -254,14 +267,14 @@ export function Header() {
                 aria-label={t.nav.displayCurrency}
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-                className="cursor-pointer appearance-none rounded-full border border-[#163038]/15 bg-transparent py-1.5 pr-6 pl-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#163038] transition-colors hover:border-[#163038] focus:outline-none"
+                className="cursor-pointer appearance-none rounded-full border border-[#163038]/15 bg-transparent py-1.5 pe-5 ps-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#163038] transition-colors hover:border-[#163038] focus:outline-none"
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
                 <option value="GBP">GBP (£)</option>
                 <option value="TRY">TRY (₺)</option>
               </select>
-              <span className="pointer-events-none absolute right-2.5 text-[8px] text-[#5C6F73]">
+              <span className="pointer-events-none absolute end-2 text-[8px] text-[#5C6F73]">
                 ▼
               </span>
             </div>
@@ -270,10 +283,10 @@ export function Header() {
               to="/properties"
               search={{ savedOnly: true }}
               title={t.nav.viewShortlist}
-              className="relative flex items-center gap-1.5 rounded-full border border-[#163038]/15 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-[#163038] no-underline transition-colors hover:border-[#163038]"
+              className="relative flex items-center gap-1 rounded-full border border-[#163038]/15 px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] whitespace-nowrap text-[#163038] no-underline transition-colors hover:border-[#163038]"
             >
               <Heart
-                className={`h-3.5 w-3.5 ${
+                className={`h-3.5 w-3.5 shrink-0 ${
                   shortlistCount > 0 ? "fill-[#C5A059] text-[#C5A059]" : ""
                 }`}
               />
@@ -286,10 +299,12 @@ export function Header() {
             {ctaConfig.is_visible !== false && (
               <Link
                 to={ctaConfig.href || "/contact"}
-                className="inline-flex items-center gap-2 rounded-full border border-[#163038] bg-[#163038] px-4 py-2 text-[12.5px] font-medium whitespace-nowrap text-white no-underline shadow-xs transition-colors hover:bg-[#10785F]"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#163038] bg-[#163038] px-3.5 py-1.5 text-[12px] font-medium whitespace-nowrap text-white no-underline shadow-xs transition-colors hover:bg-[#10785F]"
               >
                 <span>{ctaConfig.label || t.nav.contact}</span>
-                <span aria-hidden="true">→</span>
+                <span aria-hidden="true" className="rtl:rotate-180">
+                  →
+                </span>
               </Link>
             )}
           </div>
@@ -498,7 +513,10 @@ export function Footer() {
         "/properties": { expected: ["Properties", "Offers & Projects"], value: t.nav.properties },
         "/locations": { expected: ["Locations"], value: t.chrome.navLocations },
         "/citizenship": { expected: ["Citizenship"], value: t.nav.citizenship },
-        "/why-turkiye": { expected: ["Why Türkiye", "Why Turkey"], value: t.nav.whyTurkiye },
+        "/why-turkiye": {
+          expected: ["Why Türkiye", "Why Turkey", "Locations"],
+          value: t.nav.whyTurkiye,
+        },
         "/contact": { expected: ["Contact"], value: t.nav.contact },
         "/calculator": { expected: ["Calculator"], value: t.nav.calculator },
       };
@@ -631,7 +649,7 @@ export function Footer() {
       ref={footerRef}
       data-framer-name="Footer"
       className="relative z-[2] w-full overflow-hidden bg-[#163038] text-white"
-      style={{ fontFamily: '"Inter", sans-serif' }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       {/* Upper Architectural Pre-Footer CTA Band (Image 1 + Sunset Terrace Background Image 2) */}
       <div

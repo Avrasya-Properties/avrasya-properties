@@ -102,7 +102,7 @@ export function RegionShowcase({
       data-regions
       id="regions-showcase"
       className="relative border-y border-[#DEE0DD] bg-[#FAF9F5] py-12 md:py-20"
-      style={{ fontFamily: '"Geist", "Inter", sans-serif' }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <div className="container-site grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-20">
         <div>

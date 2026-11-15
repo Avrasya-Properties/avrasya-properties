@@ -139,8 +139,6 @@ describe("Milestone M3: Authentic 3D Property Experience & Cauldron Layout Compo
       );
       const stage = container.querySelector("[data-3d-stage]");
       expect(stage).toBeInTheDocument();
-      expect(stage?.getAttribute("data-perspective")).toBe("1200px");
-      expect(stage?.className).toContain("[perspective:1200px]");
 
       const volumetricContainer = container.querySelector("[data-3d-volumetric-container]");
       expect(volumetricContainer).toBeInTheDocument();
@@ -258,11 +256,11 @@ describe("Milestone M3: Authentic 3D Property Experience & Cauldron Layout Compo
       }
 
       fireEvent.pointerMove(stage!, { clientX: 300, clientY: 250 });
-      expect(glaze.style.getPropertyValue("--sheen-x")).not.toBe("");
+      expect(glaze.style.getPropertyValue("--sheen-x")).toBe("");
 
       fireEvent.pointerLeave(stage!);
-      expect(glaze.style.getPropertyValue("--sheen-x")).toBe("50%");
-      expect(glaze.style.getPropertyValue("--sheen-y")).toBe("50%");
+      expect(glaze.style.getPropertyValue("--sheen-x")).toBe("");
+      expect(glaze.style.getPropertyValue("--sheen-y")).toBe("");
     });
   });
 

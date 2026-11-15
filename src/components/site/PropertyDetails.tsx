@@ -140,9 +140,9 @@ function PriceBlock({ r }: { r: PropertyRecord }) {
 export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; preview?: boolean }) {
   const waLink = useWhatsAppLink();
   const media = getPropertyMedia(r);
-  const p = priceDisplay(r.price);
-  const contact = useLiveContact();
   const { t, locale, isRtl } = useLanguage();
+  const p = priceDisplay(r.price, t.common);
+  const contact = useLiveContact();
   const [activeImg, setActiveImg] = useState(0);
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [lightbox, setLightbox] = useState(false);
@@ -156,10 +156,8 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
   const usdVal = comparableUsd(r.price);
   const displayPrice =
     currency === "USD" || usdVal === null
-      ? p.main === "Price on request"
-        ? t.common.priceOnRequest
-        : p.main
-      : convertUsdPrice(usdVal, currency);
+      ? p.main
+      : convertUsdPrice(usdVal, currency, t.common.priceOnRequest);
   const settings = useSiteSettings();
   const isCbi = r.details["cbi_verified"] === true;
 
@@ -401,8 +399,8 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                 </span>
               )}
               <span className="rounded-xs border border-border bg-card px-2 py-0.5 text-xs font-medium">
-                {locationText(r)}
-                {neighborhood ? ` · ${neighborhood}` : ""} · {sideText(r)}
+                {locationText(r, t.common)}
+                {neighborhood ? ` · ${neighborhood}` : ""} · {sideText(r, t.common)}
               </span>
               {isCbi ? (
                 <span className="flex items-center gap-1 rounded-xs bg-brass px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
@@ -426,7 +424,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground md:text-base">
               <MapPin className="h-4 w-4 text-brass" />
               <span>
-                {locationText(r)}
+                {locationText(r, t.common)}
                 {neighborhood ? ` (${neighborhood})` : ""}
               </span>
               <span>·</span>
@@ -605,9 +603,9 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
             </h2>
 
             <div className="mt-6 grid gap-x-12 sm:grid-cols-2">
-              <Fact k={t.propertyDetail.district} v={locationText(r)} />
+              <Fact k={t.propertyDetail.district} v={locationText(r, t.common)} />
               {showsSide(r.city, r.side) && (
-                <Fact k={t.propertyDetail.istanbulSide} v={sideText(r)} />
+                <Fact k={t.propertyDetail.istanbulSide} v={sideText(r, t.common)} />
               )}
               <Fact
                 k={t.propertyDetail.listingType}
@@ -1019,7 +1017,7 @@ export function PropertyDetails({ r, preview = false }: { r: PropertyRecord; pre
                     {t.propertiesExtra.detail.locationConnectivityEyebrow}
                   </p>
                   <h2 className="headline text-2xl font-semibold mt-1">
-                    {locationText(r)}
+                    {locationText(r, t.common)}
                     {neighborhood ? ` — ${neighborhood}` : ""}
                   </h2>
                 </div>

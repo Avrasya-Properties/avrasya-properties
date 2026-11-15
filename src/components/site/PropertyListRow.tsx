@@ -20,8 +20,11 @@ export function PropertyListRow({ r }: { r: PropertyRecord }) {
   const { t } = useLanguage();
   const media = getPropertyMedia(r);
   const usd = comparableUsd(r.price);
-  const price = priceDisplay(r.price);
-  const shown = currency !== "USD" && usd != null ? convertUsdPrice(usd, currency) : price.main;
+  const price = priceDisplay(r.price, t.common);
+  const shown =
+    currency !== "USD" && usd != null
+      ? convertUsdPrice(usd, currency, t.common.priceOnRequest)
+      : price.main;
   const src = media.cover?.trim()
     ? media.cover
     : resolvePlaceholderSrc(PLACEHOLDER_IMAGES.aboutArcGallery[0]!);
@@ -50,7 +53,7 @@ export function PropertyListRow({ r }: { r: PropertyRecord }) {
             {r.marketing_title}
           </h3>
           <p className="mt-1 inline-flex items-center gap-1 text-[13px] text-[#5C6F73]">
-            <MapPin className="h-3.5 w-3.5" /> {locationText(r)}
+            <MapPin className="h-3.5 w-3.5" /> {locationText(r, t.common)}
             {areaText(r) ? ` · ${areaText(r)}` : ""}
           </p>
         </div>

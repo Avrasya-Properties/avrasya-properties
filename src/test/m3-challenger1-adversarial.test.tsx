@@ -100,8 +100,6 @@ describe("Milestone M3 Adversarial Challenge Suite (Empirical Challenger 1)", ()
       );
       const stage = container.querySelector("[data-3d-stage]");
       expect(stage).not.toBeNull();
-      expect(stage?.getAttribute("data-perspective")).toBe("1200px");
-      expect(stage?.className).toContain("[perspective:1200px]");
 
       const volumetricContainer = container.querySelector("[data-3d-volumetric-container]");
       expect(volumetricContainer).not.toBeNull();
@@ -228,14 +226,13 @@ describe("Milestone M3 Adversarial Challenge Suite (Empirical Challenger 1)", ()
         toJSON: () => {},
       });
 
-      // Pointer move to right
+      // Scroll-only hero building stage does not mutate specular sheen on pointer movement
       fireEvent.pointerMove(stage, { clientX: 700, clientY: 400 });
-      expect(glaze.style.getPropertyValue("--sheen-x")).not.toBe("");
+      expect(glaze.style.getPropertyValue("--sheen-x")).toBe("");
 
-      // Pointer leave resets to 50%
       fireEvent.pointerLeave(stage);
-      expect(glaze.style.getPropertyValue("--sheen-x")).toBe("50%");
-      expect(glaze.style.getPropertyValue("--sheen-y")).toBe("50%");
+      expect(glaze.style.getPropertyValue("--sheen-x")).toBe("");
+      expect(glaze.style.getPropertyValue("--sheen-y")).toBe("");
     });
   });
 

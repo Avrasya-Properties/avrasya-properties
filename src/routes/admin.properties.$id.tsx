@@ -5,11 +5,12 @@ import { PropertyDetails } from "@/components/site/PropertyDetails";
 import { managedRows, linkUnit } from "@/admin/management";
 import { rawRecord } from "@/admin/remote";
 import { decode, type Row } from "@/admin/mappers";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Check, FolderKanban, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Check, FolderKanban, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
+import { UnsavedChangesDialog } from "@/admin/cms/UnsavedChangesGuard";
 import {
   AVAIL,
   DEMO_ENABLED,
@@ -18,6 +19,7 @@ import {
   can,
   fmtMoney,
   publishIssues,
+  remove,
   upsert,
   useDB,
   useSession,
@@ -54,12 +56,15 @@ const COMMON_AMENITIES = [...DEFAULT_AMENITY_CATALOG];
 
 function Editor() {
   const { id } = Route.useParams();
+  const nav = useNavigate();
   const db = useDB();
   const user = useSession();
   const saved = db.properties.find((p) => p.id === id);
   const [units, setUnits] = useState<Row[]>([]);
   const [projects, setProjects] = useState<Row[]>([]);
   const [unitId, setUnitId] = useState("");
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   useEffect(() => {
     if (DEMO_ENABLED) return;
     void Promise.all([managedRows("physical_units"), managedRows("projects")])
@@ -108,6 +113,21 @@ function Editor() {
       toast.error((e as Error).message);
     }
   };
+  const isDirty = JSON.stringify(d) !== JSON.stringify(saved);
+  const delAllowed = can(user, "delete-inventory");
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await remove("properties", id);
+      toast.success(`Deleted property ${d.ref}`);
+      setConfirmDeleteOpen(false);
+      await nav({ to: "/admin/properties" });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setDeleting(false);
+    }
+  };
   const issues = publishIssues(d, db.properties);
   const regions = db.siteSettings.regions || [];
   const region = regionForCity(d.city, regions);
@@ -144,7 +164,7 @@ function Editor() {
         crumbs={`Inventory / Properties / ${d.ref}`}
         action={
           !ro && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button className={btnGhost} onClick={() => save()}>
                 Save changes
               </button>
@@ -154,7 +174,7 @@ function Editor() {
                   onClick={() =>
                     issues.length
                       ? (setTab("Checks and notes"),
-                        toast.error("Publishing blocked â€” see fix list"))
+                        toast.error("Publishing blocked — see fix list"))
                       : save({ publication: "Published" })
                   }
                 >
@@ -164,6 +184,16 @@ function Editor() {
               {can(user, "publish") && d.publication === "Published" && (
                 <button className={btnGhost} onClick={() => save({ publication: "Draft" })}>
                   Unpublish
+                </button>
+              )}
+              {delAllowed && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteOpen(true)}
+                  className={btnGhost + " text-destructive hover:bg-destructive/10"}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete</span>
                 </button>
               )}
             </div>
@@ -1418,6 +1448,54 @@ function Editor() {
         initialCategory="properties"
         allowedMimes={["image/jpeg", "image/png", "image/webp", "image/svg+xml"]}
       />
+      <UnsavedChangesDialog isDirty={isDirty && !deleting} />
+      {confirmDeleteOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-editor-property-title"
+        >
+          <div className="w-full max-w-md rounded-xl border bg-card p-6 shadow-2xl space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <h3
+                  id="delete-editor-property-title"
+                  className="text-base font-semibold text-foreground"
+                >
+                  Confirm Property Deletion
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                  Are you sure you want to permanently delete{" "}
+                  <strong className="text-foreground">{d.ref}</strong> (
+                  <span className="italic">{d.title}</span>)? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setConfirmDeleteOpen(false)}
+                className={btnGhost}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDelete}
+                className="inline-flex items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete Property"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

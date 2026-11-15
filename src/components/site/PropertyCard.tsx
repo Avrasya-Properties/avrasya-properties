@@ -36,10 +36,12 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
   const saved = isSaved(r.slug);
   const media = getPropertyMedia(r);
   const usdVal = comparableUsd(r.price);
-  const priceObj = priceDisplay(r.price);
+  const priceObj = priceDisplay(r.price, t.common);
 
   const displayPrice =
-    currency !== "USD" && usdVal != null ? convertUsdPrice(usdVal, currency) : priceObj.main;
+    currency !== "USD" && usdVal != null
+      ? convertUsdPrice(usdVal, currency, t.common.priceOnRequest)
+      : priceObj.main;
 
   // PDF Compliance (Page 8): Never label a single property under $400,000 USD as Citizenship Eligible on its own.
   const isCbiVerified = r.details["cbi_verified"] === true;
@@ -63,8 +65,8 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
       ? media.cover
       : resolvePlaceholderSrc(fallbackSlot);
 
-  const locationStr = locationText(r);
-  const sideStr = sideText(r);
+  const locationStr = locationText(r, t.common);
+  const sideStr = sideText(r, t.common);
   const areaStr = areaText(r);
   const typeStr = localizedRecordTypeLabel(r.record_type, t.common, t.propertiesExtra.typeLabels);
 
@@ -97,7 +99,7 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
       data-framer-name="Property"
       className="group relative flex h-[480px] w-full flex-col justify-between overflow-hidden rounded-[24px] border border-[#163038]/15 bg-[#0E2228] shadow-[0_20px_50px_rgba(14,34,40,0.18)] transition-all duration-500 will-change-transform hover:-translate-y-1 hover:border-[#C5A059]/60 hover:shadow-[0_28px_64px_rgba(14,34,40,0.32)] sm:h-[520px]"
       style={{
-        fontFamily: '"Geist", "Inter", sans-serif',
+        fontFamily: "var(--font-sans)",
         transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
       }}
     >
@@ -132,11 +134,6 @@ export function PropertyCard({ r, index }: PropertyCardProps) {
           {qualifiesViaBundle && (
             <span className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[#0E2228]/80 px-2.5 py-1 text-[9.5px] font-medium uppercase leading-none tracking-[0.1em] text-white backdrop-blur-md">
               {t.propertiesExtra.combinableCbi}
-            </span>
-          )}
-          {r.ref && (
-            <span className="rounded-full bg-black/40 px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-white/85 backdrop-blur-md">
-              {r.ref}
             </span>
           )}
         </div>

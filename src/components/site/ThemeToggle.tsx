@@ -154,7 +154,7 @@ export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleP
       aria-label={isDark ? t.chrome.switchToLight : t.chrome.switchToDark}
       title={isDark ? t.chrome.switchToLight : t.chrome.switchToDark}
       className={`group relative inline-flex shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A059] ${
-        isCompact ? "h-10 w-10" : "h-9 px-3 gap-2"
+        isCompact ? "h-10 w-10" : "h-9 w-9"
       } ${
         isDark
           ? "border-[#C5A059]/45 bg-[#12252B] text-[#E5C378] shadow-[0_0_20px_rgba(197,160,89,0.16)] hover:border-[#C5A059] hover:bg-[#173038]"
@@ -224,12 +224,6 @@ export function ThemeToggle({ variant = "navbar", className = "" }: ThemeToggleP
             </g>
           </svg>
         </span>
-
-        {!isCompact && (
-          <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em]">
-            {resolvedTheme === "dark" ? t.chrome.themeDark : t.chrome.themeLight}
-          </span>
-        )}
       </span>
     </button>
   );

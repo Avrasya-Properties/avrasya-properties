@@ -69,7 +69,6 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
                 }`}
               >
                 <span className="flex items-center gap-1.5 truncate">
-                  <span className="text-base select-none">{loc.flag}</span>
                   <span className="truncate">{loc.nativeName}</span>
                 </span>
                 {active && <Check className="h-3 w-3 text-brass shrink-0" />}
@@ -93,8 +92,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
           aria-label={t.chrome.changeLanguage}
           className="group flex items-center gap-1.5 rounded border border-on-dark/20 bg-primary/40 px-2 py-0.5 text-[0.68rem] font-semibold text-on-dark-muted transition-all hover:border-brass/70 hover:bg-primary/80 hover:text-on-dark focus-visible:ring-1 focus-visible:ring-brass"
         >
-          <span className="select-none text-xs">{config.flag}</span>
-          <span className="uppercase tracking-wider font-bold text-on-dark">{config.code}</span>
+          <span className="font-semibold text-on-dark">{config.nativeName}</span>
           <ChevronDown
             className={`h-3 w-3 text-on-dark-muted transition-transform duration-200 group-hover:text-brass ${
               open ? "rotate-180 text-brass" : ""
@@ -128,10 +126,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
                       : "text-white/80 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="text-sm select-none">{loc.flag}</span>
-                    <span className="font-medium">{loc.nativeName}</span>
-                  </span>
+                  <span className="font-medium">{loc.nativeName}</span>
                   {active && <Check className="h-3 w-3 text-brass" />}
                 </button>
               );
@@ -154,7 +149,6 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
           className="flex items-center gap-1.5 rounded border border-white/20 bg-white/5 px-2.5 py-1 text-xs text-on-dark-muted hover:border-brass hover:text-on-dark transition-all"
         >
           <Globe className="h-3.5 w-3.5 text-brass" />
-          <span className="select-none">{config.flag}</span>
           <span className="font-semibold">{config.nativeName}</span>
           <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
@@ -179,10 +173,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
                       : "text-white/70 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <span>{loc.flag}</span>
-                    <span>{loc.nativeName}</span>
-                  </span>
+                  <span>{loc.nativeName}</span>
                   {active && <Check className="h-3.5 w-3.5 text-brass" />}
                 </button>
               );
@@ -203,15 +194,14 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={t.chrome.changeLanguage}
-        className={`group flex items-center gap-2 rounded-xs border border-border bg-card text-xs font-semibold text-foreground transition-colors duration-300 hover:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass ${compact ? "h-11 px-2.5" : "h-10 px-3"}`}
+        className={`group flex items-center gap-1.5 rounded-full border border-border bg-card text-xs font-semibold text-foreground transition-colors duration-300 hover:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass ${compact ? "h-10 px-2.5" : "h-9 px-3"}`}
       >
-        {!compact && <Globe className="h-3.5 w-3.5 text-brass" />}
-        <span className="select-none text-sm">{config.flag}</span>
-        <span className="uppercase tracking-wider font-bold text-foreground text-[0.72rem]">
-          {config.code}
+        {!compact && <Globe className="h-3.5 w-3.5 text-brass shrink-0" />}
+        <span className="font-semibold text-foreground text-[0.75rem] whitespace-nowrap">
+          {config.nativeName}
         </span>
         <ChevronDown
-          className={`h-3 w-3 text-muted-foreground transition-transform duration-200 group-hover:text-foreground ${
+          className={`h-3 w-3 text-muted-foreground transition-transform duration-200 group-hover:text-foreground shrink-0 ${
             open ? "rotate-180 text-brass" : ""
           }`}
         />
@@ -220,7 +210,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
       {open && (
         <div
           role="listbox"
-          className="absolute top-full z-50 mt-2 min-w-[170px] overflow-hidden rounded-xs border border-border bg-card p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-150"
+          className="absolute top-full z-50 mt-2 min-w-[160px] overflow-hidden rounded-xs border border-border bg-card p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.12)] animate-in fade-in zoom-in-95 duration-150"
           style={{ [isRtl ? "left" : "right"]: 0 }}
         >
           <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/50 mb-1">
@@ -243,10 +233,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
                     : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <span className="text-base select-none">{loc.flag}</span>
-                  <span className="text-[0.8rem]">{loc.nativeName}</span>
-                </span>
+                <span className="text-[0.8rem]">{loc.nativeName}</span>
                 {active && <Check className="h-3.5 w-3.5 text-brass" />}
               </button>
             );

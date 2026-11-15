@@ -240,7 +240,7 @@ export function AdminCmsPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-68px)] flex-col bg-background">
+    <div className="flex h-[calc(100vh-60px)] -m-4 md:-m-6 flex-col bg-background">
       {/* Top Action Bar */}
       <div className="flex items-center justify-between border-b px-6 py-3 bg-card shrink-0">
         <div className="flex items-center gap-4">

@@ -417,12 +417,12 @@ export function AdminSettingsPage() {
         ))}
       </div>
       {/* Tabs */}
-      <div className="flex gap-1 overflow-x-auto border-b">
+      <div className="flex flex-wrap gap-1 border-b">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 whitespace-nowrap px-3.5 py-2 text-sm font-medium transition-colors ${
               tab === t
                 ? "border-b-2 border-brass text-brass"
                 : "text-muted-foreground hover:text-foreground"

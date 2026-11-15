@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, Copy, MapPin, Trash2 } from "lucide-react";
+import { AlertTriangle, Copy, MapPin, Star, Trash2 } from "lucide-react";
 import { PageHead, Status, btnGhost, btnPrimary, field } from "@/admin/Shell";
 import {
   AVAIL,
@@ -82,6 +82,25 @@ function Inventory() {
     }
   };
   const editInv = can(user, "edit-inventory");
+  const delInv = can(user, "delete-inventory");
+
+  const toggleFeatured = async (p: Property, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!editInv) return;
+    try {
+      const nextFeatured = !p.featured;
+      await upsert<Property>("properties", {
+        id: p.id,
+        featured: nextFeatured,
+        updatedAt: p.updatedAt,
+      });
+      toast.success(
+        nextFeatured ? `${p.ref} marked as Featured` : `${p.ref} removed from Featured`,
+      );
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
 
   const handleDuplicate = async (source: Property, e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -92,7 +111,7 @@ function Inventory() {
         ...db.properties.map((p) => Number(p.ref.replace(/^AVR-/, ""))).filter(Number.isFinite),
       );
       const nextRef = `AVR-${maxRefNum + 1}`;
-      const nextSlug = `${source.slug || "listing"}-copy`;
+      const nextSlug = `${source.slug || "listing"}-${nextRef.toLowerCase()}`;
       const nextTitle = `${source.title || "Untitled property"} (Copy)`;
 
       const clone: Partial<Property> = {
@@ -208,15 +227,15 @@ function Inventory() {
           </div>
         }
       />
-      <div className="mb-3 flex flex-wrap gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <input
-          className={`${field} max-w-xs`}
+          className={`${field} !w-full sm:!w-64`}
           placeholder="Search title, ref, district"
           defaultValue={s.q}
           onChange={(e) => set({ q: e.target.value || undefined })}
         />
         <select
-          className={`${field} w-40`}
+          className={`${field} !w-full sm:!w-40`}
           value={s.avail ?? ""}
           onChange={(e) => set({ avail: e.target.value || undefined })}
         >
@@ -226,7 +245,7 @@ function Inventory() {
           ))}
         </select>
         <select
-          className={`${field} w-40`}
+          className={`${field} !w-full sm:!w-40`}
           value={s.pub ?? ""}
           onChange={(e) => set({ pub: e.target.value || undefined })}
         >
@@ -236,7 +255,7 @@ function Inventory() {
           ))}
         </select>
         <select
-          className={`${field} w-40`}
+          className={`${field} !w-full sm:!w-48`}
           value={s.sort ?? ""}
           onChange={(e) => set({ sort: e.target.value || undefined })}
         >
@@ -307,6 +326,15 @@ function Inventory() {
                     >
                       <button
                         type="button"
+                        onClick={(e) => toggleFeatured(p, e)}
+                        title={p.featured ? "Remove featured highlight" : "Feature on homepage"}
+                        className={`${btnGhost} !px-2 !py-1 text-xs ${p.featured ? "text-brass" : ""}`}
+                      >
+                        <Star className={`h-3 w-3 ${p.featured ? "fill-current" : ""}`} />
+                        <span>{p.featured ? "Featured" : "Feature"}</span>
+                      </button>
+                      <button
+                        type="button"
                         onClick={(e) => handleDuplicate(p, e)}
                         title="Duplicate property"
                         className={btnGhost + " !px-2 !py-1 text-xs"}
@@ -314,17 +342,20 @@ function Inventory() {
                         <Copy className="h-3 w-3" />
                         <span>Duplicate</span>
                       </button>
-                      <button
-                        type="button"
-                        onClick={(e) => confirmDelete(p, e)}
-                        title="Delete property"
-                        className={
-                          btnGhost + " !px-2 !py-1 text-xs text-destructive hover:bg-destructive/10"
-                        }
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        <span>Delete</span>
-                      </button>
+                      {delInv && (
+                        <button
+                          type="button"
+                          onClick={(e) => confirmDelete(p, e)}
+                          title="Delete property"
+                          className={
+                            btnGhost +
+                            " !px-2 !py-1 text-xs text-destructive hover:bg-destructive/10"
+                          }
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          <span>Delete</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -342,16 +373,16 @@ function Inventory() {
                         onChange={(e) => setSel(e.target.checked ? page.map((p) => p.id) : [])}
                       />
                     </th>
-                    <th></th>
+                    <th className="px-1"></th>
                     <th className="p-2">Reference</th>
-                    <th>Title</th>
-                    <th>District</th>
-                    <th>Layout</th>
-                    <th className="text-right">Price</th>
+                    <th className="px-2">Title</th>
+                    <th className="px-2">District</th>
+                    <th className="px-2">Layout</th>
+                    <th className="px-2 text-right">Price</th>
                     <th className="px-2">Availability</th>
-                    <th>Publication</th>
-                    <th>Agent</th>
-                    <th className="pr-2">Updated</th>
+                    <th className="px-2">Publication</th>
+                    <th className="px-2">Agent</th>
+                    <th className="px-2">Updated</th>
                     <th className="p-2 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -386,12 +417,12 @@ function Inventory() {
                           {p.ref}
                         </Link>
                       </td>
-                      <td className="max-w-56 truncate">
+                      <td className="max-w-52 truncate px-2">
                         {p.title || <i className="text-muted-foreground">Untitled</i>}
                       </td>
-                      <td>{p.district || "—"}</td>
-                      <td>{p.layout ?? "—"}</td>
-                      <td className="text-right tabular-nums">
+                      <td className="px-2">{p.district || "—"}</td>
+                      <td className="max-w-44 truncate px-2">{p.layout ?? "—"}</td>
+                      <td className="px-2 text-right tabular-nums">
                         {p.priceType === "on-request"
                           ? "On request"
                           : `${p.priceType === "from" ? "from " : ""}${fmtMoney(p.amount, p.currency)}`}
@@ -399,14 +430,24 @@ function Inventory() {
                       <td className="px-2">
                         <Status v={p.availability} />
                       </td>
-                      <td>
+                      <td className="px-2">
                         <Status v={p.publication} />
                       </td>
-                      <td className="whitespace-nowrap">{userName(p.agentId)}</td>
-                      <td className="pr-2 text-xs">{fmtDate(p.updatedAt)}</td>
+                      <td className="whitespace-nowrap px-2">{userName(p.agentId)}</td>
+                      <td className="whitespace-nowrap px-2 text-xs">{fmtDate(p.updatedAt)}</td>
                       <td className="p-2 text-right" onClick={(e) => e.stopPropagation()}>
                         {editInv && (
                           <div className="flex items-center justify-end gap-1">
+                            <button
+                              type="button"
+                              onClick={(e) => toggleFeatured(p, e)}
+                              title={
+                                p.featured ? "Remove featured highlight" : "Feature on homepage"
+                              }
+                              className={`rounded p-1 hover:bg-muted ${p.featured ? "text-brass" : "text-muted-foreground hover:text-foreground"}`}
+                            >
+                              <Star className={`h-3.5 w-3.5 ${p.featured ? "fill-current" : ""}`} />
+                            </button>
                             <button
                               type="button"
                               onClick={(e) => handleDuplicate(p, e)}
@@ -415,14 +456,16 @@ function Inventory() {
                             >
                               <Copy className="h-3.5 w-3.5" />
                             </button>
-                            <button
-                              type="button"
-                              onClick={(e) => confirmDelete(p, e)}
-                              title="Delete property"
-                              className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                            {delInv && (
+                              <button
+                                type="button"
+                                onClick={(e) => confirmDelete(p, e)}
+                                title="Delete property"
+                                className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            )}
                           </div>
                         )}
                       </td>
@@ -474,10 +517,10 @@ function Inventory() {
                 ["Price", fmtMoney(panel.amount, panel.currency)],
                 ["Agent", userName(panel.agentId)],
               ].map(([k, v]) => (
-                <>
+                <Fragment key={k}>
                   <dt className="text-muted-foreground">{k}</dt>
                   <dd className="tabular-nums">{v}</dd>
-                </>
+                </Fragment>
               ))}
             </dl>
             <div className="mt-2 flex gap-1">
@@ -502,13 +545,16 @@ function Inventory() {
                     <Copy className="h-3.5 w-3.5" />
                     <span>Duplicate</span>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => confirmDelete(panel)}
-                    className={`${btnGhost} justify-center text-destructive hover:bg-destructive/10`}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  {delInv && (
+                    <button
+                      type="button"
+                      onClick={() => confirmDelete(panel)}
+                      className={`${btnGhost} justify-center text-destructive hover:bg-destructive/10`}
+                      title="Delete property"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>

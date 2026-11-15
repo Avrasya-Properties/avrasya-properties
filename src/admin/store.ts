@@ -89,22 +89,7 @@ export const uploadImage = async (file: File): Promise<string> => {
       reader.readAsDataURL(file);
     });
   }
-  try {
-    return await remote.uploadImage(file);
-  } catch (err) {
-    if (
-      !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-      file.size > 5 * 1024 * 1024
-    ) {
-      throw err;
-    }
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(err);
-      reader.readAsDataURL(file);
-    });
-  }
+  return remote.uploadImage(file);
 };
 export const resetPassword = remote.resetPassword;
 export const changePassword = remote.changePassword;

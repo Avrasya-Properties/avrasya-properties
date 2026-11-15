@@ -107,10 +107,10 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
   const pinSubtitle = featuredProperty
     ? `${featuredProperty.location_label || featuredProperty.city} · ${
         featuredProperty.price?.amount
-          ? `From $${featuredProperty.price.amount.toLocaleString()}`
-          : "From $420,000"
+          ? `$${featuredProperty.price.amount.toLocaleString()}`
+          : t.common.priceOnRequest
       }`
-    : "Beşiktaş, Istanbul · From $420,000";
+    : `Beşiktaş, Istanbul · $420,000`;
 
   const rawHeadline =
     (typeof settings?.websiteDesign?.["heroHeadline"] === "string"
@@ -229,53 +229,8 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
-      // 0. Setup GSAP quickTo functions for smooth 3D tilt tracking
-      if (skylineRef.current) {
-        qRotateXRef.current = gsap.quickTo(skylineRef.current, "rotationX", {
-          duration: 0.75,
-          ease: "power2.out",
-        });
-        qRotateYRef.current = gsap.quickTo(skylineRef.current, "rotationY", {
-          duration: 0.75,
-          ease: "power2.out",
-        });
-        qTranslateZRef.current = gsap.quickTo(skylineRef.current, "z", {
-          duration: 0.75,
-          ease: "power2.out",
-        });
-      }
-
       // 1. Entrance Timeline
       const tl = gsap.timeline({ defaults: { overwrite: "auto" } });
-
-      // Architectural residence ascends with 3D scale and crisp lift
-      if (skylineRef.current) {
-        gsap.set(skylineRef.current, {
-          y: 40,
-          scale: 1,
-          opacity: 0,
-          transformOrigin: "50% 100%",
-        });
-        tl.to(
-          skylineRef.current,
-          {
-            y: 0,
-            scale: 1,
-            duration: 1.6,
-            ease: "power3.out",
-          },
-          0.12,
-        );
-        tl.to(
-          skylineRef.current,
-          {
-            opacity: 1,
-            duration: 1.0,
-            ease: "power2.out",
-          },
-          0.12,
-        );
-      }
 
       // Headline words entrance
       if (headlineRef.current) {
@@ -483,7 +438,7 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
         backgroundColor: "#0B1619",
         background:
           "radial-gradient(ellipse 85% 50% at 50% 0%, rgba(22, 48, 56, 0.55) 0%, #0B1619 75%)",
-        fontFamily: '"Geist", "Inter", sans-serif',
+        fontFamily: "var(--font-sans)",
       }}
     >
       {/* Minimal Architectural Grid Layer in the Outer Frame */}
@@ -497,17 +452,6 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
         <p className="text-[10px] sm:text-[10.5px] font-medium uppercase tracking-[0.22em] text-white/85">
           {t.heroShowcase.topBar}
         </p>
-      </div>
-
-      {/* Right-Edge Decorative Vertical Indicator Pill (Desktop) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-3 top-[310px] z-30 hidden h-[96px] w-[24px] flex-col items-center justify-between rounded-full bg-[#163038]/85 py-2.5 text-white/90 backdrop-blur-md shadow-lg xl:flex"
-      >
-        <span className="h-9 w-[1.5px] rounded-full bg-white/40" />
-        <span className="flex h-4 w-4 items-center justify-center rounded-full border border-[#C5A059]/60 text-[9px] text-[#C5A059]">
-          ✦
-        </span>
       </div>
 
       {/* Inner White Frame (Pristine clean card matching Caldren) */}
@@ -525,39 +469,50 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
             data-framer-name="Headline"
             className="relative z-[2] mx-auto mt-2 max-w-[1120px] px-4 text-center sm:mt-4 sm:px-8 lg:mt-[16px] lg:px-[40px]"
           >
-            <h1 className="text-[36px] font-normal leading-[1.02] tracking-[-0.035em] text-[#163038] sm:text-[62px] sm:leading-[0.98] lg:text-[96px]">
-              {headlineWords.map((word, idx) => (
-                <React.Fragment key={idx}>
-                  <span
-                    data-hero-word
-                    className={`inline-block ${
-                      idx === 1 ? "italic font-normal tracking-[-0.02em] text-[#163038]" : ""
-                    }`}
-                    style={
-                      idx === 1
-                        ? { fontFamily: '"Cormorant Garamond", "Instrument Serif", Georgia, serif' }
-                        : undefined
-                    }
-                  >
-                    {word}
-                  </span>
-                  {idx < headlineWords.length - 1 ? " " : null}
-                  {idx === 1 ? <br /> : null}
-                </React.Fragment>
-              ))}
+            <h1
+              className={`font-normal text-[#163038] ${
+                ["bn", "ar", "fa", "zh"].includes(activeLocale)
+                  ? "text-[32px] leading-[1.28] tracking-normal sm:text-[52px] sm:leading-[1.24] lg:text-[74px]"
+                  : "text-[36px] leading-[1.02] tracking-[-0.035em] sm:text-[62px] sm:leading-[0.98] lg:text-[96px]"
+              }`}
+            >
+              {headlineWords.map((word, idx) => {
+                const useLatinSerifItalic =
+                  idx === 1 && !["bn", "ar", "fa", "zh"].includes(activeLocale);
+                return (
+                  <React.Fragment key={idx}>
+                    <span
+                      data-hero-word
+                      className={`inline-block ${
+                        useLatinSerifItalic
+                          ? "italic font-normal tracking-[-0.02em] text-[#163038]"
+                          : ""
+                      }`}
+                      style={
+                        useLatinSerifItalic
+                          ? {
+                              fontFamily:
+                                '"Cormorant Garamond", "Instrument Serif", Georgia, serif',
+                            }
+                          : undefined
+                      }
+                    >
+                      {word}
+                    </span>
+                    {idx < headlineWords.length - 1 ? " " : null}
+                    {idx === 1 ? <br /> : null}
+                  </React.Fragment>
+                );
+              })}
             </h1>
           </div>
 
-          {/* Interactive Mobile Overview Strip: Subtitle + Explore Properties + Watch Showreel + Featured Pin */}
+          {/* Interactive Mobile Overview Strip: Explore Properties + Watch Showreel + Featured Pin */}
           <div
             ref={mobileCtaRef}
             data-mobile-solitary-cta
             className="relative z-20 mt-3 sm:mt-4 flex flex-col items-center gap-3 px-4 lg:hidden"
           >
-            <p className="m-0 max-w-[330px] text-center text-[12px] sm:text-[13px] font-normal leading-[1.45] text-[#5C6F73]">
-              {heroSubtitle}
-            </p>
-
             <div className="flex flex-wrap items-center justify-center gap-2.5">
               <Link
                 to="/properties"
@@ -681,16 +636,12 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
               <span>{t.heroShowcase.showreelLabel}</span>
             </button>
 
-            {/* 2. Left Column Intro Copy & Desktop Explore Properties Pill */}
+            {/* 2. Left Column Desktop Explore Properties Pill */}
             <div
               ref={introRef}
               data-framer-name="Intro"
               className="flex max-w-[260px] flex-col items-start gap-[18px] text-left lg:absolute lg:top-[335px] lg:left-[48px] xl:left-[80px] 2xl:left-[110px] lg:z-[3]"
             >
-              <p className="text-[13px] font-normal leading-[1.55] text-[#5C6F73]">
-                {heroSubtitle}
-              </p>
-
               <Link
                 to="/properties"
                 className="group inline-flex h-[46px] items-center gap-[14px] rounded-full bg-[#163038] py-[6px] pr-[6px] pl-[20px] text-[13px] font-medium text-white no-underline shadow-md transition-all duration-300 hover:bg-[#10785F] hover:shadow-lg"
@@ -835,19 +786,12 @@ export const CaldrenHeroSection: React.FC<CaldrenHeroSectionProps> = ({
             </div>
           </div>
 
-          {/* Central Grounded Luxury Building Asset — Caldren Scroll Interaction */}
+          {/* Central Grounded Luxury Building Asset — Caldren Scroll Interaction Only */}
           <div
             ref={towerWrapRef}
             data-framer-name="Building Presentation"
             data-3d-stage
-            data-perspective="1200px"
-            className="relative z-[10] m-0 -mt-8 sm:-mt-14 lg:-mt-20 w-full max-w-none overflow-hidden flex items-end justify-center pointer-events-auto select-none [perspective:1200px]"
-            style={{
-              perspective: "1200px",
-              perspectiveOrigin: "50% 100%",
-            }}
-            onPointerMove={handlePointerMove}
-            onPointerLeave={handlePointerLeave}
+            className="relative z-[10] m-0 -mt-8 sm:-mt-14 lg:-mt-20 w-full max-w-none overflow-hidden flex items-end justify-center pointer-events-auto select-none"
           >
             {/* 3D Volumetric Tilting Container with Multi-Plane Depth */}
             <div

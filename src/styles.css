@@ -360,7 +360,12 @@ html.dark main select option {
     outline-offset: 2px;
   }
 
-  /* RTL Support for Arabic and Persian */
+  /* RTL & Script-Specific Typography Support */
+  [dir="rtl"],
+  html[dir="rtl"] {
+    --font-sans: "Cairo", "Vazirmatn", system-ui, sans-serif;
+    --font-display: "Cairo", "Vazirmatn", system-ui, sans-serif;
+  }
   [dir="rtl"],
   html[dir="rtl"] body {
     font-family: "Cairo", "Vazirmatn", var(--font-sans);
@@ -372,7 +377,15 @@ html.dark main select option {
   [dir="rtl"] .display-hero,
   [dir="rtl"] .headline {
     font-family: "Cairo", "Vazirmatn", sans-serif;
-    letter-spacing: 0;
+    letter-spacing: 0 !important;
+    line-height: 1.25;
+  }
+  [dir="rtl"] .eyebrow,
+  [dir="rtl"] [class*="tracking-"] {
+    letter-spacing: 0 !important;
+  }
+  [dir="rtl"] .italic {
+    font-style: normal !important;
   }
   [dir="rtl"] .eyebrow-mark::before {
     margin-right: 0;
@@ -380,6 +393,49 @@ html.dark main select option {
   }
   [dir="rtl"] .rtl-flip {
     transform: scaleX(-1);
+  }
+
+  /* Bangla (bn) Typography: prevent conjunct/matra clipping & broken tracking */
+  html[lang="bn"] {
+    --font-sans: "Noto Sans Bengali", "Hind Siliguri", "Manrope", system-ui, sans-serif;
+    --font-display: "Noto Sans Bengali", "Hind Siliguri", system-ui, sans-serif;
+  }
+  html[lang="bn"] body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+  html[lang="bn"] h1,
+  html[lang="bn"] h2,
+  html[lang="bn"] h3,
+  html[lang="bn"] .display-hero,
+  html[lang="bn"] .headline {
+    font-family: var(--font-display);
+    letter-spacing: 0 !important;
+    line-height: 1.28;
+  }
+  html[lang="bn"] [class*="tracking-"] {
+    letter-spacing: 0 !important;
+  }
+  html[lang="bn"] .italic {
+    font-style: normal !important;
+  }
+
+  /* Chinese (zh) Typography */
+  html[lang="zh"] {
+    --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --font-display: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  html[lang="zh"] h1,
+  html[lang="zh"] h2,
+  html[lang="zh"] h3,
+  html[lang="zh"] .display-hero,
+  html[lang="zh"] .headline {
+    font-family: var(--font-display);
+    letter-spacing: 0 !important;
+    line-height: 1.26;
+  }
+  html[lang="zh"] .italic {
+    font-style: normal !important;
   }
 }
 

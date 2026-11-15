@@ -60,7 +60,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const isRtl = isRtlLocale(l);
       document.documentElement.lang = l;
       document.documentElement.dir = isRtl ? "rtl" : "ltr";
-      // Arabic/Persian faces are only downloaded when an RTL language is actually selected.
+      // Script-specific Google Fonts loaded dynamically when needed
       if (isRtl && !document.getElementById("rtl-fonts")) {
         const link = document.createElement("link");
         link.id = "rtl-fonts";
@@ -69,10 +69,33 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap";
         document.head.appendChild(link);
       }
+      if (l === "bn" && !document.getElementById("bn-fonts")) {
+        const link = document.createElement("link");
+        link.id = "bn-fonts";
+        link.rel = "stylesheet";
+        link.href =
+          "https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap";
+        document.head.appendChild(link);
+      }
+      if (l === "zh" && !document.getElementById("zh-fonts")) {
+        const link = document.createElement("link");
+        link.id = "zh-fonts";
+        link.rel = "stylesheet";
+        link.href =
+          "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap";
+        document.head.appendChild(link);
+      }
       if (isRtl) {
         document.documentElement.classList.add("rtl");
       } else {
         document.documentElement.classList.remove("rtl");
+      }
+      if (typeof window !== "undefined" && !navigator.userAgent.includes("jsdom")) {
+        requestAnimationFrame(() => {
+          void import("gsap/ScrollTrigger")
+            .then(({ ScrollTrigger }) => ScrollTrigger.refresh())
+            .catch(() => {});
+        });
       }
     }
   }, []);

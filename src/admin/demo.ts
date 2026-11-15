@@ -957,7 +957,7 @@ export function logout() {
   listeners.forEach((l) => l());
 }
 
-export type Action = "edit-inventory" | "publish" | "edit-crm" | "admin";
+export type Action = "edit-inventory" | "delete-inventory" | "publish" | "edit-crm" | "admin";
 export function can(u: User | null, action: Action, ownerId?: string): boolean {
   if (!u) return false;
   if (u.role === "admin") return true;
@@ -1157,7 +1157,8 @@ export function remove(coll: Coll, id: string) {
     (x) => x["id"] === id,
   );
   if (!current) throw new Error("Record not found.");
-  assertAccess(coll, current);
+  if (coll === "properties") guard("delete-inventory", ownerOf(coll, current));
+  else assertAccess(coll, current);
   if (coll === "properties") {
     const d = edit();
     d.properties = d.properties.filter((x) => x.id !== id);

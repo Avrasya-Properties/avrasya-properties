@@ -128,14 +128,14 @@ export function CmsLivePreview({
           style={{ fontFamily: '"Geist", "Inter", sans-serif' }}
         >
           {/* Mock Public Top Navbar */}
-          <div className="flex h-14 items-center justify-between border-b border-[#DEE0DD] bg-[#F7F6F2] px-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold tracking-tight text-[#163038]">AVRASYA</span>
-              <span className="text-[10px] uppercase font-semibold text-[#C5A059] tracking-wider">
+          <div className="flex h-12 items-center justify-between gap-2 border-b border-[#DEE0DD] bg-[#F7F6F2] px-4">
+            <div className="flex shrink-0 items-center gap-1.5">
+              <span className="text-xs font-bold tracking-tight text-[#163038]">AVRASYA</span>
+              <span className="text-[9px] uppercase font-semibold text-[#C5A059] tracking-wider">
                 Properties
               </span>
             </div>
-            <div className="hidden sm:flex items-center gap-4 text-xs font-medium text-[#163038]/80">
+            <div className="hidden xl:flex items-center gap-3 text-[11px] font-medium text-[#163038]/80 truncate">
               <span className={page.slug === "home" ? "text-[#C5A059] font-bold" : ""}>Home</span>
               <span className={page.slug === "properties" ? "text-[#C5A059] font-bold" : ""}>
                 Properties
@@ -151,8 +151,8 @@ export function CmsLivePreview({
                 Contact
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-[#163038] px-3 py-1 text-[11px] font-medium text-white">
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="rounded-full bg-[#163038] px-2.5 py-1 text-[10px] font-medium text-white">
                 Consultation
               </span>
             </div>
@@ -182,11 +182,11 @@ export function CmsLivePreview({
                       isActive
                         ? "ring-2 ring-brass ring-inset"
                         : "hover:outline-dashed hover:outline-1 hover:outline-brass/60"
-                    } ${bgImage ? "text-white" : "text-[#163038]"}`}
+                    } ${bgImage ? (c.background_overlay === "light" ? "bg-white text-[#163038]" : "bg-[#163038] text-white") : "text-[#163038]"}`}
                   >
                     {/* Background Image & Overlay */}
                     {bgImage && (
-                      <div className="absolute inset-0 -z-10 overflow-hidden">
+                      <div className="absolute inset-0 z-0 overflow-hidden">
                         <img
                           src={bgImage}
                           alt=""
@@ -204,7 +204,7 @@ export function CmsLivePreview({
                       </div>
                     )}
 
-                    <div className="relative mx-auto max-w-5xl px-6 py-16 sm:px-8">
+                    <div className="relative z-10 mx-auto max-w-5xl px-6 py-16 sm:px-8">
                       {/* Active section indicator badge */}
                       {isActive && (
                         <div className="mb-4 inline-flex items-center gap-1 rounded bg-brass px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary shadow-xs">

@@ -326,7 +326,7 @@ export const BildoraServicesTimeline: React.FC<BildoraServicesTimelineProps> = (
       ref={sectionRef}
       data-framer-name="Values"
       className="relative z-[2] w-full overflow-hidden bg-[#F9F8F5] pt-[36px] pb-[48px] sm:pt-[48px] sm:pb-[64px] lg:pt-[56px] lg:pb-[88px]"
-      style={{ fontFamily: '"Inter", sans-serif' }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <div
         data-framer-name="Container"

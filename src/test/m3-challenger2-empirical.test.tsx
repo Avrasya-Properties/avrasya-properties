@@ -95,7 +95,6 @@ describe("Challenger 2 Empirical Verification: Milestone M3", () => {
       );
       const stage = container.querySelector("[data-3d-stage]");
       expect(stage).not.toBeNull();
-      expect(stage?.getAttribute("data-perspective")).toBe("1200px");
 
       const volumetricContainer = container.querySelector("[data-3d-volumetric-container]");
       expect(volumetricContainer).not.toBeNull();

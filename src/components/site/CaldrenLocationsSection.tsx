@@ -308,7 +308,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
   const displayImageSrc = activeRegion.imageSrc || resolvePlaceholderSrc(fallbackSlot);
 
   const formattedPrice = useMemo(() => {
-    return convertUsdPrice(regionFeaturedProperty.priceUsd, currency);
+    return convertUsdPrice(regionFeaturedProperty.priceUsd, currency, t.common.priceOnRequest);
   }, [regionFeaturedProperty.priceUsd, currency]);
 
   return (
@@ -316,7 +316,7 @@ export const CaldrenLocationsSection: React.FC<CaldrenLocationsSectionProps> = (
       ref={sectionRef}
       data-framer-name="Locations Section"
       className="relative z-[2] w-full overflow-hidden bg-[#F9F8F5] py-16 sm:py-24 lg:py-28"
-      style={{ fontFamily: '"Geist", "Inter", sans-serif' }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <div className="mx-auto w-full max-w-[1312px] px-5 sm:px-8 lg:px-[64px]">
         {/* 1. Header (Reference Image 3: "Four cities, one standard.") */}

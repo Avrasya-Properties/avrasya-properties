@@ -668,7 +668,13 @@ export function remove(coll: Collection, id: string) {
       return;
     }
     const table = TABLES[coll];
-    const { error } = await supabase.from(table).delete().eq("id", id);
+    const { data, error } = await supabase.from(table).delete().eq("id", id).select("id");
     if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error("Property could not be deleted or you do not have manager permission.");
+    }
+    if (coll === "properties") {
+      websiteChanged();
+    }
   });
 }

@@ -120,23 +120,45 @@ const fmt = (n: number, c = "USD") =>
     maximumFractionDigits: 0,
   }).format(n);
 
+export interface PropertyCommonLabels {
+  priceOnRequest?: string;
+  requestCurrentOptions?: string;
+  confirmOfferDetails?: string;
+  packageTotal?: string;
+  sideEurope?: string;
+  sideAsia?: string;
+  sideUnknown?: string;
+}
+
 /** Human price headline + qualifier appropriate to the record's price basis. */
-export function priceDisplay(p: Price): { main: string; note: string } {
+export function priceDisplay(
+  p: Price,
+  common?: PropertyCommonLabels,
+): { main: string; note: string } {
   if (p.basis === "on_request")
-    return { main: "Price on request", note: "Enquire for current options" };
+    return {
+      main: common?.priceOnRequest || "Price on request",
+      note: common?.requestCurrentOptions || "Enquire for current options",
+    };
   if (p.basis === "conflicting_starting_prices")
-    return { main: "Request current options", note: "Two source starting prices on file" };
+    return {
+      main: common?.requestCurrentOptions || "Request current options",
+      note: "Two source starting prices on file",
+    };
   if (p.basis === "scope_unconfirmed")
-    return { main: "Confirm offer details", note: "Flyer amount scope unclear" };
+    return {
+      main: common?.confirmOfferDetails || "Confirm offer details",
+      note: "Flyer amount scope unclear",
+    };
   if (p.basis === "installment_schedule" && p.down_payment_amount)
     return {
       main: `${fmt(p.down_payment_amount, "TRY")} down`,
       note: `TRY schedule · ${p.installment_count} instalments · full price to confirm`,
     };
-  if (p.amount == null) return { main: "Price on request", note: "" };
+  if (p.amount == null) return { main: common?.priceOnRequest || "Price on request", note: "" };
   const c = p.currency ?? "USD";
   const notes: Record<string, string> = {
-    package: "Package total · not a per-unit price",
+    package: common?.packageTotal || "Package total · not a per-unit price",
     cash: "Cash · source-advertised",
     advertised: "Source-advertised",
     special_offer: "Special offer · source-advertised",
@@ -166,11 +188,17 @@ export function areaText(r: PropertyRecord): string {
     .join(" · ");
 }
 
-export const locationText = (r: PropertyRecord) =>
-  r.location_label ? `${r.location_label}, ${r.city}` : "Location to confirm";
+export const locationText = (r: PropertyRecord, common?: PropertyCommonLabels) =>
+  r.location_label
+    ? `${r.location_label}, ${r.city}`
+    : common?.confirmOfferDetails || "Location to confirm";
 
-export const sideText = (r: PropertyRecord) =>
-  r.side === "Europe" ? "European side" : r.side === "Asia" ? "Asian side" : "Side to confirm";
+export const sideText = (r: PropertyRecord, common?: PropertyCommonLabels) =>
+  r.side === "Europe"
+    ? common?.sideEurope || "European side"
+    : r.side === "Asia"
+      ? common?.sideAsia || "Asian side"
+      : common?.sideUnknown || "Side to confirm";
 
 export const LAYOUTS = ["1+1", "2+1", "Duplex"] as const;
 export function matchesLayout(r: PropertyRecord, l: string) {
@@ -200,8 +228,12 @@ export const EXCHANGE_RATES: Record<
   GBP: { symbol: "£", rate: 0.78, prefix: true },
 };
 
-export function convertUsdPrice(usdAmount: number | null, curr: SupportedCurrency): string {
-  if (usdAmount == null) return "Price on request";
+export function convertUsdPrice(
+  usdAmount: number | null,
+  curr: SupportedCurrency,
+  priceOnRequestLabel?: string,
+): string {
+  if (usdAmount == null) return priceOnRequestLabel || "Price on request";
   const { symbol, rate } = EXCHANGE_RATES[curr];
   const converted = Math.round(usdAmount * rate);
   return `${symbol}${converted.toLocaleString("en-US")}`;

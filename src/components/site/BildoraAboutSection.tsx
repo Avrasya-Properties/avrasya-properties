@@ -450,7 +450,7 @@ export const BildoraAboutSection: React.FC<BildoraAboutSectionProps> = ({
       ref={sectionRef}
       data-framer-name="About"
       className="relative z-[2] w-full overflow-hidden bg-[#F9F8F5] pt-[48px] pb-[36px] sm:pt-[64px] sm:pb-[48px] lg:pt-[88px] lg:pb-[60px]"
-      style={{ fontFamily: '"Inter", sans-serif' }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <div
         data-framer-name="Container"

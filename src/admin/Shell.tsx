@@ -84,13 +84,9 @@ function Nav({ onNav }: { onNav?: () => void }) {
   const newInquiriesCount = db.inquiries?.filter((i) => i.status === "New").length ?? 0;
 
   return (
-    <nav className="flex flex-col gap-5 px-3 py-4">
+    <nav className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-3 py-3">
       {NAV.filter(
-        (g) =>
-          g.group !== "Website and team" ||
-          user?.role === "admin" ||
-          user?.role === "manager" ||
-          user?.role === "viewer",
+        (g) => g.group !== "Website and team" || user?.role === "admin" || user?.role === "manager",
       ).map((g) => (
         <div key={g.group}>
           <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-on-dark-muted/70">
@@ -104,7 +100,7 @@ function Nav({ onNav }: { onNav?: () => void }) {
                 key={it.to}
                 to={it.to}
                 onClick={onNav}
-                className={`flex items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors ${active ? "bg-brass/20 text-brass font-medium shadow-[inset_3px_0_0_var(--brass)]" : "text-on-dark-muted hover:bg-white/5 hover:text-on-dark"}`}
+                className={`flex items-center justify-between rounded-md px-2.5 py-1.5 text-sm transition-colors ${active ? "bg-brass/20 text-brass font-medium shadow-[inset_3px_0_0_var(--brass)]" : "text-on-dark-muted hover:bg-white/5 hover:text-on-dark"}`}
               >
                 <div className="flex items-center gap-2.5">
                   <it.icon className={`h-4 w-4 ${active ? "text-brass" : "text-on-dark-muted"}`} />
@@ -224,8 +220,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const unread = notes.filter((n) => !db.readNotes.includes(n.id));
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-ink text-on-dark border-r border-white/10">
-      <div className="flex h-[68px] items-center gap-2.5 px-4 border-b border-white/10">
+    <div className="flex h-full min-h-0 flex-col bg-ink text-on-dark border-r border-white/10">
+      <div className="flex h-[60px] shrink-0 items-center gap-2.5 px-4 border-b border-white/10">
         <img
           src="/images/avrasya-logo-white.svg"
           alt="Avrasya Properties"
@@ -236,7 +232,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </span>
       </div>
       <Nav onNav={() => setOpen(false)} />
-      <div className="mt-auto p-4 border-t border-white/10 text-[11px] text-on-dark-muted/80">
+      <div className="mt-auto shrink-0 border-t border-white/10 p-3 text-[11px] text-on-dark-muted/80">
         <div className="flex items-center gap-1.5 text-xs text-on-dark">
           <ShieldCheck className="h-3.5 w-3.5 text-brass" />
           <span>Avrasya Internal Workspace</span>

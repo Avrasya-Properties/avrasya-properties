@@ -301,8 +301,8 @@ function RegionLanding() {
               </div>
               <span className="shrink-0 text-[15px] font-medium text-[#0e0e0c] tabular-nums">
                 {featuredUsd != null
-                  ? convertUsdPrice(featuredUsd, currency)
-                  : priceDisplay(featuredProp.price).main}
+                  ? convertUsdPrice(featuredUsd, currency, t.common.priceOnRequest)
+                  : priceDisplay(featuredProp.price, t.common).main}
               </span>
             </Link>
           )}

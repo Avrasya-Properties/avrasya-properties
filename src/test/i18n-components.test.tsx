@@ -206,7 +206,11 @@ describe("Customer-facing Full Localization Coverage", () => {
     expect(screen.getByText(tr.aboutPageExtra.heroEyebrow)).toBeInTheDocument();
     expect(screen.getByText(tr.aboutPageExtra.coreValuesHeading)).toBeInTheDocument();
     expect(screen.getByText(tr.propertiesExtra.viewResidence)).toBeInTheDocument();
-    expect(screen.getByText(tr.chrome.themeLight)).toBeInTheDocument();
+    expect(screen.queryByText(tr.chrome.themeLight)).not.toBeInTheDocument();
+    expect(screen.getByTestId("theme-toggle-button")).toHaveAttribute(
+      "aria-label",
+      tr.chrome.switchToDark,
+    );
     expect(screen.queryByText("View Residence")).not.toBeInTheDocument();
     expect(screen.queryByText("The Avrasya Approach.")).not.toBeInTheDocument();
   });
@@ -286,5 +290,49 @@ describe("Customer-facing Full Localization Coverage", () => {
       screen.getByText(ar.propertiesExtra.detail.locationConnectivityEyebrow),
     ).toBeInTheDocument();
     expect(screen.queryByText("Location & Connectivity")).not.toBeInTheDocument();
+  });
+
+  it("enforces hero cleanup, icon-only ThemeToggle, flagless LanguageSwitcher, and PropertyCard without ref", async () => {
+    const { CaldrenHeroSection } = await import("@/components/site/CaldrenHeroSection");
+    const { LanguageSwitcher } = await import("@/components/site/LanguageSwitcher");
+    const { PropertyDetails } = await import("@/components/site/PropertyDetails");
+    const { en } = await import("@/i18n/locales/en");
+    const { bn } = await import("@/i18n/locales/bn");
+
+    const sampleProp = properties.find((p) => p.ref) ?? { ...properties[0]!, ref: "AVR-1031" };
+    const { container } = renderWithProviders(
+      <>
+        <CaldrenHeroSection featuredProperty={sampleProp} />
+        <LanguageSwitcher variant="navbar" />
+        <PropertyCard r={sampleProp} />
+      </>,
+    );
+
+    // Hero subtext & decorative vertical indicator pill removed
+    expect(screen.queryByText(en.heroShowcase.subtitle)).not.toBeInTheDocument();
+    expect(container.querySelector("[data-hero-scroll-pill]")).toBeNull();
+    expect(screen.queryByText("✦")).not.toBeInTheDocument();
+
+    // LanguageSwitcher renders native language name without flag emojis / GB/BD codes
+    expect(screen.queryByText("🇬🇧")).not.toBeInTheDocument();
+    expect(screen.queryByText("🇧🇩")).not.toBeInTheDocument();
+    expect(screen.getByText("English")).toBeInTheDocument();
+
+    // PropertyCard hides ref (e.g., AVR-1031), while PropertyDetails keeps it
+    expect(screen.queryByText(sampleProp.ref!)).not.toBeInTheDocument();
+
+    renderWithProviders(<PropertyDetails r={sampleProp} preview />);
+    expect(screen.getAllByText(new RegExp(sampleProp.ref!)).length).toBeGreaterThan(0);
+
+    // Property helpers localize "Price on request" and "European side" when common is passed
+    const { priceDisplay, sideText, convertUsdPrice } = await import("@/data/properties");
+    expect(
+      priceDisplay(
+        { basis: "on_request", currency: "USD", amount: null, status: "published" },
+        bn.common,
+      ).main,
+    ).toBe(bn.common.priceOnRequest);
+    expect(sideText({ ...sampleProp, side: "Europe" }, bn.common)).toBe(bn.common.sideEurope);
+    expect(convertUsdPrice(null, "USD", bn.common.priceOnRequest)).toBe(bn.common.priceOnRequest);
   });
 });

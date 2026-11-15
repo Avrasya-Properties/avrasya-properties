@@ -371,7 +371,6 @@ describe("Empirical Challenger 1: Milestone 3 (3D WebGL Experiences & Spatial Ar
 
       const stage = container.querySelector("[data-3d-stage]");
       expect(stage).toBeInTheDocument();
-      expect(stage?.getAttribute("data-perspective")).toBe("1200px");
 
       const buildingPlane = container.querySelector('[data-plane="building-asset"]');
       expect(buildingPlane).toBeInTheDocument();
